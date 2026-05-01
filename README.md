@@ -1,27 +1,34 @@
 # Xiaoge Zhang's HEOR Technical Portfolio
 
-This repository serves as a technical showcase for bridging academic econometrics with industrial Health Technology Assessment (HTA) standards. It contains forensic audits of NICE appraisals and advanced RWE causal inference pipelines.
+This repository serves as a professional technical showcase for bridging academic econometrics with industrial Health Technology Assessment (HTA) standards. It is structured as a series of high-fidelity case studies designed for senior consultancy-level review.
 
-## 🛡️ Featured Technical Assets
+---
 
-### 1. Advanced Oncology Modeling (Excel)
-- **Project:** [RRMM 3-State PartSM Model](./Economic_Models/)
-- **Core Challenge:** Resolved survival curve crossovers and implemented conditional hazard-based treatment waning logic.
-- **Key Features:** Automated PSA (1,000 iterations), ONS-linked background mortality, and threshold-analysis dashboard.
+## 📂 Project Directory
 
-### 2. Causal Inference for RWE (R/Stan)
-- **Pipeline:** [IPTW, AIPW, and TMLE Workflow](./RWE_Advanced_Analytics/)
-- **Methodology:** Implemented Double Robust estimation using SuperLearner to mitigate unobserved clinical confounding.
-- **Diagnostics:** Automated Love Plots for covariate balance and Effective Sample Size (ESS) auditing.
+### [00: HTA Methodology & Technical Wiki](./00_HTA_Methodology_Wiki/)
+>
+> **The Foundation**: A curated knowledge base of HTA principles, NICE/SMC/AWMSG guidelines, and technical modeling standards. Focuses on the "how" and "why" behind submission-ready models.
 
-### 3. Evidence Synthesis & NMA
-- **Project:** [NMA/ML-NMR Codebase](./Evidence_Synthesis_Stan/)
-- **Focus:** Bayesian hierarchical models in Stan with non-centered parameterization to ensure MCMC convergence in high-stakes appraisals.
+### [01: Oncology PartSM & Strategic Audit](./01_Oncology_PartSM_Audit/)
+>
+> **The Case Study**: Forensic audit and technical remediation of a 3-state oncology model in RRMM. Includes complex hazard-based treatment waning logic and full PSA validation.
 
-### 4. Strategic HTA Technical Audits
-- **Project:** [Forensic Audit Memo: RRMM PartSM Implementation](./Audit_Memos/)
-- **Focus:** Strategic critique and remediation of manufacturer-submitted economic models. 
-- **Core Insights:** Identified and corrected structural flaws (e.g., subsequent therapy cost misallocation, time-unit errors) and synthesized defensive arguments regarding **Treatment Waning** to ensure NICE submission readiness.
+### [02: RWE Causal Inference Pipeline](./02_RWE_Causal_Inference_Pipeline/)
+>
+> **The Analytics**: An advanced R-based pipeline for real-world evidence. Implements IPTW, AIPW, and TMLE with SuperLearner to eliminate unobserved clinical confounding.
+
+### [03: Bayesian NMA Reconstruction](./03_Bayesian_NMA_Reconstruction/)
+>
+> **The Synthesis**: High-stakes evidence synthesis using Bayesian hierarchical models in Stan. Features non-centered parameterization for robust MCMC convergence.
+
+---
+
+## 🛠️ Tech Stack & Methodologies
+
+- **Economic Modeling**: Excel (VBA/PowerQuery), R (HEEMOD).
+- **Statistics**: R (tidyverse, SuperLearner, MatchIt), Stan.
+- **Standards**: NICE DSU Technical Support Documents, SMC Submission Guidelines.
 
 ---
 **Contact:** [linkedin.com/in/xg-zhang](https://www.linkedin.com/in/xgzhang2026) | [xgzhang.com](http://xgzhang.com)
