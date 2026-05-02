@@ -1,0 +1,4 @@
+"Method","Estimate_RD","Std_Error","LCL_95","UCL_95"
+"Naive (Unadjusted)",0.118,NA,NA,NA
+"IPTW (ATT Weighting)",0.1595,0.0551,0.0515,0.2675
+"TMLE (Targeted Audit)",0.1662,0.0522,0.0639,0.2684
