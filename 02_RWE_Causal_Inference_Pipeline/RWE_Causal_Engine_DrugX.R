@@ -14,9 +14,13 @@
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 # -------------------------------------------------------------------------
-# DIRECTORY SETUP
+# DIRECTORY SETUP (Self-Correcting Path Logic)
 # -------------------------------------------------------------------------
-# Ensure visuals directory exists for GitHub showcase
+#' @audit
+#' Robust path handling: We ensure visuals are always saved to the 02 project folder.
+script_path <- tryCatch(dirname(sys.frame(1)$ofile), error = function(e) ".")
+setwd(script_path)
+
 if (!dir.exists("visuals")) dir.create("visuals")
 
 # -------------------------------------------------------------------------

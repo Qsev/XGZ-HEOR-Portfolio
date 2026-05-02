@@ -1,16 +1,20 @@
-# 🕸️ 03: Bayesian Network Meta-Analysis (NMA) Reconstruction
+# 03_Bayesian_NMA_Reconstruction: ML-NMR Stress Testing
 
-Implementation of advanced evidence synthesis models using Bayesian frameworks to support indirect treatment comparisons (ITC) in high-stakes HTA appraisals.
+> **"In HTA, the absence of head-to-head trials forces us to rely on indirect comparisons. When covariate distributions do not overlap, simple matching fails. The solution is Multilevel Network Meta-Regression (ML-NMR)."**
 
-## 🧬 Model Architecture
-- **Framework**: Bayesian Hierarchical Models (Fixed and Random Effects).
-- **Engine**: `Stan` (via `rstan` or `cmdstanr`) for robust MCMC sampling.
-- **Methodology**: Non-centered parameterization to ensure convergence in sparse networks.
+## 🎯 Project Overview
 
-## 🎯 Key Outputs
-- **Relative Effects**: Odds Ratios (OR), Hazard Ratios (HR), and Probability of being best.
-- **Consistency Checks**: Bucher method and Node-splitting for assessing local and global inconsistency.
-- **Visualizations**: Network plots, Forest plots, and SUCRA curves.
+Because proprietary Individual Patient Data (IPD) from actual submissions (e.g., NICE TA1013) is strictly confidential, I reverse-engineered a **Synthetic Evidence Network** to stress-test the ML-NMR algorithmic architecture.
 
----
-*Focuses on rigorous evidence synthesis for HTA submissions.*
+This module bypasses the "black-box" use of R packages, demonstrating a deep, forensic understanding of how **Bayesian Hierarchical Models (Stan/MCMC)** perform numerical integration to bridge micro-level IPD with macro-level Aggregate Data (AgD).
+
+## 🛠️ Key Technical Audits Performed
+
+1. **The Extrapolation Gap:** Deliberately simulated a network with zero covariate overlap (Age & WBC mismatch) to trigger MCMC divergent transitions, then implemented data-alignment strategies to restore R-hat convergence to 1.00.
+2. **Joint Likelihood Calibration:** Demonstrated how macroscopic summary data (AgD) acts as a structural constraint, anchoring the patient-level regression coefficients ($\beta$) via Sobol sequence integration.
+3. **MCMC Diagnostics:** Bypassed high-level wrapper errors to manually extract and validate trace plots directly from the underlying `rstan` engine.
+
+## 📂 Assets in this Module
+
+- [`Audit_Report_ML_NMR_Convergence.md`](./Audit_Report_ML_NMR_Convergence.md): A step-by-step breakdown of the math, the MCMC failure modes, and the recovery process.
+- [`Synthetic_MLNMR_Pipeline.R`](./Synthetic_MLNMR_Pipeline.R): The R code generating the synthetic DGP and executing the Bayesian evidence synthesis.
