@@ -29,7 +29,7 @@ This repository showcases a **forensic reconstruction** of the ML-NMR framework.
 * **Narrative:** A technical white paper documenting the "Extrapolation Gap" failure and subsequent remediation.
 * **Key Findings:** Demonstrates the reclamation of **80%+ survival value** by adjusting for population-level age penalties.
 
-### 3. Bayesian Foundations: Manual MCMC Sampling 【To be added】
+### 3. Bayesian Foundations: Manual MCMC Sampling
 
 * **Files:** [`Manual_MH_Sampler.R`](./Manual_MH_Sampler.R) | [`MH_Logic_Fundamentals.md`](./Bayesian_Fundamentals_MH_Logic.md)
 * **Purpose:** To demonstrate PhD-level depth, I reverse-engineered a **Metropolis-Hastings (MH)** sampler from scratch in R.
