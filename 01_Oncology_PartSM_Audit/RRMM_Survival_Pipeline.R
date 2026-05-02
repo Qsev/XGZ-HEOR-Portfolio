@@ -15,9 +15,9 @@ library(ggplot2) # For generating high-fidelity audit plots
 library(dplyr) # For clean, pipeable data manipulation
 library(tidyr) # For pivoting and handling long/wide data formats
 
-# 自动检测脚本所在目录，确保输出文件不“迷路”
+# Automatically detect the script's directory to ensure output artifacts are correctly colocated
 get_script_dir <- function() {
-  # 1. 优先尝试探测 Rscript 运行模式下的路径
+  # 1. Attempt to detect the path when running via Rscript command line
   args <- commandArgs(trailingOnly = FALSE)
   file_arg <- "--file="
   match <- grep(file_arg, args)
@@ -25,7 +25,7 @@ get_script_dir <- function() {
     return(dirname(sub(file_arg, "", args[match])))
   }
 
-  # 2. 尝试探测 source() 运行模式 (针对非 RStudio 用户常用的 source 运行方式)
+  # 2. Attempt to detect the path when executed via source() (standard for non-RStudio workflows)
   this_file <- NULL
   try(
     {
@@ -37,7 +37,7 @@ get_script_dir <- function() {
     return(dirname(this_file))
   }
 
-  # 3. 如果以上方式都失效，则默认为当前工作目录 (getwd)
+  # 3. Fallback to the current working directory if all detection methods fail
   return(getwd())
 }
 out_dir <- get_script_dir()
