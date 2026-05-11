@@ -1,0 +1,423 @@
+---
+title: "Technical Guide 03: Survival NMA & Other Data Types"
+author: "Xiaoge Zhang"
+date: "06/05/2026"
+engine: knitr
+format: 
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "View the code"
+    number-sections: True
+---
+
+*Extending NMA to Continuous, Count, and Time-to-Event (Survival) Data*
+
+## 📑 Table of Contents {.unnumbered}
+
+
+1.  [**Bridging the Gap: Continuous and Count Data**](#1-bridging-the-gap)
+2.  [**Executive Summary: The Survival Challenge in HTA**](#2-executive-summary)
+3.  [**Approach 1: Contrast-Based Survival NMA (Hazard Ratios)**](#3-contrast-based)
+4.  [**Approach 2: Arm-Based Parametric Survival NMA (Curve Fitting)**](#4-arm-based)
+5.  [**Connecting to Economic Models (HTA Focus)**](#5-connecting-to-economic)
+
+## Bridging the Gap: Continuous and Count Data {#1-bridging-the-gap}
+
+In our previous guides, we dealt exclusively with **Binomial Data** (responders out of total patients) using a Binomial likelihood and a Logit link. Before diving into Survival NMA, let's briefly map out the likelihoods and link functions for other standard data types. The core Bayesian MCMC engine remains exactly the same; we only swap out the statistical distribution mapping.
+
+### Continuous Data: Change from Baseline (CfB) vs. Final Values
+
+In clinical trials for conditions like hypertension, continuous outcomes are typically reported in two ways:
+
+1. **Change from Baseline (CfB)**: The absolute difference between post-treatment and pre-treatment values (e.g., $-15$ mmHg).
+1. **Final Values**: The absolute value measured at the end of the study (e.g., $120$ mmHg).
+
+In NMA, both are modeled using a **Normal Likelihood** with an **Identity Link**. However, the choice between them impacts the interpretation and requires specific handling of variance.
+
+#### Contrast-Based NMA for Aggregate Data (AD) {.unnumbered}
+When extracting data from publications, we usually obtain the **sample mean** ($y_{jk}$) and its standard error ($se_{jk}$) for each arm $k$ in study $j$.
+
+- **Likelihood**: $y_{jk} \sim \text{Normal}(\theta_{jk}, se_{jk}^2)$
+- **Linear Predictor**: $\theta_{jk} = \mu_j + \delta_{jk}$ (where $\delta_{j1} = 0$)
+
+The effect measure synthesized across the network is the **Mean Difference (MD)**.
+
+#### The "Change from Baseline" Caveat {.unnumbered}
+If some studies report CfB and others report Final Values, they can often be combined in the same NMA because the relative effect (difference between arms) should theoretically be the same. 
+
+However, the variance (SD) of CfB is usually smaller than the SD of Final Values because it removes between-patient baseline variability. If the SD for CfB is missing, it cannot be simply imputed from the Final Value SD without accounting for the baseline-post correlation ($\rho$).
+
+### Rate / Count Data (e.g., Number of Asthma Exacerbations)
+
+In trials for chronic diseases (like asthma or COPD), we often count the number of events (exacerbations) over a period of time. This is modeled using a **Poisson Likelihood** with a **Log Link**.
+
+- **Likelihood**: $r_{jk} \sim \text{Poisson}(\lambda_{jk} \times E_{jk})$
+- **Link Function**: $\log(\lambda_{jk}) = \mu_j + \delta_{jk}$
+
+*(Where $r_{jk}$ is the observed number of events, $E_{jk}$ is the total exposure time (e.g., person-years) in arm $k$ of study $j$, and $\lambda_{jk}$ is the underlying event rate).*
+
+The effect measure synthesized here is the **Rate Ratio (RR)** or **Incidence Rate Ratio (IRR)**.
+
+#### The Overdispersion Problem (Poisson vs. Negative Binomial) {.unnumbered}
+
+A strict assumption of the Poisson distribution is that the **mean equals the variance**. In real clinical trials, patient heterogeneity often causes the variance to exceed the mean, a phenomenon known as **Overdispersion**.
+
+- **The Risk**: If overdispersion is present but ignored in a Poisson model, the standard errors will be underestimated, leading to artificially narrow credible intervals and false claims of statistical significance.
+- **The Solution in NMA**: 
+  1. Upgrade to a **Negative Binomial** likelihood, which adds a dispersion parameter to allow the variance to exceed the mean.
+  2. Or, add a random effect term $\epsilon_{jk}$ to the log-linear predictor to account for the extra-Poisson variation.
+
+```{=html}
+<!-- Audit Point: Intuitive Explanation of Overdispersion
+Why do we care about Overdispersion in Poisson models?
+Imagine we are counting asthma exacerbations in a clinical trial. 
+- If we use a Poisson model and the estimated mean is 5, the model automatically assumes the variance is also 5.
+- In reality, patients are highly heterogeneous. Some may have zero attacks, while others may have many. This individual variability causes the actual variance to be much larger than 5 (e.g., 12). This phenomenon (Variance > Mean) is called Overdispersion.
+- If ignored, the Poisson model assumes the data is much more precise than it actually is. Consequently, the calculated standard errors will be too small, leading to artificially narrow credible intervals and potential false positives (e.g., declaring a treatment significantly effective when it is not).
+- Solutions include upgrading to a Negative Binomial distribution or adding a random effect term to account for the extra variance.
+-->
+```
+
+
+
+
+```{=html}
+<!-- Audit Point: The Physical Meaning of Link Functions
+Why do we need link functions like Logit or Log?
+Think of a link function as a "gearbox" between the linear math engine ($\mu + \delta$) and the real physical world.
+- Probabilities (Binomial) are bounded between 0 and 1. If we use an Identity link, $\mu + \delta$ could easily output 1.5 or -0.2, which is physically impossible. The Logit link squashes the entire real number line $(-\infty, \infty)$ into $(0, 1)$.
+- Counts/Rates (Poisson) cannot be negative. The Log link ensures that even if $\mu + \delta$ is heavily negative, the exponentiated rate $\lambda$ is strictly positive.
+- Continuous Data (Normal) naturally spans $(-\infty, \infty)$, so it uses an Identity link (no gearbox needed).
+-->
+```
+
+## Executive Summary: The Survival Challenge in HTA {#2-executive-summary}
+
+**Time-to-Event Data** (e.g., Overall Survival (OS) or Progression-Free Survival (PFS)) is the lifeblood of Oncology Health Technology Assessment (HTA).
+
+It poses a unique challenge: **Censoring**. We don't know the exact time of death for patients who are still alive at the end of the trial. Furthermore, HTA agencies (like NICE in the UK) require modeling lifetimes (e.g., over a 30-year time horizon), forcing us to extrapolate survival curves far beyond the observed trial data.
+
+There are two primary ways to handle survival data in NMA, depending on the granularity of the available data and the validity of the proportional hazards assumption:
+
+1. **Contrast-Based Approach (Synthesizing Hazard Ratios)**:
+   - **What it means**: This approach focuses on the *relative treatment effect* (the contrast) between trial arms, typically reported as a Hazard Ratio (HR). You extract the reported HR and its 95% Confidence Interval from each study.
+   - **The Logic**: You treat the log-transformed Hazard Ratio ($\log(HR)$) and its standard error as a continuous outcome. The NMA then synthesizes these relative effects across the network using a standard Normal likelihood, just like you would with Mean Differences in continuous data.
+   - **When to use**: When you only have access to published aggregate data (no KM curves) and the Proportional Hazards assumption holds.
+
+2. **Arm-Based Approach (Parametric Curve Fitting)**:
+   - **What it means**: This approach bypasses the reported HRs and models the *absolute survival time* in each treatment arm directly.
+   - **The Logic**: You use algorithms (like Guyot's method) to digitize published Kaplan-Meier curves and reconstruct pseudo-Individual Patient Data (IPD). You then fit full parametric survival distributions (e.g., Weibull, Gompertz, or Fractional Polynomials) to the data. The treatment effect is modeled as a shift in the parameters of these distributions.
+   - **When to use**: When proportional hazards are violated (e.g., crossing KM curves in immunotherapy) and you need full survival curves to extrapolate over a long time horizon for cost-effectiveness models.
+
+## The Minimal Mock Case: Advanced Melanoma
+
+To ground both approaches in a realistic clinical context, we define a shared simulation scenario representative of modern oncology health technology assessments.
+
+- **Disease**: Advanced Melanoma (metastatic or unresectable).
+- **Treatments**:
+  1. **Dacarbazine** (Chemotherapy, the standard of care anchor).
+  2. **Ipilimumab** (CTLA-4 inhibitor, representing early immunotherapy).
+  3. **Nivolumab** (PD-1 inhibitor, representing advanced immunotherapy).
+- **The Evidence Network**: 4 randomized controlled trials (RCTs) forming a connected network:
+  - Study 1: Trt 1 vs. Trt 2
+  - Study 2: Trt 1 vs. Trt 2
+  - Study 3: Trt 1 vs. Trt 3
+  - Study 4: Trt 2 vs. Trt 3
+
+- In **Approach 1**, we assume we only extracted the reported Hazard Ratios from these trials.
+- In **Approach 2**, we assume we used algorithms like Guyot's method to reconstruct the individual patient data (IPD) from the published Kaplan-Meier curves.
+
+---
+
+### Approach 1: Contrast-Based Survival NMA (Hazard Ratios) {#3-contrast-based}
+
+When extracting data from publications, we often only get the reported **Hazard Ratio (HR)** and its 95% Confidence Interval.
+
+Mathematically, a reported $\log(HR)$ and its standard error ($se$) can be treated as **Continuous Data**.
+
+- **Likelihood**: Normal
+- **Link Function**: Identity
+
+Let $y_{jk}$ be the observed $\log(HR)$ of arm $k$ relative to the baseline arm $1$ in study $j$.
+
+$$y_{jk} \sim \text{Normal}(\delta_{jk}, se_{jk}^2)$$
+
+#### The Stan Model {.unnumbered}
+
+We define the model for contrast-based NMA. It is a simple Normal likelihood model.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# STAN Contrast_HR_NMA.stan
+
+``` stan
+data {
+  int<lower=1> NS;
+  real y[NS];
+  real<lower=0> se[NS];
+  int t1[NS];
+  int t2[NS];
+}
+parameters {
+  real d[3]; // 3 treatments
+}
+model {
+  d[1] ~ normal(0, 0.001); // Reference
+  d[2] ~ normal(0, 5);
+  d[3] ~ normal(0, 5);
+  
+  for (i in 1:NS) {
+    y[i] ~ normal(d[t2[i]] - d[t1[i]], se[i]);
+  }
+}
+```
+:::
+
+#### Simulation and Execution in R {.unnumbered}
+
+
+Here we provide a full working example. We assume all studies are 2-arm trials for simplicity. The observed data is the $\log(HR)$ and its standard error.
+
+::: {.callout-note collapse="true"}
+## Click to view R Simulation and Stan Execution
+
+```{r}
+#| label: contrast-based-nma
+#| message: false
+#| warning: false
+#| cache: true
+library(rstan)
+
+# Simulate Contrast-Based Data (Log Hazard Ratios)
+set.seed(42)
+# We assume 4 studies comparing 3 treatments
+# True effects relative to trt 1: d[2] = -0.3, d[3] = -0.55
+contrast_data <- list(
+    NS = 4,
+    y = c(-0.25, -0.35, -0.55, -0.25), # observed log(HR)
+    se = c(0.1, 0.12, 0.15, 0.1), # standard errors
+    t1 = c(1, 1, 1, 2), # treatment 1 (reference)
+    t2 = c(2, 2, 3, 3) # treatment 2
+)
+
+# Run Stan
+fit_contrast <- stan(
+    file = "Contrast_HR_NMA.stan",
+    data = contrast_data,
+    chains = 3,
+    iter = 2000,
+    warmup = 1000,
+    refresh = 0
+)
+
+# Print results
+print(fit_contrast, pars = "d")
+```
+:::
+
+Based on the Contrast-Based NMA (Approach 1), the estimated Hazard Ratios (Median) relative to Treatment 1 are:
+
+- **Treatment 2 vs 1**: `r round(exp(median(as.matrix(fit_contrast)[, "d[2]"])), 2)`
+- **Treatment 3 vs 1**: `r round(exp(median(as.matrix(fit_contrast)[, "d[3]"])), 2)`
+
+
+
+```{=html}
+<!-- Audit Point: The Fatal Flaw of the HR approach (Proportional Hazards)
+Treating log(HR) as a single number relies on the strict assumption of Proportional Hazards (PH). 
+Physical analogy: Imagine two runners. PH assumes Runner A is *always* exactly 1.5 times faster than Runner B, from the start line to the marathon finish. 
+In modern immuno-oncology, survival curves often cross. A treatment might perform worse initially (due to toxicity) but offer long-term durable survival (the "tail plateau"). If curves cross, the hazard ratio is no longer constant over time. Synthesizing a single HR across trials under these conditions violates the PH assumption, and NICE will routinely reject models that rely on a single HR when PH is violated.
+-->
+```
+
+### Approach 2: Arm-Based Parametric Survival NMA (Weibull) {#4-arm-based}
+
+
+To demonstrate a highly complete implementation, we will build a **Weibull Parametric Survival NMA** using simulated Individual Patient Data (IPD). This approach allows us to model the full survival curve, which is the gold standard for NICE submissions when proportional hazards are questioned.
+
+
+#### The Stan Model {.unnumbered}
+
+We define the log-likelihood for the Weibull distribution manually to handle right-censoring.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# STAN Weibull_Survival_NMA.stan
+
+``` stan
+data {
+  int<lower=1> N;       // Total number of patients
+  int<lower=1> NS;      // Number of studies
+  int<lower=1> NT;      // Number of treatments
+  real time[N];         // Time to event or censoring
+  int event[N];        // 1 if event, 0 if censored
+  int study[N];        // Study index
+  int treatment[N];    // Treatment index
+}
+
+parameters {
+  real mu[NS];          // Study baselines for log-scale
+  real d[NT];           // Relative treatment effects
+  real<lower=0> shape; // Common shape parameter
+}
+
+transformed parameters {
+  real log_scale[N];
+  for (i in 1:N) {
+    log_scale[i] = mu[study[i]] + d[treatment[i]];
+  }
+}
+
+model {
+  // Priors
+  mu ~ normal(0, 5);
+  d[1] ~ normal(0, 0.001); // Fix reference to 0
+  d[2] ~ normal(0, 5);
+  d[3] ~ normal(0, 5);
+  shape ~ exponential(1);
+
+  // Likelihood for Weibull Survival
+  for (i in 1:N) {
+    real lambda = exp(log_scale[i]); # <1>
+    if (event[i] == 1) {
+      // Event: PDF = hazard * survival
+      target += log_scale[i] + log(shape) + (shape - 1) * log(time[i]) - lambda * pow(time[i], shape); # <2>
+    } else {
+      // Censored: Survival
+      target += - lambda * pow(time[i], shape); # <3>
+    }
+  }
+}
+```
+
+1. **Lambda calculation**: We exponentiate the `log_scale` to get the scale parameter $\lambda$ for the Weibull hazard.
+2. **Log-PDF for Events**: When an event occurs, the likelihood contribution is the Probability Density Function (PDF), which is $f(t) = h(t)S(t)$. In log-scale, this is $\ln(h(t)) + \ln(S(t))$. The first part is the log-hazard, and the second part (`- lambda * pow(time[i], shape)`) is the log-survival.
+3. **Log-Survival for Censored**: When data is censored, we only know the patient survived up to time $t$. So the likelihood contribution is just the Survival Function $S(t)$. In log-scale, this is $\ln(S(t)) = -\lambda t^\gamma$.
+:::
+
+```{=html}
+<!-- Audit Point: Why Manual Likelihood and `target +=` in Stan?
+1. What is `target`? In Stan, `target` is a special built-in variable representing the total log-posterior probability density. The standard `~` notation (e.g., `x ~ normal(mu, sigma)`) is actually syntactic sugar for `target += normal_lpdf(x | mu, sigma)`.
+2. Why use it here? Stan's built-in `weibull` distribution does not support automated censoring out of the box. To handle censoring, we must split the likelihood: adding the log-PDF for events and the log-Survival for censored observations. Since no built-in function handles this automatically, we must write the formulas manually and use `target +=` to inject them directly into the total log-probability.
+-->
+```
+
+#### Simulation and Execution in R {.unnumbered}
+
+We simulate the IPD and run the Stan model.
+
+::: {.callout-note collapse="true"}
+## Click to view R Simulation and Stan Execution
+
+```{r}
+#| message: false
+#| warning: false
+#| cache: true
+library(rstan)
+set.seed(42)
+
+# Simulate IPD for 4 studies using a vectorized approach (Idiomatic R)
+n_per_arm <- 50
+
+# 1. Define the study designs in a clean data frame
+study_designs <- data.frame(
+    study = c(1, 2, 3, 4),
+    t1 = c(1, 1, 1, 2),
+    t2 = c(2, 2, 3, 3),
+    b1 = c(0.1, 0.12, 0.1, 0.05), # Hazard scale (lambda) for Arm 1
+    b2 = c(0.05, 0.06, 0.02, 0.02) # Hazard scale (lambda) for Arm 2
+)
+
+# 2. Expand to a patient-level data frame
+# Arm 1 for all studies
+arm1_df <- data.frame(
+    study = rep(study_designs$study, each = n_per_arm),
+    treatment = rep(study_designs$t1, each = n_per_arm),
+    lambda = rep(study_designs$b1, each = n_per_arm)
+)
+# Arm 2 for all studies
+arm2_df <- data.frame(
+    study = rep(study_designs$study, each = n_per_arm),
+    treatment = rep(study_designs$t2, each = n_per_arm),
+    lambda = rep(study_designs$b2, each = n_per_arm)
+)
+# Combine and sort by study to maintain grouping
+ipd_df <- rbind(arm1_df, arm2_df)
+ipd_df <- ipd_df[order(ipd_df$study), ] # <1>
+
+# 3. Generate Weibull survival times
+ipd_df$time <- rweibull( # <2>
+    n = nrow(ipd_df),
+    shape = 1.2,
+    scale = (1 / ipd_df$lambda)^(1 / 1.2)
+)
+
+# 4. Add administrative censoring at 24 months
+ipd_df$event <- as.integer(ipd_df$time < 24) # <3>
+ipd_df$time[ipd_df$time > 24] <- 24
+
+# Extract vectors for Stan data list
+times <- ipd_df$time
+events <- ipd_df$event
+study_vec <- ipd_df$study
+treatment_vec <- ipd_df$treatment
+
+stan_data <- list(
+    N = length(times),
+    NS = 4,
+    NT = 3,
+    time = times,
+    event = events,
+    study = study_vec,
+    treatment = treatment_vec
+)
+
+# Run Stan
+fit_surv <- stan(
+    file = "Weibull_Survival_NMA.stan",
+    data = stan_data,
+    chains = 3,
+    iter = 2000,
+    warmup = 1000,
+    refresh = 0
+)
+
+print(fit_surv, pars = c("d", "shape"))
+```
+1. **Sorting to maintain grouping**: We combine the two arms and sort by study ID. This ensures the data is ordered as Study 1 Arm 1, Study 1 Arm 2, Study 2 Arm 1, etc., matching the structure of standard IPD datasets.
+2. **Vectorized data generation**: R's `rweibull` is vectorized over its parameters. By passing the entire lambda vector, we generate all 400 survival times in a single call, avoiding slow for-loops.
+3. **Administrative Censoring**: Patients who do not experience the event before 24 months are censored (event = 0), and their observed time is set to the maximum follow-up of 24 months.
+:::
+
+Based on the Arm-Based Parametric NMA (Approach 2), the estimated Hazard Ratios (Median) relative to Treatment 1 are:
+
+- **Treatment 2 vs 1**: `r round(exp(median(as.matrix(fit_surv)[, "d[2]"])), 2)`
+- **Treatment 3 vs 1**: `r round(exp(median(as.matrix(fit_surv)[, "d[3]"])), 2)`
+
+## Connecting to Economic Models (HTA Focus) {#5-connecting-to-economic}
+
+Why do we go through the pain of curve fitting? Because Cost-Effectiveness Models (CEMs) require the **extrapolation of survival time over a lifetime horizon** to calculate mean time spent in each health state.
+
+### Partitioned Survival Models (PSM) {.unnumbered}
+
+In a 3-state PSM (Progression-Free, Progressed Disease, Dead), the health states are driven directly by two survival curves: 
+
+- **PFS Curve**: Defines the proportion of patients in the "Progression-Free" state. 
+- **OS Curve**: Defines the proportion of patients alive. 
+- **Progressed Disease State**: Calculated as the area between the OS and PFS curves.
+
+By running a Parametric Survival NMA, we extract the posterior distributions of the curve parameters (e.g., Weibull scale and shape). We then plug these parameters into the PSM in Excel or R to calculate Quality-Adjusted Life Years (QALYs) over a lifetime horizon.
+
+```{=html}
+<!-- Audit Point: Transition Probabilities (Markov Models)
+If using a Markov Model instead of a PSM, the survival parameters can be mathematically transformed into time-dependent transition probabilities. 
+For example, the probability of dying in cycle $t$ is calculated from the cumulative hazard $H(t)$:
+$P(\text{event between } t_1 \text{ and } t_2) = 1 - \exp(-(H(t_2) - H(t_1)))$
+This precise linkage between Bayesian Evidence Synthesis and Health Economics is exactly what distinguishes a senior HEOR statistician from a general biostatistician.
+-->
+```
+
+------------------------------------------------------------------------
+
+**Guide Authored by**: Antigravity (Advanced Agentic Coding)

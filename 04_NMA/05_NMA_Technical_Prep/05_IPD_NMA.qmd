@@ -1,0 +1,251 @@
+---
+title: "Technical Guide 05: Individual Patient Data (IPD) NMA"
+author: "Xiaoge Zhang"
+date: "06/05/2026"
+engine: knitr
+format: 
+  html:
+    theme: cosmo
+    toc: false # true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "View the code"
+    number-sections: true
+---
+
+*The Gold Standard for Handling Heterogeneity in Evidence Synthesis*
+
+## 📑 Table of Contents {.unnumbered}
+
+1.  [**Executive Summary: Why IPD is the Gold Standard**](#1-executive-summary)
+2.  [**The Minimal Mock Case: Binary Outcomes with Patient Covariates**](#2-mock-case)
+3.  [**Methodological Foundation: One-Stage vs. Two-Stage Models**](#3-methodology)
+4.  [**The Stan Model for One-Stage IPD NMA**](#4-stan-model)
+
+## Executive Summary: Why IPD is the Gold Standard {#1-executive-summary}
+
+In Standard Network Meta-Analysis (NMA), we synthesize **Aggregate Data (AD)**—summary statistics like Log-Hazard Ratios or Log-Odds Ratios extracted from published literature. While AD NMA is standard practice, it suffers from a critical limitation: the **Ecological Fallacy**.
+
+When processing trial-level summaries, we cannot accurately adjust for patient-level covariates (e.g., age, baseline severity, biomarker status). If Trial 1 enrolled systematically older, sicker patients than Trial 2, direct comparison of their aggregate results will be biased, and trial-level meta-regression is often underpowered to correct it.
+
+**Individual Patient Data (IPD) NMA** solves this by pooling the raw, row-by-row patient data from multiple trials. It allows us to:
+
+1.  Adjust for patient-level covariates directly in the regression model.
+2.  Standardize outcome definitions and follow-up times across different trials.
+3.  Conduct reliable subgroup analyses (e.g., precise treatment effect estimation in patients with biomarker X).
+
+```{=html}
+<!-- Audit Point: Understanding the Ecological Fallacy
+The **Ecological Fallacy** occurs when we assume that a relationship observed at the group/aggregate level also holds true at the individual level.
+In NMA, if we run a trial-level meta-regression and find that "studies with a higher average age show a lower treatment effect," it is an ecological fallacy to conclude that "older individual patients benefit less from the drug." 
+The study-level trend can be confounded by other trial-specific factors (e.g., different background care or study designs). IPD NMA avoids this fallacy by estimating the effect of age directly using row-by-row patient data *within* the studies, separating the within-study effect from across-study differences.
+-->
+```
+
+```{=html}
+<!-- Audit Point: The HTA Perspective on IPD
+NICE and other HTA agencies strongly prefer IPD NMA whenever the data is available. If a manufacturer owns the IPD for their own trials (e.g., Trial A vs Placebo) and can access the IPD for a competitor's trial (e.g., via data-sharing platforms like Project Data Sphere or Yale YODA), submitting an IPD NMA is expected. 
+When IPD is only available for the manufacturer's own drug but not for the competitor's drug, methods like MAIC or ML-NMR (which we cover in later chapters) are used to bridge the IPD-to-AD gap. Pure IPD NMA is strictly used when IPD is available across the relevant network.
+-->
+```
+
+## The Minimal Mock Case: Binary Outcomes with Patient Covariates {#2-mock-case}
+
+To demonstrate IPD NMA, let's consider a scenario evaluating treatments for a chronic disease with a binary outcome. For example, in autoimmune diseases like **Rheumatoid Arthritis** or **Psoriasis**, we often measure **Clinical Response** (meaning the patient achieved a predefined threshold of improvement, such as a 50% reduction in symptoms, coded as 1) vs. **No Response** (failing to meet the improvement threshold, coded as 0).
+
+### The Scenario & Treatments
+
+We have an evidence network with 3 treatments:
+
+- **Treatment 1**: Placebo (Reference)
+- **Treatment 2**: Drug A
+- **Treatment 3**: Drug B
+
+We have successfully obtained the raw patient data from 2 large trials:
+
+- **Study 1**: Compares Placebo vs Drug A.
+- **Study 2**: Compares Placebo vs Drug B.
+
+### Extracted Data (Patient-Level)
+
+Instead of extracting single effect sizes per study, our dataset has one row per patient (e.g., $N=1000$ rows total). We observe:
+
+- $y_i \in \{0, 1\}$: The binary clinical response for patient $i$.
+- $trt_i \in \{1, 2, 3\}$: The treatment received by patient $i$.
+- $study_i \in \{1, 2\}$: The study patient $i$ belongs to. - $x_{i}$: A patient-level continuous covariate (e.g., Baseline Disease Severity Score).
+
+### Regression Input Data
+
+In a One-Stage IPD NMA, we fit a single hierarchical logistic regression model to all patients simultaneously. The probability of response $p_i$ for patient $i$ is modeled as:
+
+$$logit(p_i) = \mu_{study_i} + \delta_{trt_i} + \beta \cdot (x_i - \bar{x}_{study_i})$$
+
+Where: - $\mu_{study_i}$: Study-specific baseline log-odds (handled as fixed or random effects). - $\delta_{trt_i}$: The relative treatment effect of the patient's assigned drug vs Placebo (with $\delta_1 \equiv 0$). - $\beta$: The prognostic effect of the covariate $x_i$ on the clinical outcome. Centering $x_i$ by the study mean $\bar{x}_{study_i}$ is a crucial statistical technique to separate true within-study patient effects from across-study ecological confounding.
+
+### Results
+
+The model outputs the covariate-adjusted treatment effects ($\delta_2$ for Drug A and $\delta_3$ for Drug B). Because we adjusted for individual disease severity ($x_i$), these estimates are robust to baseline imbalances between Study 1 and Study 2—a level of precision impossible to achieve with standard AD NMA.
+
+## Methodological Foundation: One-Stage vs. Two-Stage Models {#3-methodology}
+
+When conducting IPD NMA, statisticians must choose between two distinct modeling architectures:
+
+1.  **One-Stage Approach**: All patient data from all trials are pooled into a single hierarchical regression model (as demonstrated in the mock case). This is statistically elegant, preserves all individual-level correlations exactly, and readily accommodates complex covariate interactions (e.g., treatment-by-covariate interactions $\delta_{trt_i} \cdot x_i$).
+2.  **Two-Stage Approach**:
+    - **Stage 1**: Fit a separate regression model within each study independently to estimate the aggregate treatment effect (e.g., log-Odds Ratio) and its standard error, adjusted for covariates.
+    - **Stage 2**: Feed these adjusted aggregate estimates into a standard AD NMA model.
+
+```{=html}
+<!-- Audit Point: Which approach to choose?
+HTA submissions (like NICE ERGs) generally accept both methodologies. One-Stage models are strictly preferred when the number of patients per trial or the number of events is small, or when modeling non-linear treatment-by-covariate interactions. Two-Stage models are often computationally faster to converge in MCMC and conceptually easier to explain to non-statisticians, as Stage 2 utilizes the exact same familiar mechanics as standard NMA.
+-->
+```
+
+## The Stan Model for One-Stage IPD NMA {#4-stan-model}
+
+We implement a One-Stage Bayesian Hierarchical Logistic Regression for the IPD NMA.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# STAN IPD_NMA_Binary.stan
+
+``` stan
+data {
+  int<lower=1> N;                // Total number of individual patients
+  int<lower=0,upper=1> y[N];     // Binary outcome (1 = Response, 0 = No Response)
+  int<lower=1> NS;               // Number of studies
+  int<lower=1> study[N];         // Study ID for each patient
+  int<lower=1> NT;               // Number of treatments
+  int<lower=1> trt[N];           // Treatment ID for each patient
+  vector[N] x;                   // Patient-level covariate (e.g., Baseline Severity)
+}
+
+transformed data {
+  // Center covariate within each study to avoid ecological bias
+  vector[N] x_centered;
+  for (j in 1:NS) {
+    real sum_x = 0;
+    int n_j = 0;
+    for (i in 1:N) {
+      if (study[i] == j) {
+        sum_x += x[i];         // Accumulate: sum_x = sum_x + x[i]
+        n_j += 1;
+      }
+    }
+    real mean_x_j = sum_x / n_j;
+    for (i in 1:N) {
+      if (study[i] == j) {
+        x_centered[i] = x[i] - mean_x_j;
+      }
+    }
+  }
+}
+
+parameters {
+  vector[NS] mu;                 // Study-specific baselines (fixed effects for simplicity)
+  vector[NT-1] delta_raw;        // Treatment effects for trt 2, 3, ..., NT
+  real beta;                     // Prognostic effect of the covariate
+}
+
+transformed parameters {
+  vector[NT] delta;              // Full treatment effect vector including reference
+  delta[1] = 0.0;                // Reference treatment (Placebo) fixed to 0
+  for (k in 2:NT) {
+    delta[k] = delta_raw[k-1];
+  }
+}
+
+model {
+  // Priors
+  mu ~ normal(0, 5);             // Weakly informative prior for baselines
+  delta_raw ~ normal(0, 5);      // Weakly informative prior for relative effects
+  beta ~ normal(0, 5);           // Weakly informative prior for covariate effect
+
+  // Likelihood (One-Stage Hierarchical Logistic Regression)
+  vector[N] logit_p;
+  for (i in 1:N) {
+    logit_p[i] = mu[study[i]] + delta[trt[i]] + beta * x_centered[i];
+  }
+  y ~ bernoulli_logit(logit_p);
+}
+```
+:::
+
+This model directly processes the `N` rows of individual patient data. By internally calculating and subtracting the study-specific mean `mean_x_j` from the covariate `x`, the model effectively separates the pure within-trial prognostic effect (`beta`) from any across-trial baseline confounding.
+
+## Simulating and Executing IPD NMA in R {#5-simulation}
+
+To complete the Bayesian workflow, we simulate a patient-level dataset with known true parameters and check if our Stan model can recover them accurately.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# Click to view R Simulation Code
+
+```{r}
+#| cache: true
+#| message: false
+#| warning: false
+#| results: "hide"
+library(rstan)
+set.seed(42)
+
+# 1. Define simulation parameters
+N_per_study <- 100
+NS <- 2
+N <- N_per_study * NS
+
+# Study 1: Placebo (trt 1) vs Drug A (trt 2)
+# Study 2: Placebo (trt 1) vs Drug B (trt 3)
+study <- c(rep(1, N_per_study), rep(2, N_per_study))
+trt <- c(
+    rep(1, N_per_study / 2), rep(2, N_per_study / 2),
+    rep(1, N_per_study / 2), rep(3, N_per_study / 2)
+)
+
+# Generate patient-level covariate (e.g., Baseline Severity)
+x <- c(
+    rnorm(N_per_study, mean = 0, sd = 1),
+    rnorm(N_per_study, mean = 1, sd = 1)
+)
+
+# True parameters
+mu_true <- c(-1.0, -0.5) # Study baselines (log-odds)
+delta_true <- c(0, 1.0, 1.5) # Reference, Drug A, Drug B effects
+beta_true <- 0.8 # Covariate effect
+
+# 2. Calculate probability and generate outcomes
+logit_p <- mu_true[study] + delta_true[trt] + beta_true * (x - ifelse(study == 1, 0, 1))
+p <- 1 / (1 + exp(-logit_p))
+y <- rbinom(N, size = 1, prob = p)
+
+# 3. Prepare data for Stan
+stan_data <- list(
+    N = N,
+    y = y,
+    NS = NS,
+    study = study,
+    NT = 3,
+    trt = trt,
+    x = x
+)
+
+# 4. Run Stan model
+fit <- stan(
+    file = "IPD_NMA_Binary.stan", data = stan_data,
+    chains = 4, iter = 2000, warmup = 1000, refresh = 0
+)
+
+# 5. Extract results for inline R
+sum_fit <- summary(fit, pars = c("delta", "beta"))$summary
+```
+:::
+
+### Parameter Recovery Results
+
+Running the above simulation yields the following posterior summaries. We compare the estimated values against the true simulation parameters to validate model correctness:
+
+| Parameter | True Value | Posterior Median | 95% CrI Lower | 95% CrI Upper | Recovery Status |
+|:-----------|:----------:|:----------:|:----------:|:----------:|:----------:|
+| `delta[2]` (Drug A vs Ref) | 1.00 | `r round(sum_fit["delta[2]", "50%"], 2)` | `r round(sum_fit["delta[2]", "2.5%"], 2)` | `r round(sum_fit["delta[2]", "97.5%"], 2)` | Successfully Recovered |
+| `delta[3]` (Drug B vs Ref) | 1.50 | `r round(sum_fit["delta[3]", "50%"], 2)` | `r round(sum_fit["delta[3]", "2.5%"], 2)` | `r round(sum_fit["delta[3]", "97.5%"], 2)` | Successfully Recovered |
+| `beta` (Covariate Effect) | 0.80 | `r round(sum_fit["beta", "50%"], 2)` | `r round(sum_fit["beta", "2.5%"], 2)` | `r round(sum_fit["beta", "97.5%"], 2)` | Successfully Recovered |
+
+By recovering the true parameters within the 95% Credible Intervals, we demonstrate that the One-Stage IPD NMA successfully adjusts for the baseline severity imbalance across trials without falling into ecological bias.

@@ -1,0 +1,761 @@
+---
+title: "Technical Guide 02: Network Meta-Regression (NMR) & Random Effects"
+author: "Xiaoge Zhang"
+date: 06/05/2026
+engine: knitr
+format: 
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "View the code"
+    number-sections: false
+---
+
+*Handling Heterogeneity and Ecological Bias with Aggregate Data (AD)*
+
+## 📑 Table of Contents
+
+1.  [**Executive Summary: The Heterogeneity Problem**](#1-executive-summary)
+2.  [**Theoretical Framework: RE & NMR**](#2-theoretical-framework)
+3.  [**The Mock Case: Severe Plaque Psoriasis**](#3-the-mock-case)
+4.  [**MCMC Forensic Audit: JAGS & Stan Implementation**](#4-mcmc-forensic-audit)
+5.  [**Results & Interpretation: Covariate Adjustment**](#5-results)
+6.  [**Strategic Q&A: The Limits of AD NMR**](#6-strategic-qa)
+
+## 1. Executive Summary: The Heterogeneity Problem {#1-executive-summary}
+
+In the previous guide, we used a **Fixed Effects (FE)** model, which assumes that the true effect of a drug is exactly identical across all studies in the universe. In reality, patient populations, dosing protocols, and baseline severity vary.
+
+To handle this, we upgrade our model in two ways:
+
+1.  **Random Effects (RE)**: We allow the true effect to vary around a mean, capturing unexplainable heterogeneity ($\tau^2$).
+2.  **Network Meta-Regression (NMR)**: We attempt to *explain* some of that heterogeneity by introducing **Covariates** (Effect Modifiers).
+
+In this guide, we use standard study-level **Aggregate Data (AD)**.
+
+```{=html}
+<!--
+[Core Concept] Ecological Fallacy of Aggregate Data (AD)
+Regressing using study-level averages (e.g., the average age of this trial is 55 years old) may mask or distort the true biological correlation at the individual level. Although this is standard practice in standard NMA, it is also why HTA agencies prefer MAIC or ML-NMR based on individual patient data (IPD) when facing networks with strong heterogeneity.
+-->
+```
+
+## 2. Theoretical Framework: RE & NMR {#2-theoretical-framework}
+
+### 2.1 The Random Effects Assumption
+
+Instead of $\delta_{jk} = d_{bk}$ (Fixed Effect), we now assume:
+
+$$\delta_{jk} \sim \text{Normal}(d_{bk}, \tau^2)$$
+
+Where $\tau^2$ is the **between-study variance**. If $\tau = 0$, the RE model collapses back into an FE model.
+
+### 2.2 Network Meta-Regression (The Linear Predictor)
+
+We expand the logit link function to include covariates as **Effect Modifiers** (interaction terms). Let $I_{jk}$ be an indicator variable that equals $0$ for the study's baseline control arm, and $1$ for the active treatment arm:
+
+$$\text{logit}(p_{jk}) = \mu_j + \delta_{jk} + \left[ \beta_1 (X_{1j} - \bar{X}_1) + \beta_2 (X_{2j} - \bar{X}_2) \right] \times I_{jk}$$
+
+Because $I_{jk} = 0$ for the control arm and $1$ for the treatment arm, the covariate term **does not cancel out** when calculating the relative effect (Log-Odds Ratio) between the active drug and the control:
+
+$$\text{logit}(p_{1,trt}) - \text{logit}(p_{1,b}) = \delta_{1,trt} + \beta_1 (X_{11} - \bar{X}_1) + \beta_2 (X_{21} - \bar{X}_2)$$
+
+```{=html}
+<!--
+[Mathematical Audit] Why Must Covariates Be Centered?
+Centering: subtracting the mean $\bar{X}$ of all studies.
+Without centering, the meaning of the model intercept $\mu$ and relative effect $d$ would become the effect size when the "absolute value of the covariate is 0". For example, the efficacy of the drug when the average age is 0 years old or the baseline PASI is 0, which is clinically absurd.
+After centering, the meaning of $d$ returns to the relative efficacy at the "average baseline state of the network", which has perfect clinical interpretability.
+-->
+```
+
+## 3. The Mock Case: Severe Plaque Psoriasis {#3-the-mock-case}
+
+### 3.1 The Clinical Scenario
+
+- **Disease**: Severe Plaque Psoriasis.
+- **Treatments**:
+  - **A**: Methotrexate (Standard of Care / Control)
+  - **B**: TNF-$\alpha$ inhibitor (e.g., Adalimumab mock)
+  - **C**: IL-17 inhibitor (e.g., Secukinumab mock)
+
+### 3.2 The Aggregate Covariates
+
+We identified two potential Effect Modifiers:
+
+1.  **PASI_Base** (Continuous): The average baseline PASI score (Psoriasis Area and Severity Index). Centered around 20.
+2.  **Prior_Bio** (Continuous Proportion): The proportion of patients in the trial who previously failed a biologic therapy (0.0 to 1.0).
+
+```{=html}
+<!--
+【业务概念审计】为什么选这两个作为协变量（Effect Modifiers）？
+在真实的银屑病（Psoriasis）HTA 申报中，这两项是最核心的潜在效应修饰变量：
+1. PASI_Base（基线严重程度）：PASI 是衡量银屑病面积和严重程度的官方打分。基线分越高，代表入组患者病得越重。有些药物在轻症患者中表现好，但在重症中拉垮；或者重症患者“下降空间”大，显得相对疗效特别好。如果不控制这个变量，基线不同的试验就无法公平比较。
+2. Prior_Bio（既往生物制剂失败率）：指试验中有多少比例的患者，以前用过其他高级生物制剂但失败了。这个比例越高（比如 0.40 即 40%），代表这是一个“难治型（Refractory）”人群，骨头非常难啃。如果 A 药的试验里全是没用过生物制剂的“初治”患者（0%），而 B 药的试验里全是难治患者（40%），直接比较对 B 药极不公平，必须通过 NMR 在统计上将它们拉平。
+-->
+```
+
+### 3.3 The Mock Data
+
+To estimate a Random Effect, we need at least one comparison with multiple studies (S1 and S2). We introduce 4 studies:
+
+| Study | Arm 1 (Ctrl) | Arm 2 (Active) | $n_1$ | $r_1$ | $n_2$ | $r_2$ | PASI_Base ($X_1$) | Prior_Bio ($X_2$) |
+|:-------|:-------|:-------|:-------|:-------|:-------|:-------|:-------|:-------|
+| **S1** | A | B | 100 | 25 | 100 | 50 | 22 | 0.20 |
+| **S2** | A | B | 100 | 30 | 100 | 45 | 18 | 0.10 |
+| **S3** | A | C | 100 | 20 | 100 | 60 | 24 | 0.40 |
+| **S4** | B | C | 100 | 40 | 100 | 55 | 20 | 0.25 |
+
+*Network Mean Covariates*: $\bar{X}_1$ = `r (22+18+24+20)/4`, $\bar{X}_2 =$ `r (0.2+0.1+0.4+0.25)/4`.
+
+````{=html}
+<!-- ```{mermaid}
+%%| fig-width: 6.5
+flowchart LR
+  A((Methotrexate)) --- B((TNF-alpha))
+  B --- C((IL-17))
+  C --- A
+``` -->
+````
+
+## 4. MCMC Forensic Audit: JAGS & Stan Implementation {#4-mcmc-forensic-audit}
+
+### 4.1 BUGS/JAGS Implementation
+
+Notice how we define the `tau` (standard deviation) and convert it to `prec` (precision) for the normal distribution in BUGS.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# JAGS RE_NMR_model.txt
+
+``` {.R .bugs}
+model {
+  for (j in 1:NS) {
+    # Baseline for arm 1
+    w[j,1] <- 0
+    theta[j,1] <- 0
+    mu[j] ~ dnorm(0, 0.0001) # Prior for study baseline
+    
+    for (k in 1:na[j]) {
+      r[j,k] ~ dbin(p[j,k], n[j,k])
+     
+      
+      logit(p[j,k]) <- mu[j] + theta[j,k] +  # <1>
+                       beta1 * (cov1[j] - mean_cov1) * (t[j,k] != t[j,1]) + # <2>
+                       beta2 * (cov2[j] - mean_cov2) * (t[j,k] != t[j,1])
+    }
+    
+    for (k in 2:na[j]) {      
+      theta[j,k] ~ dnorm(md[j,k], prec) # <3>
+      md[j,k] <- d[t[j,k]] - d[t[j,1]]
+    }
+  }
+  
+  # Priors
+  d[1] <- 0 # Reference treatment (A)
+  for (k in 2:NT) { 
+    d[k] ~ dnorm(0, 0.0001) 
+  }
+  
+  # Heterogeneity Prior (Uniform)
+  tau ~ dunif(0, 5)  # tau (standard deviation)
+  prec <- 1 / tau^2
+  
+  beta1 ~ dnorm(0, 0.0001) # <4>
+  beta2 ~ dnorm(0, 0.0001)
+}
+```
+
+1.  Logit with Common Beta Regression
+2.  (t\[j,k\] != t\[j,1\]) is a dynamic 0/1 indicator: 1 for active drug, 0 for control. If k=1, which indicates the control group, (t\[j,1\] != t\[j,1\]) returns false (0). This avoids having to define a separate 0/1 matrix in the R data list.
+3.  Random Effects: theta ($\delta_{jk}$ in model) is drawn from Normal with mean md, precision prec
+4.  Regression Coefficient Priors
+:::
+
+```{=html}
+<!--
+[Audit Point] Common Beta (Common Interaction Effect) and Dynamic Indicator Variables
+1. In the above code, `(t[j,k] != t[j,1])` ensures that the covariate only affects the Log-Odds of the Active group relative to the Control group.
+2. Tip: This writing style dynamically generates a 0/1 switch when JAGS runs. This avoids defining a complex 0/1 matrix in the external R environment to match the model, keeping the input data (JAGS_data) clean and robust.
+3. We assume that all Active drugs share the same $\beta_1$ and $\beta_2$. In HTA, if data is extremely sparse, this is a reasonable dimension reduction assumption; if there is enough data, Treatment-Specific Betas are usually estimated (i.e., each drug has a different sensitivity to covariates).
+-->
+```
+
+To run this model in R using `rjags`:
+
+::: {.callout-note collapse="true"}
+## Click to view JAGS Model Execution and Output
+
+```{r}
+#| cache: true
+#| message: false
+#| warning: false
+library(rjags)
+
+jags_data <- list(
+    NS = 4,
+    NT = 3,
+    r = matrix(c(25, 50, 30, 45, 20, 60, 40, 55), nrow = 4, byrow = TRUE),
+    n = matrix(c(100, 100, 100, 100, 100, 100, 100, 100), nrow = 4, byrow = TRUE),
+    t = matrix(c(1, 2, 1, 2, 1, 3, 2, 3), nrow = 4, byrow = TRUE),
+    na = rep(2, 4),
+    cov1 = c(22, 18, 24, 20),
+    cov2 = c(0.20, 0.10, 0.40, 0.25),
+    mean_cov1 = 21,
+    mean_cov2 = 0.2375
+)
+
+jags_model <- jags.model(
+    file = "RE_NMR_model.txt",
+    data = jags_data,
+    n.chains = 3,
+    quiet = TRUE
+)
+samples <- coda.samples(
+    jags_model,
+    variable.names = c("d", "beta1", "beta2", "tau"),
+    n.iter = 10000,
+    progress.bar = "none"
+)
+summary(samples)
+```
+:::
+
+### 4.2 Stan Implementation (Non-Centered Parameterization)
+
+Stan struggles with centered Random Effects when data is sparse (creating "funnel" geometries in the posterior). We use **Non-Centered Parameterization** to ensure fast, divergence-free sampling.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# STAN RE_NMR_model.stan
+
+``` stan
+data {
+  int<lower=1> NS; # <1> 
+  int<lower=1> NT;
+  int r[NS, 2];    
+  int n[NS, 2];    
+  int t[NS, 2];    // Treatment index for each arm
+  real cov1[NS];
+  real cov2[NS];
+}
+
+transformed data {
+  real mean_cov1 = mean(cov1);
+  real mean_cov2 = mean(cov2);
+}
+
+parameters {
+  real mu[NS];          
+  real d[NT];           // Global treatment effects
+  real<lower=0> tau;    # <2> 
+  real z[NS, 2];        // Standard normal noise for non-centered RE
+  real beta1;
+  real beta2;
+}
+
+transformed parameters {
+  real theta[NS, 2];
+  for (j in 1:NS) {
+    theta[j, 1] = 0;
+    for (k in 2:2) {      
+      theta[j, k] = (d[t[j, k]] - d[t[j, 1]]) + tau * z[j, k]; # <3>
+    }
+  }
+}
+
+model {
+  // Priors  
+  // for (k in 2:NT) {
+  //   d[2] ~ normal(0, 100);
+  //   d[3] ~ normal(0, 100);}
+  mu ~ normal(0, 100);
+  d[1] ~ normal(0, 0.001); // Fix reference to 0
+  d[2] ~ normal(0, 100);
+  d[3] ~ normal(0, 100);
+  tau ~ uniform(0, 5);
+  beta1 ~ normal(0, 100);
+  beta2 ~ normal(0, 100);
+  
+  for (j in 1:NS) {
+    for (k in 2:2) {
+      z[j, k] ~ std_normal(); // Draw noise
+    }
+  }
+
+  // Likelihood
+  for (j in 1:NS) {
+    for (k in 1:2) {
+      real is_active = (t[j, k] != t[j, 1]) ? 1.0 : 0.0; # <4>
+      real linpred = mu[j] + theta[j, k] + 
+                     beta1 * (cov1[j] - mean_cov1) * is_active + 
+                     beta2 * (cov2[j] - mean_cov2) * is_active;
+      r[j, k] ~ binomial_logit(n[j, k], linpred);
+    }
+  }
+}
+```
+
+1.  \<lower=1\> is a constraint (data check): must be \>= 1
+2.  \<lower=0\> constraint stops sampler from guessing invalid negative SD
+3.  Non-centered parameterization: mean + sd \* standard_normal
+4.  Ternary operator: `condition ? value_if_true : value_if_false`. Returns 1.0 for active arms and 0.0 for control arms. Shorthand for if-else.
+:::
+
+```{=html}
+<!--
+[Technical Geek Point] Non-Centered Parameterization
+This is the best moment to flex your muscles to the interviewer/senior biostatistician.
+Writing `theta ~ dnorm(mean, prec)` in JAGS is a centered parameterization.
+In Stan, if the heterogeneity $\tau$ is small, directly sampling `theta ~ normal(mean, tau)` will cause the posterior distribution to form a "funnel" shape that is extremely difficult to sample, leading to dozens of Divergent Transitions warnings.
+We instead sample standard normal noise `z ~ std_normal()`, and then restore it via `theta = mean + tau * z`. This is mathematically equivalent but flattens the funnel in computational geometry, allowing the HMC engine to travel smoothly in the parameter space.
+-->
+```
+
+```{=html}
+<!--
+[Audit Point] Declarative Language (JAGS) vs Procedural Language (Stan) Execution Order
+This is a core difference in underlying code logic that is easily overlooked when preparing for interviews:
+1. JAGS is a Declarative Language: The order of the code does not matter at all. JAGS builds a directed acyclic graph (DAG) after reading the code, as long as the variables are defined in the graph. Therefore, in JAGS, you can use `prec` first and define `prec <- 1 / tau^2` at the end of the code, and the program will never report an error.
+2. Stan is a Procedural Language: It is directly translated to C++. Therefore, inside Stan code blocks, execution is strictly top-down. You must first declare and define a variable (e.g., in the `parameters` block) before you can use it in the code below (e.g., in the `transformed parameters` block). If you dare to "use before define" in Stan, the compiler will report an error directly.
+3. The only exception: In Stan's `model` block, the order of `~` (sampling statements) does not affect the result because they are just accumulating the log-density; but as long as it involves `=` (assignment statements), the principle of define-before-use must be strictly followed.
+-->
+```
+
+```{=html}
+<!--
+[Audit Point] Prior Choice for Heterogeneity Parameter tau (Uniform vs Normal)
+This is a classic examination point in HTA audits and interviews regarding the choice of prior distributions:
+1. Pixel-level alignment with NICE DSU guidance: In the UK NICE DSU NMA Technical Support Document (TSD 2), the official JAGS template recommends `dunif(0, 5)` as the default prior for the between-study standard deviation $\tau$. Here, using `uniform(0, 5)` is to align with the official standard.
+2. Dimension reduction combining business common sense: On the Logit scale, a standard deviation of 5 means that the difference in Odds Ratio between different studies can reach hundreds of times, which is almost impossible in real clinical trials. Locking the upper limit at 5 prevents the model from exploring absurdly large value areas when data is sparse.
+3. Protection when data is sparse: When the number of studies is very small (only 4 studies in this example), a broad normal distribution prior (such as `normal(0, 100)`) easily inflates the estimate of heterogeneity. Using `uniform(0, 5)` completely flattens it within a reasonable range, giving every possible value an absolutely equal probability and protecting the model from being hijacked by the shape of the prior.
+-->
+```
+
+To run this model in R using `rstan`:
+
+::: {.callout-note collapse="true"}
+## Click to view Stan Model Execution and Output
+
+```{r}
+#| cache: true
+#| message: false
+#| warning: false
+library(rstan)
+stan_data <- list(
+    NS = 4,
+    NT = 3,
+    r = matrix(c(25, 50, 30, 45, 20, 60, 40, 55), nrow = 4, byrow = TRUE),
+    n = matrix(c(100, 100, 100, 100, 100, 100, 100, 100), nrow = 4, byrow = TRUE),
+    t = matrix(c(1, 2, 1, 2, 1, 3, 2, 3), nrow = 4, byrow = TRUE),
+    cov1 = c(22, 18, 24, 20),
+    cov2 = c(0.20, 0.10, 0.40, 0.25)
+)
+fit <- stan(
+    file = "RE_NMR_model.stan",
+    data = stan_data,
+    chains = 3,
+    iter = 2000,
+    warmup = 1000,
+    refresh = 0
+)
+print(fit, pars = c("d", "beta1", "beta2", "tau"))
+```
+:::
+
+### 4.3 Experiment: Doubling the Number of Studies (N=8)
+
+To test the hypothesis that increasing the number of studies will reduce the discrepancy between JAGS (Gibbs + Centered) and Stan (NUTS + Non-Centered), we simulate a larger dataset by duplicating our 4 studies. This keeps the data patterns identical but doubles the effective sample size at the study level from $N=4$ to $N=8$.
+
+#### 4.3.1 Running Expanded JAGS
+
+::: {.callout-note collapse="true"}
+## Click to view Expanded JAGS (N=8) Output
+
+```{r}
+#| cache: true
+#| message: false
+#| warning: false
+jags_data_x2 <- list(
+    NS = 8,
+    NT = 3,
+    r = matrix(c(
+        25, 50, 30, 45, 20, 60, 40, 55,
+        25, 50, 30, 45, 20, 60, 40, 55
+    ), nrow = 8, byrow = TRUE),
+    n = matrix(rep(100, 16), nrow = 8, byrow = TRUE),
+    t = matrix(c(
+        1, 2, 1, 2, 1, 3, 2, 3,
+        1, 2, 1, 2, 1, 3, 2, 3
+    ), nrow = 8, byrow = TRUE),
+    na = rep(2, 8),
+    cov1 = c(22, 18, 24, 20, 22, 18, 24, 20),
+    cov2 = c(0.20, 0.10, 0.40, 0.25, 0.20, 0.10, 0.40, 0.25),
+    mean_cov1 = 21,
+    mean_cov2 = 0.2375
+)
+
+jags_model_x2 <- jags.model(
+    file = "RE_NMR_model.txt",
+    data = jags_data_x2,
+    n.chains = 3,
+    quiet = TRUE
+)
+samples_x2 <- coda.samples(
+    jags_model_x2,
+    variable.names = c("d", "beta1", "beta2", "tau"),
+    n.iter = 10000,
+    progress.bar = "none"
+)
+summary(samples_x2)
+```
+:::
+
+#### 4.3.2 Running Expanded Stan
+
+::: {.callout-note collapse="true"}
+## Click to view Expanded Stan (N=8) Output
+
+```{r}
+#| cache: true
+#| message: false
+#| warning: false
+stan_data_x2 <- list(
+    NS = 8,
+    NT = 3,
+    r = matrix(c(
+        25, 50, 30, 45, 20, 60, 40, 55,
+        25, 50, 30, 45, 20, 60, 40, 55
+    ), nrow = 8, byrow = TRUE),
+    n = matrix(rep(100, 16), nrow = 8, byrow = TRUE),
+    t = matrix(c(
+        1, 2, 1, 2, 1, 3, 2, 3,
+        1, 2, 1, 2, 1, 3, 2, 3
+    ), nrow = 8, byrow = TRUE),
+    cov1 = c(22, 18, 24, 20, 22, 18, 24, 20),
+    cov2 = c(0.20, 0.10, 0.40, 0.25, 0.20, 0.10, 0.40, 0.25)
+)
+
+fit_x2 <- stan(
+    file = "RE_NMR_model.stan",
+    data = stan_data_x2,
+    chains = 3,
+    iter = 2000,
+    warmup = 1000,
+    refresh = 0
+)
+print(fit_x2, pars = c("d", "beta1", "beta2", "tau"))
+```
+:::
+
+Notice if the means of `d[2]`, `d[3]`, and `tau` are now closer between the two engines compared to the 4-study case.
+
+#### 4.3.3 Comparison Table
+
+::: {.callout-note collapse="true"}
+## Click to view Comparison Table
+
+```{r}
+#| echo: false
+# Extract medians using do.call(rbind) for MAXIMUM robustness with mcmc.list (JAGS)
+jags_n4_mat <- do.call(rbind, samples)
+jags_n8_mat <- do.call(rbind, samples_x2)
+
+# Stan objects work fine with as.matrix
+stan_n4_mat <- as.matrix(fit)
+stan_n8_mat <- as.matrix(fit_x2)
+
+# Define an extremely safe extraction function: prioritize names, use indices if missing
+get_medians <- function(mat, var_name, col_idx) {
+    if (!is.null(colnames(mat)) && var_name %in% colnames(mat)) {
+        return(median(mat[, var_name]))
+    } else if (col_idx <= ncol(mat)) {
+        return(median(mat[, col_idx]))
+    } else {
+        return(NA)
+    }
+}
+
+# For JAGS, if alphabetically sorted and including d[1], the order is: beta1, beta2, d[1], d[2], d[3], tau
+# Then d[2] is column 4, d[3] is column 5, tau is column 6
+med_jags_d2_n4 <- round(get_medians(jags_n4_mat, "d[2]", 4), 2)
+med_jags_d3_n4 <- round(get_medians(jags_n4_mat, "d[3]", 5), 2)
+med_jags_tau_n4 <- round(get_medians(jags_n4_mat, "tau", 6), 2)
+
+med_jags_d2_n8 <- round(get_medians(jags_n8_mat, "d[2]", 4), 2)
+med_jags_d3_n8 <- round(get_medians(jags_n8_mat, "d[3]", 5), 2)
+med_jags_tau_n8 <- round(get_medians(jags_n8_mat, "tau", 6), 2)
+
+# For Stan, column names are usually well preserved
+med_stan_d2_n4 <- round(get_medians(stan_n4_mat, "d[2]", 1), 2)
+med_stan_d3_n4 <- round(get_medians(stan_n4_mat, "d[3]", 1), 2)
+med_stan_tau_n4 <- round(get_medians(stan_n4_mat, "tau", 1), 2)
+
+med_stan_d2_n8 <- round(get_medians(stan_n8_mat, "d[2]", 1), 2)
+med_stan_d3_n8 <- round(get_medians(stan_n8_mat, "d[3]", 1), 2)
+med_stan_tau_n8 <- round(get_medians(stan_n8_mat, "tau", 1), 2)
+```
+
+| Parameter (Median) | N=4 (JAGS) | N=4 (Stan) | N=8 (JAGS) | N=8 (Stan) |
+|---------------|---------------|---------------|---------------|---------------|
+| **d\[2\]** | `r med_jags_d2_n4` | `r med_stan_d2_n4` | `r med_jags_d2_n8` | `r med_stan_d2_n8` |
+| **d\[3\]** | `r med_jags_d3_n4` | `r med_stan_d3_n4` | `r med_jags_d3_n8` | `r med_stan_d3_n8` |
+| **tau** | `r med_jags_tau_n4` | `r med_stan_tau_n4` | `r med_jags_tau_n8` | `r med_stan_tau_n8` |
+:::
+
+```{=html}
+<!-- Audit Point: Interpretation of N=4 vs N=8 Comparison
+1. 样本量增加与算法收敛：
+随着样本量增加（从 4 变 8），后验概率分布被数据更强地约束，贝叶斯先验的影响变小，JAGS（Gibbs 抽样）和 Stan（HMC 抽样）这两个不同的算法引擎得出的结果自然高度一致。
+
+2. Stan 的抽样效率：
+Stan 即使在 N=4 的时候，算出来的 d[2] (0.87) 和 d[3] (1.66) 就已经非常接近 N=8 时的结果（0.84 和 1.67）了。这体现了 Stan (Hamiltonian Monte Carlo) 比 JAGS (Gibbs Sampling) 更优越的抽样效率。在小样本、高维度的复杂概率分布中，Stan 能更准确地勾勒出概率云的真实形状。
+
+3. tau 的暴跌与“克隆偏倚”（Cloning Artifact）：
+tau 从 2.37 暴跌到 0.13 并不是因为样本量变大，而是因为我们采取的“粗暴复制”实验设计。
+tau 代表的是“实验与实验之间的异质性（Between-study heterogeneity）”。我们将 4 个实验原封不动地复制了一遍，导致模型看到了 4 对完全一模一样、毫无差异的“双胞胎”实验。模型会错误地认为实验之间的随机误差几乎为零，因此 tau 被人工地拉低了。如果增加的是真实的、带有随机误差的新实验，tau 会稳定在一个合理的真实水平。
+-->
+```
+
+### 4.4 Drug Ranking & SUCRA
+
+To answer the strategic question "Which drug is the best?", we calculate the rank probabilities and the **SUCRA (Surface Under the Cumulative Ranking curve)**.
+
+### 4.4.1 Ranking and SUCRA Calculation Logic
+
+In the MCMC sampling of Bayesian NMA, each iteration outputs a specific set of values for all parameters. For our constructed comparison matrix: - `SoC (A)` is hardcoded to the baseline value of $0$ in the R code. - `Drug 2 (B)` outputs a sampled value in a given iteration (e.g., $0.84$). - `Drug 3 (C)` outputs a sampled value in the same iteration (e.g., $1.67$).
+
+We compare these three values horizontally in each iteration. Since a larger value represents better efficacy (larger Log-Odds means higher response rate), the drug with the largest value in that iteration receives **Rank 1**. After summarizing thousands of iterations, the proportion of times a drug achieves the first place is its **Rank 1 probability**.
+
+**SUCRA** goes a step further, measuring the average probability of a drug "beating" all other drugs. Its calculation formula is the sum of the first $T-1$ cumulative ranking probabilities divided by $T-1$ (where $T$ is the total number of drugs). A SUCRA closer to $1$ indicates better efficacy.
+
+Below, we use the posterior samples from the $N=8$ Stan model for the calculation.
+
+::: {.callout-note collapse="true"}
+## Click to view SUCRA Calculation and Rank Probabilities
+
+```{r}
+#| message: false
+#| warning: false
+# 1. Construct full matrix (SoC fixed at 0, plus samples of d[2] and d[3])
+effects_mat <- cbind(
+    `SoC (A)` = 0,
+    `Drug 2 (B)` = stan_n8_mat[, "d[2]"],
+    `Drug 3 (C)` = stan_n8_mat[, "d[3]"]
+)
+
+# 2. Calculate ranks row by row (each iteration). Larger values rank higher (1 is best)
+# R's rank defaults to ascending order, so we rank the negative values
+ranks_mat <- t(apply(-effects_mat, 1, rank))
+
+# 3. Calculate the probability of each drug at each rank
+n_iters <- nrow(ranks_mat)
+n_tx <- ncol(ranks_mat)
+rank_probs <- matrix(0, nrow = n_tx, ncol = n_tx)
+rownames(rank_probs) <- colnames(effects_mat)
+colnames(rank_probs) <- paste0("Rank_", 1:n_tx)
+
+for (i in 1:n_tx) {
+    for (j in 1:n_tx) {
+        rank_probs[i, j] <- sum(ranks_mat[, i] == j) / n_iters
+    }
+}
+
+# 4. Calculate SUCRA
+sucra <- rep(0, n_tx)
+names(sucra) <- colnames(effects_mat)
+for (i in 1:n_tx) {
+    cum_probs <- cumsum(rank_probs[i, ])
+    # SUCRA formula: sum of first T-1 cumulative probabilities / (T-1)
+    sucra[i] <- sum(cum_probs[1:(n_tx - 1)]) / (n_tx - 1)
+}
+
+# Combine and display
+ranking_summary <- cbind(rank_probs, SUCRA = sucra)
+knitr::kable(round(ranking_summary, 3), caption = "Rank Probabilities and SUCRA")
+```
+:::
+
+```{=html}
+<!-- Audit Point: Intuitive Interpretation of SUCRA
+What is SUCRA?
+SUCRA (Surface Under the Cumulative Ranking curve) is the average probability that a treatment beats all other treatments. 
+Or more simply: The average proportion of competitors that a treatment defeats.
+
+Example with 3 drugs (A, B, C):
+Suppose we run the simulation 100 times. For Drug C:
+- Gets 1st place: 80 times (beats 2 competitors: A and B)
+- Gets 2nd place: 15 times (beats 1 competitor)
+- Gets 3rd place: 5 times (beats 0 competitors)
+
+Total competitors beaten by Drug C = (80 * 2) + (15 * 1) + (5 * 0) = 175.
+On average, Drug C beats 1.75 competitors per race.
+Since the maximum competitors it could beat is 2 (Total drugs - 1), the proportion of competitors beaten is 1.75 / 2 = 0.875.
+This 0.875 is the SUCRA value!
+
+How the R code calculates it (A mathematical shortcut):
+1. Cumulate probabilities via `cumsum()`:
+   - Rank 1 or better: 0.80
+   - Rank 2 or better: 0.80 + 0.15 = 0.95
+   - Rank 3 or better: 1.00 (ignored in code as it is always 1)
+2. Sum the first T-1 cumulative probabilities and divide by T-1:
+   (0.80 + 0.95) / 2 = 0.875.
+This yields the exact same result as the physical interpretation above.
+-->
+```
+
+### 4.5 Consistency Check (Loop Inconsistency Model)
+
+A core assumption of NMA is **consistency**: direct and indirect evidence should agree within any closed loop. Our network forms a closed loop among treatments A, B, and C: - **A vs B**: Studies 1 & 2 - **A vs C**: Study 3 - **B vs C**: Study 4
+
+To test consistency, we fit an **Inconsistency Model** by adding an inconsistency parameter $\omega$ (omega) to the B vs C comparison in Study 4. In a consistent network, $\omega$ should be close to 0.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# STAN RE_NMR_inconsistency_model.stan
+
+``` stan
+data {
+  int<lower=1> NS; 
+  int<lower=1> NT;
+  int r[NS, 2];    
+  int n[NS, 2];    
+  int t[NS, 2];    
+  real cov1[NS];
+  real cov2[NS];
+}
+
+transformed data {
+  real mean_cov1 = mean(cov1);
+  real mean_cov2 = mean(cov2);
+}
+
+parameters {
+  real mu[NS];          
+  real d[NT];           
+  real<lower=0> tau;    
+  real z[NS, 2];        
+  real beta1;
+  real beta2;
+  real omega;           // <1>
+}
+
+transformed parameters {
+  real theta[NS, 2];
+  for (j in 1:NS) {
+    theta[j, 1] = 0;
+    for (k in 2:2) {
+      real inc = (j == 4) ? omega : 0.0; // <2>
+      theta[j, k] = (d[t[j, k]] - d[t[j, 1]]) + inc + tau * z[j, k];
+    }
+  }
+}
+
+model {
+  // Priors
+  mu ~ normal(0, 100);
+  for (k in 2:NT) {
+    d[k] ~ normal(0, 100);
+  }
+  d[1] ~ normal(0, 0.001); 
+  
+  tau ~ uniform(0, 5);
+  beta1 ~ normal(0, 100);
+  beta2 ~ normal(0, 100);
+  omega ~ normal(0, 100); 
+  
+  for (j in 1:NS) {
+    for (k in 2:2) {
+      z[j, k] ~ std_normal(); 
+    }
+  }
+
+  // Likelihood
+  for (j in 1:NS) {
+    for (k in 1:2) {
+      real is_active = (t[j, k] != t[j, 1]) ? 1.0 : 0.0;
+      real linpred = mu[j] + theta[j, k] + 
+                     beta1 * (cov1[j] - mean_cov1) * is_active + 
+                     beta2 * (cov2[j] - mean_cov2) * is_active;
+      r[j, k] ~ binomial_logit(n[j, k], linpred);
+    }
+  }
+}
+```
+
+1.  `omega` is the inconsistency parameter for the B vs C loop.
+2.  If `j == 4` (Study 4 which compares B vs C), we add `omega` to the relative effect.
+:::
+
+```{=html}
+<!-- Audit Point: Why does Omega detect inconsistency?
+1. What is Consistency?
+   In a consistent network, the direct effect of B vs C must equal the indirect effect calculated via A.
+   That is: d[BC_indirect] = d[3] - d[2] (where d[1]=0).
+2. What is Omega?
+   Omega represents the "Inconsistency Factor". By adding Omega to Study 4 (the direct B vs C study), we allow the direct evidence to deviate from the indirect evidence:
+   d[BC_direct] = (d[3] - d[2]) + Omega
+   Therefore, Omega = d[BC_direct] - d[BC_indirect].
+3. How to judge?
+   - If Omega is close to 0 (its 95% CrI includes 0), the direct and indirect evidence agree, satisfying the consistency assumption.
+   - If Omega is significantly non-zero, the loop is inconsistent.
+-->
+```
+
+::: {.callout-note collapse="true"}
+## Click to view Stan Inconsistency Model Output
+
+```{r}
+#| message: false
+#| warning: false
+#| cache: true
+# Run the inconsistency model
+fit_inc <- stan(
+    file = "RE_NMR_inconsistency_model.stan",
+    data = stan_data, # Use the same 4-study data
+    chains = 3,
+    iter = 2000,
+    warmup = 1000,
+    refresh = 0
+)
+
+# Extract omega
+print(fit_inc, pars = c("omega", "d", "tau"))
+```
+:::
+
+If the 95% Credible Interval of `omega` includes 0, we fail to reject the consistency assumption, meaning the direct and indirect evidence are statistically consistent.
+
+### 4.6 Node Splitting (Placeholder) {.unnumbered}
+
+Node Splitting is a systematic approach to detect local inconsistency in a network.
+
+- **Concept**: For any comparison that has both direct and indirect evidence, the model "splits" the evidence and estimates a direct effect and an indirect effect separately.
+- **Usage**: If the direct and indirect estimates differ significantly (e.g., non-overlapping 95% credible intervals), it indicates inconsistency for that specific comparison. This process is repeated for all eligible comparisons in the network.
+
+### 4.7 Unrelated Mean Effects (UME) Model (Placeholder) {.unnumbered}
+
+The Unrelated Mean Effects (UME) model is a global approach to detect inconsistency.
+
+- **Concept**: Unlike a standard NMA that assumes consistency, the UME model drops this assumption entirely. It treats every comparison between any two treatments as independent (unrelated).
+- **Usage**: We compare the model fit (e.g., DIC or residual deviance) of the UME model with the standard Consistency model. If the UME model fits significantly better, it implies that the consistency assumption is violated in the network.
+
+## 5. Results & Interpretation: Covariate Adjustment {#5-results}
+
+After extracting the posteriors, we evaluate if $\beta_1$ and $\beta_2$ are significant (e.g., if their 95% CrI crosses 0).
+
+- **If** $\beta_1 > 0$: Higher baseline PASI means the active drugs perform *even better* relative to SoC.
+- **If** $\beta_2 < 0$: More patients with prior biologic failure means the active drugs' relative advantage shrinks (a harder-to-treat population).
+
+The final League Table will now represent the comparative efficacy at the **average** covariate levels of the network.
+
+## 6. Strategic Q&A: The Limits of AD NMR {#6-strategic-qa}
+
+::: {.callout-important collapse="true" appearance="minimal"}
+# If a competitor's trial has 60% Prior Biologic users, but yours only has 10%, can Standard NMR fully fix this?
+
+**No.** While NMR attempts to adjust the intercept based on the study average, it suffers from the **Ecological Fallacy**. Adjusting based on a trial's average 60% rate is a crude proxy. It assumes every patient has a "60% probability" of being a prior user, completely ignoring the patient-level joint distribution (e.g., maybe all the prior biologic users are also the oldest patients). To truly adjust for this without bias, you need to use **MAIC** to reweight your IPD to match their baseline characteristics, or use **ML-NMR** to integrate over the full patient parameter space.
+:::
+
+------------------------------------------------------------------------
+
+**Guide Authored by**: Antigravity (Advanced Agentic Coding)
