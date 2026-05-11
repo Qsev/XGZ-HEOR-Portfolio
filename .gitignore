@@ -50,3 +50,5 @@ rsconnect/
 
 # Local drafts and AI-assisted files
 scratch/
+
+.DS_Store
