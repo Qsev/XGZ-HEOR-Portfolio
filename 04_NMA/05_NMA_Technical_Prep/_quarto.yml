@@ -10,7 +10,7 @@ website:
       - section: "Technical Guides"
         contents:
           - 01_Standard_Bayesian_NMA_Guide.qmd
-          - 02_by_Bayesian_NMA.qmd
+          - 02_Network_Meta_Regression_NMR.qmd
           - 03_Survival_NMA.qmd
           - 04_Component_NMA.qmd
           - 05_IPD_NMA.qmd

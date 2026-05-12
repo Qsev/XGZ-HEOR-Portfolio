@@ -149,7 +149,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01_Standard_Bayesian_NMA_Guide.html">Technical Guides</a></li><li class="breadcrumb-item"><a href="./02_by_Bayesian_NMA.html">Network Meta-Regression (NMR) &amp; Random Effects</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01_Standard_Bayesian_NMA_Guide.html">Technical Guides</a></li><li class="breadcrumb-item"><a href="./02_Network_Meta_Regression_NMR.html">Network Meta-Regression (NMR) &amp; Random Effects</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -191,7 +191,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./02_by_Bayesian_NMA.html" class="sidebar-item-text sidebar-link active">
+  <a href="./02_Network_Meta_Regression_NMR.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Network Meta-Regression (NMR) &amp; Random Effects</span></a>
   </div>
 </li>
@@ -274,7 +274,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01_Standard_Bayesian_NMA_Guide.html">Technical Guides</a></li><li class="breadcrumb-item"><a href="./02_by_Bayesian_NMA.html">Network Meta-Regression (NMR) &amp; Random Effects</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01_Standard_Bayesian_NMA_Guide.html">Technical Guides</a></li><li class="breadcrumb-item"><a href="./02_Network_Meta_Regression_NMR.html">Network Meta-Regression (NMR) &amp; Random Effects</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Network Meta-Regression (NMR) &amp; Random Effects</h1>
 </div>
@@ -600,22 +600,22 @@ Sample size per chain = 10000
    plus standard error of the mean:
 
          Mean     SD Naive SE Time-series SE
-beta1 -0.1958  1.095 0.006321        0.21451
-beta2  6.3483 27.018 0.155989        6.13290
+beta1  0.2617  1.419 0.008195        0.38283
+beta2 -9.1127 45.495 0.262664       17.89867
 d[1]   0.0000  0.000 0.000000        0.00000
-d[2]   1.1890  1.864 0.010764        0.13452
-d[3]   1.4361  2.091 0.012071        0.08411
-tau    1.9970  1.324 0.007644        0.06388
+d[2]   0.6012  2.480 0.014319        0.33051
+d[3]   2.0360  2.717 0.015685        0.24324
+tau    2.1816  1.444 0.008339        0.09669
 
 2. Quantiles for each variable:
 
-          2.5%      25%      50%     75%  97.5%
-beta1  -2.3955  -0.9316 -0.02776  0.5099  1.912
-beta2 -46.6793 -11.6610  3.96725 26.6331 61.749
-d[1]    0.0000   0.0000  0.00000  0.0000  0.000
-d[2]   -2.5896   0.2306  1.04773  2.1353  5.377
-d[3]   -3.2870   0.4797  1.55278  2.4177  5.813
-tau     0.1122   0.8880  1.78276  2.9685  4.734</code></pre>
+           2.5%      25%      50%    75%  97.5%
+beta1   -2.0077  -0.6683 0.068121  0.920  3.703
+beta2 -126.9550 -21.4861 0.009174 20.404 54.639
+d[1]     0.0000   0.0000 0.000000  0.000  0.000
+d[2]    -5.7075  -0.3014 0.919227  1.888  5.044
+d[3]    -2.8987   0.6857 1.715151  2.972  8.994
+tau      0.0614   0.9397 1.990541  3.381  4.843</code></pre>
 </div>
 </div>
 </div>
@@ -784,15 +784,15 @@ This is a classic examination point in HTA audits and interviews regarding the c
 3 chains, each with iter=2000; warmup=1000; thin=1; 
 post-warmup draws per chain=1000, total post-warmup draws=3000.
 
-       mean se_mean    sd   2.5%    25%   50%   75%  97.5% n_eff Rhat
-d[1]   0.00    0.00  0.00   0.00   0.00  0.00  0.00   0.00  1028 1.00
-d[2]   1.10    0.43  3.09  -6.01  -0.23  0.87  2.23   9.03    51 1.04
-d[3]   1.66    0.19  2.29  -3.57   0.45  1.66  2.88   6.44   148 1.01
-beta1 -0.05    0.29  2.21  -5.96  -0.83  0.17  1.11   3.65    59 1.04
-beta2  2.51    7.35 54.53 -91.89 -26.52 -2.20 22.28 146.90    55 1.04
-tau    2.46    0.10  1.47   0.14   1.18  2.37  3.78   4.89   232 1.03
+       mean se_mean    sd    2.5%    25%   50%   75% 97.5% n_eff Rhat
+d[1]   0.00    0.00  0.00    0.00   0.00  0.00  0.00  0.00  1829 1.00
+d[2]   0.85    0.22  2.51   -4.94  -0.35  0.84  1.99  6.45   126 1.04
+d[3]   1.66    0.13  2.28   -3.57   0.54  1.65  2.82  6.47   312 1.00
+beta1  0.27    0.15  1.81   -3.21  -0.67  0.15  1.02  4.70   141 1.03
+beta2 -4.22    3.59 43.45 -111.03 -24.28 -1.60 20.43 78.06   146 1.03
+tau    2.35    0.09  1.44    0.08   1.10  2.27  3.57  4.85   239 1.02
 
-Samples were drawn using NUTS(diag_e) at Sun May 10 13:52:16 2026.
+Samples were drawn using NUTS(diag_e) at Tue May 12 20:11:27 2026.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>
@@ -865,23 +865,23 @@ Sample size per chain = 10000
 1. Empirical mean and standard deviation for each variable,
    plus standard error of the mean:
 
-         Mean     SD  Naive SE Time-series SE
-beta1  0.1657 0.2083 0.0012025       0.017346
-beta2 -2.1379 5.2917 0.0305519       0.495053
-d[1]   0.0000 0.0000 0.0000000       0.000000
-d[2]   0.8605 0.2711 0.0015651       0.020495
-d[3]   1.6657 0.2628 0.0015175       0.013142
-tau    0.1675 0.1649 0.0009522       0.007728
+         Mean     SD Naive SE Time-series SE
+beta1  0.1564 0.2364 0.001365        0.02213
+beta2 -1.7485 5.9557 0.034385        0.60473
+d[1]   0.0000 0.0000 0.000000        0.00000
+d[2]   0.8783 0.3016 0.001741        0.02345
+d[3]   1.6444 0.2940 0.001698        0.01532
+tau    0.2043 0.2246 0.001297        0.01598
 
 2. Quantiles for each variable:
 
-            2.5%      25%     50%    75%  97.5%
-beta1  -0.273275  0.03503  0.1691 0.3063 0.5586
-beta2 -12.006105 -5.73273 -2.2685 1.2318 9.0649
-d[1]    0.000000  0.00000  0.0000 0.0000 0.0000
-d[2]    0.345348  0.67669  0.8455 1.0331 1.4113
-d[3]    1.140245  1.50350  1.6720 1.8291 2.1817
-tau     0.005004  0.04992  0.1229 0.2316 0.6123</code></pre>
+            2.5%      25%     50%    75%   97.5%
+beta1  -0.297205  0.01144  0.1583 0.2937  0.6264
+beta2 -13.790012 -5.31775 -1.8778 1.8480 10.3974
+d[1]    0.000000  0.00000  0.0000 0.0000  0.0000
+d[2]    0.287208  0.70372  0.8805 1.0504  1.4778
+d[3]    1.055541  1.47174  1.6470 1.8153  2.2137
+tau     0.004264  0.06429  0.1400 0.2574  0.8704</code></pre>
 </div>
 </div>
 </div>
@@ -937,14 +937,14 @@ tau     0.005004  0.04992  0.1229 0.2316 0.6123</code></pre>
 post-warmup draws per chain=1000, total post-warmup draws=3000.
 
        mean se_mean   sd   2.5%   25%   50%  75% 97.5% n_eff Rhat
-d[1]   0.00    0.00 0.00   0.00  0.00  0.00 0.00  0.00  2964    1
-d[2]   0.84    0.01 0.30   0.26  0.65  0.84 1.02  1.46  2774    1
-d[3]   1.67    0.01 0.30   1.08  1.48  1.67 1.84  2.23  2583    1
-beta1  0.18    0.00 0.24  -0.29  0.03  0.18 0.33  0.66  2436    1
-beta2 -2.49    0.13 6.22 -14.86 -6.21 -2.50 1.45  9.68  2454    1
-tau    0.19    0.01 0.20   0.01  0.06  0.13 0.25  0.72  1414    1
+d[1]   0.00    0.00 0.00   0.00  0.00  0.00 0.00  0.00  3202    1
+d[2]   0.86    0.01 0.30   0.27  0.68  0.86 1.04  1.43  2836    1
+d[3]   1.65    0.01 0.29   1.07  1.48  1.66 1.83  2.22  2801    1
+beta1  0.17    0.00 0.23  -0.27  0.02  0.17 0.31  0.62  2664    1
+beta2 -2.18    0.11 5.91 -13.81 -5.76 -2.20 1.65  9.24  2725    1
+tau    0.19    0.00 0.19   0.01  0.06  0.14 0.25  0.74  2203    1
 
-Samples were drawn using NUTS(diag_e) at Sun May 10 15:30:33 2026.
+Samples were drawn using NUTS(diag_e) at Tue May 12 20:11:48 2026.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>
@@ -989,24 +989,24 @@ convergence, Rhat=1).</code></pre>
 <tbody>
 <tr class="odd">
 <td><strong>d[2]</strong></td>
-<td>1.05</td>
-<td>0.87</td>
-<td>0.85</td>
+<td>0.92</td>
 <td>0.84</td>
+<td>0.88</td>
+<td>0.86</td>
 </tr>
 <tr class="even">
 <td><strong>d[3]</strong></td>
-<td>1.55</td>
+<td>1.72</td>
+<td>1.65</td>
+<td>1.65</td>
 <td>1.66</td>
-<td>1.67</td>
-<td>1.67</td>
 </tr>
 <tr class="odd">
 <td><strong>tau</strong></td>
-<td>1.78</td>
-<td>2.37</td>
-<td>0.12</td>
-<td>0.13</td>
+<td>1.99</td>
+<td>2.27</td>
+<td>0.14</td>
+<td>0.14</td>
 </tr>
 </tbody>
 </table>
@@ -1104,23 +1104,23 @@ tau 代表的是“实验与实验之间的异质性（Between-study heterogenei
 <tr class="odd">
 <td style="text-align: left;">SoC (A)</td>
 <td style="text-align: right;">0.000</td>
-<td style="text-align: right;">0.007</td>
-<td style="text-align: right;">0.993</td>
-<td style="text-align: right;">0.004</td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;">0.994</td>
+<td style="text-align: right;">0.003</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Drug 2 (B)</td>
-<td style="text-align: right;">0.035</td>
-<td style="text-align: right;">0.958</td>
-<td style="text-align: right;">0.007</td>
-<td style="text-align: right;">0.514</td>
+<td style="text-align: right;">0.039</td>
+<td style="text-align: right;">0.955</td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;">0.516</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Drug 3 (C)</td>
-<td style="text-align: right;">0.965</td>
-<td style="text-align: right;">0.035</td>
+<td style="text-align: right;">0.961</td>
+<td style="text-align: right;">0.039</td>
 <td style="text-align: right;">0.000</td>
-<td style="text-align: right;">0.983</td>
+<td style="text-align: right;">0.981</td>
 </tr>
 </tbody>
 </table>
@@ -1289,14 +1289,14 @@ This yields the exact same result as the physical interpretation above.
 3 chains, each with iter=2000; warmup=1000; thin=1; 
 post-warmup draws per chain=1000, total post-warmup draws=3000.
 
-      mean se_mean    sd   2.5%   25%  50%  75% 97.5% n_eff Rhat
-omega 0.88    1.46 13.77 -24.20 -8.55 0.84 8.73 29.07    89 1.06
-d[1]  0.00    0.00  0.00   0.00  0.00 0.00 0.00  0.00  1741 1.00
-d[2]  1.34    0.66  7.02 -12.15 -3.49 1.22 5.71 16.43   113 1.06
-d[3]  1.24    1.07  9.98 -19.84 -4.65 1.07 8.11 19.64    88 1.06
-tau   2.52    0.09  1.47   0.10  1.26 2.53 3.84  4.87   240 1.00
+      mean se_mean    sd   2.5%   25%  50%   75% 97.5% n_eff Rhat
+omega 2.05    1.05 11.76 -20.23 -5.92 1.61 10.13 26.03   126 1.01
+d[1]  0.00    0.00  0.00   0.00  0.00 0.00  0.00  0.00  1645 1.00
+d[2]  1.83    0.51  5.98  -9.38 -2.29 1.72  5.97 13.29   138 1.01
+d[3]  0.37    0.69  8.69 -16.94 -5.38 0.66  6.16 16.62   161 1.01
+tau   2.53    0.09  1.42   0.15  1.29 2.56  3.75  4.86   229 1.03
 
-Samples were drawn using NUTS(diag_e) at Sun May 10 16:40:29 2026.
+Samples were drawn using NUTS(diag_e) at Tue May 12 20:12:09 2026.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>
