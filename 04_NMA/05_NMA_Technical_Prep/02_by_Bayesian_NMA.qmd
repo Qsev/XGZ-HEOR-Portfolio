@@ -1,5 +1,5 @@
 ---
-title: "Technical Guide 02: Network Meta-Regression (NMR) & Random Effects"
+title: "Network Meta-Regression (NMR) & Random Effects"
 author: "Xiaoge Zhang"
 date: 06/05/2026
 engine: knitr
@@ -15,6 +15,7 @@ format:
 
 *Handling Heterogeneity and Ecological Bias with Aggregate Data (AD)*
 
+```{=html}
 <!--
 ## 📑 Table of Contents
 
@@ -25,6 +26,7 @@ format:
 5.  [**Results & Interpretation: Covariate Adjustment**](#5-results)
 6.  [**Strategic Q&A: The Limits of AD NMR**](#6-strategic-qa)
 -->
+```
 
 ## 1. Executive Summary: The Heterogeneity Problem {#1-executive-summary}
 

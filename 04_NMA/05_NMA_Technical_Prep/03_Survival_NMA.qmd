@@ -1,5 +1,5 @@
 ---
-title: "Technical Guide 03: Survival NMA & Other Data Types"
+title: "Survival NMA & Other Data Types"
 author: "Xiaoge Zhang"
 date: "06/05/2026"
 engine: knitr
@@ -15,6 +15,7 @@ format:
 
 *Extending NMA to Continuous, Count, and Time-to-Event (Survival) Data*
 
+```{=html}
 <!--
 ## 📑 Table of Contents {.unnumbered}
 
@@ -25,6 +26,7 @@ format:
 4.  [**Approach 2: Arm-Based Parametric Survival NMA (Curve Fitting)**](#4-arm-based)
 5.  [**Connecting to Economic Models (HTA Focus)**](#5-connecting-to-economic)
 -->
+```
 
 ## Bridging the Gap: Continuous and Count Data {#1-bridging-the-gap}
 
@@ -34,12 +36,13 @@ In our previous guides, we dealt exclusively with **Binomial Data** (responders 
 
 In clinical trials for conditions like hypertension, continuous outcomes are typically reported in two ways:
 
-1. **Change from Baseline (CfB)**: The absolute difference between post-treatment and pre-treatment values (e.g., $-15$ mmHg).
-1. **Final Values**: The absolute value measured at the end of the study (e.g., $120$ mmHg).
+1.  **Change from Baseline (CfB)**: The absolute difference between post-treatment and pre-treatment values (e.g., $-15$ mmHg).
+2.  **Final Values**: The absolute value measured at the end of the study (e.g., $120$ mmHg).
 
 In NMA, both are modeled using a **Normal Likelihood** with an **Identity Link**. However, the choice between them impacts the interpretation and requires specific handling of variance.
 
 #### Contrast-Based NMA for Aggregate Data (AD) {.unnumbered}
+
 When extracting data from publications, we usually obtain the **sample mean** ($y_{jk}$) and its standard error ($se_{jk}$) for each arm $k$ in study $j$.
 
 - **Likelihood**: $y_{jk} \sim \text{Normal}(\theta_{jk}, se_{jk}^2)$
@@ -48,7 +51,8 @@ When extracting data from publications, we usually obtain the **sample mean** ($
 The effect measure synthesized across the network is the **Mean Difference (MD)**.
 
 #### The "Change from Baseline" Caveat {.unnumbered}
-If some studies report CfB and others report Final Values, they can often be combined in the same NMA because the relative effect (difference between arms) should theoretically be the same. 
+
+If some studies report CfB and others report Final Values, they can often be combined in the same NMA because the relative effect (difference between arms) should theoretically be the same.
 
 However, the variance (SD) of CfB is usually smaller than the SD of Final Values because it removes between-patient baseline variability. If the SD for CfB is missing, it cannot be simply imputed from the Final Value SD without accounting for the baseline-post correlation ($\rho$).
 
@@ -59,7 +63,7 @@ In trials for chronic diseases (like asthma or COPD), we often count the number 
 - **Likelihood**: $r_{jk} \sim \text{Poisson}(\lambda_{jk} \times E_{jk})$
 - **Link Function**: $\log(\lambda_{jk}) = \mu_j + \delta_{jk}$
 
-*(Where $r_{jk}$ is the observed number of events, $E_{jk}$ is the total exposure time (e.g., person-years) in arm $k$ of study $j$, and $\lambda_{jk}$ is the underlying event rate).*
+*(Where* $r_{jk}$ is the observed number of events, $E_{jk}$ is the total exposure time (e.g., person-years) in arm $k$ of study $j$, and $\lambda_{jk}$ is the underlying event rate).
 
 The effect measure synthesized here is the **Rate Ratio (RR)** or **Incidence Rate Ratio (IRR)**.
 
@@ -68,9 +72,9 @@ The effect measure synthesized here is the **Rate Ratio (RR)** or **Incidence Ra
 A strict assumption of the Poisson distribution is that the **mean equals the variance**. In real clinical trials, patient heterogeneity often causes the variance to exceed the mean, a phenomenon known as **Overdispersion**.
 
 - **The Risk**: If overdispersion is present but ignored in a Poisson model, the standard errors will be underestimated, leading to artificially narrow credible intervals and false claims of statistical significance.
-- **The Solution in NMA**: 
-  1. Upgrade to a **Negative Binomial** likelihood, which adds a dispersion parameter to allow the variance to exceed the mean.
-  2. Or, add a random effect term $\epsilon_{jk}$ to the log-linear predictor to account for the extra-Poisson variation.
+- **The Solution in NMA**:
+  1.  Upgrade to a **Negative Binomial** likelihood, which adds a dispersion parameter to allow the variance to exceed the mean.
+  2.  Or, add a random effect term $\epsilon_{jk}$ to the log-linear predictor to account for the extra-Poisson variation.
 
 ```{=html}
 <!-- Audit Point: Intuitive Explanation of Overdispersion
@@ -82,9 +86,6 @@ Imagine we are counting asthma exacerbations in a clinical trial.
 - Solutions include upgrading to a Negative Binomial distribution or adding a random effect term to account for the extra variance.
 -->
 ```
-
-
-
 
 ```{=html}
 <!-- Audit Point: The Physical Meaning of Link Functions
@@ -104,15 +105,14 @@ It poses a unique challenge: **Censoring**. We don't know the exact time of deat
 
 There are two primary ways to handle survival data in NMA, depending on the granularity of the available data and the validity of the proportional hazards assumption:
 
-1. **Contrast-Based Approach (Synthesizing Hazard Ratios)**:
-   - **What it means**: This approach focuses on the *relative treatment effect* (the contrast) between trial arms, typically reported as a Hazard Ratio (HR). You extract the reported HR and its 95% Confidence Interval from each study.
-   - **The Logic**: You treat the log-transformed Hazard Ratio ($\log(HR)$) and its standard error as a continuous outcome. The NMA then synthesizes these relative effects across the network using a standard Normal likelihood, just like you would with Mean Differences in continuous data.
-   - **When to use**: When you only have access to published aggregate data (no KM curves) and the Proportional Hazards assumption holds.
-
-2. **Arm-Based Approach (Parametric Curve Fitting)**:
-   - **What it means**: This approach bypasses the reported HRs and models the *absolute survival time* in each treatment arm directly.
-   - **The Logic**: You use algorithms (like Guyot's method) to digitize published Kaplan-Meier curves and reconstruct pseudo-Individual Patient Data (IPD). You then fit full parametric survival distributions (e.g., Weibull, Gompertz, or Fractional Polynomials) to the data. The treatment effect is modeled as a shift in the parameters of these distributions.
-   - **When to use**: When proportional hazards are violated (e.g., crossing KM curves in immunotherapy) and you need full survival curves to extrapolate over a long time horizon for cost-effectiveness models.
+1.  **Contrast-Based Approach (Synthesizing Hazard Ratios)**:
+    - **What it means**: This approach focuses on the *relative treatment effect* (the contrast) between trial arms, typically reported as a Hazard Ratio (HR). You extract the reported HR and its 95% Confidence Interval from each study.
+    - **The Logic**: You treat the log-transformed Hazard Ratio ($\log(HR)$) and its standard error as a continuous outcome. The NMA then synthesizes these relative effects across the network using a standard Normal likelihood, just like you would with Mean Differences in continuous data.
+    - **When to use**: When you only have access to published aggregate data (no KM curves) and the Proportional Hazards assumption holds.
+2.  **Arm-Based Approach (Parametric Curve Fitting)**:
+    - **What it means**: This approach bypasses the reported HRs and models the *absolute survival time* in each treatment arm directly.
+    - **The Logic**: You use algorithms (like Guyot's method) to digitize published Kaplan-Meier curves and reconstruct pseudo-Individual Patient Data (IPD). You then fit full parametric survival distributions (e.g., Weibull, Gompertz, or Fractional Polynomials) to the data. The treatment effect is modeled as a shift in the parameters of these distributions.
+    - **When to use**: When proportional hazards are violated (e.g., crossing KM curves in immunotherapy) and you need full survival curves to extrapolate over a long time horizon for cost-effectiveness models.
 
 ## The Minimal Mock Case: Advanced Melanoma
 
@@ -120,19 +120,18 @@ To ground both approaches in a realistic clinical context, we define a shared si
 
 - **Disease**: Advanced Melanoma (metastatic or unresectable).
 - **Treatments**:
-  1. **Dacarbazine** (Chemotherapy, the standard of care anchor).
-  2. **Ipilimumab** (CTLA-4 inhibitor, representing early immunotherapy).
-  3. **Nivolumab** (PD-1 inhibitor, representing advanced immunotherapy).
+  1.  **Dacarbazine** (Chemotherapy, the standard of care anchor).
+  2.  **Ipilimumab** (CTLA-4 inhibitor, representing early immunotherapy).
+  3.  **Nivolumab** (PD-1 inhibitor, representing advanced immunotherapy).
 - **The Evidence Network**: 4 randomized controlled trials (RCTs) forming a connected network:
   - Study 1: Trt 1 vs. Trt 2
   - Study 2: Trt 1 vs. Trt 2
   - Study 3: Trt 1 vs. Trt 3
   - Study 4: Trt 2 vs. Trt 3
-
 - In **Approach 1**, we assume we only extracted the reported Hazard Ratios from these trials.
 - In **Approach 2**, we assume we used algorithms like Guyot's method to reconstruct the individual patient data (IPD) from the published Kaplan-Meier curves.
 
----
+------------------------------------------------------------------------
 
 ### Approach 1: Contrast-Based Survival NMA (Hazard Ratios) {#3-contrast-based}
 
@@ -179,7 +178,6 @@ model {
 
 #### Simulation and Execution in R {.unnumbered}
 
-
 Here we provide a full working example. We assume all studies are 2-arm trials for simplicity. The observed data is the $\log(HR)$ and its standard error.
 
 ::: {.callout-note collapse="true"}
@@ -224,8 +222,6 @@ Based on the Contrast-Based NMA (Approach 1), the estimated Hazard Ratios (Media
 - **Treatment 2 vs 1**: `r round(exp(median(as.matrix(fit_contrast)[, "d[2]"])), 2)`
 - **Treatment 3 vs 1**: `r round(exp(median(as.matrix(fit_contrast)[, "d[3]"])), 2)`
 
-
-
 ```{=html}
 <!-- Audit Point: The Fatal Flaw of the HR approach (Proportional Hazards)
 Treating log(HR) as a single number relies on the strict assumption of Proportional Hazards (PH). 
@@ -236,9 +232,7 @@ In modern immuno-oncology, survival curves often cross. A treatment might perfor
 
 ### Approach 2: Arm-Based Parametric Survival NMA (Weibull) {#4-arm-based}
 
-
 To demonstrate a highly complete implementation, we will build a **Weibull Parametric Survival NMA** using simulated Individual Patient Data (IPD). This approach allows us to model the full survival curve, which is the gold standard for NICE submissions when proportional hazards are questioned.
-
 
 #### The Stan Model {.unnumbered}
 
@@ -293,9 +287,9 @@ model {
 }
 ```
 
-1. **Lambda calculation**: We exponentiate the `log_scale` to get the scale parameter $\lambda$ for the Weibull hazard.
-2. **Log-PDF for Events**: When an event occurs, the likelihood contribution is the Probability Density Function (PDF), which is $f(t) = h(t)S(t)$. In log-scale, this is $\ln(h(t)) + \ln(S(t))$. The first part is the log-hazard, and the second part (`- lambda * pow(time[i], shape)`) is the log-survival.
-3. **Log-Survival for Censored**: When data is censored, we only know the patient survived up to time $t$. So the likelihood contribution is just the Survival Function $S(t)$. In log-scale, this is $\ln(S(t)) = -\lambda t^\gamma$.
+1.  **Lambda calculation**: We exponentiate the `log_scale` to get the scale parameter $\lambda$ for the Weibull hazard.
+2.  **Log-PDF for Events**: When an event occurs, the likelihood contribution is the Probability Density Function (PDF), which is $f(t) = h(t)S(t)$. In log-scale, this is $\ln(h(t)) + \ln(S(t))$. The first part is the log-hazard, and the second part (`- lambda * pow(time[i], shape)`) is the log-survival.
+3.  **Log-Survival for Censored**: When data is censored, we only know the patient survived up to time $t$. So the likelihood contribution is just the Survival Function $S(t)$. In log-scale, this is $\ln(S(t)) = -\lambda t^\gamma$.
 :::
 
 ```{=html}
@@ -387,9 +381,10 @@ fit_surv <- stan(
 
 print(fit_surv, pars = c("d", "shape"))
 ```
-1. **Sorting to maintain grouping**: We combine the two arms and sort by study ID. This ensures the data is ordered as Study 1 Arm 1, Study 1 Arm 2, Study 2 Arm 1, etc., matching the structure of standard IPD datasets.
-2. **Vectorized data generation**: R's `rweibull` is vectorized over its parameters. By passing the entire lambda vector, we generate all 400 survival times in a single call, avoiding slow for-loops.
-3. **Administrative Censoring**: Patients who do not experience the event before 24 months are censored (event = 0), and their observed time is set to the maximum follow-up of 24 months.
+
+1.  **Sorting to maintain grouping**: We combine the two arms and sort by study ID. This ensures the data is ordered as Study 1 Arm 1, Study 1 Arm 2, Study 2 Arm 1, etc., matching the structure of standard IPD datasets.
+2.  **Vectorized data generation**: R's `rweibull` is vectorized over its parameters. By passing the entire lambda vector, we generate all 400 survival times in a single call, avoiding slow for-loops.
+3.  **Administrative Censoring**: Patients who do not experience the event before 24 months are censored (event = 0), and their observed time is set to the maximum follow-up of 24 months.
 :::
 
 Based on the Arm-Based Parametric NMA (Approach 2), the estimated Hazard Ratios (Median) relative to Treatment 1 are:
@@ -403,10 +398,10 @@ Why do we go through the pain of curve fitting? Because Cost-Effectiveness Model
 
 ### Partitioned Survival Models (PSM) {.unnumbered}
 
-In a 3-state PSM (Progression-Free, Progressed Disease, Dead), the health states are driven directly by two survival curves: 
+In a 3-state PSM (Progression-Free, Progressed Disease, Dead), the health states are driven directly by two survival curves:
 
-- **PFS Curve**: Defines the proportion of patients in the "Progression-Free" state. 
-- **OS Curve**: Defines the proportion of patients alive. 
+- **PFS Curve**: Defines the proportion of patients in the "Progression-Free" state.
+- **OS Curve**: Defines the proportion of patients alive.
 - **Progressed Disease State**: Calculated as the area between the OS and PFS curves.
 
 By running a Parametric Survival NMA, we extract the posterior distributions of the curve parameters (e.g., Weibull scale and shape). We then plug these parameters into the PSM in Excel or R to calculate Quality-Adjusted Life Years (QALYs) over a lifetime horizon.

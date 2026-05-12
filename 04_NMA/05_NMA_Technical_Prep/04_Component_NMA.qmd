@@ -1,5 +1,5 @@
 ---
-title: "Technical Guide 04: Component Network Meta-Analysis (CNMA)"
+title: "Component Network Meta-Analysis (CNMA)"
 author: "Xiaoge Zhang"
 date: "06/05/2026"
 engine: knitr
@@ -15,6 +15,7 @@ format:
 
 *Disentangling the Effects of Combination Therapies*
 
+```{=html}
 <!--
 ## 📑 Table of Contents {.unnumbered}
 
@@ -24,6 +25,7 @@ format:
 4.  [**The Stan Model for CNMA**](#4-stan-model)
 5.  [**Simulating and Executing CNMA in R**](#5-simulation)
 -->
+```
 
 ## Executive Summary: The Rise of Combination Therapies {#1-executive-summary}
 

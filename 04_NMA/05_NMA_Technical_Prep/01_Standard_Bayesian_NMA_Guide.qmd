@@ -1,5 +1,5 @@
 ---
-title: "Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)"
+title: "Standard Bayesian Network Meta-Analysis (NMA)"
 author: "Xiaoge Zhang"
 date: 06/05/2026
 format: 

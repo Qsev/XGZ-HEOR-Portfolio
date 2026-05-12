@@ -1,5 +1,5 @@
 ---
-title: "Technical Guide 06: Matching-Adjusted Indirect Comparison (MAIC)"
+title: "Matching-Adjusted Indirect Comparison (MAIC)"
 author: "Xiaoge Zhang"
 date: "06/05/2026"
 engine: knitr
@@ -15,6 +15,7 @@ format:
 
 *Bridging the Gap When Patient-Level Data is Only Partially Available*
 
+```{=html}
 <!--
 ## 📑 Table of Contents {.unnumbered}
 
@@ -24,17 +25,18 @@ format:
 4.  [**Custom R Implementation: Calculating Weights from Scratch**](#4-custom-r-implementation)
 5.  [**Industry Standard Alternative: `maic` Package**](#5-maic-package)
 -->
+```
 
 ## Executive Summary: When NMA Fails {#1-executive-summary}
 
 Standard Network Meta-Analysis (NMA) requires a connected network of trials (usually connected via a common comparator like Placebo or Standard of Care). However, in many real-world Health Technology Assessment (HTA) submissions, the network is **broken**.
 
-A common scenario is when a pharmaceutical company conducts a single-arm trial for their new drug (Drug A), while the competitor drug (Drug B) also only has published single-arm trial data. Since there is no common comparator, standard NMA is mathematically impossible. Furthermore, direct naive comparison of the two single arms is severely biased if the patient populations differ (e.g., Trial A enrolled younger patients with lower disease severity than Trial B, as is often the case in real-world clinical practice). 
+A common scenario is when a pharmaceutical company conducts a single-arm trial for their new drug (Drug A), while the competitor drug (Drug B) also only has published single-arm trial data. Since there is no common comparator, standard NMA is mathematically impossible. Furthermore, direct naive comparison of the two single arms is severely biased if the patient populations differ (e.g., Trial A enrolled younger patients with lower disease severity than Trial B, as is often the case in real-world clinical practice).
 
-**Matching-Adjusted Indirect Comparison (MAIC)** is a form of Population-Adjusted Indirect Comparison (PAIC) designed specifically for this scenario. It requires: 
+**Matching-Adjusted Indirect Comparison (MAIC)** is a form of Population-Adjusted Indirect Comparison (PAIC) designed specifically for this scenario. It requires:
 
-1. **Individual Patient Data (IPD)** for the active treatment (Drug A). 
-2. **Aggregate Data (AgD)** (summary statistics) for the comparator treatment (Drug B).
+1.  **Individual Patient Data (IPD)** for the active treatment (Drug A).
+2.  **Aggregate Data (AgD)** (summary statistics) for the comparator treatment (Drug B).
 
 MAIC works by assigning a statistical weight to every individual patient in Trial A, such that the *weighted* baseline characteristics of Trial A perfectly match the *published* aggregate characteristics of Trial B. Once matched, the outcomes can be compared directly.
 
@@ -53,7 +55,7 @@ In this chapter, we demonstrate the mathematical mechanism of weighting using th
 
 We are evaluating a new oncology drug with a continuous outcome (e.g., reduction in tumor size).
 
-- **Drug A (Our Drug)**: We have row-by-row IPD for $N=200$ patients from a single-arm Phase II trial. 
+- **Drug A (Our Drug)**: We have row-by-row IPD for $N=200$ patients from a single-arm Phase II trial.
 - **Drug B (Competitor)**: We only have a published paper showing aggregate baseline characteristics and an average outcome.
 
 ### The Problem (Baseline Imbalance)
@@ -70,7 +72,7 @@ Unlike Bayesian NMA, the standard MAIC weight calculation is purely frequentist.
 
 $$w_i = \exp(\alpha_0 + x_i^T \alpha_1)$$
 
-Where: 
+Where:
 
 - $w_i$ is the final weight assigned to patient $i$ in Trial A.
 - $x_i$ represents the centered covariates for patient $i$ in Trial A (centered around the published aggregate mean of Trial B).
@@ -254,7 +256,7 @@ cat("Point Estimate of Treatment Effect (A vs B): ", treatment_effect, "\n")
 
 ### Quantifying Uncertainty via Bootstrapping
 
-We cannot use standard t-test formulas to calculate the standard error of this treatment effect because the weights themselves are random variables estimated from the data. 
+We cannot use standard t-test formulas to calculate the standard error of this treatment effect because the weights themselves are random variables estimated from the data.
 
 In real-world HTA submissions, practitioners use **Bootstrapping** to calculate the 95% Confidence Interval. This involves repeatedly resampling the IPD data with replacement, recalculating the MAIC weights each time, and generating a distribution of the treatment effect.
 
@@ -300,7 +302,7 @@ cat("Bootstrapped 95% CI: [", ci_lower, ", ", ci_upper, "]\n")
 With the point estimate and the bootstrapped standard error, we can now present the complete MAIC indirect comparison results as they would appear in an HTA dossier:
 
 | Metric | Estimate | 95% CI Lower | 95% CI Upper |
-|:---|:---:|:---:|:---:|
+|:-----------------|:----------------:|:----------------:|:----------------:|
 | **Naive Difference** | `r round(mean_y_A_naive - mean_y_B_published, 2)` | N/A | N/A |
 | **MAIC Adjusted Difference** | **`r round(treatment_effect, 2)`** | **`r round(ci_lower, 2)`** | **`r round(ci_upper, 2)`** |
 

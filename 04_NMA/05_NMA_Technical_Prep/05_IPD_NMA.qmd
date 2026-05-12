@@ -1,5 +1,5 @@
 ---
-title: "Technical Guide 05: Individual Patient Data (IPD) NMA"
+title: "Individual Patient Data (IPD) NMA"
 author: "Xiaoge Zhang"
 date: "06/05/2026"
 engine: knitr

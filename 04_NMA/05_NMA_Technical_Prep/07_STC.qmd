@@ -1,5 +1,5 @@
 ---
-title: "Technical Guide 07: Simulated Treatment Comparison (STC)"
+title: "Simulated Treatment Comparison (STC)"
 author: "Xiaoge Zhang"
 date: "06/05/2026"
 engine: knitr
@@ -15,6 +15,7 @@ format:
 
 *Predicting Outcomes Across Disconnected Networks via Regression*
 
+```{=html}
 <!--
 ## 📑 Table of Contents {.unnumbered}
 
@@ -25,24 +26,25 @@ format:
 5.  [**Outcome Analysis: The Final Comparison**](#5-outcome-analysis)
 6.  [**The Fatal Flaw: Ecological Bias in Non-Linear Models**](#6-ecological-bias)
 -->
+```
 
 ## Executive Summary: The Predictive Approach {#1-executive-summary}
 
-When attempting an indirect comparison between Trial A and Trial B, differing patient populations can introduce severe bias if there are **Effect Modifiers** (covariates that change the treatment effect) that are imbalanced between the trials. 
+When attempting an indirect comparison between Trial A and Trial B, differing patient populations can introduce severe bias if there are **Effect Modifiers** (covariates that change the treatment effect) that are imbalanced between the trials.
 
 If we have full Individual Patient Data (IPD) for both trials, we can simply run an IPD Network Meta-Analysis (IPD-NMA) to adjust for these differences. However, the standard reality in HEOR is that we only have IPD for our own Trial A, and only published Aggregate Data (AgD) for the competitor's Trial B. This creates a severe **population mismatch** that prevents a fair "apples-to-apples" comparison.
 
 While **MAIC** resolves this mismatch by *re-weighting* the IPD of Trial A to match Trial B's baseline, **Simulated Treatment Comparison (STC)** approaches it by predicting outcomes. STC builds a **regression** model using Trial A's IPD to understand the relationship between baseline characteristics and the clinical outcome. It then plugs Trial B's aggregate baseline characteristics into this model to predict what Trial A's outcome *would have been* if its patients had the same average baseline as Trial B.
 
--   **Pros**: STC does **not** reduce the Effective Sample Size (ESS) like MAIC does, and it can handle scenarios where covariate overlap is poor.
--   **Cons**: STC suffers from severe **ecological bias** when the outcome model is non-linear (e.g., Logistic regression for binary endpoints, Cox PH for survival). Plugging aggregate means into a non-linear function is mathematically flawed ($f(E[X]) \neq E[f(X)]$).
+- **Pros**: STC does **not** reduce the Effective Sample Size (ESS) like MAIC does, and it can handle scenarios where covariate overlap is poor.
+- **Cons**: STC suffers from severe **ecological bias** when the outcome model is non-linear (e.g., Logistic regression for binary endpoints, Cox PH for survival). Plugging aggregate means into a non-linear function is mathematically flawed ($f(E[X]) \neq E[f(X)]$).
 
 ## The Minimal Mock Case: Continuous Outcome {#2-mock-case}
 
 To demonstrate STC without the distraction of complex clinical datasets, we will simulate a minimal scenario:
 
--   **Drug A (Index Trial)**: We have full IPD for 200 patients. The continuous outcome $y$ is highly dependent on `age`.
--   **Drug B (Target Trial)**: We only have published aggregate data. The mean age is 65, and the published mean outcome is 3.0.
+- **Drug A (Index Trial)**: We have full IPD for 200 patients. The continuous outcome $y$ is highly dependent on `age`.
+- **Drug B (Target Trial)**: We only have published aggregate data. The mean age is 65, and the published mean outcome is 3.0.
 
 ```{r}
 #| message: false
@@ -71,13 +73,9 @@ mean_y_A_naive <- mean(df_A$y)
 
 The STC workflow consists of two simple mathematical steps:
 
-1. **Fit a multivariable regression model on the IPD from Trial A.**
-   For a continuous outcome, we estimate the regression coefficients $\hat{\beta}_0$ (intercept) and $\hat{\beta}_1$ (effect of covariate $X$) using Trial A's data:
-   $$ y_{Ai} = \beta_0 + \beta_1 X_{Ai} + \epsilon_i $$
+1.  **Fit a multivariable regression model on the IPD from Trial A.** For a continuous outcome, we estimate the regression coefficients $\hat{\beta}_0$ (intercept) and $\hat{\beta}_1$ (effect of covariate $X$) using Trial A's data: $$ y_{Ai} = \beta_0 + \beta_1 X_{Ai} + \epsilon_i $$
 
-2. **Predict the outcome using the aggregate covariate values from Trial B.**
-   We take the published mean of the covariate from Trial B ($\bar{X}_B$) and plug it into our fitted model. This gives us the simulated, adjusted mean outcome for Drug A:
-   $$ \hat{Y}_{A|B} = \hat{\beta}_0 + \hat{\beta}_1 \bar{X}_B $$
+2.  **Predict the outcome using the aggregate covariate values from Trial B.** We take the published mean of the covariate from Trial B ($\bar{X}_B$) and plug it into our fitted model. This gives us the simulated, adjusted mean outcome for Drug A: $$ \hat{Y}_{A|B} = \hat{\beta}_0 + \hat{\beta}_1 \bar{X}_B $$
 
 ```{r}
 #| message: false
@@ -109,9 +107,9 @@ Therefore, plugging the mean of X (E[X]) directly into the fitted model yields a
 
 ## Industry Standard Packages for STC {#4-industry-packages}
 
-In the previous chapter on MAIC, we used the `maicplus` package because calculating weights requires a dedicated non-linear optimization routine. 
+In the previous chapter on MAIC, we used the `maicplus` package because calculating weights requires a dedicated non-linear optimization routine.
 
-For STC, however, **there is no universally dominant dedicated R package**. Why? Because the core methodology of STC is simply standard regression modeling. In pharmaceutical industry submissions, STC is almost exclusively performed using base R functions like `lm()` (for continuous outcomes), `glm()` (for binary), or `survival::coxph()` (for time-to-event). The model is fit, and `predict()` is called. 
+For STC, however, **there is no universally dominant dedicated R package**. Why? Because the core methodology of STC is simply standard regression modeling. In pharmaceutical industry submissions, STC is almost exclusively performed using base R functions like `lm()` (for continuous outcomes), `glm()` (for binary), or `survival::coxph()` (for time-to-event). The model is fit, and `predict()` is called.
 
 Recently, newer packages like `outstandR` have been developed to provide a unified framework for Population-Adjusted Indirect Comparisons (PAIC), but writing the regression equations explicitly in base R remains the most transparent and widely accepted practice by HTA reviewers.
 
@@ -153,7 +151,7 @@ cat("STC Standard Error: ", round(se_stc, 3), "\n")
 With the point estimate and the standard error, we can present the complete STC indirect comparison results:
 
 | Metric | Estimate | 95% CI Lower | 95% CI Upper |
-|:---|:---:|:---:|:---:|
+|:-----------------|:----------------:|:----------------:|:----------------:|
 | **Naive Difference** | `r round(mean_y_A_naive - mean_y_B_published, 2)` | N/A | N/A |
 | **STC Adjusted Difference** | **`r round(treatment_effect_stc, 2)`** | **`r round(ci_lower_stc, 2)`** | **`r round(ci_upper_stc, 2)`** |
 
@@ -167,9 +165,9 @@ A fundamental rule of mathematics (Jensen's Inequality) states that for a non-li
 
 $$ f(E[X]) \neq E[f(X)] $$
 
-If you fit a logistic regression model on Trial A, and then plug in the *mean age* of Trial B ($\bar{X}_B = 65$), you are calculating $f(E[X])$. This predicts the probability of an event for a single hypothetical patient who is exactly 65 years old. 
+If you fit a logistic regression model on Trial A, and then plug in the *mean age* of Trial B ($\bar{X}_B = 65$), you are calculating $f(E[X])$. This predicts the probability of an event for a single hypothetical patient who is exactly 65 years old.
 
-However, what you *actually want* is the average probability of the event across the entire Trial B population, which is $E[f(X)]$. 
+However, what you *actually want* is the average probability of the event across the entire Trial B population, which is $E[f(X)]$.
 
 Because STC plugs aggregate means into non-linear equations, it produces systematically biased population-level estimates. This mathematical flaw is the exact reason why **Multilevel Network Meta-Regression (ML-NMR)** was invented—to perform numerical integration over the distribution of $X$ to correctly calculate $E[f(X)]$ without ecological bias.
 
