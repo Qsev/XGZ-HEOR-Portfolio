@@ -1,0 +1,294 @@
+---
+title: "Technical Guide 04: Component Network Meta-Analysis (CNMA)"
+author: "Xiaoge Zhang"
+date: "06/05/2026"
+engine: knitr
+format: 
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "View the code"
+    number-sections: True
+---
+
+*Disentangling the Effects of Combination Therapies*
+
+<!--
+## 📑 Table of Contents {.unnumbered}
+
+1.  [**Executive Summary: The Rise of Combination Therapies**](#1-executive-summary)
+2.  [**The Additive Assumption in CNMA**](#2-additive-assumption)
+3.  [**Setting Up the Component Design Matrix**](#3-design-matrix)
+4.  [**The Stan Model for CNMA**](#4-stan-model)
+5.  [**Simulating and Executing CNMA in R**](#5-simulation)
+-->
+
+## Executive Summary: The Rise of Combination Therapies {#1-executive-summary}
+
+In modern oncology and chronic disease management, treatments are increasingly formulated as **combination therapies**. For example, treating advanced melanoma might involve a base chemotherapy (Drug A) combined with a novel immunotherapy (Drug B), creating the combination arm (Drug A + Drug B).
+
+Standard Network Meta-Analysis (NMA) treats every unique combination as a completely separate, independent node in the network. This approach fails to leverage the shared information: the effect of "Drug A" is present in both the monotherapy arm (A) and the combination arm (A + B).
+
+**Component Network Meta-Analysis (CNMA)** solves this by decomposing treatments into their constituent parts. Instead of estimating the relative effect of "Treatment X vs Treatment Y", we directly estimate the main effect of "Component A", "Component B", etc.
+
+**The Reality of Combination Trials** A common misconception is that pharmaceutical companies rarely test their drugs in combination with others to avoid confounding the effect of their own drug. In reality, combination trials are the absolute norm in areas like Oncology, HIV, and Hepatitis C. Companies frequently run trials of their new compound *on top of* an established background therapy or another company's drug (via collaboration or as Standard of Care) to prove superiority over the existing care standard.
+
+## The Additive Assumption in CNMA {#2-additive-assumption}
+
+The most fundamental form of CNMA relies on the **Additive Assumption**. This assumes that the effect of a combination therapy is exactly equal to the sum of the independent effects of its components.
+
+If $\theta_A$ is the effect of Drug A, and $\theta_B$ is the effect of Drug B, then the effect of the combination $AB$ is modeled as: $$\theta_{AB} = \theta_A + \theta_B$$
+
+```{=html}
+<!-- Audit Point: The "Absurdity" of Additivity and the Link Function
+A common critique is: "If taking Drug A and Drug B adds up their effects, wouldn't taking 5 active drugs just cure the patient entirely?" 
+This misunderstanding stems from confusing the scales. In CNMA, additivity is assumed on the **Log Scale** (e.g., log-Odds Ratio, log-Hazard Ratio), not the natural physical scale.
+- If Drug A has a log-OR of -1 and Drug B has a log-OR of -1.
+- The combination A+B has a log-OR of -2.
+- Because the link function (like Logit) maps $(-\infty, \infty)$ strictly into $(0, 1)$, even stacking 5 drugs to get a log-OR of -5 only pushes the event probability asymptotically toward 0%. You can never "overshoot" physical bounds (like >100% cure rate) simply by adding components.
+-->
+```
+
+### The HTA Perspective: Will NICE Accept This?
+
+In practice, HTA agencies like NICE are **highly skeptical** of the strict additive assumption, particularly in oncology where drug combinations (e.g., IO + Chemo) are explicitly designed to be **synergistic** rather than merely additive.
+
+If you submit a pure additive CNMA to NICE, the ERG (Evidence Review Group) will likely challenge it. The accepted practices are:
+
+1.  **Interaction Models**: Introduce an interaction term ($\theta_{AB} = \theta_A + \theta_B + \theta_{A*B}$). If the interaction term is significant, it captures synergy or antagonism. However, robustly estimating interaction terms requires a dense network with trials directly comparing the combination against its individual components (e.g., A+B vs A).
+2.  **Standard NMA as Base Case**: When data is too sparse to estimate interactions, NICE generally prefers treating the combination "A+B" as a completely distinct, independent treatment node (Standard NMA). This avoids making unverified additive assumptions, even if it means sacrificing some statistical power by not pooling the component effects.
+
+### Unique Real-World Scenarios for CNMA
+
+Beyond simply increasing sample size or precision, CNMA is uniquely required in specific scenarios where Standard NMA fails:
+
+1.  **Predicting the Efficacy of Unobserved Combinations**: Suppose we have trials for `Drug A vs Placebo` and `Drug B vs Placebo`. A manufacturer wants to launch a combination therapy `Drug A + Drug B` but has not yet run a trial for the combination. CNMA allows the prediction of the combination's efficacy (under the additive assumption) to support early HTA submissions or pricing strategies.
+2.  **Connecting Disconnected Networks**: In Standard NMA, treatments are distinct nodes. If Study 1 compares `Drug A vs Drug B` and Study 2 compares `Drug C vs Drug C + Drug D`, these networks are disconnected in standard NMA. You cannot compare A or B with D. CNMA breaks treatments down into components. If `Drug A` and `Drug C` share a common component, CNMA can bridge the network at the component level.
+3.  **Disentangling Heterogeneous "Standard of Care" (SoC) Baselines**: In many disease areas, the "control" arm is the investigator's choice of SoC, which varies across trials (e.g., SoC in Trial 1 contains components X and Y; SoC in Trial 2 contains components X and Z). Standard NMA treats these as different nodes or ignores the difference. CNMA can adjust for the specific components present in the background therapy of each trial.
+
+## The Minimal Mock Case: Advanced Melanoma Combination Therapy {#3-design-matrix}
+
+To make the Component NMA (CNMA) operation clear, let's ground it in a concrete clinical scenario answering the specific workflow questions.
+
+### The Scenario & Treatments
+
+We are analyzing clinical trials for **Advanced Melanoma**. The network evaluates 3 distinct components:
+
+- **Component 1**: Placebo (Reference, effect set to 0).
+- **Component 2**: Drug A (a novel immunotherapy).
+- **Component 3**: Drug B (another novel immunotherapy).
+
+Across the evidence network, trials do not just test single drugs; they test combinations. We have a total of 4 unique treatments in the network:
+
+- **Trt 1**: Placebo.
+- **Trt 2**: Drug A monotherapy.
+- **Trt 3**: Drug B monotherapy.
+- **Trt 4**: Drug A + Drug B combination.
+
+### Extracted Data
+
+Instead of individual patient data, we **extract aggregate effect sizes** (e.g., Log-Hazard Ratios) from **published papers**:
+
+- **Study 1** (Trt 1 vs 2): Observed effect = -0.5 (SE = 0.1).
+- **Study 2** (Trt 1 vs 3): Observed effect = -0.3 (SE = 0.1).
+- **Study 3** (Trt 2 vs 4): Observed effect = -0.3 (SE = 0.1).
+
+### Regression Input Data
+
+We do not treat the 4 treatments as independent categories. We break them down into a **Design Matrix** $X$ based on their components:
+
+| Treatment | Description | $X_2$ (Drug A) | $X_3$ (Drug B) |
+|:----------|:------------|:--------------:|:--------------:|
+| 1         | Placebo     |       0        |       0        |
+| 2         | Drug A      |       1        |       0        |
+| 3         | Drug B      |       0        |       1        |
+| 4         | Drug A + B  |       1        |       1        |
+
+The data fed into the Stan regression model consists of: - `y`: The vector of observed effects from the trials (e.g., `[-0.5, -0.3, -0.3]`). - `X`: The rows of the design matrix corresponding to the treatments compared in those trials. - `study`: Identifiers mapping each arm to its specific study (to handle study-specific baselines $\mu_j$).
+
+The linear predictor for Treatment $k$ in Study $j$ becomes: $$\theta_{jk} = \mu_j + X_{k,2}\delta_2 + X_{k,3}\delta_3$$
+
+Where: - $X_{k,2}$ and $X_{k,3}$ are **indicator variables** (values 0 or 1) from the Design Matrix. - $\delta_2$ and $\delta_3$ are the **true underlying marginal effects** of Component 2 and Component 3.
+
+### Results
+
+The regression outputs the independent, marginal effects of the components: - $\delta_2$: The effect of Drug A (estimated to be around -0.5). - $\delta_3$: The effect of Drug B (estimated to be around -0.3).
+
+With these, we can predict the effect of the combination (Trt 4) relative to Placebo as $\delta_2 + \delta_3 = -0.8$, even if no trial directly compared Trt 1 vs Trt 4.
+
+```{=html}
+<!-- Audit Point: Why Include Study 3? The Value of Indirect Evidence
+A logical question is: "If Study 1 gives the effect of Drug A, and Study 2 gives the effect of Drug B, why do we need Study 3?"
+The answer lies in **Information Borrowing** and Precision:
+1. **Indirect Evidence**: Study 3 compares Trt 2 (Drug A) vs Trt 4 (Drug A + Drug B). Under the additive assumption, the contrast between them is *purely the effect of Drug B*. 
+2. **Precision**: Study 3 provides indirect evidence for Drug B. By pooling Study 2 (direct evidence) and Study 3 (indirect evidence) in the regression, we effectively increase the sample size informing the estimate of Drug B's effect. This leads to narrower credible intervals and a more robust conclusion.
+-->
+```
+
+## The Stan Model for CNMA {#4-stan-model}
+
+We implement a standard Normal likelihood (Continuous Data) CNMA model in Stan.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# STAN Component_NMA.stan
+
+``` stan
+data {
+  int<lower=1> N;           // Total number of arms
+  real y[N];                // Observed effect size in arm (e.g., mean)
+  real<lower=0> se[N];      // Standard error of effect size
+  int<lower=1> NS;          // Number of studies
+  int<lower=1> study[N];    // Study ID for each arm
+  int<lower=1> NC;          // Number of active components
+  matrix[N, NC] X;          // Design matrix for components
+}
+parameters {
+  real mu[NS];              // Study-specific baselines
+  vector[NC] d;             // Main effects of each component
+}
+transformed parameters {
+  vector[N] theta;
+  for (i in 1:N) {
+    theta[i] = mu[study[i]] + dot_product(row(X, i), d);
+  }
+}
+model {
+  // Priors
+  mu ~ normal(0, 5);
+  d ~ normal(0, 5);
+  
+  // Likelihood
+  for (i in 1:N) {
+    y[i] ~ normal(theta[i], se[i]);
+  }
+}
+```
+:::
+
+```{=html}
+<!-- Audit Point: Why use `dot_product`?
+Instead of hardcoding `X2*d2 + X3*d3`, we use vector multiplication `dot_product(row(X, i), d)`. 
+This makes the Stan code highly scalable. Whether we have 2 components or 10 components, the Stan model code remains exactly the same; we only change the dimension of the input matrix X.
+-->
+```
+
+## Simulating and Executing CNMA in R {#5-simulation}
+
+We simulate a mock network where Drug A has a true effect of -0.5, Drug B has a true effect of -0.3, and their combination is exactly additive (-0.8).
+
+```{=html}
+<!-- Audit Point: Why Simulate Data Instead of Using Real Data?
+A common challenge from applied statisticians is: "We never know `d_true` in reality. We just extract `y_obs` from papers. Why are we doing this simulation?"
+In Bayesian methodology development, basic parameter recovery tests are mandatory before touching real data. 
+1. **Model Validation**: Before trusting a custom Stan model with real, messy clinical data, we MUST prove that the mathematical logic in the code is sound. We do this by feeding it simulated data where we *do* know the ground truth (`d_true`). If the Stan model cannot recover `d_true` from the simulated `y_obs`, the code has a bug.
+2. **Real-World Application**: In a real HTA submission, you completely skip Step 2 ("Simulate Study Data"). Instead, you populate `y_obs` and `se_obs` directly with the Means and Standard Errors extracted from the systematic literature review (e.g., from Forest plots). The Stan model itself remains exactly the same.
+-->
+```
+
+::: {.callout-note collapse="true"}
+## Click to view R Simulation (Model Validation) and Stan Execution
+
+```{r}
+#| label: cnma-simulation
+#| message: false
+#| warning: false
+#| cache: true
+library(rstan)
+
+# 1. Define the Design Matrix (4 treatments, 2 active components)
+# Col 1: Drug A, Col 2: Drug B
+X_matrix <- matrix(c(
+    0, 0, # Trt 1: Placebo
+    1, 0, # Trt 2: Drug A
+    0, 1, # Trt 3: Drug B
+    1, 1 # Trt 4: Drug A + Drug B
+), ncol = 2, byrow = TRUE)
+
+# 2. Simulate Study Data (Continuous outcome)
+set.seed(123)
+# Study 1: Trt 1 vs Trt 2
+# Study 2: Trt 1 vs Trt 3
+# Study 3: Trt 2 vs Trt 4
+study_vec <- c(1, 1, 2, 2, 3, 3)
+trt_vec <- c(1, 2, 1, 3, 2, 4)
+
+# True Component Effects
+d_true <- c(-0.5, -0.3)
+mu_true <- c(0.1, 0.2, 0.15) # Study baselines
+
+# Generate observed outcomes
+N_arms <- length(study_vec)
+X_data <- matrix(0, nrow = N_arms, ncol = 2)
+y_obs <- numeric(N_arms) # Pre-allocate a numeric vector of length N_arms initialized with zeros
+se_obs <- rep(0.1, N_arms)
+
+for (i in 1:N_arms) {
+    X_data[i, ] <- X_matrix[trt_vec[i], ]
+    true_theta <- mu_true[study_vec[i]] + sum(X_data[i, ] * d_true)
+    y_obs[i] <- rnorm(1, mean = true_theta, sd = se_obs[i])
+}
+
+# 3. Stan Data List
+stan_data <- list(
+    N = N_arms,
+    y = y_obs,
+    se = se_obs,
+    NS = 3,
+    study = study_vec,
+    NC = 2,
+    X = X_data
+)
+
+# 4. Run Stan
+fit_cnma <- stan(
+    model_code = "
+data {
+  int<lower=1> N;
+  real y[N];
+  real<lower=0> se[N];
+  int<lower=1> NS;
+  int<lower=1> study[N];
+  int<lower=1> NC;
+  matrix[N, NC] X;
+}
+parameters {
+  real mu[NS];
+  vector[NC] d;
+}
+transformed parameters {
+  vector[N] theta;
+  for (i in 1:N) {
+    theta[i] = mu[study[i]] + dot_product(row(X, i), d);
+  }
+}
+model {
+  mu ~ normal(0, 5);
+  d ~ normal(0, 5);
+  for (i in 1:N) {
+    y[i] ~ normal(theta[i], se[i]);
+  }
+}
+  ",
+    data = stan_data,
+    chains = 3,
+    iter = 2000,
+    warmup = 1000,
+    refresh = 0
+)
+
+print(fit_cnma, pars = "d")
+```
+:::
+
+Based on the Component NMA model, the estimated independent effects of the components are:
+
+- **Component A Effect**: `r round(median(as.matrix(fit_cnma)[, "d[1]"]), 2)` (True: -0.5)
+- **Component B Effect**: `r round(median(as.matrix(fit_cnma)[, "d[2]"]), 2)` (True: -0.3)
+
+By successfully decomposing the treatments, we can now predict the effect of the combination therapy even if it was never directly compared to placebo in a single trial.
+
+------------------------------------------------------------------------
+
+**Guide Authored by**: Antigravity (Advanced Agentic Coding)

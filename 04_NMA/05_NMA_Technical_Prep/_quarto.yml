@@ -1,0 +1,27 @@
+project:
+  type: website
+
+website:
+  title: "NMA Technical Portfolio"
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - section: "Technical Guides"
+        contents:
+          - 01_Standard_Bayesian_NMA_Guide.qmd
+          - 02_by_Bayesian_NMA.qmd
+          - 03_Survival_NMA.qmd
+          - 04_Component_NMA.qmd
+          - 05_IPD_NMA.qmd
+          - 06_MAIC.qmd
+          - 07_STC.qmd
+          - 08_ML_NMR.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true

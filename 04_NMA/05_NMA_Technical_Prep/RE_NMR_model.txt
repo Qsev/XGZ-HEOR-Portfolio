@@ -1,0 +1,38 @@
+model {
+  for (j in 1:NS) {
+    # Baseline for arm 1
+    w[j,1] <- 0
+    theta[j,1] <- 0
+    mu[j] ~ dnorm(0, 0.0001) # Prior for study baseline
+    
+    for (k in 1:na[j]) {
+      r[j,k] ~ dbin(p[j,k], n[j,k])
+      # Logit with Common Beta Regression
+      # (t[j,k] != t[j,1]) is a dynamic 0/1 indicator: 1 for active drug, 0 for control.
+      # This avoids having to define a separate 0/1 matrix in the R data list.
+      logit(p[j,k]) <- mu[j] + theta[j,k] + 
+                       beta1 * (cov1[j] - mean_cov1) * (t[j,k] != t[j,1]) + 
+                       beta2 * (cov2[j] - mean_cov2) * (t[j,k] != t[j,1])
+    }
+    
+    for (k in 2:na[j]) {
+      # Random Effects: theta is drawn from Normal with mean md, precision prec
+      theta[j,k] ~ dnorm(md[j,k], prec)
+      md[j,k] <- d[t[j,k]] - d[t[j,1]]
+    }
+  }
+  
+  # Priors
+  d[1] <- 0 # Reference treatment (A)
+  for (k in 2:NT) { 
+    d[k] ~ dnorm(0, 0.0001) 
+  }
+  
+  # Heterogeneity Prior (Uniform)
+  tau ~ dunif(0, 5) 
+  prec <- 1 / (tau^2)
+  
+  # Regression Coefficient Priors
+  beta1 ~ dnorm(0, 0.0001)
+  beta2 ~ dnorm(0, 0.0001)
+}

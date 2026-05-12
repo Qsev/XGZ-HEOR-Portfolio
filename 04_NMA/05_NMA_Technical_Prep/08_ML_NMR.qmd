@@ -1,0 +1,411 @@
+---
+title: "08. Multilevel Network Meta-Regression (ML-NMR)"
+description: "Resolving Ecological Bias in Population-Adjusted Indirect Comparisons"
+author: "Xiaoge Zhang"
+date: "today"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    code-tools: true
+    number-sections: true
+    embed-resources: true
+---
+
+## Executive Summary
+
+As demonstrated in Chapter 07, **Simulated Treatment Comparison (STC)** suffers from a mathematical fatal flaw when dealing with non-linear clinical endpoints (such as survival or binary outcomes): **Ecological Bias**. Because $f(E[X]) \neq E[f(X)]$ for a non-linear link function $f$, plugging aggregate means into a regression model will inevitably yield biased population-level predictions.
+
+**Multilevel Network Meta-Regression (ML-NMR)** was specifically invented to solve this exact problem. It represents the state-of-the-art methodology for Population-Adjusted Indirect Comparisons (PAIC) in Health Technology Assessment (HTA).
+
+Instead of plugging in aggregate means, ML-NMR performs **numerical integration** over the target population's covariate distribution (e.g., integrating over the age distribution). By projecting the individual-level non-linear relationship (from IPD) across the macro-level probability density function (PDF) of the AgD trial, ML-NMR successfully calculates $E[f(X)]$ without ecological bias.
+
+In this chapter, we will: 
+
+1. Simulate a realistic scenario with IPD and AgD (assuming the binary outcome $y$ is **Complete Remission (CR)**). 
+2. Formulate the **Joint Likelihood** function. 
+3. Use numerical integration (Sobol sequences) to solve the ecological bias. 
+4. Run an ML-NMR using the industry-standard `multinma` package.
+
+------------------------------------------------------------------------
+
+## The Mock Scenario: Anchored PAIC
+
+Imagine a connected network with three treatments: 
+
+- **Treatment A (Quizartinib)**: We own the Individual Patient Data (IPD) from Trial 1 (A vs. Placebo). 
+- **Treatment B (Midostaurin)**: We only have published Aggregate Data (AgD) from Trial 2 (B vs. Placebo). 
+- **Endpoint**: Binary response $y_i$ (Responded = 1, Failed = 0). Modeled via Logistic Regression. 
+- **Effect Modifier**: `age`. The treatment effect diminishes as patients get older.
+
+Let's generate the mock datasets.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(dplyr)
+library(multinma)
+library(ggplot2)
+set.seed(2026)
+# ---------------------------------------------------------
+# 1. Generate IPD for Trial 1 (Our Trial: Quizartinib vs Placebo)
+# Outcome y represents Complete Remission (CR)
+# ---------------------------------------------------------
+n_ipd <- 600
+age_ipd <- rnorm(n_ipd, mean = 45, sd = 10) # Younger population
+trt_ipd <- sample(c("Placebo", "Quizartinib"), n_ipd, replace = TRUE)
+
+# Simulate logit probabilities:
+logit_p_ipd <- -1.0 + # <1>
+    ifelse(trt_ipd == "Quizartinib", 2.5, 0) + # <2>
+    (-0.05 * (age_ipd - 45)) +
+    ifelse(trt_ipd == "Quizartinib", -0.04 * (age_ipd - 45), 0) # <3>
+
+prob_ipd <- 1 / (1 + exp(-logit_p_ipd))
+y_ipd <- rbinom(n_ipd, 1, prob_ipd)
+
+ipd_data <- data.frame(
+    study = "Trial 1",
+    patient_id = 1:n_ipd,
+    trt = trt_ipd,
+    age = age_ipd,
+    y = y_ipd
+)
+
+# ---------------------------------------------------------
+# 2. Generate AgD for Trial 2 (Competitor: Midostaurin vs Placebo)
+# ---------------------------------------------------------
+n_agd_pbo <- 300
+n_agd_mido <- 300
+age_agd_pbo <- rnorm(n_agd_pbo, mean = 65, sd = 8) # <4>
+age_agd_mido <- rnorm(n_agd_mido, mean = 65, sd = 8)
+
+
+logit_p_agd_pbo <- -1.5 + (-0.05 * (age_agd_pbo - 45)) # <5>
+prob_agd_pbo <- 1 / (1 + exp(-logit_p_agd_pbo))
+r_pbo <- sum(rbinom(n_agd_pbo, 1, prob_agd_pbo))
+
+logit_p_agd_mido <- -1.5 + 2.2 + (-0.05 * (age_agd_mido - 45)) + (-0.04 * (age_agd_mido - 45)) # <6>
+prob_agd_mido <- 1 / (1 + exp(-logit_p_agd_mido))
+r_mido <- sum(rbinom(n_agd_mido, 1, prob_agd_mido))
+
+agd_data <- data.frame(
+    study = "Trial 2",
+    trt = c("Placebo", "Midostaurin"),
+    r = c(r_pbo, r_mido),
+    n = c(n_agd_pbo, n_agd_mido),
+    age_mean = 65,
+    age_sd = 8
+)
+```
+1. Base risk (Placebo) = -1.0
+2. Effect of Quizartinib = +2.5
+3. Age penalty = -0.05 per year above 45; Age*Quizartinib interaction (effect decay) = -0.04 per year above 45
+4. Trial 2 is older (Mean Age = 65, SD = 8); We simulate the true underlying AgD data to get the counts, but we will ONLY use the counts.
+5. Trial 2 Base risk (Placebo) might be different, let's say -1.5 (Study-specific intercept).
+6. Midostaurin effect = +2.2; Same age penalties apply.
+
+## The Core Philosophy: Joint Likelihood ($L_{Joint}$)
+
+ML-NMR works by constructing a **Joint Likelihood** that glues IPD and AgD together using shared parameters.
+
+### The Logistic Regression Equation
+
+For any patient $i$ in study $k$: 
+$$ \text{logit}(P_{ik}) = \ln (\dfrac{P_{ik}}{1-P_{ik}}) = \mu_k + \beta_{age}\text{Age}_i + \beta_{trt_k}\text{Trt}_i + \beta_{age:trt}(\text{Age}_i \times \text{Trt}_i) $$
+
+- $P_{ik}$ (Patient Probability): Can be explicitly derived by applying the inverse-logit transformation to the right-hand side. This value acts as the direct mathematical input for the IPD likelihood ($L_{IPD}$) below.
+- $\mu_k$ (Study-Specific Intercepts): Accommodates unmeasured background risk differences between Trial 1 and Trial 2. It is the independent "baseline floor" for each trial.
+- $\beta$ (Shared Parameters): The treatment effects ($\beta_{trt}$) and the covariate modifiers ($\beta_{age}, \beta_{age:trt}$) are shared across the entire network. These act as the mathematical "bridges" that allow information to flow from the IPD trial to the AgD trial.
+
+### IPD Likelihood ($L_{IPD}$)
+
+For the 300 patients in Trial 1, the likelihood is straightforward Bernoulli: $$ L_{IPD} = \prod_i P_{i}^{y_i} (1 - P_{i})^{1 - y_i} $$ Because we have exact ages $x_i$, $P_i$ can be expressed exactly. Because we also have the binary response $y_i$, $L_{IPD}$ can be expressed exactly.
+
+### AgD Likelihood ($L_{AgD}$) & Numerical Integration
+
+For Trial 2, we only have the total responders $R$ out of $N$. The expected probability for the group is $\bar{P}_{AgD}$.
+
+**This is where STC failed.** STC assumed $\bar{P}_{AgD} = \text{inv\_logit}(\mu_2 + \beta_{age}\bar{X}_{age} + \dots)$, which is WRONG, Ecological Fallacy.
+
+**ML-NMR** correctly defines it as an integral over the population's age distribution's density function $p(x)$: $$ \bar{P}_{AgD} = \int \text{inv\_logit}(\mu_2 + \beta_{age}x + \dots) \cdot p(x) \, dx $$
+
+To solve this analytically impossible integral, ML-NMR uses **Sobol sequences** to generate a set of representative "virtual avatars" (integration points) that match the mean and SD of the AgD trial. The integral is approximated by averaging the probabilities of these avatars: $$ \bar{P}_{AgD} \approx \frac{1}{J} \sum_{j=1}^{J} \text{inv\_logit}(\mu_2 + \beta_{age}x_j + \dots) $$
+
+```{=html}
+<!-- Audit Point: Riemann vs. Monte Carlo Integration
+Why did the probability density function p(x) disappear in the discrete summation?
+An intuitive approach (Riemann Integration) would suggest laying out a fixed, evenly spaced grid of ages and multiplying each calculated probability by its corresponding PDF weight p(x_j). However, ML-NMR employs Quasi-Monte Carlo integration via Sobol sequences. 
+Because the J "virtual avatars" (the x_j points) are *sampled directly from* the underlying probability distribution p(x), the density weight is physically represented by the clustering of the avatars. For example, more avatars will naturally be generated around the mean age of 65 than at age 20. 
+By the Law of Large Numbers, the integral simplifies: \int f(x) p(x) dx \approx \frac{1}{J} \sum f(x_j) as long as x_j ~ p(x). Multiplying by p(x_j) again in the summation would incorrectly double-count the density weights.
+-->
+```
+
+
+The final AgD likelihood is Binomial, anchoring the model to the published macro-data: $$ L_{AgD} = \binom{N}{R} [\bar{P}_{AgD}]^R [1 - \bar{P}_{AgD}]^{N-R} $$
+
+```{=html}
+<!-- Audit Point: The "Iron Tongs" of the Binomial Likelihood
+Why does ML-NMR require the raw counts (R, N) instead of just the percentage rate?
+Because N determines the "weight" or statistical gravity of the evidence. A 40% survival rate derived from N=10 has massive variance, allowing the MCMC chain to wander. A 40% survival rate derived from N=1000 acts like iron tongs, forcing the macro average of the Sobol avatars (\bar{P}_{AgD}) to strictly align with the real-world observation. This forces the underlying shared \beta parameters into the correct alignment.
+-->
+```
+
+### The Total Audit Balance (Joint Likelihood)
+
+$$L_{Joint}(\beta, \mu) = L_{IPD}(\mu_1, \beta) \times L_{AgD}(\mu_2, \beta)$$
+
+Because $L_{IPD}$ and $L_{AgD}$ share the exact same treatment effect $\beta$, the model is forced during optimization to find the mathematical equilibrium that best explains both the micro-level individual logic (IPD) and the macro-level summary bill (AgD).
+
+## R Implementation with `multinma`
+
+Let's build the ML-NMR model using the `multinma` package.
+
+### Network Construction and Integration Points
+
+First, we tell the model who the baseline comparator is, and we generate the Sobol integration points for the AgD trial.
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+# Add treatment classes to share interaction effects
+ipd_data$class <- ifelse(ipd_data$trt == "Placebo", "Placebo", "Active")
+agd_data$class <- ifelse(agd_data$trt == "Placebo", "Placebo", "Active")
+
+# 1. Combine Network with classes
+net <- combine_network(
+    set_ipd(ipd_data, study = study, trt = trt, r = y, trt_class = class),
+    set_agd_arm(agd_data, study = study, trt = trt, r = r, n = n, trt_class = class),
+    trt_ref = "Placebo"
+)
+
+# 2. Add Numerical Integration Points (Sobol Sequences)
+net <- add_integration(net,
+    age = distr(qnorm, mean = age_mean, sd = age_sd),
+    n_int = 64
+) # 64 Sobol points
+```
+
+### Fitting the ML-NMR Model
+
+We instruct Stan to fit a regression model including the interaction between treatment and age (`~ age * .trt`). We will use Fixed Effects (FE) for this sparse network.
+
+```{r, message=FALSE, warning=FALSE}
+# 3. Fit ML-NMR (using a short chain for demonstration)
+fit_mlnmr <- nma(net,
+    trt_effects = "fixed",
+    regression = ~ age * .trt,
+    class_interactions = "common",
+    prior_intercept = normal(scale = 10),
+    prior_trt = normal(scale = 10),
+    prior_reg = normal(scale = 10),
+    iter = 2000,
+    warmup = 1000,
+    chains = 2,
+    refresh = 0
+)
+# Extract summary matrix from the underlying Stan fit for clean formatting
+fit_summary <- as.data.frame(rstan::summary(fit_mlnmr$stanfit)$summary)
+# Filter rows for key parameters and select desired columns
+rows_to_keep <- grep("^(d\\[|beta|mu\\[)", rownames(fit_summary))
+clean_summary <- fit_summary[rows_to_keep, c("mean", "sd", "2.5%", "50%", "97.5%", "n_eff", "Rhat")]
+print(round(clean_summary, 2))
+```
+```{r, echo=FALSE}
+# Extract parameters for inline display
+samples <- as.data.frame(fit_mlnmr)
+beta_age_val <- mean(samples$`beta[age]`)
+d_quiz_val <- mean(samples$`d[Quizartinib]`)
+d_mido_val <- mean(samples$`d[Midostaurin]`)
+
+# Robustly find interaction columns (might be treatment-specific or class-shared)
+if ("beta[age:.trtclassActive]" %in% names(samples)) {
+    beta_mido_age_val <- mean(samples$`beta[age:.trtclassActive]`)
+    beta_quiz_age_val <- mean(samples$`beta[age:.trtclassActive]`)
+} else if (length(grep(".trtMidostaurin:age", names(samples))) > 0) {
+    beta_mido_age_val <- mean(samples$`beta[.trtMidostaurin:age]`)
+    beta_quiz_age_val <- mean(samples$`beta[.trtQuizartinib:age]`)
+} else {
+    beta_mido_age_val <- NA
+    beta_quiz_age_val <- NA
+}
+
+# Dynamically find mu columns (study-specific intercepts)
+mu_cols <- grep("^mu\\[", names(samples), value = TRUE)
+mu_cols <- sort(mu_cols) # Sort to ensure consistent ordering
+mu_1_val <- mean(samples[[mu_cols[1]]])
+mu_2_val <- mean(samples[[mu_cols[2]]])
+
+# Centering point used by multinma
+c_point <- (mean(ipd_data$age) * n_ipd + 65 * (n_agd_pbo + n_agd_mido)) / (n_ipd + n_agd_pbo + n_agd_mido)
+
+# Calculate Adjusted Posterior Means (shifting back to Age 45)
+# Formula: Adjusted = Estimated + Interaction_Slope * (45 - 55.08)
+adj_mu1 <- mu_1_val + beta_age_val * (45 - c_point)
+adj_mu2 <- mu_2_val + beta_age_val * (45 - c_point)
+adj_d_quiz <- d_quiz_val + beta_quiz_age_val * (45 - c_point)
+adj_d_mido <- d_mido_val + beta_mido_age_val * (45 - c_point)
+
+eta_35 <- adj_mu1 + (beta_age_val * (35 - 45)) + adj_d_mido + (beta_mido_age_val * (35 - 45))
+p_35 <- 1 / (1 + exp(-eta_35))
+
+eta_70 <- adj_mu2 + (beta_age_val * (70 - 45)) + adj_d_mido + (beta_mido_age_val * (70 - 45))
+p_70 <- 1 / (1 + exp(-eta_70))
+```
+
+### Counterfactual Prediction (The Infilling Logic)
+
+### How the Adjustment from 55.08 to 45 Works
+
+Since `multinma` automatically centers the covariate (Age) at the overall network mean ($c \approx 55.08$), the estimated intercepts ($\mu$) and main treatment effects ($d$) are specific to a 55.08-year-old patient. To compare them with our true simulation values (which were defined at Age 45), we must algebraically shift them back.
+
+The specific formulas are derived from the linear predictor equation:
+$$\text{logit}(p) = \mu + \beta_{age} \cdot (\text{Age} - c) + d_{trt} \cdot \text{trt} + \beta_{age:trt} \cdot (\text{Age} - c) \cdot \text{trt}$$
+
+To find the parameters at $\text{Age} = 45$:
+
+1. **Adjusted Intercept ($\mu'$)**:
+   $$\mu'_{k} = \mu_k + \beta_{age} \cdot (45 - c)$$
+   *The intercept shifts by the age effect over the distance of ~10.08 years.*
+
+2. **Adjusted Treatment Effect ($d'_{trt}$)**:
+   $$d'_{trt} = d_{trt} + \beta_{age:trt} \cdot (45 - c)$$
+   *The main treatment effect shifts by the interaction effect over the same distance.*
+
+3. **Slopes ($\beta_{age}, \beta_{age:trt}$)**:
+   These are rates of change per year and are invariant to the centering point. Therefore, no adjustment is needed.
+
+Here is the comparison table (dynamically extracted from the model):
+
+| Parameter | Estimated Value (at 55.08) | Adjusted Value (at 45) | True Value (at 45) |
+|---|---|---|---|
+| $\mu_1$ (Trial 1 Baseline) | `r round(mu_1_val, 2)` | `r round(adj_mu1, 2)` | -1.0 |
+| $\mu_2$ (Trial 2 Baseline) | `r round(mu_2_val, 2)` | `r round(adj_mu2, 2)` | -1.5 |
+| $\beta_{age}$ (Age Effect) | `r round(beta_age_val, 2)` | `r round(beta_age_val, 2)` | -0.05 |
+| $\beta_{Quiz}$ (Quizartinib Effect) | `r round(d_quiz_val, 2)` | `r round(adj_d_quiz, 2)` | 2.5 |
+| $\beta_{Mido}$ (Midostaurin Effect) | `r round(d_mido_val, 2)` | `r round(adj_d_mido, 2)` | 2.2 |
+| $\beta_{age:trt}$ (Shared Interaction) | `r round(beta_mido_age_val, 2)` | `r round(beta_mido_age_val, 2)` | -0.04 |
+
+::: {.callout-warning}
+### Methodological Insight: Ecological Fallacy & Collinearity in AgD
+
+Even after doubling the sample size, the model failed to accurately recover the true values of $\mu_2$ (-1.5) and $\beta_{Mido}$ (2.2). Instead, it estimated $\mu_2 \approx -2.42$ and $\beta_{Mido} \approx 3.22$. 
+
+Notice that their sum is almost perfect ($-2.42 + 3.22 = 0.8$ vs. the true $-1.5 + 2.2 = 0.7$), but the individual decomposition is incorrect. This is because Trial 2 only has Aggregate Data (AgD). No matter how much we increase the sample size (from 300 to 3000 or more), the model only ever sees two macro metrics in Trial 2: the overall event rate for Placebo and the overall event rate for Midostaurin. 
+
+Trying to disentangle "baseline risk" from "treatment effect" using only two data points naturally introduces severe **Collinearity**. This is the famous **Ecological Fallacy**: inferring individual-level effects from group-level data, where parameters cannot be fully decoupled without individual-level variance.
+:::
+
+**The ultimate goal of PAIC is to answer:** *What would the competitor's drug (Midostaurin) have achieved if it were given to a specific patient in our Trial 1?*
+
+Let's perform the **Counterfactual Projection** for a hypothetical 35-year-old patient from Trial 1 receiving Midostaurin. We will use the **Adjusted Parameters (at Age 45)** for a more intuitive calculation:
+
+1. **Select the Arena (Baseline)**: We project onto Trial 1's adjusted baseline at age 45, so $\mu'_1 = `r round(adj_mu1, 2)`$.
+2. **Calculate the Linear Predictor ($\eta$)**:
+   $$\begin{aligned}\eta_{35, Mido} &= \mu'_1 + (\beta_{age} \times (35 - 45)) + d'_{Mido} + (\beta_{age:trt} \times (35 - 45)) \\ &= `r round(adj_mu1, 2)` + (`r round(beta_age_val, 2)` \times -10) + `r round(adj_d_mido, 2)` + (`r round(beta_mido_age_val, 2)` \times -10) \\ &= `r round(adj_mu1, 2)` + `r round(beta_age_val * -10, 2)` + `r round(adj_d_mido, 2)` + `r round(beta_mido_age_val * -10, 2)` \\ &= `r round(eta_35, 2)`\end{aligned}$$
+3. **Convert to Probability (Inverse Logit)**:
+   $$P = \frac{1}{1 + e^{-`r round(eta_35, 2)`}} \approx \mathbf{`r round(p_35 * 100, 1)`\%}$$
+
+Contrast this with a 70-year-old patient from Trial 2 (where the original Midostaurin data came from), also using adjusted parameters at age 45:
+
+$$\begin{aligned}\eta_{70, Mido} &= \mu'_2 + (\beta_{age} \times (70 - 45)) + d'_{Mido} + (\beta_{age:trt} \times (70 - 45)) \\ &= `r round(adj_mu2, 2)` + (`r round(beta_age_val, 2)` \times 25) + `r round(adj_d_mido, 2)` + (`r round(beta_mido_age_val, 2)` \times 25) \\ &= `r round(adj_mu2, 2)` + `r round(beta_age_val * 25, 2)` + `r round(adj_d_mido, 2)` + `r round(beta_mido_age_val * 25, 2)` \\ &= `r round(eta_70, 2)`\end{aligned}$$
+
+$$P = \frac{1}{1 + e^{-(`r round(eta_70, 2)`)}} \approx \mathbf{`r round(p_70 * 100, 1)`\%}$$
+
+**This is the true power of ML-NMR:**
+By decomposing the effects, ML-NMR mathematically "transplants" Midostaurin into a younger body (35 years old), revealing a potential **`r round(p_35 * 100, 1)`%** Complete Remission (CR) rate. We then compare this against Quizartinib's performance *in the exact same patient profile*. This guarantees a rigorous, apples-to-apples comparison.
+
+To calculate this in `multinma`, the `relative_effects` function performs this exact integration over the target age distribution:
+
+```{r}
+# 4. Extract Relative Effects specifically for the Trial 1 population
+releff_trial1 <- relative_effects(fit_mlnmr,
+    newdata = data.frame(age = 45),
+    all_contrasts = TRUE
+)
+
+# Convert to data frame and select key columns including diagnostics
+releff_df <- as.data.frame(releff_trial1)
+# Combine Treatment B and Treatment A into one column
+releff_df$Comparison <- paste(releff_df$.trtb, "vs", releff_df$.trta)
+# Abbreviate names to prevent line wrapping
+releff_df$Comparison <- gsub("Quizartinib", "Quiz", releff_df$Comparison)
+releff_df$Comparison <- gsub("Midostaurin", "Mido", releff_df$Comparison)
+releff_df$Comparison <- gsub("Placebo", "Pbo", releff_df$Comparison)
+# Select key columns including diagnostics
+releff_df <- releff_df[, c("Comparison", "mean", "sd", "2.5%", "97.5%", "Rhat", "Bulk_ESS")]
+# Rename columns to be concise and fit on one line
+names(releff_df) <- c("Comparison", "Mean", "SD", "2.5%", "97.5%", "Rhat", "ESS")
+print(releff_df)
+```
+
+### Interpreting the Results (The 3rd Row)
+
+In the 3rd row of the table above (**`Quiz vs Mido`**), we are answering the counterfactual question: *What if the patients in our Trial 1 (mean age 45) were given Midostaurin instead of Quizartinib?*
+
+Since `multinma` fits a logistic model, the outputs are on the **Log Odds Ratio (Log OR)** scale. To make them clinically interpretable, we must exponentiate them to get the **Odds Ratio (OR)**.
+
+For the Quizartinib vs Midostaurin comparison:
+$$\text{OR} = e^{-0.664} \approx 0.51$$
+
+Since the comparison is `Quiz vs Mido`, an OR of 0.51 means that for a 45-year-old patient, the odds of achieving Complete Remission (CR) with Quizartinib are only **0.51 times** the odds with Midostaurin. Conversely, the odds of CR with Midostaurin are $1 / 0.51 \approx 1.96$ times higher than with Quizartinib in this younger population.
+
+By explicitly standardizing the comparison to a shared target covariate profile (e.g., `age = 45`), we finally achieve a mathematically rigorous "apples-to-apples" comparison that is immune to Ecological Bias.
+
+------------------------------------------------------------------------
+
+## Technical Audit Considerations
+
+### Fixed vs. Random Effects
+
+In the code above, we used `trt_effects = "fixed"`. This mathematically forces the relative treatment effect $\theta_{jk}$ to equal the global network effect $d_k$. If we used `random`, the formula becomes $\theta_{jk} \sim N(d_k, \tau^2)$, acknowledging between-study heterogeneity ($\tau$). In HEOR submissions involving sparse networks (e.g., just 2 or 3 trials), Random Effects models are statistically over-parameterized and usually fail to converge.
+
+### Multi-Dimensional Integration & Correlation Borrowing
+
+If we needed to adjust for two variables (e.g., `age` and `WBC`), the Sobol sequence must sample from a 2D space. Because literature rarely reports the correlation ($\rho$) between variables in the AgD trial, standard practice involves **Correlation Borrowing**: 
+
+1. Calculate the covariance matrix from the IPD trial. 
+2. Extract the Cholesky decomposition of this matrix. 
+3. Apply this Cholesky operator to the AgD Sobol points to stretch the independent 2D grid into a realistic, biologically-correlated elliptical "probability cloud".
+
+This ensures the integration avatars accurately represent real human physiological profiles, rather than mathematically impossible combinations.
+
+------------------------------------------------------------------------
+
+## Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)
+
+To demonstrate the real-world applicability of this minimal mock case, we compare its settings and findings with the actual ML-NMR analysis submitted by Daiichi Sankyo for **TA1013 (Quizartinib)**, as audited by the External Assessment Group (EAG).
+
+### Network Structure & Evidence Types
+*   **Mock Case**: Simulates 1 IPD trial ($N=300$) and 1 AgD trial ($N=300$).
+*   **TA1013 Reality**: The actual network also relied on just 2 core trials: **QuANTUM-First** (provided IPD for Quizartinib, $N=539$) and **RATIFY** (only AgD was available for Midostaurin, $N=717$, with the analyzed FLT3-ITD subgroup being $N=452$) [1, 2, 6].
+
+### Population Characteristics (Baseline Age)
+*   **Mock Case**: IPD population is younger (mean age 45) and AgD population is older (mean age 65).
+*   **TA1013 Reality**: The direction was reversed, but the extreme mismatch remained. The IPD trial (QuANTUM-First) included older patients (median age ~56), while the AgD trial (RATIFY) included only younger patients aged 18–59 (median age 47) [6, 8].
+
+### Statistical Model & Link Function
+*   **Mock Case**: Modeled a binary outcome (CR rate) using a Bernoulli distribution (`bernoulli2`) and a Logit link function (`logit`).
+*   **TA1013 Reality**: The company's actual code for the CR endpoint also specified `likelihood = "bernoulli2"` and `link = "logit"` [2].
+
+### Treatment-Covariate Interactions
+*   **Mock Case**: Assumed a shared interaction effect for Age across active treatments (`class_interactions = "common"`).
+*   **TA1013 Reality**: Because data from only one IPD and one AgD trial was insufficient to estimate independent interaction terms, the company was forced to make the **Shared Effect Modification (SEM)** assumption [7, 9]. They assumed that covariates like Age had the same interaction effect on both Quizartinib and Midostaurin, specifying `class_interactions = "common"` in their code [2].
+
+### Collinearity & Bias Challenges
+*   **Mock Case**: We observed that missing IPD for the AgD trial caused severe collinearity between baseline risk and treatment effect, leading to an overestimation of Midostaurin's effect in our simulation.
+*   **TA1013 Reality**: The EAG pointed out that the population adjustments applied within the company's ML-NMR were biased and tended to overestimate **Quizartinib's** effect [2]. This led the appraisal committee to conclude that the results "lacked face validity" [3].
+
+### References (NICE TA1013 Committee Papers)
+*   **[1]** Document B: Section B.2.4 (Starts on Page 50).
+*   **[2]** Document B: Section B.2.8 (Starts on Page 82).
+*   **[3]** External Assessment Report (EAR) (Separate report by University of York).
+*   **[6]** Document B: Section B.2.4.1 (Page 50).
+*   **[7]** Document B: Section B.2.7 (Subgroup analysis).
+*   **[8]** Document B: Section B.2.8.2 (Page 83).
+*   **[9]** Document B: Section B.2.8.7 (Page 111) & Appendix M.
+
+This comparison proves that our mock case, while minimal, perfectly captures the structural constraints, forced statistical compromises, and inherent bias risks of state-of-the-art ML-NMR in real HTA submissions.
+
+```{=html}
+<!-- Audit Point: ML-NMR Interview Summary
+"ML-NMR is not simply pooling data. It actively isolates study-specific baseline intercepts (\mu_k) from network-shared treatment effects (\beta). By utilizing numerical integration via Sobol sequences, it seamlessly backfills individual-level non-linear signals (IPD) into macro-level target populations (AgD) without incurring the ecological bias inherent to traditional STC."
+-->
+```

@@ -1,0 +1,205 @@
+---
+title: "Technical Guide 07: Simulated Treatment Comparison (STC)"
+author: "Xiaoge Zhang"
+date: "06/05/2026"
+engine: knitr
+format: 
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "View the code"
+    number-sections: true
+---
+
+*Predicting Outcomes Across Disconnected Networks via Regression*
+
+<!--
+## 📑 Table of Contents {.unnumbered}
+
+1.  [**Executive Summary: The Predictive Approach**](#1-executive-summary)
+2.  [**The Minimal Mock Case: Continuous Outcome**](#2-mock-case)
+3.  [**Custom R Implementation: STC from Scratch**](#3-custom-r-implementation)
+4.  [**Industry Standard Packages for STC**](#4-industry-packages)
+5.  [**Outcome Analysis: The Final Comparison**](#5-outcome-analysis)
+6.  [**The Fatal Flaw: Ecological Bias in Non-Linear Models**](#6-ecological-bias)
+-->
+
+## Executive Summary: The Predictive Approach {#1-executive-summary}
+
+When attempting an indirect comparison between Trial A and Trial B, differing patient populations can introduce severe bias if there are **Effect Modifiers** (covariates that change the treatment effect) that are imbalanced between the trials. 
+
+If we have full Individual Patient Data (IPD) for both trials, we can simply run an IPD Network Meta-Analysis (IPD-NMA) to adjust for these differences. However, the standard reality in HEOR is that we only have IPD for our own Trial A, and only published Aggregate Data (AgD) for the competitor's Trial B. This creates a severe **population mismatch** that prevents a fair "apples-to-apples" comparison.
+
+While **MAIC** resolves this mismatch by *re-weighting* the IPD of Trial A to match Trial B's baseline, **Simulated Treatment Comparison (STC)** approaches it by predicting outcomes. STC builds a **regression** model using Trial A's IPD to understand the relationship between baseline characteristics and the clinical outcome. It then plugs Trial B's aggregate baseline characteristics into this model to predict what Trial A's outcome *would have been* if its patients had the same average baseline as Trial B.
+
+-   **Pros**: STC does **not** reduce the Effective Sample Size (ESS) like MAIC does, and it can handle scenarios where covariate overlap is poor.
+-   **Cons**: STC suffers from severe **ecological bias** when the outcome model is non-linear (e.g., Logistic regression for binary endpoints, Cox PH for survival). Plugging aggregate means into a non-linear function is mathematically flawed ($f(E[X]) \neq E[f(X)]$).
+
+## The Minimal Mock Case: Continuous Outcome {#2-mock-case}
+
+To demonstrate STC without the distraction of complex clinical datasets, we will simulate a minimal scenario:
+
+-   **Drug A (Index Trial)**: We have full IPD for 200 patients. The continuous outcome $y$ is highly dependent on `age`.
+-   **Drug B (Target Trial)**: We only have published aggregate data. The mean age is 65, and the published mean outcome is 3.0.
+
+```{r}
+#| message: false
+#| warning: false
+set.seed(42)
+
+# ---------------------------------------------------------
+# 1. Simulate Mock Data
+# ---------------------------------------------------------
+N_A <- 200
+# Drug A (IPD): Mean age = 55, SD = 8
+age_A <- rnorm(N_A, mean = 55, sd = 8)
+# True outcome for Drug A (True effect = 10, minus 0.5 per year of age)
+y_A <- rnorm(N_A, mean = 10 - 0.5 * (age_A - 55), sd = 2)
+df_A <- data.frame(id = 1:N_A, age = age_A, y = y_A)
+
+# Drug B (AgD published data)
+mean_age_B <- 65.0
+mean_y_B_published <- 3.0
+
+# Naive comparison (Unadjusted)
+mean_y_A_naive <- mean(df_A$y)
+```
+
+## Custom R Implementation: STC from Scratch {#3-custom-r-implementation}
+
+The STC workflow consists of two simple mathematical steps:
+
+1. **Fit a multivariable regression model on the IPD from Trial A.**
+   For a continuous outcome, we estimate the regression coefficients $\hat{\beta}_0$ (intercept) and $\hat{\beta}_1$ (effect of covariate $X$) using Trial A's data:
+   $$ y_{Ai} = \beta_0 + \beta_1 X_{Ai} + \epsilon_i $$
+
+2. **Predict the outcome using the aggregate covariate values from Trial B.**
+   We take the published mean of the covariate from Trial B ($\bar{X}_B$) and plug it into our fitted model. This gives us the simulated, adjusted mean outcome for Drug A:
+   $$ \hat{Y}_{A|B} = \hat{\beta}_0 + \hat{\beta}_1 \bar{X}_B $$
+
+```{r}
+#| message: false
+#| warning: false
+# ---------------------------------------------------------
+# 2. STC Implementation
+# ---------------------------------------------------------
+
+# Step 1: Fit the regression model on Trial A IPD
+stc_model <- lm(y ~ age, data = df_A)
+
+# Step 2: Create a synthetic data frame representing Trial B's average patient
+target_profile <- data.frame(age = mean_age_B)
+
+# Step 3: Predict the outcome for Drug A at Trial B's baseline
+# This is \hat{Y}_{A|B}
+mean_y_A_stc <- predict(stc_model, newdata = target_profile)
+
+cat("Naive Mean Outcome (Drug A): ", round(mean_y_A_naive, 2), "\n")
+cat("STC Predicted Outcome (Drug A adjusted to B's baseline): ", round(mean_y_A_stc, 2), "\n")
+```
+
+```{=html}
+<!-- Audit Point: Why STC is mathematically simple for linear models
+For a purely linear regression y = beta_0 + beta_1 * X, the expected value is strictly E[y] = beta_0 + beta_1 * E[X]. 
+Therefore, plugging the mean of X (E[X]) directly into the fitted model yields an unbiased estimate of the population mean outcome. This is why STC works perfectly for continuous outcomes modeled via OLS.
+-->
+```
+
+## Industry Standard Packages for STC {#4-industry-packages}
+
+In the previous chapter on MAIC, we used the `maicplus` package because calculating weights requires a dedicated non-linear optimization routine. 
+
+For STC, however, **there is no universally dominant dedicated R package**. Why? Because the core methodology of STC is simply standard regression modeling. In pharmaceutical industry submissions, STC is almost exclusively performed using base R functions like `lm()` (for continuous outcomes), `glm()` (for binary), or `survival::coxph()` (for time-to-event). The model is fit, and `predict()` is called. 
+
+Recently, newer packages like `outstandR` have been developed to provide a unified framework for Population-Adjusted Indirect Comparisons (PAIC), but writing the regression equations explicitly in base R remains the most transparent and widely accepted practice by HTA reviewers.
+
+## Outcome Analysis: The Final Comparison {#5-outcome-analysis}
+
+Just like in MAIC, once we have the adjusted outcome for Drug A, we perform the indirect comparison against Drug B.
+
+### Point Estimate of the Treatment Effect
+
+The comparative treatment effect ($\Delta$) is the difference between the STC-predicted outcome of Drug A and the published outcome of Drug B.
+
+```{r}
+#| message: false
+#| warning: false
+# Point Estimate
+treatment_effect_stc <- mean_y_A_stc - mean_y_B_published
+cat("Point Estimate of Treatment Effect (A vs B): ", round(treatment_effect_stc, 2), "\n")
+```
+
+### Quantifying Uncertainty
+
+Unlike MAIC (which heavily relies on Bootstrapping because the weights are complex non-linear functions), the standard error for an STC prediction using linear regression can be extracted analytically directly from the model object.
+
+```{r}
+#| message: false
+#| warning: false
+# Extract standard error of the prediction directly from the lm object
+pred_obj <- predict(stc_model, newdata = target_profile, se.fit = TRUE)
+se_stc <- pred_obj$se.fit
+
+ci_lower_stc <- mean_y_A_stc - 1.96 * se_stc - mean_y_B_published
+ci_upper_stc <- mean_y_A_stc + 1.96 * se_stc - mean_y_B_published
+
+cat("STC Standard Error: ", round(se_stc, 3), "\n")
+```
+
+### Final Results
+
+With the point estimate and the standard error, we can present the complete STC indirect comparison results:
+
+| Metric | Estimate | 95% CI Lower | 95% CI Upper |
+|:---|:---:|:---:|:---:|
+| **Naive Difference** | `r round(mean_y_A_naive - mean_y_B_published, 2)` | N/A | N/A |
+| **STC Adjusted Difference** | **`r round(treatment_effect_stc, 2)`** | **`r round(ci_lower_stc, 2)`** | **`r round(ci_upper_stc, 2)`** |
+
+## The Fatal Flaw: Ecological Bias in Non-Linear Models {#6-ecological-bias}
+
+If STC is so simple and preserves the full sample size (unlike MAIC), why is it considered highly flawed by HTA bodies like NICE?
+
+The answer is **Ecological Bias**. In oncology and many other fields, outcomes are rarely continuous. They are typically binary (Logistic regression) or time-to-event (Cox Proportional Hazards). These models use non-linear link functions (e.g., logit, log).
+
+A fundamental rule of mathematics (Jensen's Inequality) states that for a non-linear function $f$:
+
+$$ f(E[X]) \neq E[f(X)] $$
+
+If you fit a logistic regression model on Trial A, and then plug in the *mean age* of Trial B ($\bar{X}_B = 65$), you are calculating $f(E[X])$. This predicts the probability of an event for a single hypothetical patient who is exactly 65 years old. 
+
+However, what you *actually want* is the average probability of the event across the entire Trial B population, which is $E[f(X)]$. 
+
+Because STC plugs aggregate means into non-linear equations, it produces systematically biased population-level estimates. This mathematical flaw is the exact reason why **Multilevel Network Meta-Regression (ML-NMR)** was invented—to perform numerical integration over the distribution of $X$ to correctly calculate $E[f(X)]$ without ecological bias.
+
+```{=html}
+<!-- Audit Point: Common Misconceptions Regarding STC and Jensen's Inequality
+1. Direction of Simulation: 
+   STC does NOT predict "how Drug B would perform in Trial A's population." Since we only have IPD for Trial A, we can only build a regression model for Drug A. STC predicts "how Drug A would perform in Trial B's population" by plugging Trial B's aggregate baseline into Drug A's model.
+
+2. Where Jensen's Inequality Happens (Ecological Bias):
+   The inequality does NOT apply to plugging the average outcome Y into a function. It applies when plugging the average baseline covariates E[X] into a regression outcome model f(X).
+   
+   - Example 1 (Continuous Outcome / Linear Regression): 
+     If the outcome is blood pressure, the regression link function f is linear. You plug Trial B's "average age (65)" into the model, and it perfectly yields the "average blood pressure" for the population. Here, f(E[X]) = E[f(X)]. No bias.
+     
+   - Example 2 (Binary Outcome / Logistic Regression): 
+     If the outcome is mortality, the regression link function f is an S-shaped non-linear curve. If you plug Trial B's "average age (65)" into this S-curve (calculating f(E[X])), you are actually calculating "the exact mortality probability of a single hypothetical patient who is exactly 65 years old."
+     However, what you truly want is "the average mortality probability of the entire Trial B population (where some are 40 and some are 90, averaging 65)." This is E[f(X)].
+     Because the function is non-linear, f(E[X]) != E[f(X)]. The predicted probability using the average age will never equal the true average probability of the population. This mathematical inevitability is Ecological Bias.
+-->
+```
+
+```{=html}
+<!-- Audit Point: Is STC practically useless due to Ecological Bias?
+Your intuition is sharp: for Oncology and survival outcomes (which are non-linear), STC is heavily criticized by NICE. However, STC is STILL widely used in practice for two reasons:
+
+1. Valid Linear Scenarios: There are many disease areas where the primary clinical endpoint IS continuous (modeled via OLS linear regression). In these cases, the link function is linear, Jensen's Inequality does not trigger Ecological Bias, and STC is mathematically perfectly valid. Examples include:
+   - Diabetes: Mean reduction in HbA1c.
+   - Obesity: Mean weight loss (kg).
+   - Rheumatology/Psychiatry: Mean change in continuous symptom scores (e.g., PASI, HAQ-DI, MADRS).
+
+2. The "Desperation" Scenario: When Trial A and Trial B have almost NO covariate overlap (e.g., matching a very young cohort to a very old cohort), MAIC will drop the Effective Sample Size (ESS) to near zero, destroying statistical power. STC, being a predictive model, does not drop ESS. In desperate cases, sponsors submit STC for non-linear outcomes, arguing that ecological bias is the "lesser evil" compared to a MAIC with an ESS of 2. (Though today, reviewers will demand ML-NMR in this exact situation).
+-->
+```

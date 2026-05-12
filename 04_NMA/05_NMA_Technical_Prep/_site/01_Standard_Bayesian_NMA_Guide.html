@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Xiaoge Zhang">
+<meta name="dcterms.date" content="2026-06-05">
+
+<title>Technical Guide: Standard Bayesian Network Meta-Analysis (NMA) – NMA Technical Portfolio</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-a2a938b4dd5711f7a799c87bd16ba44c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01_Standard_Bayesian_NMA_Guide.html">Technical Guides</a></li><li class="breadcrumb-item"><a href="./01_Standard_Bayesian_NMA_Guide.html">Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">NMA Technical Portfolio</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Technical Guides</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_Standard_Bayesian_NMA_Guide.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_by_Bayesian_NMA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Technical Guide 02: Network Meta-Regression (NMR) &amp; Random Effects</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_Survival_NMA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Technical Guide 03: Survival NMA &amp; Other Data Types</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_Component_NMA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Technical Guide 04: Component Network Meta-Analysis (CNMA)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_IPD_NMA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Technical Guide 05: Individual Patient Data (IPD) NMA</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_MAIC.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Technical Guide 06: Matching-Adjusted Indirect Comparison (MAIC)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_STC.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Technical Guide 07: Simulated Treatment Comparison (STC)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_ML_NMR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08. Multilevel Network Meta-Regression (ML-NMR)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#technical-guide-standard-bayesian-network-meta-analysis-nma" id="toc-technical-guide-standard-bayesian-network-meta-analysis-nma" class="nav-link active" data-scroll-target="#technical-guide-standard-bayesian-network-meta-analysis-nma">🛡️ Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)</a>
+  <ul class="collapse">
+  <li><a href="#1-executive-summary-the-anatomy-of-a-network" id="toc-1-executive-summary-the-anatomy-of-a-network" class="nav-link" data-scroll-target="#1-executive-summary-the-anatomy-of-a-network">1. Executive Summary: The Anatomy of a Network</a></li>
+  <li><a href="#2-theoretical-framework-the-calculus-of-consistency" id="toc-2-theoretical-framework-the-calculus-of-consistency" class="nav-link" data-scroll-target="#2-theoretical-framework-the-calculus-of-consistency">2. Theoretical Framework: The Calculus of Consistency</a>
+  <ul class="collapse">
+  <li><a href="#the-likelihood-binomial-logit-model" id="toc-the-likelihood-binomial-logit-model" class="nav-link" data-scroll-target="#the-likelihood-binomial-logit-model">2.1 The Likelihood (Binomial-Logit Model)</a></li>
+  <li><a href="#the-consistency-assumption-the-core-constraint" id="toc-the-consistency-assumption-the-core-constraint" class="nav-link" data-scroll-target="#the-consistency-assumption-the-core-constraint">2.2 The Consistency Assumption (The Core Constraint)</a></li>
+  <li><a href="#fixed-effects-fe-vs.-random-effects-re" id="toc-fixed-effects-fe-vs.-random-effects-re" class="nav-link" data-scroll-target="#fixed-effects-fe-vs.-random-effects-re">2.3 Fixed Effects (FE) vs.&nbsp;Random Effects (RE)</a></li>
+  </ul></li>
+  <li><a href="#3-the-minimal-mock-case-a-vs-b-vs-c" id="toc-3-the-minimal-mock-case-a-vs-b-vs-c" class="nav-link" data-scroll-target="#3-the-minimal-mock-case-a-vs-b-vs-c">3. The Minimal Mock Case: A vs B vs C</a>
+  <ul class="collapse">
+  <li><a href="#the-mock-data" id="toc-the-mock-data" class="nav-link" data-scroll-target="#the-mock-data">3.1 The Mock Data</a></li>
+  <li><a href="#the-calculus-of-the-loop" id="toc-the-calculus-of-the-loop" class="nav-link" data-scroll-target="#the-calculus-of-the-loop">3.2 The Calculus of the Loop</a></li>
+  </ul></li>
+  <li><a href="#4-mcmc-forensic-audit-implementation--convergence" id="toc-4-mcmc-forensic-audit-implementation--convergence" class="nav-link" data-scroll-target="#4-mcmc-forensic-audit-implementation--convergence">4. MCMC Forensic Audit: How Bayes Actually Solves the Network</a>
+  <ul class="collapse">
+  <li><a href="#step-1-setting-up-the-likelihood-and-parameters" id="toc-step-1-setting-up-the-likelihood-and-parameters" class="nav-link" data-scroll-target="#step-1-setting-up-the-likelihood-and-parameters">4.1 Step 1: Setting up the Likelihood and Parameters</a></li>
+  <li><a href="#step-2-assigning-priors-the-bayesian-part" id="toc-step-2-assigning-priors-the-bayesian-part" class="nav-link" data-scroll-target="#step-2-assigning-priors-the-bayesian-part">4.2 Step 2: Assigning Priors (The Bayesian Part)</a></li>
+  <li><a href="#the-iterative-algorithm-and-posterier." id="toc-the-iterative-algorithm-and-posterier." class="nav-link" data-scroll-target="#the-iterative-algorithm-and-posterier.">4.3 The Iterative Algorithm and Posterier.</a></li>
+  <li><a href="#model-implementation-bugsjags-stan" id="toc-model-implementation-bugsjags-stan" class="nav-link" data-scroll-target="#model-implementation-bugsjags-stan">4.5 Model Implementation: BUGS/JAGS &amp; Stan</a></li>
+  <li><a href="#convergence-diagnostics" id="toc-convergence-diagnostics" class="nav-link" data-scroll-target="#convergence-diagnostics">4.6 Convergence Diagnostics</a></li>
+  </ul></li>
+  <li><a href="#5-results--interpretation-the-league-table" id="toc-5-results--interpretation-the-league-table" class="nav-link" data-scroll-target="#5-results--interpretation-the-league-table">5. Results &amp; Interpretation: The League Table</a>
+  <ul class="collapse">
+  <li><a href="#the-league-table-median-or-and-95-cri" id="toc-the-league-table-median-or-and-95-cri" class="nav-link" data-scroll-target="#the-league-table-median-or-and-95-cri">5.1 The League Table (Median OR and 95% CrI)</a></li>
+  <li><a href="#probability-of-being-best" id="toc-probability-of-being-best" class="nav-link" data-scroll-target="#probability-of-being-best">5.2 Probability of Being Best</a></li>
+  </ul></li>
+  <li><a href="#6-strategic-qa-interview-prep" id="toc-6-strategic-qa-interview-prep" class="nav-link" data-scroll-target="#6-strategic-qa-interview-prep">6. Strategic Q&amp;A: Interview Prep</a></li>
+  <li><a href="#7-strategic-conclusion" id="toc-7-strategic-conclusion" class="nav-link" data-scroll-target="#7-strategic-conclusion">7. Strategic Conclusion</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01_Standard_Bayesian_NMA_Guide.html">Technical Guides</a></li><li class="breadcrumb-item"><a href="./01_Standard_Bayesian_NMA_Guide.html">Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xiaoge Zhang </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 5, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="technical-guide-standard-bayesian-network-meta-analysis-nma" class="level1">
+<h1>🛡️ Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)</h1>
+<p><em>Mastering Evidence Synthesis through a Minimal Mock Case</em></p>
+<!--
+## 📑 Table of Contents
+
+1.  [**Executive Summary: The Anatomy of a Network**](#1-executive-summary-the-anatomy-of-a-network)
+2.  [**Theoretical Framework: The Calculus of Consistency**](#2-theoretical-framework-the-calculus-of-consistency)
+3.  [**The Minimal Mock Case: A vs B vs C**](#3-the-minimal-mock-case-a-vs-b-vs-c)
+4.  [**MCMC Forensic Audit: Implementation & Convergence**](#4-mcmc-forensic-audit-implementation--convergence)
+5.  [**Results & Interpretation: The League Table**](#5-results--interpretation-the-league-table)
+6.  [**Strategic Q&A: Interview Prep**](#6-strategic-qa-interview-prep)
+7.  [**Strategic Conclusion**](#7-strategic-conclusion)
+-->
+<section id="1-executive-summary-the-anatomy-of-a-network" class="level2">
+<h2 class="anchored" data-anchor-id="1-executive-summary-the-anatomy-of-a-network">1. Executive Summary: The Anatomy of a Network</h2>
+<p>Network Meta-Analysis (NMA) is the gold standard for evidence synthesis in Health Technology Assessment (HTA). It extends traditional pair-wise meta-analysis by allowing the simultaneous comparison of multiple treatments, even those that have never been compared head-to-head in a clinical trial.</p>
+<!--
+【基础概念】traditional pair-wise meta-analysis（传统两两 Meta 分析）
+指仅在两个特定治疗（如 A vs B）之间进行直接比较的 Meta 分析。它只能整合那些做了相同头对头（head-to-head）试验的数据，通过合并多个试验的效应量来提高统计效能。它的局限是无法连接没有直接临床试验的药物。
+-->
+<p>This guide is designed to take you from a conceptual understanding to a mastery of <strong>Standard Bayesian NMA</strong>. We use a <strong>Minimal Mock Case</strong> involving three treatments (A, B, and C) forming a closed loop. This structure allows us to explore the critical concepts of <strong>Direct Evidence</strong>, <strong>Indirect Evidence</strong>, and <strong>Network Consistency</strong>.</p>
+<!--
+【审计备忘/面试要点】为什么在 HTA 中偏爱“贝叶斯” NMA 而非频率学派？
+1. 贝叶斯不是回归方法，而是一种统计学范式。回归只是我们在该框架下使用的具体模型。
+2. 频率学派（Frequentist）NMA 存在（如 R 包 netmeta），但贝叶斯学派具有以下压倒性优势：
+   - 天然输出“排名概率”（Rankogram/SUCRA），直接回答“哪个药最好”的 HTA 核心问题。
+   - 全量不确定性传播（Full Uncertainty Propagation）：通过 MCMC 采样，将异质性参数（tau^2）的不确定性自动带入最终效应量的可信区间，结果更诚实。
+   - 处理稀疏网络能力强：通过弱信息先验（Weakly Informative Priors）稳定模型，避免频率学派在稀疏数据时矩阵无法求逆的不收敛问题。
+-->
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning Strategy
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Focus on the transition from the data likelihood to the network constraints. Understanding how indirect paths are calculated is the key to answering advanced interview questions.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="2-theoretical-framework-the-calculus-of-consistency" class="level2">
+<h2 class="anchored" data-anchor-id="2-theoretical-framework-the-calculus-of-consistency">2. Theoretical Framework: The Calculus of Consistency</h2>
+<p>In a Bayesian NMA, we model the data at the study level and connect the treatment effects through a common reference treatment.</p>
+<section id="the-likelihood-binomial-logit-model" class="level3">
+<h3 class="anchored" data-anchor-id="the-likelihood-binomial-logit-model">2.1 The Likelihood (Binomial-Logit Model)</h3>
+<p>For a binary outcome (e.g., responders <span class="math inline">\(r_{jk}\)</span> out of <span class="math inline">\(n_{jk}\)</span> patients in study <span class="math inline">\(j\)</span> for treatment <span class="math inline">\(k\)</span>): <!-- 一个 study 就是指某一种特定的药物 vs 自己的对照组比较的实验 --></p>
+<p>For example, we can have: <span class="math display">\[r_{1,base/control} \sim \text{Binomial}(p_{1b}, n_{1b})\]</span> <span class="math display">\[r_{1,trt} \sim \text{Binomial}(p_{1,trt}, n_{1,trt})\]</span></p>
+<p>We use the logit link function to map probabilities to the real line:</p>
+<p><span class="math display">\[\text{logit}(p_{1b}) = \ln\left(\frac{p_{1b}}{1-p_{1b}}\right) = \mu_1 + \delta_{1b} = \mu_1\]</span> <span class="math display">\[\text{logit}(p_{1,trt}) = \ln\left(\frac{p_{1,trt}}{1-p_{1,trt}}\right) = \mu_1 + \delta_{1,trt}\]</span></p>
+<p>obviously,</p>
+<p><span class="math display">\[\text{logit}(p_{1,trt}) - \text{logit}(p_{1b}) = \ln\left( \frac{\frac{p_{1,trt}}{1-p_{1,trt}}}{\frac{p_{1b}}{1-p_{1b}}} \right) = \delta_{1,trt}\]</span> Where:</p>
+<ul>
+<li><span class="math inline">\(\mu_1\)</span>: The baseline log-odds of response in study <span class="math inline">\(j\)</span> (for the control treatment in that study).</li>
+<li><span class="math inline">\(\delta_{1,trt}\)</span>: The log-odds ratio of treatment <span class="math inline">\(k\)</span> compared to the study’s control treatment. Note that <span class="math inline">\(\delta_{1,b} = 0\)</span>.</li>
+</ul>
+</section>
+<section id="the-consistency-assumption-the-core-constraint" class="level3">
+<h3 class="anchored" data-anchor-id="the-consistency-assumption-the-core-constraint">2.2 The Consistency Assumption (The Core Constraint)</h3>
+<p>The defining feature of NMA is the assumption of consistency. We assume that the relative effect of B vs C can be derived from the relative effects of A vs B and A vs C:</p>
+<p><span class="math display">\[d_{BC} = d_{AC} - d_{AB}\]</span></p>
+<p>Where <span class="math inline">\(d_{xy}\)</span> is the pooled relative effect (log-odds ratio) of treatment <span class="math inline">\(y\)</span> vs treatment <span class="math inline">\(x\)</span>.</p>
+<!--
+【参数解析】关于公式中的 d 变量
+1. 对应关系：这里的 d 对应 2.3 节中的 d_bk（网络池化/合成效应量）。
+2. 符号说明：字母 b 代表 Baseline（基线/对照），在 NMA 中指代**该具体试验的对照药**。因为不同试验的对照药可能不同（不一定是安慰剂），所以 b 会随试验而变。
+3. 与 delta_jk 的区别：
+   - delta_jk 是具体试验 j 中药物 k 相比对照组 b 的效应量。
+   - d 是整个网络跨所有试验池化后的真实效应量。
+   - 在固定效应模型下 delta_jk = d_bk；在随机效应模型下 delta_jk 围绕 d_bk 呈正态分布。
+4. 计算方式：模型通常直接估算与网络基准药物（如 A）相比的基础参数（如 d_AB, d_AC），而间接效应 d_BC 是通过减法派生出来的：d_BC = d_AC - d_AB。
+-->
+<!--
+【核心假设剖析】一致性假设（Consistency Assumption）成立与不成立的场景
+1. 成立的场景（大概率）：
+   - 临床同质性高：各试验的人群基线特征（如年龄、疾病严重程度）、伴随治疗、终点定义高度相似。
+   - 共同对照药（A）具有可比性：在 A vs B 和 A vs C 的试验中，A 的给药方案和患者群体没有实质差异。
+
+【直观直觉：平行宇宙视角】
+假设存在平行宇宙，一号宇宙中这群人使用 A vs 安慰剂，二号宇宙中完全相同的一群人在完全相同的条件下使用 B vs 安慰剂。此时用 (B vs 安慰剂) - (A vs 安慰剂) 得到的间接效应完美成立。现实中 NMA 的所有数学修正（如倾向性评分、Meta回归、ML-NMR 的积分），本质上都是在试图把不同试验的人群，拉回到这个“完全相同”的平行宇宙状态。
+
+1. 不成立的场景（大概率）：
+   - 存在效应修饰变量（Effect Modifier）分布不均：例如，B 药在老年人中效果更好，而 A vs B 试验招募的全是年轻人，A vs C 试验全是老年人。此时通过 A 间接推算 B vs C 就会失真（Transitivity 违背）。
+   - 试验设计/方法论差异大：例如一个是开放标签（Open-label）试验，另一个是双盲（Double-blind）试验，主观终点可能受到偏倚影响导致不一致。
+-->
+</section>
+<section id="fixed-effects-fe-vs.-random-effects-re" class="level3">
+<h3 class="anchored" data-anchor-id="fixed-effects-fe-vs.-random-effects-re">2.3 Fixed Effects (FE) vs.&nbsp;Random Effects (RE)</h3>
+<ul>
+<li><strong>Fixed Effects Model</strong>: Assumes that the true relative effect of treatment <span class="math inline">\(k\)</span> vs <span class="math inline">\(b\)</span> is constant across all studies: <span class="math inline">\(\delta_{jk} = d_{bk}\)</span>.</li>
+<li><strong>Random Effects Model</strong>: Assumes that the true relative effects vary across studies following a normal distribution: <span class="math inline">\(\delta_{jk} \sim \text{Normal}(d_{bk}, \tau^2)\)</span>, where <span class="math inline">\(\tau^2\)</span> is the between-study heterogeneity variance.</li>
+</ul>
+</section>
+</section>
+<section id="3-the-minimal-mock-case-a-vs-b-vs-c" class="level2">
+<h2 class="anchored" data-anchor-id="3-the-minimal-mock-case-a-vs-b-vs-c">3. The Minimal Mock Case: A vs B vs C</h2>
+<ul>
+<li><strong>Treatment A</strong>: Standard of Care (SoC) - Reference</li>
+<li><strong>Treatment B</strong>: New Drug 1</li>
+<li><strong>Treatment C</strong>: New Drug 2</li>
+</ul>
+<p>To make this concrete, let’s construct a minimal network with 3 treatments and 3 studies forming a complete loop.</p>
+<section id="the-mock-data" class="level3">
+<h3 class="anchored" data-anchor-id="the-mock-data">3.1 The Mock Data</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Study</th>
+<th style="text-align: left;">Arm 1 (Control)</th>
+<th style="text-align: left;">Arm 2 (Active)</th>
+<th style="text-align: left;"><span class="math inline">\(n_1\)</span></th>
+<th style="text-align: left;"><span class="math inline">\(r_1\)</span></th>
+<th style="text-align: left;"><span class="math inline">\(n_2\)</span></th>
+<th style="text-align: left;"><span class="math inline">\(r_2\)</span></th>
+<th style="text-align: left;">Observed OR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Study 1</strong></td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">B</td>
+<td style="text-align: left;">100</td>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;">100</td>
+<td style="text-align: left;">40</td>
+<td style="text-align: left;">2.67</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Study 2</strong></td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">100</td>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;">100</td>
+<td style="text-align: left;">50</td>
+<td style="text-align: left;">4.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Study 3</strong></td>
+<td style="text-align: left;">B</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">100</td>
+<td style="text-align: left;">30</td>
+<td style="text-align: left;">100</td>
+<td style="text-align: left;">40</td>
+<td style="text-align: left;">1.55</td>
+</tr>
+</tbody>
+</table>
+<p><em>Where:</em></p>
+<ul>
+<li><span class="math inline">\(n_1, n_2\)</span>: Total number of patients (sample size) in Arm 1 and Arm 2 respectively.</li>
+<li><span class="math inline">\(r_1, r_2\)</span>: Number of responders (events) in Arm 1 and Arm 2 respectively.</li>
+<li><strong>Observed OR</strong> (Odds Ratio) is calculated as: <span class="math inline">\(OR = \frac{r_2 / (n_2 - r_2)}{r_1 / (n_1 - r_1)}\)</span>.
+<ul>
+<li>For example, in Study 1: <span class="math inline">\(OR = \frac{40 / (100 - 40)}{20 / (100 - 20)} \approx 2.67\)</span>.</li>
+</ul></li>
+</ul>
+<!--
+【逻辑思辨】如果现实中已经有了 Study 3（B vs C 的直接头对头试验），还需要做 NMA 吗？
+1. 没有 Study 3 时：这是 NMA 的经典场景（雪中送炭），必须通过共同对照药 A 进行间接比较。
+2. 有 Study 3 时：依然需要做 NMA，并纳入 Study 1 和 2（锦上添花），原因如下：
+   - 提高精度：结合直接证据与间接证据，变相扩大样本量，使效应量的置信/可信区间更窄。
+   - 一致性检验：只有形成闭环，才能检验直接证据与间接证据是否一致，这是评估证据链可靠性的核心。
+   - 全网排名：HTA 机构（如 NICE）需要对网络中所有药物进行优劣排名，而不仅仅是 B 和 C。
+-->
+</section>
+<section id="the-calculus-of-the-loop" class="level3">
+<h3 class="anchored" data-anchor-id="the-calculus-of-the-loop">3.2 The Calculus of the Loop</h3>
+<p>Let’s calculate the log-odds ratios (LOR) for each study:</p>
+<ol type="1">
+<li><strong>Study 1 (A vs B)</strong>: <span class="math inline">\(\ln(OR_{AB}) = \ln(2.67) \approx 0.982\)</span></li>
+<li><strong>Study 2 (A vs C)</strong>: <span class="math inline">\(\ln(OR_{AC}) = \ln(4.00) \approx 1.386\)</span></li>
+<li><strong>Study 3 (B vs C)</strong>: <span class="math inline">\(\ln(OR_{BC}) = \ln(1.55) \approx 0.438\)</span></li>
+</ol>
+<p><strong>The Indirect Check:</strong> According to the consistency assumption, the indirect estimate of B vs C should be: <span class="math display">\[\ln(OR_{BC, \text{ind}}) = \ln(OR_{AC}) - \ln(OR_{AB}) = 1.386 - 0.982 = 0.404\]</span></p>
+<p><strong>The Consistency Gap:</strong></p>
+<ul>
+<li>Direct <span class="math inline">\(\ln(OR_{BC}) = 0.438\)</span></li>
+<li>Indirect <span class="math inline">\(\ln(OR_{BC}) = 0.404\)</span></li>
+<li>Difference (Inconsistency) = <span class="math inline">\(0.438 - 0.404 = 0.034\)</span></li>
+</ul>
+<p>This difference is very small, indicating a consistent network.</p>
+</section>
+</section>
+<section id="4-mcmc-forensic-audit-implementation--convergence" class="level2">
+<h2 class="anchored" data-anchor-id="4-mcmc-forensic-audit-implementation--convergence">4. MCMC Forensic Audit: How Bayes Actually Solves the Network</h2>
+<p>In this section, we move away from simple arithmetic and look at how the Bayesian MCMC engine actually processes our mock data to find the global solution.</p>
+<section id="step-1-setting-up-the-likelihood-and-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-setting-up-the-likelihood-and-parameters">4.1 Step 1: Setting up the Likelihood and Parameters</h3>
+<p>For our 3 studies, the model views the data as follows. Let <span class="math inline">\(r_{jk}\)</span> be the number of events in study <span class="math inline">\(j\)</span>, arm <span class="math inline">\(k\)</span>, and <span class="math inline">\(n_{jk}\)</span> be the total patients.</p>
+<p>The formal mathematical likelihood <span class="math inline">\(L\)</span> for the entire network is the product of the probability mass functions (PMF) of the independent Binomial distributions for all studies and arms:</p>
+<p><span class="math display">\[L(\mu, d | r, n) = \prod_{j=1}^{3} \prod_{k=1}^{2} \binom{n_{jk}}{r_{jk}} p_{jk}^{r_{jk}} (1 - p_{jk})^{n_{jk} - r_{jk}}\]</span></p>
+<!--
+【学派思辨】频率派与贝叶斯派处理似然函数的不同哲学
+1. 频率学派：目标是寻找“最值点”。通过解析求导或数值优化算法，寻找使似然函数 L 达到最大值的唯一参数组合。这本质上是一个求解最值（极大似然估计，MLE）的确定性问题。
+2. 贝叶斯学派：目标是寻找“概率分布”。它不追求单一的最值点，而是通过 MCMC 采样在参数空间中不断游走（即“波动”）。在似然值更高的参数区域，采样点会被更密集地记录；在似然值低的区域，采样点则较稀疏。
+最终，这些海量的采样点在参数空间中形成了一个密度的分布，其直观形态就像一片“概率云”（即后验分布），从而诚实地反映了参数的不确定性。
+--> 
+<p>Where the probabilities <span class="math inline">\(p_{jk}\)</span> are derived from the model: <span class="math inline">\(\text{logit}(p_{jk}) = \mu_j + \delta_{jk}\)</span>.</p>
+<p>Solving for <span class="math inline">\(p_{jk}\)</span> (the inverse-logit or logistic function):</p>
+<p><span class="math display">\[p_{jk} = \frac{1}{1 + \exp(-(\mu_j + \delta_{jk}))}\]</span></p>
+<p>Now let’s look at the specific setup for our 3 studies:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Study</th>
+<th style="text-align: left;">Arm</th>
+<th style="text-align: left;">Treatment</th>
+<th style="text-align: left;">Distribution</th>
+<th style="text-align: left;">Linear Predictor (<span class="math inline">\(\text{logit}(p)\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Study 1</strong></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">A (SoC)</td>
+<td style="text-align: left;"><span class="math inline">\(r_{11} \sim \text{Binomial}(p_{11}, 100)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\mu_1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">B</td>
+<td style="text-align: left;"><span class="math inline">\(r_{12} \sim \text{Binomial}(p_{12}, 100)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\mu_1 + d_{AB}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Study 2</strong></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">A (SoC)</td>
+<td style="text-align: left;"><span class="math inline">\(r_{21} \sim \text{Binomial}(p_{21}, 100)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\mu_2\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;"><span class="math inline">\(r_{22} \sim \text{Binomial}(p_{22}, 100)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\mu_2 + d_{AC}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Study 3</strong></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">B</td>
+<td style="text-align: left;"><span class="math inline">\(r_{31} \sim \text{Binomial}(p_{31}, 100)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\mu_3\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;"><span class="math inline">\(r_{32} \sim \text{Binomial}(p_{32}, 100)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\mu_3 + d_{BC}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>The Consistency Constraint (The Golden Rule):</strong> At all times, the model enforces: <span class="math inline">\(d_{BC} = d_{AC} - d_{AB}\)</span>. This means we only have 5 independent parameters to estimate: <span class="math inline">\(\mu_1, \mu_2, \mu_3, d_{AB}, d_{AC}\)</span>. All study data are pooled simultaneously to find the best values for these 5 parameters.</p>
+</section>
+<section id="step-2-assigning-priors-the-bayesian-part" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-assigning-priors-the-bayesian-part">4.2 Step 2: Assigning Priors (The Bayesian Part)</h3>
+<p>Since we have no prior knowledge, we use vague (non-informative) priors:</p>
+<ul>
+<li>Study baselines: <span class="math inline">\(\mu_1, \mu_2, \mu_3 \sim \text{Normal}(0, 1000)\)</span></li>
+<li>Treatment effects: <span class="math inline">\(d_{AB}, d_{AC} \sim \text{Normal}(0, 1000)\)</span></li>
+</ul>
+<p><strong>How Priors and Likelihood Connect in MCMC:</strong></p>
+<p>According to Bayes’ Theorem, the <strong>Posterior</strong> (the target distribution MCMC tries to map) is proportional to the <strong>Likelihood</strong> multiplied by the <strong>Prior</strong>: <span class="math display">\[\text{Posterior} \propto \text{Likelihood} \times \text{Prior}\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>In our minimal mock case
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><strong>Flat Priors</strong>: Because we use a huge variance (1000), the prior distribution is extremely flat. The prior probability of guessing <span class="math inline">\(d_{AB} = 0.982\)</span> is almost identical to guessing <span class="math inline">\(d_{AB} = 10.0\)</span>.</li>
+<li><strong>Likelihood Dominance</strong>: Therefore, when the MCMC engine calculates the score of a guess, the Prior part contributes almost nothing. The score is dominated by the <strong>Likelihood</strong> (how well the parameters fit the 100-patient data in the table).</li>
+<li><strong>Guiding the Walk</strong>: When MCMC decides whether to move to a new guess, it compares the ratio of the scores. Since the priors are flat, the decision is almost entirely based on whether the new guess makes the observed data <em>more likely</em> than the old guess.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What exactly are we multiplying in a single MCMC step?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li>It is <strong>NOT</strong> a distribution.</li>
+<li>It is <strong>NOT</strong> a random draw from <span class="math inline">\(\text{Normal}(0, 1000)\)</span>.</li>
+<li>It is a <strong>specific number</strong> (probability density). In each MCMC step, the engine has a <em>specific guess</em> for the parameters (e.g., <span class="math inline">\(d_{AB} = 0.982\)</span>). The “Prior” in the formula is the <strong>function value of the probability density function (PDF)</strong> of <span class="math inline">\(\text{Normal}(0, 1000)\)</span> at the point <span class="math inline">\(0.982\)</span>. Similarly, the “Likelihood” is the probability of seeing the data given this guess (a single number). MCMC multiplies these two numbers to score the current guess.</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- 
+ 【学派思辨】似然与先验相乘的实际物理意义
+本质上，这是两个概率密度（Density）在相乘，决定了 MCMC 采样的“方向”和“驻留时间”：
+
+1. 似然（Likelihood）：
+   反映“数据”的话语权。即在当前参数取值下，生成我们观察到的这组真实数据的概率。
+2. 先验（Prior）：
+   反映“背景知识”的话语权。即在未看数据前，我们根据经验或常识认为该参数取值的概率。
+
+两者相乘的博弈逻辑：
+- 似然低 x 先验高：背景知识认为很可能，但无法解释现实数据。这取决于两者的“拉扯”力道：如果先验只是微弱偏好，采样会变稀疏；但若先验极强，它甚至能压过低似然，在该区域强行拉�<!--
+
+【逻辑思辨】Stan 能完全替代 BUGS/JAGS 吗？
+不能简单地认为 Stan 可以完全替代 BUGS/JAGS。Stan 虽强，但有一个致命弱点：无法直接处理“离散未知参数”（Discrete Parameters）。
+
+举两个具体的 HEOR/临床场景：
+
+1. 分类缺失数据（Categorical Missing Data）：
+- 场景：在 NMA 中，需要调整一个二分类协变量（如患者是否吸烟，1=是，0=否）。但部分患者数据缺失。
+- 离散变量：在 BUGS/JAGS 中，可以直接把缺失的“吸烟状态”设为未知的离散参数（0 或 1），模型在游走时会顺便为这些患者“猜”出他们到底是 0 还是 1。
+- Stan 的困难：因为 0 或 1 离散变量不连续、无法求导，所以 Stan 无法直接对离散参数进行采样。程序员必须在数学上把“吸烟”和“不吸烟”的两种可能性用概率加权求和，把离散变量从似然函数中消去（边缘化，Marginalize）。
+
+2. 潜在亚组分类（Latent Subgroup Classification）：
+- 场景：假设某药物对一部分患者极有效，对另一部分完全无效。你怀疑人群存在两个“潜在亚组”，但临床上无法直接区分他们。
+- 离散变量：我们可以为每个患者引入一个隐藏变量（0 代表隐性无效组，1 代表隐性有效组）。这个 0 或 1 就是离散参数。
+- Stan 的困难：Stan 无法直接为每个患者采样他是属于 0 还是 1。
+
+这个变量是我们最终要估计的参数吗？
+- 在数学定义上是。在贝叶斯框架下，任何未知量（包括缺失值、隐藏状态）都是参数。
+- 但在业务目标上通常不是，它们是“隐变量”或“干扰参数”。我们真正关心的依然是“药物的真实疗效”（连续参数）。但为了准确估计疗效，模型必须处理掉这些离散的 0 或 1。
+
+总结：
+1. BUGS/JAGS：基于 Gibbs 采样，可以轻松处理离散变量。
+2. Stan：基于梯度的 HMC 算法，无法直接采样离散变量，必须进行复杂的数学“边缘化”处理。
+因此，对于绝大多数 HEOR 连续参数模型，Stan 完胜；但对于包含复杂离散隐变量的模型，BUGS/JAGS 仍有优势。
+-->
+</section>
+<section id="the-iterative-algorithm-and-posterier." class="level3">
+<h3 class="anchored" data-anchor-id="the-iterative-algorithm-and-posterier.">4.3 The Iterative Algorithm and Posterier.</h3>
+<ol type="1">
+<li><strong>Proposal</strong>: The engine guesses values for the parameters.
+<ul>
+<li>Suppose it guesses: <span class="math inline">\(\mu_1=-1.386, \mu_2=-1.386, \mu_3=-0.847, d_{AB}=0.982, d_{AC}=1.386\)</span>.</li>
+</ul></li>
+<li><strong>Derivation</strong>: It calculates <span class="math inline">\(d_{BC} = 1.386 - 0.982 = 0.404\)</span> (forced by consistency).</li>
+<li><strong>Likelihood Calculation</strong>: It calculates the probability of seeing our mock data given these guesses:
+<ul>
+<li>For Study 1: <span class="math inline">\(p_{11} = \text{logit}^{-1}(-1.386) = 0.20\)</span>. <span class="math inline">\(r_{11}=20\)</span> fits perfectly!</li>
+<li>For Study 3: <span class="math inline">\(p_{31} = \text{logit}^{-1}(-0.847) = 0.30\)</span>. <span class="math inline">\(r_{31}=30\)</span> fits perfectly!</li>
+</ul></li>
+<li><strong>Acceptance</strong>: If the guessed values make the data highly probable, the engine accepts them and records them. If not, it might reject them.</li>
+<li>The engine repeats this <strong>thousands of times</strong> (e.g., 50,000 iterations).</li>
+<li>After 50,000 steps, we don’t get single numbers. We get thousands of recorded values for <span class="math inline">\(d_{AB}, d_{AC}\)</span>, and the derived <span class="math inline">\(d_{BC}\)</span>. This is the simulated Posterier distribution.
+<ul>
+<li>The <strong>median</strong> of the recorded values for <span class="math inline">\(d_{AB}\)</span> becomes our pooled estimate.</li>
+<li>The 2.5th and 97.5th percentiles become our <strong>95% Credible Interval (CrI)</strong>.</li>
+</ul></li>
+</ol>
+</section>
+<section id="model-implementation-bugsjags-stan" class="level3">
+<h3 class="anchored" data-anchor-id="model-implementation-bugsjags-stan">4.5 Model Implementation: BUGS/JAGS &amp; Stan</h3>
+<p>Here we present the implementation of our Fixed Effects NMA model in both the traditional BUGS/JAGS language and the modern Stan language, along with the R code to call them.</p>
+<section id="bugsjags-implementation" class="level4">
+<h4 class="anchored" data-anchor-id="bugsjags-implementation">4.5.1 BUGS/JAGS Implementation</h4>
+<p>Here is the actual code used to run this simulation in JAGS:</p>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>JAGS nma_model.txt
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3"><pre class="sourceCode R bugs code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a>model {</span>
+<span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-3" class="code-annotation-target"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-4" class="code-annotation-target"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="annotated-cell-3-5"><a href="#annotated-cell-3-5" aria-hidden="true" tabindex="-1"></a>      r[j,k] <span class="sc">~</span> <span class="fu">dbin</span>(p[j,k], n[j,k])</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-3-6" class="code-annotation-target"><a href="#annotated-cell-3-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">logit</span>(p[j,k]) <span class="ot">&lt;-</span> mu[j] <span class="sc">+</span> delta[j,k]</span>
+<span id="annotated-cell-3-7"><a href="#annotated-cell-3-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="annotated-cell-3-8"><a href="#annotated-cell-3-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-3-9" class="code-annotation-target"><a href="#annotated-cell-3-9" aria-hidden="true" tabindex="-1"></a>    delta[j,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="annotated-cell-3-10"><a href="#annotated-cell-3-10" aria-hidden="true" tabindex="-1"></a>  }  </span>
+<span id="annotated-cell-3-11"><a href="#annotated-cell-3-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Consistency Equations (Fixed Effects)</span></span>
+<span id="annotated-cell-3-12"><a href="#annotated-cell-3-12" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">1</span>,<span class="dv">2</span>] <span class="ot">&lt;-</span> d_AB</span>
+<span id="annotated-cell-3-13"><a href="#annotated-cell-3-13" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">2</span>,<span class="dv">2</span>] <span class="ot">&lt;-</span> d_AC</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-3-14" class="code-annotation-target"><a href="#annotated-cell-3-14" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">3</span>,<span class="dv">2</span>] <span class="ot">&lt;-</span> d_AC <span class="sc">-</span> d_AB</span>
+<span id="annotated-cell-3-15"><a href="#annotated-cell-3-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Priors</span></span>
+<span id="annotated-cell-3-16"><a href="#annotated-cell-3-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-3-17" class="code-annotation-target"><a href="#annotated-cell-3-17" aria-hidden="true" tabindex="-1"></a>    mu[j] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="fl">0.0001</span>)</span>
+<span id="annotated-cell-3-18"><a href="#annotated-cell-3-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="annotated-cell-3-19"><a href="#annotated-cell-3-19" aria-hidden="true" tabindex="-1"></a>  d_AB <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="fl">0.0001</span>)</span>
+<span id="annotated-cell-3-20"><a href="#annotated-cell-3-20" aria-hidden="true" tabindex="-1"></a>  d_AC <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="fl">0.0001</span>)</span>
+<span id="annotated-cell-3-21"><a href="#annotated-cell-3-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="7" onclick="event.preventDefault();">7</a><span id="annotated-cell-3-22" class="code-annotation-target"><a href="#annotated-cell-3-22" aria-hidden="true" tabindex="-1"></a>  OR_AB <span class="ot">&lt;-</span> <span class="fu">exp</span>(d_AB)</span>
+<span id="annotated-cell-3-23"><a href="#annotated-cell-3-23" aria-hidden="true" tabindex="-1"></a>  OR_AC <span class="ot">&lt;-</span> <span class="fu">exp</span>(d_AC)</span>
+<span id="annotated-cell-3-24"><a href="#annotated-cell-3-24" aria-hidden="true" tabindex="-1"></a>  OR_BC <span class="ot">&lt;-</span> <span class="fu">exp</span>(d_AC <span class="sc">-</span> d_AB)</span>
+<span id="annotated-cell-3-25"><a href="#annotated-cell-3-25" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="1">3 studies</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="4" data-code-annotation="2">2 arms per study</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="6" data-code-annotation="3">Likelihood</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="9" data-code-annotation="4">Define delta relative to arm 1</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="14" data-code-annotation="5">This is d_BC</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="17" data-code-annotation="6">The second parameter is Precision (1/Variance). So this is a no information prior.</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="7">7</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="22" data-code-annotation="7">Derived parameters for output</span>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<!--
+【操作指南】如何在 R 中运行上述 BUGS 代码？
+很多初学者会误以为可以直接在 R 脚本中运行 BUGS 代码。实际上，R 无法直接解析 BUGS 语言。
+正确的工作流是：
+1. 头部加载：在 R 脚本开头写 `library(rjags)`。
+2. 保存代码：将上述 `model { ... }` 块的代码复制并保存为一个独立的纯文本文件（如 `nma_model.txt`）。
+3. 传参调用：在 R 中使用 `jags.model(file = "nma_model.txt", ...)` 读取该文件。
+
+这样，R 只是作为一个“搬运工”和“控制器”，把数据和模型文件发给后台的 JAGS 引擎去计算。
+-->
+<p>To run this model in R, you would use the <code>rjags</code> package:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>View the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rjags)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare the data</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>data_list <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">40</span>, <span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">15</span>, <span class="dv">20</span>), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize the model</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>jags_model <span class="ot">&lt;-</span> <span class="fu">jags.model</span>(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/scratch/CareerTransferZXG/08_Practice_Drafts/05_NMA_Technical_Prep/nma_model.txt"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> data_list,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.chains =</span> <span class="dv">3</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.adapt =</span> <span class="dv">1000</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample from the posterior</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">coda.samples</span>(</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> jags_model,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable.names =</span> <span class="fu">c</span>(<span class="st">"d_AB"</span>, <span class="st">"d_AC"</span>, <span class="st">"OR_AB"</span>, <span class="st">"OR_AC"</span>, <span class="st">"OR_BC"</span>),</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.iter =</span> <span class="dv">10000</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(samples)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Iterations = 1001:11000
+Thinning interval = 1 
+Number of chains = 3 
+Sample size per chain = 10000 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+       Mean     SD Naive SE Time-series SE
+OR_AB 2.829 0.8028 0.004635       0.013432
+OR_AC 4.122 1.3435 0.007757       0.024485
+OR_BC 1.510 0.4724 0.002727       0.006338
+d_AB  1.001 0.2771 0.001600       0.004612
+d_AC  1.367 0.3118 0.001800       0.005662
+
+2. Quantiles for each variable:
+
+        2.5%    25%   50%   75% 97.5%
+OR_AB 1.5907 2.2541 2.719 3.286 4.713
+OR_AC 2.1750 3.1735 3.908 4.807 7.395
+OR_BC 0.7973 1.1737 1.438 1.764 2.641
+d_AB  0.4642 0.8128 1.000 1.190 1.550
+d_AC  0.7770 1.1548 1.363 1.570 2.001</code></pre>
+</div>
+</div>
+</section>
+<section id="stan-implementation" class="level4">
+<h4 class="anchored" data-anchor-id="stan-implementation">4.5.2 Stan Implementation</h4>
+<p>The exact same functionality can be implemented in Stan. Notice that Stan uses standard deviation instead of precision in its normal distribution, and uses vectorized operations.</p>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>STAN nma_model.stan
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5"><pre class="sourceCode stan code-annotation-code code-with-copy code-annotated"><code class="sourceCode stan"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; J; <span class="co">// Number of studies</span></span>
+<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> r[J, <span class="dv">2</span>];    <span class="co">// Events</span></span>
+<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n[J, <span class="dv">2</span>];    <span class="co">// Total patients</span></span>
+<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-5-7"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="annotated-cell-5-8"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> mu[J];     <span class="co">// Study baselines</span></span>
+<span id="annotated-cell-5-9"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d_AB;      <span class="co">// Effect of B vs A</span></span>
+<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d_AC;      <span class="co">// Effect of C vs A</span></span>
+<span id="annotated-cell-5-11"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-5-13"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">transformed parameters</span> {</span>
+<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> delta[J, <span class="dv">2</span>];</span>
+<span id="annotated-cell-5-15"><a href="#annotated-cell-5-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Study 1: A vs B</span></span>
+<span id="annotated-cell-5-16"><a href="#annotated-cell-5-16" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">1</span>, <span class="dv">1</span>] = <span class="dv">0</span>;</span>
+<span id="annotated-cell-5-17"><a href="#annotated-cell-5-17" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">1</span>, <span class="dv">2</span>] = d_AB;</span>
+<span id="annotated-cell-5-18"><a href="#annotated-cell-5-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Study 2: A vs C</span></span>
+<span id="annotated-cell-5-19"><a href="#annotated-cell-5-19" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">2</span>, <span class="dv">1</span>] = <span class="dv">0</span>;</span>
+<span id="annotated-cell-5-20"><a href="#annotated-cell-5-20" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">2</span>, <span class="dv">2</span>] = d_AC;</span>
+<span id="annotated-cell-5-21"><a href="#annotated-cell-5-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Study 3: B vs C</span></span>
+<span id="annotated-cell-5-22"><a href="#annotated-cell-5-22" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">3</span>, <span class="dv">1</span>] = <span class="dv">0</span>;</span>
+<span id="annotated-cell-5-23"><a href="#annotated-cell-5-23" aria-hidden="true" tabindex="-1"></a>  delta[<span class="dv">3</span>, <span class="dv">2</span>] = d_AC - d_AB; <span class="co">// Consistency constraint</span></span>
+<span id="annotated-cell-5-24"><a href="#annotated-cell-5-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-5-25"><a href="#annotated-cell-5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-5-26"><a href="#annotated-cell-5-26" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-27" class="code-annotation-target"><a href="#annotated-cell-5-27" aria-hidden="true" tabindex="-1"></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
+<span id="annotated-cell-5-28"><a href="#annotated-cell-5-28" aria-hidden="true" tabindex="-1"></a>  d_AB ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
+<span id="annotated-cell-5-29"><a href="#annotated-cell-5-29" aria-hidden="true" tabindex="-1"></a>  d_AC ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
+<span id="annotated-cell-5-30"><a href="#annotated-cell-5-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span>:J) {</span>
+<span id="annotated-cell-5-31"><a href="#annotated-cell-5-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span>:<span class="dv">2</span>) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-32" class="code-annotation-target"><a href="#annotated-cell-5-32" aria-hidden="true" tabindex="-1"></a>      r[j, k] ~ binomial_logit(n[j, k], mu[j] + delta[j, k]);</span>
+<span id="annotated-cell-5-33"><a href="#annotated-cell-5-33" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="annotated-cell-5-34"><a href="#annotated-cell-5-34" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="annotated-cell-5-35"><a href="#annotated-cell-5-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-5-36"><a href="#annotated-cell-5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-5-37"><a href="#annotated-cell-5-37" aria-hidden="true" tabindex="-1"></a><span class="kw">generated quantities</span> {</span>
+<span id="annotated-cell-5-38"><a href="#annotated-cell-5-38" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR_AB = exp(d_AB);</span>
+<span id="annotated-cell-5-39"><a href="#annotated-cell-5-39" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR_AC = exp(d_AC);</span>
+<span id="annotated-cell-5-40"><a href="#annotated-cell-5-40" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR_BC = exp(d_AC - d_AB);</span>
+<span id="annotated-cell-5-41"><a href="#annotated-cell-5-41" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="27" data-code-annotation="1">Priors (Stan uses standard deviation, so 100 means variance 10000)</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="32" data-code-annotation="2">Likelihood</span>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<p>To run this model in R, you would use the <code>rstan</code> package:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>View the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstan)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>stan_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">J =</span> <span class="dv">3</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">40</span>, <span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">15</span>, <span class="dv">20</span>), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the model</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">stan</span>(</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/scratch/CareerTransferZXG/08_Practice_Drafts/05_NMA_Technical_Prep/nma_model.stan"</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> stan_data,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">chains =</span> <span class="dv">3</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">iter =</span> <span class="dv">2000</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract results</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(fit, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"d_AB"</span>, <span class="st">"d_AC"</span>, <span class="st">"OR_AB"</span>, <span class="st">"OR_AC"</span>, <span class="st">"OR_BC"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Inference for Stan model: anon_model.
+3 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=3000.
+
+      mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
+d_AB  1.00    0.01 0.28 0.45 0.82 1.00 1.19  1.55  1359    1
+d_AC  1.36    0.01 0.30 0.78 1.16 1.36 1.57  1.97  1433    1
+OR_AB 2.83    0.02 0.80 1.56 2.26 2.72 3.28  4.70  1331    1
+OR_AC 4.10    0.03 1.28 2.17 3.19 3.90 4.82  7.14  1475    1
+OR_BC 1.50    0.01 0.47 0.80 1.17 1.44 1.76  2.61  1863    1
+
+Samples were drawn using NUTS(diag_e) at Sat May  9 22:48:47 2026.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).</code></pre>
+</div>
+</div>
+<!--
+【审计要点】注意 BUGS 代码中的精度（Precision）
+在 BUGS/JAGS 中，`dnorm(mean, precision)` 里的第二个参数是**精度**（方差的倒数），而不是标准差或方差。所以 `0.0001` 代表方差是 `10000`，这是一个非常宽的无信息先验。
+-->
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Comparison: BUGS vs JAGS vs Stan
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>While the code above is written in the BUGS/JAGS language, it is helpful to understand the differences between the three major MCMC engines used in HEOR:</p>
+<ul>
+<li><strong>BUGS (WinBUGS / OpenBUGS)</strong>: The pioneer. It uses <strong>Gibbs sampling</strong>. It is the oldest and can be slow or unstable for complex models.</li>
+<li><strong>JAGS (Just Another Gibbs Sampler)</strong>: A C++ reimplementation of BUGS. It uses the same language syntax but is cross-platform and more stable. It is currently the most widely used engine for traditional NMA (e.g., in NICE DSU technical support documents).</li>
+<li><strong>Stan</strong>: The modern standard. It uses <strong>Hamiltonian Monte Carlo (HMC)</strong> and the <strong>No-U-Turn Sampler (NUTS)</strong>. Instead of random walking, it uses the gradient of the log-posterior to “glide” efficiently through the parameter space. It is much faster and more reliable for complex, high-dimensional models (like ML-NMR), though it requires compiling the model to C++ first.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>BUGS/JAGS: Software or Language?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>BUGS and JAGS are both <strong>standalone software (computational engines)</strong> and <strong>modeling languages</strong>. - <strong>BUGS</strong> (WinBUGS/OpenBUGS) has its own language syntax and originally had a GUI. - <strong>JAGS</strong> is a command-line program with no GUI. In modern HEOR practice, they are almost always used as “plugins” called from R (via packages like <code>rjags</code> or <code>R2jags</code>), rather than run standalone.</p>
+</div>
+</div>
+</div>
+<!--
+【逻辑思辨】Stan 能完全替代 BUGS/JAGS 吗？
+不能简单地认为 Stan 可以完全替代 BUGS/JAGS。Stan 虽强，但有一个致命弱点：无法直接处理“离散未知参数”（Discrete Parameters）。
+
+举个具体的 HEOR 场景（分类缺失数据）：
+- 场景：在 NMA 中，需要调整一个二分类协变量（如患者是否吸烟，1=是，0=否）。但部分患者数据缺失。
+- 离散变量：在 BUGS/JAGS 中，可以直接把缺失的“吸烟状态”设为未知的离散参数（0 或 1），模型在游走时会顺便为这些患者“猜”出他们到底是 0 还是 1。
+- Stan 的困难：因为 0 或 1 离散变量不连续、无法求导，所以 Stan 无法直接对离散参数进行采样。程序员必须在数学上把“吸烟”和“不吸烟”的两种可能性用概率加权求和，把离散变量从似然函数中消去（边缘化，Marginalize）。
+
+这个变量是我们最终要估计的参数吗？
+- 在数学定义上是。在贝叶斯框架下，任何未知量（包括缺失值、隐藏状态）都是参数。
+- 但在业务目标上通常不是，它们是“隐变量”或“干扰参数”。我们真正关心的依然是“药物的真实疗效”（连续参数）。但为了准确估计疗效，模型必须处理掉这些离散的 0 或 1。
+
+总结与跑车比喻：
+1. BUGS/JAGS：基于 Gibbs 采样，可以轻松处理离散变量。就像一辆老款吉普车，虽然慢，但能开过乱石泥泞路段（离散变量）。
+2. Stan：基于梯度的 HMC 算法，无法直接采样离散变量，必须进行复杂的数学“边缘化”处理。就像一辆性能极强的现代跑车，在 95% 的绝大多数公路（连续参数模型）上降维打击吉普车，但在泥泞路段会趴窝。
+
+因此，在业务层面上，Stan 几乎完全涵盖并超越了 BUGS/JAGS 的功能，正在成为新的行业标准；但在底层技术特性上，对于包含复杂离散隐变量的模型，BUGS/JAGS 仍有其不可替代的优势。
+-->
+</section>
+</section>
+<section id="convergence-diagnostics" class="level3">
+<h3 class="anchored" data-anchor-id="convergence-diagnostics">4.6 Convergence Diagnostics</h3>
+<p>When auditing an NMA, always verify:</p>
+<ul>
+<li><strong>R-hat</strong>: Must be <span class="math inline">\(&lt; 1.05\)</span> for all parameters.</li>
+<li><strong>Trace Plots</strong>: Chains should look like “fat hairy caterpillars,” showing good mixing.</li>
+<li><strong>Auto-correlation</strong>: Should drop to zero quickly.</li>
+</ul>
+</section>
+</section>
+<section id="5-results--interpretation-the-league-table" class="level2">
+<h2 class="anchored" data-anchor-id="5-results--interpretation-the-league-table">5. Results &amp; Interpretation: The League Table</h2>
+<p>After running the MCMC, we combine the direct and indirect evidence to get the final pooled estimates.</p>
+<section id="the-league-table-median-or-and-95-cri" class="level3">
+<h3 class="anchored" data-anchor-id="the-league-table-median-or-and-95-cri">5.1 The League Table (Median OR and 95% CrI)</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Treatment A</th>
+<th style="text-align: left;">2.67 (1.5, 4.8)</th>
+<th style="text-align: left;">4.00 (2.2, 7.3)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>0.37 (0.2, 0.7)</strong></td>
+<td style="text-align: left;">Treatment B</td>
+<td style="text-align: left;">1.50 (0.8, 2.7)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>0.25 (0.1, 0.5)</strong></td>
+<td style="text-align: left;"><strong>0.67 (0.4, 1.2)</strong></td>
+<td style="text-align: left;">Treatment C</td>
+</tr>
+</tbody>
+</table>
+<p><em>How to read</em>: The upper-right triangle shows the OR of the column treatment vs the row treatment. The lower-left triangle shows the inverse.</p>
+</section>
+<section id="probability-of-being-best" class="level3">
+<h3 class="anchored" data-anchor-id="probability-of-being-best">5.2 Probability of Being Best</h3>
+<p>Bayesian NMA allows us to calculate the probability that each treatment is the most effective.</p>
+<ul>
+<li><strong>Treatment C</strong>: ~75%</li>
+<li><strong>Treatment B</strong>: ~24%</li>
+<li><strong>Treatment A</strong>: ~1%</li>
+</ul>
+</section>
+</section>
+<section id="6-strategic-qa-interview-prep" class="level2">
+<h2 class="anchored" data-anchor-id="6-strategic-qa-interview-prep">6. Strategic Q&amp;A: Interview Prep</h2>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>What is the difference between a Consistency Model and an Unrelated Mean Effects (UME) model?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A consistency model forces all loops to close (e.g., <span class="math inline">\(d_{BC} = d_{AC} - d_{AB}\)</span>). A UME model relaxes this assumption and estimates all relative effects independently. We compare the two to check for network inconsistency.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>How do you handle a disconnected network in Standard NMA?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Standard NMA cannot handle disconnected networks. You must either bridge the gap with a common comparator (if possible) or use population adjustment methods like MAIC or ML-NMR if you have IPD for at least one trial.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="7-strategic-conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="7-strategic-conclusion">7. Strategic Conclusion</h2>
+<p>Mastering Standard Bayesian NMA requires understanding the interplay between direct and indirect evidence. This minimal case demonstrates that when data forms a loop, consistency must be verified.</p>
+<p><strong>Guide Authored by</strong>: Antigravity (Advanced Agentic Coding)<br>
+<strong>Methodological Reference</strong>: NICE DSU TSD 2 &amp; 4</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

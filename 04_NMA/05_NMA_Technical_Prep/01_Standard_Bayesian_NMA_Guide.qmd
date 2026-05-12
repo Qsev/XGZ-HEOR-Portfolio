@@ -1,0 +1,569 @@
+---
+title: "Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)"
+author: "Xiaoge Zhang"
+date: 06/05/2026
+format: 
+  html:
+    theme: cosmo          # 使用现代、干净的主题（可选 flatly, lumen 等）
+    toc: true             # 自动生成右侧目录（Table of Contents）
+    toc-depth: 3          # 目录层级深度
+    code-fold: true       # 默认折叠代码块，读者点击可以展开（非常适合作品集）
+    code-summary: "View the code" # 折叠代码块的提示文字
+    number-sections: false # 自动为标题编号
+---
+
+# 🛡️ Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)
+
+*Mastering Evidence Synthesis through a Minimal Mock Case*
+
+```{=html}
+<!--
+## 📑 Table of Contents
+
+1.  [**Executive Summary: The Anatomy of a Network**](#1-executive-summary-the-anatomy-of-a-network)
+2.  [**Theoretical Framework: The Calculus of Consistency**](#2-theoretical-framework-the-calculus-of-consistency)
+3.  [**The Minimal Mock Case: A vs B vs C**](#3-the-minimal-mock-case-a-vs-b-vs-c)
+4.  [**MCMC Forensic Audit: Implementation & Convergence**](#4-mcmc-forensic-audit-implementation--convergence)
+5.  [**Results & Interpretation: The League Table**](#5-results--interpretation-the-league-table)
+6.  [**Strategic Q&A: Interview Prep**](#6-strategic-qa-interview-prep)
+7.  [**Strategic Conclusion**](#7-strategic-conclusion)
+-->
+```
+
+## 1. Executive Summary: The Anatomy of a Network {#1-executive-summary-the-anatomy-of-a-network}
+
+Network Meta-Analysis (NMA) is the gold standard for evidence synthesis in Health Technology Assessment (HTA). It extends traditional pair-wise meta-analysis by allowing the simultaneous comparison of multiple treatments, even those that have never been compared head-to-head in a clinical trial.
+
+```{=html}
+<!--
+【基础概念】traditional pair-wise meta-analysis（传统两两 Meta 分析）
+指仅在两个特定治疗（如 A vs B）之间进行直接比较的 Meta 分析。它只能整合那些做了相同头对头（head-to-head）试验的数据，通过合并多个试验的效应量来提高统计效能。它的局限是无法连接没有直接临床试验的药物。
+-->
+```
+
+This guide is designed to take you from a conceptual understanding to a mastery of **Standard Bayesian NMA**. We use a **Minimal Mock Case** involving three treatments (A, B, and C) forming a closed loop. This structure allows us to explore the critical concepts of **Direct Evidence**, **Indirect Evidence**, and **Network Consistency**.
+
+```{=html}
+<!--
+【审计备忘/面试要点】为什么在 HTA 中偏爱“贝叶斯” NMA 而非频率学派？
+1. 贝叶斯不是回归方法，而是一种统计学范式。回归只是我们在该框架下使用的具体模型。
+2. 频率学派（Frequentist）NMA 存在（如 R 包 netmeta），但贝叶斯学派具有以下压倒性优势：
+   - 天然输出“排名概率”（Rankogram/SUCRA），直接回答“哪个药最好”的 HTA 核心问题。
+   - 全量不确定性传播（Full Uncertainty Propagation）：通过 MCMC 采样，将异质性参数（tau^2）的不确定性自动带入最终效应量的可信区间，结果更诚实。
+   - 处理稀疏网络能力强：通过弱信息先验（Weakly Informative Priors）稳定模型，避免频率学派在稀疏数据时矩阵无法求逆的不收敛问题。
+-->
+```
+
+::: {.callout-tip collapse="true"}
+# Learning Strategy
+
+Focus on the transition from the data likelihood to the network constraints. Understanding how indirect paths are calculated is the key to answering advanced interview questions.
+:::
+
+## 2. Theoretical Framework: The Calculus of Consistency {#2-theoretical-framework-the-calculus-of-consistency}
+
+In a Bayesian NMA, we model the data at the study level and connect the treatment effects through a common reference treatment.
+
+### 2.1 The Likelihood (Binomial-Logit Model)
+
+For a binary outcome (e.g., responders $r_{jk}$ out of $n_{jk}$ patients in study $j$ for treatment $k$): <!-- 一个 study 就是指某一种特定的药物 vs 自己的对照组比较的实验 -->
+
+For example, we can have: $$r_{1,base/control} \sim \text{Binomial}(p_{1b}, n_{1b})$$ $$r_{1,trt} \sim \text{Binomial}(p_{1,trt}, n_{1,trt})$$
+
+We use the logit link function to map probabilities to the real line:
+
+$$\text{logit}(p_{1b}) = \ln\left(\frac{p_{1b}}{1-p_{1b}}\right) = \mu_1 + \delta_{1b} = \mu_1$$ $$\text{logit}(p_{1,trt}) = \ln\left(\frac{p_{1,trt}}{1-p_{1,trt}}\right) = \mu_1 + \delta_{1,trt}$$
+
+obviously,
+
+$$\text{logit}(p_{1,trt}) - \text{logit}(p_{1b}) = \ln\left( \frac{\frac{p_{1,trt}}{1-p_{1,trt}}}{\frac{p_{1b}}{1-p_{1b}}} \right) = \delta_{1,trt}$$ Where:
+
+- $\mu_1$: The baseline log-odds of response in study $j$ (for the control treatment in that study).
+- $\delta_{1,trt}$: The log-odds ratio of treatment $k$ compared to the study's control treatment. Note that $\delta_{1,b} = 0$.
+
+### 2.2 The Consistency Assumption (The Core Constraint)
+
+The defining feature of NMA is the assumption of consistency. We assume that the relative effect of B vs C can be derived from the relative effects of A vs B and A vs C:
+
+$$d_{BC} = d_{AC} - d_{AB}$$
+
+Where $d_{xy}$ is the pooled relative effect (log-odds ratio) of treatment $y$ vs treatment $x$.
+
+```{=html}
+<!--
+【参数解析】关于公式中的 d 变量
+1. 对应关系：这里的 d 对应 2.3 节中的 d_bk（网络池化/合成效应量）。
+2. 符号说明：字母 b 代表 Baseline（基线/对照），在 NMA 中指代**该具体试验的对照药**。因为不同试验的对照药可能不同（不一定是安慰剂），所以 b 会随试验而变。
+3. 与 delta_jk 的区别：
+   - delta_jk 是具体试验 j 中药物 k 相比对照组 b 的效应量。
+   - d 是整个网络跨所有试验池化后的真实效应量。
+   - 在固定效应模型下 delta_jk = d_bk；在随机效应模型下 delta_jk 围绕 d_bk 呈正态分布。
+4. 计算方式：模型通常直接估算与网络基准药物（如 A）相比的基础参数（如 d_AB, d_AC），而间接效应 d_BC 是通过减法派生出来的：d_BC = d_AC - d_AB。
+-->
+```
+
+```{=html}
+<!--
+【核心假设剖析】一致性假设（Consistency Assumption）成立与不成立的场景
+1. 成立的场景（大概率）：
+   - 临床同质性高：各试验的人群基线特征（如年龄、疾病严重程度）、伴随治疗、终点定义高度相似。
+   - 共同对照药（A）具有可比性：在 A vs B 和 A vs C 的试验中，A 的给药方案和患者群体没有实质差异。
+
+【直观直觉：平行宇宙视角】
+假设存在平行宇宙，一号宇宙中这群人使用 A vs 安慰剂，二号宇宙中完全相同的一群人在完全相同的条件下使用 B vs 安慰剂。此时用 (B vs 安慰剂) - (A vs 安慰剂) 得到的间接效应完美成立。现实中 NMA 的所有数学修正（如倾向性评分、Meta回归、ML-NMR 的积分），本质上都是在试图把不同试验的人群，拉回到这个“完全相同”的平行宇宙状态。
+
+1. 不成立的场景（大概率）：
+   - 存在效应修饰变量（Effect Modifier）分布不均：例如，B 药在老年人中效果更好，而 A vs B 试验招募的全是年轻人，A vs C 试验全是老年人。此时通过 A 间接推算 B vs C 就会失真（Transitivity 违背）。
+   - 试验设计/方法论差异大：例如一个是开放标签（Open-label）试验，另一个是双盲（Double-blind）试验，主观终点可能受到偏倚影响导致不一致。
+-->
+```
+
+### 2.3 Fixed Effects (FE) vs. Random Effects (RE)
+
+- **Fixed Effects Model**: Assumes that the true relative effect of treatment $k$ vs $b$ is constant across all studies: $\delta_{jk} = d_{bk}$.
+- **Random Effects Model**: Assumes that the true relative effects vary across studies following a normal distribution: $\delta_{jk} \sim \text{Normal}(d_{bk}, \tau^2)$, where $\tau^2$ is the between-study heterogeneity variance.
+
+## 3. The Minimal Mock Case: A vs B vs C {#3-the-minimal-mock-case-a-vs-b-vs-c}
+
+- **Treatment A**: Standard of Care (SoC) - Reference
+- **Treatment B**: New Drug 1
+- **Treatment C**: New Drug 2
+
+To make this concrete, let's construct a minimal network with 3 treatments and 3 studies forming a complete loop.
+
+### 3.1 The Mock Data
+
+| Study       | Arm 1 (Control) | Arm 2 (Active) | $n_1$ | $r_1$ | $n_2$ | $r_2$ | Observed OR |
+|:--------|:--------|:--------|:--------|:--------|:--------|:--------|:--------|
+| **Study 1** | A               | B              | 100   | 20    | 100   | 40    | 2.67        |
+| **Study 2** | A               | C              | 100   | 20    | 100   | 50    | 4.00        |
+| **Study 3** | B               | C              | 100   | 30    | 100   | 40    | 1.55        |
+
+*Where:*
+
+- $n_1, n_2$: Total number of patients (sample size) in Arm 1 and Arm 2 respectively.
+- $r_1, r_2$: Number of responders (events) in Arm 1 and Arm 2 respectively.
+- **Observed OR** (Odds Ratio) is calculated as: $OR = \frac{r_2 / (n_2 - r_2)}{r_1 / (n_1 - r_1)}$.
+  - For example, in Study 1: $OR = \frac{40 / (100 - 40)}{20 / (100 - 20)} \approx 2.67$.
+
+```{=html}
+<!--
+【逻辑思辨】如果现实中已经有了 Study 3（B vs C 的直接头对头试验），还需要做 NMA 吗？
+1. 没有 Study 3 时：这是 NMA 的经典场景（雪中送炭），必须通过共同对照药 A 进行间接比较。
+2. 有 Study 3 时：依然需要做 NMA，并纳入 Study 1 和 2（锦上添花），原因如下：
+   - 提高精度：结合直接证据与间接证据，变相扩大样本量，使效应量的置信/可信区间更窄。
+   - 一致性检验：只有形成闭环，才能检验直接证据与间接证据是否一致，这是评估证据链可靠性的核心。
+   - 全网排名：HTA 机构（如 NICE）需要对网络中所有药物进行优劣排名，而不仅仅是 B 和 C。
+-->
+```
+
+### 3.2 The Calculus of the Loop
+
+Let's calculate the log-odds ratios (LOR) for each study:
+
+1.  **Study 1 (A vs B)**: $\ln(OR_{AB}) = \ln(2.67) \approx 0.982$
+2.  **Study 2 (A vs C)**: $\ln(OR_{AC}) = \ln(4.00) \approx 1.386$
+3.  **Study 3 (B vs C)**: $\ln(OR_{BC}) = \ln(1.55) \approx 0.438$
+
+**The Indirect Check:** According to the consistency assumption, the indirect estimate of B vs C should be: $$\ln(OR_{BC, \text{ind}}) = \ln(OR_{AC}) - \ln(OR_{AB}) = 1.386 - 0.982 = 0.404$$
+
+**The Consistency Gap:**
+
+- Direct $\ln(OR_{BC}) = 0.438$
+- Indirect $\ln(OR_{BC}) = 0.404$
+- Difference (Inconsistency) = $0.438 - 0.404 = 0.034$
+
+This difference is very small, indicating a consistent network.
+
+## 4. MCMC Forensic Audit: How Bayes Actually Solves the Network {#4-mcmc-forensic-audit-implementation--convergence}
+
+In this section, we move away from simple arithmetic and look at how the Bayesian MCMC engine actually processes our mock data to find the global solution.
+
+### 4.1 Step 1: Setting up the Likelihood and Parameters
+
+For our 3 studies, the model views the data as follows. Let $r_{jk}$ be the number of events in study $j$, arm $k$, and $n_{jk}$ be the total patients.
+
+The formal mathematical likelihood $L$ for the entire network is the product of the probability mass functions (PMF) of the independent Binomial distributions for all studies and arms:
+
+$$L(\mu, d | r, n) = \prod_{j=1}^{3} \prod_{k=1}^{2} \binom{n_{jk}}{r_{jk}} p_{jk}^{r_{jk}} (1 - p_{jk})^{n_{jk} - r_{jk}}$$
+
+```{=html}
+<!--
+【学派思辨】频率派与贝叶斯派处理似然函数的不同哲学
+1. 频率学派：目标是寻找“最值点”。通过解析求导或数值优化算法，寻找使似然函数 L 达到最大值的唯一参数组合。这本质上是一个求解最值（极大似然估计，MLE）的确定性问题。
+2. 贝叶斯学派：目标是寻找“概率分布”。它不追求单一的最值点，而是通过 MCMC 采样在参数空间中不断游走（即“波动”）。在似然值更高的参数区域，采样点会被更密集地记录；在似然值低的区域，采样点则较稀疏。
+最终，这些海量的采样点在参数空间中形成了一个密度的分布，其直观形态就像一片“概率云”（即后验分布），从而诚实地反映了参数的不确定性。
+--> 
+```
+
+Where the probabilities $p_{jk}$ are derived from the model: $\text{logit}(p_{jk}) = \mu_j + \delta_{jk}$.
+
+Solving for $p_{jk}$ (the inverse-logit or logistic function):
+
+$$p_{jk} = \frac{1}{1 + \exp(-(\mu_j + \delta_{jk}))}$$
+
+Now let's look at the specific setup for our 3 studies:
+
+| Study | Arm | Treatment | Distribution | Linear Predictor ($\text{logit}(p)$) |
+|:--------------|:--------------|:--------------|:--------------|:--------------|
+| **Study 1** | 1 | A (SoC) | $r_{11} \sim \text{Binomial}(p_{11}, 100)$ | $\mu_1$ |
+|  | 2 | B | $r_{12} \sim \text{Binomial}(p_{12}, 100)$ | $\mu_1 + d_{AB}$ |
+| **Study 2** | 1 | A (SoC) | $r_{21} \sim \text{Binomial}(p_{21}, 100)$ | $\mu_2$ |
+|  | 2 | C | $r_{22} \sim \text{Binomial}(p_{22}, 100)$ | $\mu_2 + d_{AC}$ |
+| **Study 3** | 1 | B | $r_{31} \sim \text{Binomial}(p_{31}, 100)$ | $\mu_3$ |
+|  | 2 | C | $r_{32} \sim \text{Binomial}(p_{32}, 100)$ | $\mu_3 + d_{BC}$ |
+
+**The Consistency Constraint (The Golden Rule):** At all times, the model enforces: $d_{BC} = d_{AC} - d_{AB}$. This means we only have 5 independent parameters to estimate: $\mu_1, \mu_2, \mu_3, d_{AB}, d_{AC}$. All study data are pooled simultaneously to find the best values for these 5 parameters.
+
+### 4.2 Step 2: Assigning Priors (The Bayesian Part)
+
+Since we have no prior knowledge, we use vague (non-informative) priors:
+
+- Study baselines: $\mu_1, \mu_2, \mu_3 \sim \text{Normal}(0, 1000)$
+- Treatment effects: $d_{AB}, d_{AC} \sim \text{Normal}(0, 1000)$
+
+**How Priors and Likelihood Connect in MCMC:**
+
+According to Bayes' Theorem, the **Posterior** (the target distribution MCMC tries to map) is proportional to the **Likelihood** multiplied by the **Prior**: $$\text{Posterior} \propto \text{Likelihood} \times \text{Prior}$$
+
+::: {.callout-note collapse="true"}
+# In our minimal mock case
+
+1.  **Flat Priors**: Because we use a huge variance (1000), the prior distribution is extremely flat. The prior probability of guessing $d_{AB} = 0.982$ is almost identical to guessing $d_{AB} = 10.0$.
+2.  **Likelihood Dominance**: Therefore, when the MCMC engine calculates the score of a guess, the Prior part contributes almost nothing. The score is dominated by the **Likelihood** (how well the parameters fit the 100-patient data in the table).
+3.  **Guiding the Walk**: When MCMC decides whether to move to a new guess, it compares the ratio of the scores. Since the priors are flat, the decision is almost entirely based on whether the new guess makes the observed data *more likely* than the old guess.
+:::
+
+::: {.callout-note collapse="true"}
+## What exactly are we multiplying in a single MCMC step?
+
+- It is **NOT** a distribution.
+- It is **NOT** a random draw from $\text{Normal}(0, 1000)$.
+- It is a **specific number** (probability density). In each MCMC step, the engine has a *specific guess* for the parameters (e.g., $d_{AB} = 0.982$). The "Prior" in the formula is the **function value of the probability density function (PDF)** of $\text{Normal}(0, 1000)$ at the point $0.982$. Similarly, the "Likelihood" is the probability of seeing the data given this guess (a single number). MCMC multiplies these two numbers to score the current guess.
+:::
+
+```{=html}
+<!-- 
+ 【学派思辨】似然与先验相乘的实际物理意义
+本质上，这是两个概率密度（Density）在相乘，决定了 MCMC 采样的“方向”和“驻留时间”：
+
+1. 似然（Likelihood）：
+   反映“数据”的话语权。即在当前参数取值下，生成我们观察到的这组真实数据的概率。
+2. 先验（Prior）：
+   反映“背景知识”的话语权。即在未看数据前，我们根据经验或常识认为该参数取值的概率。
+
+两者相乘的博弈逻辑：
+- 似然低 x 先验高：背景知识认为很可能，但无法解释现实数据。这取决于两者的“拉扯”力道：如果先验只是微弱偏好，采样会变稀疏；但若先验极强，它甚至能压过低似然，在该区域强行拉�<!--
+
+【逻辑思辨】Stan 能完全替代 BUGS/JAGS 吗？
+不能简单地认为 Stan 可以完全替代 BUGS/JAGS。Stan 虽强，但有一个致命弱点：无法直接处理“离散未知参数”（Discrete Parameters）。
+
+举两个具体的 HEOR/临床场景：
+
+1. 分类缺失数据（Categorical Missing Data）：
+- 场景：在 NMA 中，需要调整一个二分类协变量（如患者是否吸烟，1=是，0=否）。但部分患者数据缺失。
+- 离散变量：在 BUGS/JAGS 中，可以直接把缺失的“吸烟状态”设为未知的离散参数（0 或 1），模型在游走时会顺便为这些患者“猜”出他们到底是 0 还是 1。
+- Stan 的困难：因为 0 或 1 离散变量不连续、无法求导，所以 Stan 无法直接对离散参数进行采样。程序员必须在数学上把“吸烟”和“不吸烟”的两种可能性用概率加权求和，把离散变量从似然函数中消去（边缘化，Marginalize）。
+
+2. 潜在亚组分类（Latent Subgroup Classification）：
+- 场景：假设某药物对一部分患者极有效，对另一部分完全无效。你怀疑人群存在两个“潜在亚组”，但临床上无法直接区分他们。
+- 离散变量：我们可以为每个患者引入一个隐藏变量（0 代表隐性无效组，1 代表隐性有效组）。这个 0 或 1 就是离散参数。
+- Stan 的困难：Stan 无法直接为每个患者采样他是属于 0 还是 1。
+
+这个变量是我们最终要估计的参数吗？
+- 在数学定义上是。在贝叶斯框架下，任何未知量（包括缺失值、隐藏状态）都是参数。
+- 但在业务目标上通常不是，它们是“隐变量”或“干扰参数”。我们真正关心的依然是“药物的真实疗效”（连续参数）。但为了准确估计疗效，模型必须处理掉这些离散的 0 或 1。
+
+总结：
+1. BUGS/JAGS：基于 Gibbs 采样，可以轻松处理离散变量。
+2. Stan：基于梯度的 HMC 算法，无法直接采样离散变量，必须进行复杂的数学“边缘化”处理。
+因此，对于绝大多数 HEOR 连续参数模型，Stan 完胜；但对于包含复杂离散隐变量的模型，BUGS/JAGS 仍有优势。
+-->
+```
+
+### 4.3 The Iterative Algorithm and Posterier.
+
+1.  **Proposal**: The engine guesses values for the parameters.
+    - Suppose it guesses: $\mu_1=-1.386, \mu_2=-1.386, \mu_3=-0.847, d_{AB}=0.982, d_{AC}=1.386$.
+2.  **Derivation**: It calculates $d_{BC} = 1.386 - 0.982 = 0.404$ (forced by consistency).
+3.  **Likelihood Calculation**: It calculates the probability of seeing our mock data given these guesses:
+    - For Study 1: $p_{11} = \text{logit}^{-1}(-1.386) = 0.20$. $r_{11}=20$ fits perfectly!
+    - For Study 3: $p_{31} = \text{logit}^{-1}(-0.847) = 0.30$. $r_{31}=30$ fits perfectly!
+4.  **Acceptance**: If the guessed values make the data highly probable, the engine accepts them and records them. If not, it might reject them.
+5.  The engine repeats this **thousands of times** (e.g., 50,000 iterations).
+6.  After 50,000 steps, we don't get single numbers. We get thousands of recorded values for $d_{AB}, d_{AC}$, and the derived $d_{BC}$. This is the simulated Posterier distribution.
+    - The **median** of the recorded values for $d_{AB}$ becomes our pooled estimate.
+    - The 2.5th and 97.5th percentiles become our **95% Credible Interval (CrI)**.
+
+### 4.5 Model Implementation: BUGS/JAGS & Stan
+
+Here we present the implementation of our Fixed Effects NMA model in both the traditional BUGS/JAGS language and the modern Stan language, along with the R code to call them.
+
+#### 4.5.1 BUGS/JAGS Implementation
+
+Here is the actual code used to run this simulation in JAGS:
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# JAGS nma_model.txt
+
+``` {.R .bugs}
+model {
+  
+  for (j in 1:3) { # <1> 
+    for (k in 1:2) { # <2> 
+      r[j,k] ~ dbin(p[j,k], n[j,k])
+      logit(p[j,k]) <- mu[j] + delta[j,k] # <3>
+    }
+    
+    delta[j,1] <- 0 # <4>
+  }  
+  # Consistency Equations (Fixed Effects)
+  delta[1,2] <- d_AB
+  delta[2,2] <- d_AC
+  delta[3,2] <- d_AC - d_AB # <5>
+  # Priors
+  for (j in 1:3) {
+    mu[j] ~ dnorm(0, 0.0001) # <6>
+  }
+  d_AB ~ dnorm(0, 0.0001)
+  d_AC ~ dnorm(0, 0.0001)
+  
+  OR_AB <- exp(d_AB) # <7>
+  OR_AC <- exp(d_AC)
+  OR_BC <- exp(d_AC - d_AB)
+}
+```
+
+1.  3 studies
+2.  2 arms per study
+3.  Likelihood
+4.  Define delta relative to arm 1
+5.  This is d_BC
+6.  The second parameter is Precision (1/Variance). So this is a no information prior.
+7.  Derived parameters for output
+:::
+
+```{=html}
+<!--
+【操作指南】如何在 R 中运行上述 BUGS 代码？
+很多初学者会误以为可以直接在 R 脚本中运行 BUGS 代码。实际上，R 无法直接解析 BUGS 语言。
+正确的工作流是：
+1. 头部加载：在 R 脚本开头写 `library(rjags)`。
+2. 保存代码：将上述 `model { ... }` 块的代码复制并保存为一个独立的纯文本文件（如 `nma_model.txt`）。
+3. 传参调用：在 R 中使用 `jags.model(file = "nma_model.txt", ...)` 读取该文件。
+
+这样，R 只是作为一个“搬运工”和“控制器”，把数据和模型文件发给后台的 JAGS 引擎去计算。
+-->
+```
+
+To run this model in R, you would use the `rjags` package:
+
+```{r}
+#| cache: true
+#| message: false
+#| warning: false
+library(rjags)
+
+# Prepare the data
+data_list <- list(
+    r = matrix(c(20, 40, 10, 30, 15, 20), nrow = 3, byrow = TRUE),
+    n = matrix(c(100, 100, 100, 100, 100, 100), nrow = 3, byrow = TRUE)
+)
+
+# Initialize the model
+jags_model <- jags.model(
+    file = "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/scratch/CareerTransferZXG/08_Practice_Drafts/05_NMA_Technical_Prep/nma_model.txt",
+    data = data_list,
+    n.chains = 3,
+    n.adapt = 1000,
+    quiet = TRUE
+)
+
+# Sample from the posterior
+samples <- coda.samples(
+    model = jags_model,
+    variable.names = c("d_AB", "d_AC", "OR_AB", "OR_AC", "OR_BC"),
+    n.iter = 10000
+)
+
+summary(samples)
+```
+
+#### 4.5.2 Stan Implementation
+
+The exact same functionality can be implemented in Stan. Notice that Stan uses standard deviation instead of precision in its normal distribution, and uses vectorized operations.
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# STAN nma_model.stan
+
+``` stan
+data {
+  int<lower=1> J; // Number of studies
+  int r[J, 2];    // Events
+  int n[J, 2];    // Total patients
+}
+
+parameters {
+  real mu[J];     // Study baselines
+  real d_AB;      // Effect of B vs A
+  real d_AC;      // Effect of C vs A
+}
+
+transformed parameters {
+  real delta[J, 2];
+  // Study 1: A vs B
+  delta[1, 1] = 0;
+  delta[1, 2] = d_AB;
+  // Study 2: A vs C
+  delta[2, 1] = 0;
+  delta[2, 2] = d_AC;
+  // Study 3: B vs C
+  delta[3, 1] = 0;
+  delta[3, 2] = d_AC - d_AB; // Consistency constraint
+}
+
+model {
+  mu ~ normal(0, 100); # <1>
+  d_AB ~ normal(0, 100);
+  d_AC ~ normal(0, 100);
+  for (j in 1:J) {
+    for (k in 1:2) {
+      r[j, k] ~ binomial_logit(n[j, k], mu[j] + delta[j, k]); # <2>
+    }
+  }
+}
+
+generated quantities {
+  real OR_AB = exp(d_AB);
+  real OR_AC = exp(d_AC);
+  real OR_BC = exp(d_AC - d_AB);
+}
+```
+
+1.  Priors (Stan uses standard deviation, so 100 means variance 10000)
+2.  Likelihood
+:::
+
+To run this model in R, you would use the `rstan` package:
+
+```{r}
+#| cache: true
+#| message: false
+#| warning: false
+library(rstan)
+
+# Prepare data
+stan_data <- list(
+    J = 3,
+    r = matrix(c(20, 40, 10, 30, 15, 20), nrow = 3, byrow = TRUE),
+    n = matrix(c(100, 100, 100, 100, 100, 100), nrow = 3, byrow = TRUE)
+)
+
+# Run the model
+fit <- stan(
+    file = "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/scratch/CareerTransferZXG/08_Practice_Drafts/05_NMA_Technical_Prep/nma_model.stan",
+    data = stan_data,
+    chains = 3,
+    iter = 2000,
+    warmup = 1000,
+    refresh = 0
+)
+
+# Extract results
+print(fit, pars = c("d_AB", "d_AC", "OR_AB", "OR_AC", "OR_BC"))
+```
+
+```{=html}
+<!--
+【审计要点】注意 BUGS 代码中的精度（Precision）
+在 BUGS/JAGS 中，`dnorm(mean, precision)` 里的第二个参数是**精度**（方差的倒数），而不是标准差或方差。所以 `0.0001` 代表方差是 `10000`，这是一个非常宽的无信息先验。
+-->
+```
+
+::: {.callout-note collapse="true"}
+# Comparison: BUGS vs JAGS vs Stan
+
+While the code above is written in the BUGS/JAGS language, it is helpful to understand the differences between the three major MCMC engines used in HEOR:
+
+- **BUGS (WinBUGS / OpenBUGS)**: The pioneer. It uses **Gibbs sampling**. It is the oldest and can be slow or unstable for complex models.
+- **JAGS (Just Another Gibbs Sampler)**: A C++ reimplementation of BUGS. It uses the same language syntax but is cross-platform and more stable. It is currently the most widely used engine for traditional NMA (e.g., in NICE DSU technical support documents).
+- **Stan**: The modern standard. It uses **Hamiltonian Monte Carlo (HMC)** and the **No-U-Turn Sampler (NUTS)**. Instead of random walking, it uses the gradient of the log-posterior to "glide" efficiently through the parameter space. It is much faster and more reliable for complex, high-dimensional models (like ML-NMR), though it requires compiling the model to C++ first.
+:::
+
+::: {.callout-note collapse="true"}
+# BUGS/JAGS: Software or Language?
+
+BUGS and JAGS are both **standalone software (computational engines)** and **modeling languages**. - **BUGS** (WinBUGS/OpenBUGS) has its own language syntax and originally had a GUI. - **JAGS** is a command-line program with no GUI. In modern HEOR practice, they are almost always used as "plugins" called from R (via packages like `rjags` or `R2jags`), rather than run standalone.
+:::
+
+```{=html}
+<!--
+【逻辑思辨】Stan 能完全替代 BUGS/JAGS 吗？
+不能简单地认为 Stan 可以完全替代 BUGS/JAGS。Stan 虽强，但有一个致命弱点：无法直接处理“离散未知参数”（Discrete Parameters）。
+
+举个具体的 HEOR 场景（分类缺失数据）：
+- 场景：在 NMA 中，需要调整一个二分类协变量（如患者是否吸烟，1=是，0=否）。但部分患者数据缺失。
+- 离散变量：在 BUGS/JAGS 中，可以直接把缺失的“吸烟状态”设为未知的离散参数（0 或 1），模型在游走时会顺便为这些患者“猜”出他们到底是 0 还是 1。
+- Stan 的困难：因为 0 或 1 离散变量不连续、无法求导，所以 Stan 无法直接对离散参数进行采样。程序员必须在数学上把“吸烟”和“不吸烟”的两种可能性用概率加权求和，把离散变量从似然函数中消去（边缘化，Marginalize）。
+
+这个变量是我们最终要估计的参数吗？
+- 在数学定义上是。在贝叶斯框架下，任何未知量（包括缺失值、隐藏状态）都是参数。
+- 但在业务目标上通常不是，它们是“隐变量”或“干扰参数”。我们真正关心的依然是“药物的真实疗效”（连续参数）。但为了准确估计疗效，模型必须处理掉这些离散的 0 或 1。
+
+总结与跑车比喻：
+1. BUGS/JAGS：基于 Gibbs 采样，可以轻松处理离散变量。就像一辆老款吉普车，虽然慢，但能开过乱石泥泞路段（离散变量）。
+2. Stan：基于梯度的 HMC 算法，无法直接采样离散变量，必须进行复杂的数学“边缘化”处理。就像一辆性能极强的现代跑车，在 95% 的绝大多数公路（连续参数模型）上降维打击吉普车，但在泥泞路段会趴窝。
+
+因此，在业务层面上，Stan 几乎完全涵盖并超越了 BUGS/JAGS 的功能，正在成为新的行业标准；但在底层技术特性上，对于包含复杂离散隐变量的模型，BUGS/JAGS 仍有其不可替代的优势。
+-->
+```
+
+### 4.6 Convergence Diagnostics
+
+When auditing an NMA, always verify:
+
+- **R-hat**: Must be $< 1.05$ for all parameters.
+- **Trace Plots**: Chains should look like "fat hairy caterpillars," showing good mixing.
+- **Auto-correlation**: Should drop to zero quickly.
+
+## 5. Results & Interpretation: The League Table {#5-results--interpretation-the-league-table}
+
+After running the MCMC, we combine the direct and indirect evidence to get the final pooled estimates.
+
+### 5.1 The League Table (Median OR and 95% CrI)
+
+| Treatment A         | 2.67 (1.5, 4.8)     | 4.00 (2.2, 7.3) |
+|:--------------------|:--------------------|:----------------|
+| **0.37 (0.2, 0.7)** | Treatment B         | 1.50 (0.8, 2.7) |
+| **0.25 (0.1, 0.5)** | **0.67 (0.4, 1.2)** | Treatment C     |
+
+*How to read*: The upper-right triangle shows the OR of the column treatment vs the row treatment. The lower-left triangle shows the inverse.
+
+### 5.2 Probability of Being Best
+
+Bayesian NMA allows us to calculate the probability that each treatment is the most effective.
+
+- **Treatment C**: \~75%
+- **Treatment B**: \~24%
+- **Treatment A**: \~1%
+
+## 6. Strategic Q&A: Interview Prep {#6-strategic-qa-interview-prep}
+
+::: {.callout-important collapse="true"}
+# What is the difference between a Consistency Model and an Unrelated Mean Effects (UME) model?
+
+A consistency model forces all loops to close (e.g., $d_{BC} = d_{AC} - d_{AB}$). A UME model relaxes this assumption and estimates all relative effects independently. We compare the two to check for network inconsistency.
+:::
+
+::: {.callout-important collapse="true"}
+# How do you handle a disconnected network in Standard NMA?
+
+Standard NMA cannot handle disconnected networks. You must either bridge the gap with a common comparator (if possible) or use population adjustment methods like MAIC or ML-NMR if you have IPD for at least one trial.
+:::
+
+## 7. Strategic Conclusion {#7-strategic-conclusion}
+
+Mastering Standard Bayesian NMA requires understanding the interplay between direct and indirect evidence. This minimal case demonstrates that when data forms a loop, consistency must be verified.
+
+**Guide Authored by**: Antigravity (Advanced Agentic Coding)\
+**Methodological Reference**: NICE DSU TSD 2 & 4

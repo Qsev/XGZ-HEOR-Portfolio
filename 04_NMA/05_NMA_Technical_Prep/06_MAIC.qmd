@@ -1,0 +1,311 @@
+---
+title: "Technical Guide 06: Matching-Adjusted Indirect Comparison (MAIC)"
+author: "Xiaoge Zhang"
+date: "06/05/2026"
+engine: knitr
+format: 
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "View the code"
+    number-sections: true
+---
+
+*Bridging the Gap When Patient-Level Data is Only Partially Available*
+
+<!--
+## 📑 Table of Contents {.unnumbered}
+
+1.  [**Executive Summary: When NMA Fails**](#1-executive-summary)
+2.  [**The Minimal Mock Case: Unanchored MAIC**](#2-mock-case)
+3.  [**Methodological Foundation: The Method of Moments**](#3-methodology)
+4.  [**Custom R Implementation: Calculating Weights from Scratch**](#4-custom-r-implementation)
+5.  [**Industry Standard Alternative: `maic` Package**](#5-maic-package)
+-->
+
+## Executive Summary: When NMA Fails {#1-executive-summary}
+
+Standard Network Meta-Analysis (NMA) requires a connected network of trials (usually connected via a common comparator like Placebo or Standard of Care). However, in many real-world Health Technology Assessment (HTA) submissions, the network is **broken**.
+
+A common scenario is when a pharmaceutical company conducts a single-arm trial for their new drug (Drug A), while the competitor drug (Drug B) also only has published single-arm trial data. Since there is no common comparator, standard NMA is mathematically impossible. Furthermore, direct naive comparison of the two single arms is severely biased if the patient populations differ (e.g., Trial A enrolled younger patients with lower disease severity than Trial B, as is often the case in real-world clinical practice). 
+
+**Matching-Adjusted Indirect Comparison (MAIC)** is a form of Population-Adjusted Indirect Comparison (PAIC) designed specifically for this scenario. It requires: 
+
+1. **Individual Patient Data (IPD)** for the active treatment (Drug A). 
+2. **Aggregate Data (AgD)** (summary statistics) for the comparator treatment (Drug B).
+
+MAIC works by assigning a statistical weight to every individual patient in Trial A, such that the *weighted* baseline characteristics of Trial A perfectly match the *published* aggregate characteristics of Trial B. Once matched, the outcomes can be compared directly.
+
+```{=html}
+<!-- Audit Point: Anchored vs Unanchored MAIC
+NICE DSU Technical Support Document (TSD) 18 outlines two types of MAIC:
+1. **Unanchored MAIC**: Used when there is no common comparator (e.g., comparing two single-arm trials). This relies on a very strong assumption: *all* relative effect modifiers and prognostic factors must be accounted for.
+2. **Anchored MAIC**: Used when both trials have a common comparator (e.g., Placebo), but we still want to adjust for population differences. This only requires accounting for relative effect modifiers, making it the preferred method by HTA bodies whenever possible.
+In this chapter, we demonstrate the mathematical mechanism of weighting using the simpler Unanchored scenario.
+-->
+```
+
+## The Minimal Mock Case: Unanchored MAIC {#2-mock-case}
+
+### The Scenario
+
+We are evaluating a new oncology drug with a continuous outcome (e.g., reduction in tumor size).
+
+- **Drug A (Our Drug)**: We have row-by-row IPD for $N=200$ patients from a single-arm Phase II trial. 
+- **Drug B (Competitor)**: We only have a published paper showing aggregate baseline characteristics and an average outcome.
+
+### The Problem (Baseline Imbalance)
+
+From the published paper for Drug B, we know the mean age of their patients was exactly **65.0 years**. In our trial for Drug A, the mean age is **55.0 years**. Because age is a known prognostic factor (older patients generally have worse outcomes), simply comparing the average outcome of A vs. B would unfairly favor Drug A, as our population is systematically younger and healthier.
+
+### The Goal
+
+We need to calculate a weight $w_i$ for each patient $i$ in Trial A so that the weighted mean age of Trial A exactly equals 65.0, allowing for a fair "apples-to-apples" comparison.
+
+## Methodological Foundation: The Method of Moments {#3-methodology}
+
+Unlike Bayesian NMA, the standard MAIC weight calculation is purely frequentist. The **weights are modeled as an exponential function of the baseline covariates** to ensure they remain strictly positive:
+
+$$w_i = \exp(\alpha_0 + x_i^T \alpha_1)$$
+
+Where: 
+
+- $w_i$ is the final weight assigned to patient $i$ in Trial A.
+- $x_i$ represents the centered covariates for patient $i$ in Trial A (centered around the published aggregate mean of Trial B).
+- $x_i^T$: The transpose of the covariate vector $x_i$. This matrix notation represents the dot product of covariates and coefficients. For a single covariate, this simply implies scalar multiplication $x_i \cdot \alpha_1$.
+- $\alpha_1$ is the vector of coefficients we need to estimate via optimization.
+- $\alpha_0$ is a scaling constant (not an optimization parameter). It is calculated *after* finding the optimal $\alpha_1$ to ensure that the sum of the weights equals the original sample size $N_A$ (i.e., $\sum w_i = N_A$). Mathematically, $\exp(\alpha_0) = N_A / \sum \exp(x_i^T \alpha_1)$.
+
+We find the optimal $\alpha_1$ by **minimizing an objective function** (using the Method of Moments). Specifically, we minimize the sum of the unnormalized weights:
+
+$$Q(\alpha_1) = \sum_{i=1}^N \exp(x_i^T \alpha_1)$$
+
+By finding the $\alpha_1$ that minimizes this convex function, its gradient becomes zero, which mathematically guarantees that the weighted mean of the centered covariates in Trial A equals zero (and thus matches Trial B).
+
+```{=html}
+<!-- Audit Point: Why alpha0 is calculated last
+To understand the workflow of finding weights, think of it as a 3-step process:
+1. Find alpha1: Minimize Q(alpha1) to find the optimal coefficients that achieve balance.
+2. Calculate Raw Weights: Compute w_i_tilde = exp(x_i^T * alpha1) for each patient. These weights already achieve the perfect match!
+3. Normalize with alpha0: The sum of raw weights might not equal the original sample size N_A. To make the weights sum to N_A (a standard reporting practice), we multiply everyone by a constant factor C = N_A / sum(w_i_tilde). Since exp(alpha0) = C, this is where alpha0 comes from.
+-->
+```
+
+After finding the optimal weights, a crucial metric evaluated is the **Effective Sample Size (ESS)**:
+
+$$ESS = \frac{(\sum w_i)^2}{\sum w_i^2}$$
+
+A severe drop in ESS (e.g., from 200 patients down to an ESS of 20) indicates that the populations are too distinct, and the matching relies heavily on just a few outlier patients in Trial A.
+
+## Custom R Implementation: Calculating Weights from Scratch {#4-custom-r-implementation}
+
+To demonstrate a deep understanding of the underlying mathematics, we will manually implement the objective function and use R's `optim()` to solve for the weights, rather than hiding behind a black-box package.
+
+```{=html}
+<!-- Audit Point: Real-world Workflow vs Simulation
+In real-world practice, you DO NOT simulate the outcome Y_A. You receive the IPD dataset with real outcomes for each patient. 
+The workflow is:
+1. Calculate weights using ONLY covariates (ignoring Y_A entirely to prevent bias).
+2. Apply the weights to Y_A to get the weighted mean for Trial A.
+3. Compare that single weighted mean with the published mean of Trial B.
+-->
+```
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# Click to view R Simulation and Custom MAIC Code
+
+```{r}
+#| message: false
+#| warning: false
+set.seed(123)
+
+# ---------------------------------------------------------
+# 1. Simulate Mock Data
+# ---------------------------------------------------------
+N_A <- 200
+# Drug A (IPD): Mean age = 55, SD = 8
+age_A <- rnorm(N_A, mean = 55, sd = 8)
+# True outcome for Drug A (True effect = 10, minus 0.5 per year of age)
+y_A <- rnorm(N_A, mean = 10 - 0.5 * (age_A - 55), sd = 2)
+df_A <- data.frame(id = 1:N_A, age = age_A, y = y_A)
+
+# Drug B (AgD published data)
+mean_age_B <- 65.0
+# True outcome for B if they were age 65 would be, say, 3.0
+mean_y_B_published <- 3.0
+
+# Naive comparison (Unadjusted)
+mean_y_A_naive <- mean(df_A$y)
+
+# ---------------------------------------------------------
+# 2. Custom MAIC Weight Calculation (Method of Moments)
+# ---------------------------------------------------------
+# Step A: Center the IPD covariates around the AgD targets
+# This makes the math easier: we want the weighted mean of the centered covariate to be 0.
+df_A$age_centered <- df_A$age - mean_age_B
+
+# Step B: Define the Objective Function to minimize
+# The objective is sum(exp(X * alpha1))
+obj_fn <- function(alpha1, X) {
+    sum(exp(X %*% alpha1))
+}
+
+# Step C: Define the Gradient Function (for faster/stable optimization)
+# The gradient is sum(X * exp(X * alpha1))
+grad_fn <- function(alpha1, X) {
+    colSums(X * as.vector(exp(X %*% alpha1)))
+}
+
+# Step D: Optimize to find alpha1
+X_matrix <- as.matrix(df_A$age_centered)
+opt_res <- optim(
+    par = 0, # Initial guess
+    fn = obj_fn,
+    gr = grad_fn,
+    X = X_matrix,
+    method = "BFGS"
+)
+alpha1 <- opt_res$par
+
+# Step E: Calculate individual weights
+unnormalized_w <- exp(X_matrix %*% alpha1)
+# Normalize so sum(w) = N_A (optional, but standard for interpretability)
+w <- unnormalized_w / sum(unnormalized_w) * N_A
+df_A$weight <- as.vector(w)
+
+# ---------------------------------------------------------
+# 3. Validation & Outcome Comparison
+# ---------------------------------------------------------
+# Check covariate balance
+weighted_mean_age_A <- sum(df_A$age * df_A$weight) / sum(df_A$weight)
+
+# Calculate Effective Sample Size (ESS)
+ESS <- (sum(df_A$weight)^2) / sum(df_A$weight^2)
+
+# Calculate MAIC-adjusted outcome for Drug A
+mean_y_A_maic <- sum(df_A$y * df_A$weight) / sum(df_A$weight)
+```
+:::
+
+### Results & Validation
+
+After running the custom optimization, we can verify that the weights successfully matched the baseline characteristics:
+
+| Metric | Drug A (Naive IPD) | Drug A (MAIC Weighted) | Drug B (AgD Target) |
+|:-----------------|:----------------:|:----------------:|:----------------:|
+| **Mean Age** | `r round(mean(df_A$age), 1)` | **`r round(weighted_mean_age_A, 1)`** | `r mean_age_B` |
+| **Effective Sample Size (ESS)** | `r N_A` | **`r round(ESS, 1)`** | N/A |
+| **Mean Outcome** $y$ | `r round(mean_y_A_naive, 2)` | **`r round(mean_y_A_maic, 2)`** | `r mean_y_B_published` |
+
+Notice that the naive comparison (`r round(mean_y_A_naive, 2)` vs `r mean_y_B_published`) is highly biased because Trial A patients are much younger. After MAIC weighting, the mean age of Trial A is artificially shifted to exactly `r round(weighted_mean_age_A, 1)`, and the adjusted outcome drops to `r round(mean_y_A_maic, 2)`. This provides a much fairer "apples-to-apples" comparison against Drug B, albeit at the cost of statistical power (ESS dropped to `r round(ESS, 1)`).
+
+## Industry Standard Alternative: `maicplus` Package {#5-maic-package}
+
+While calculating the weights via `optim()` demonstrates the mathematical rigor behind the method, industry practitioners typically use dedicated R packages like **`maicplus`** (developed by the Roche team and available on CRAN) to streamline the process, handle multiple covariates, and automatically compute standard errors.
+
+Here is how the above analysis would be executed using the `maicplus` package (syntax example):
+
+```{r}
+#| message: false
+#| warning: false
+library(maicplus)
+
+# Add ARM column (required by maicplus by default)
+df_A$ARM <- "A"
+
+# Use the manually centered variable 'age_centered' created earlier
+maic_res <- estimate_weights(
+    data = df_A,
+    centered_colnames = "age_centered"
+)
+
+# View Effective Sample Size (ESS) calculated by the package
+cat("ESS calculated by maicplus: ", maic_res$ess, "\n")
+
+# Calculate MAIC-adjusted outcome using the package's scaled weights
+mean_y_A_maicplus <- sum(maic_res$data$y * maic_res$data$scaled_weights) / sum(maic_res$data$scaled_weights)
+cat("Adjusted mean outcome: ", mean_y_A_maicplus, "\n")
+```
+
+## Outcome Analysis: The Final Comparison {#6-outcome-analysis}
+
+Now that we have the matched weights and the adjusted outcome for Drug A, we can complete the indirect comparison.
+
+```{=html}
+<!-- Audit Point: The Fundamental Limitation of MAIC (Pseudo-IPD)
+Notice that in the final comparison, we are reducing Trial A's IPD to a single weighted summary number to compare it with Trial B's published summary. 
+This means MAIC is actually an Aggregate-Level comparison at the end. 
+- Why? Because we don't have IPD for Trial B, we are forced to step down to the lowest common denominator.
+- Does it waste IPD? IPD is used as a source of flexibility to match the populations. Without it, we couldn't adjust at all. But it is not a full individual-level regression.
+-->
+```
+
+### Point Estimate of the Treatment Effect
+
+In our unanchored scenario, the comparative treatment effect ($\Delta$) is simply the difference between the MAIC-adjusted mean outcome of Drug A and the published mean outcome of Drug B.
+
+```{r}
+# Point Estimate
+treatment_effect <- mean_y_A_maic - mean_y_B_published
+cat("Point Estimate of Treatment Effect (A vs B): ", treatment_effect, "\n")
+```
+
+### Quantifying Uncertainty via Bootstrapping
+
+We cannot use standard t-test formulas to calculate the standard error of this treatment effect because the weights themselves are random variables estimated from the data. 
+
+In real-world HTA submissions, practitioners use **Bootstrapping** to calculate the 95% Confidence Interval. This involves repeatedly resampling the IPD data with replacement, recalculating the MAIC weights each time, and generating a distribution of the treatment effect.
+
+Here is a minimal demonstration of the bootstrapping workflow (using 100 iterations for speed, though 2000+ is standard in practice):
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# Click to view Bootstrapping Code
+
+```{r}
+#| message: false
+#| warning: false
+n_boot <- 100
+boot_effects <- numeric(n_boot)
+
+for (b in 1:n_boot) {
+    # Step A: Resample IPD with replacement
+    boot_idx <- sample(1:N_A, size = N_A, replace = TRUE)
+    df_A_boot <- df_A[boot_idx, ]
+
+    # Step B: Recalculate weights (using our custom optim approach)
+    X_boot <- as.matrix(df_A_boot$age_centered)
+    opt_boot <- optim(par = 0, fn = obj_fn, gr = grad_fn, X = X_boot, method = "BFGS")
+
+    w_boot <- exp(X_boot %*% opt_boot$par)
+    w_boot <- w_boot / sum(w_boot) * N_A
+
+    # Step C: Calculate weighted outcome for A and the Delta
+    mean_y_A_boot <- sum(df_A_boot$y * w_boot) / sum(w_boot)
+    boot_effects[b] <- mean_y_A_boot - mean_y_B_published
+}
+
+# Calculate 95% CI from percentiles
+ci_lower <- quantile(boot_effects, 0.025)
+ci_upper <- quantile(boot_effects, 0.975)
+se_boot <- sd(boot_effects)
+cat("Bootstrapped SE: ", se_boot, "\n")
+cat("Bootstrapped 95% CI: [", ci_lower, ", ", ci_upper, "]\n")
+```
+:::
+
+### Final Results
+
+With the point estimate and the bootstrapped standard error, we can now present the complete MAIC indirect comparison results as they would appear in an HTA dossier:
+
+| Metric | Estimate | 95% CI Lower | 95% CI Upper |
+|:---|:---:|:---:|:---:|
+| **Naive Difference** | `r round(mean_y_A_naive - mean_y_B_published, 2)` | N/A | N/A |
+| **MAIC Adjusted Difference** | **`r round(treatment_effect, 2)`** | **`r round(ci_lower, 2)`** | **`r round(ci_upper, 2)`** |
+
+```{=html}
+<!-- Audit Point: Sandwich vs Bootstrap
+While bootstrapping is universally accepted by HTA bodies like NICE, it can be computationally intensive, especially with large datasets or complex models. An alternative is the **Sandwich Estimator** (Robust Standard Errors), which calculates the variance analytically without simulation. The `maicplus` package supports both methods.
+-->
+```
