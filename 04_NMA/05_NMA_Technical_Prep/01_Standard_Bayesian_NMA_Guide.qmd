@@ -12,7 +12,7 @@ format:
     number-sections: false # 自动为标题编号
 ---
 
-# 🛡️ Technical Guide: Standard Bayesian Network Meta-Analysis (NMA)
+# Standard Bayesian Network Meta-Analysis (NMA)
 
 *Mastering Evidence Synthesis through a Minimal Mock Case*
 
