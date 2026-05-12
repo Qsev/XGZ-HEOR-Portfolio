@@ -12,8 +12,6 @@ format:
     number-sections: true # 自动为标题编号
 ---
 
-
-
 *Mastering Evidence Synthesis through a Minimal Mock Case*
 
 ```{=html}
