@@ -403,6 +403,25 @@ window.Quarto = {
 <li><strong>Fixed Effects Model</strong>: Assumes that the true relative effect of treatment <span class="math inline">\(k\)</span> vs <span class="math inline">\(b\)</span> is constant across all studies: <span class="math inline">\(\delta_{jk} = d_{bk}\)</span>.</li>
 <li><strong>Random Effects Model</strong>: Assumes that the true relative effects vary across studies following a normal distribution: <span class="math inline">\(\delta_{jk} \sim \text{Normal}(d_{bk}, \tau^2)\)</span>, where <span class="math inline">\(\tau^2\)</span> is the between-study heterogeneity variance.</li>
 </ul>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Judgment Logic for FE vs.&nbsp;RE (HTA Audit Focus)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Deciding between a Fixed Effects and a Random Effects model is a critical decision in NMA. Here is the standard judgment logic:</p>
+<ol type="1">
+<li><strong>Clinical Plausibility</strong>: Are the trials sufficiently similar in terms of patient populations (e.g., age, baseline severity), treatment protocols, and outcome definitions? If there are obvious differences, an RE model is clinically more plausible.</li>
+<li><strong>Statistical Heterogeneity</strong>: - Check the estimated between-study standard deviation (<span class="math inline">\(\tau\)</span>). Is it large relative to the treatment effects? - Look at the <span class="math inline">\(I^2\)</span> statistic from pairwise meta-analyses.</li>
+<li><strong>Model Fit (DIC)</strong>: Compare the Deviance Information Criterion (DIC) between FE and RE models. A smaller DIC indicates a better fit. A difference of 3-5 points is usually considered meaningful. If DIC is similar, the simpler FE model is often preferred (principle of parsimony).</li>
+<li><strong>Network Sparsity</strong>: If the network is sparse (very few studies per comparison), the RE model may struggle to estimate <span class="math inline">\(\tau\)</span> accurately, leading to wide credible intervals. In such cases, an FE model or an RE model with an informative prior for <span class="math inline">\(\tau\)</span> may be necessary.</li>
+</ol>
+</div>
+</div>
 </section>
 </section>
 <section id="3-the-minimal-mock-case-a-vs-b-vs-c" class="level2" data-number="3">
@@ -591,15 +610,37 @@ window.Quarto = {
 </section>
 <section id="step-2-assigning-priors-the-bayesian-part" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="step-2-assigning-priors-the-bayesian-part"><span class="header-section-number">4.2</span> Step 2: Assigning Priors (The Bayesian Part)</h3>
-<p>Since we have no prior knowledge, we use vague (non-informative) priors:</p>
+<p>Since we have no prior knowledge in this mock case, we use vague (non-informative) priors:</p>
 <ul>
 <li>Study baselines: <span class="math inline">\(\mu_1, \mu_2, \mu_3 \sim \text{Normal}(0, 1000)\)</span></li>
 <li>Treatment effects: <span class="math inline">\(d_{AB}, d_{AC} \sim \text{Normal}(0, 1000)\)</span></li>
 </ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Prior Choice in Real-World NMA
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In real HTA submissions, prior choice is heavily scrutinized:</p>
+<ol type="1">
+<li><strong>Priors for Treatment Effects (</strong><span class="math inline">\(d\)</span>): Typically use weakly informative priors like <span class="math inline">\(N(0, 100^2)\)</span> rather than extremely flat priors like <span class="math inline">\(N(0, 1000^2)\)</span>, to prevent the sampler from exploring unrealistically large effect sizes while still letting the data dominate.</li>
+<li><strong>Priors for Heterogeneity (</strong><span class="math inline">\(\tau\)</span>) (in RE models): This is the most sensitive choice!
+<ul>
+<li><strong>Uniform Prior</strong>: e.g., <span class="math inline">\(\tau \sim \text{Uniform}(0, 2)\)</span> or <span class="math inline">\(\text{Uniform}(0, 5)\)</span>. Easy to implement but can place too much weight on large values if data is sparse.</li>
+<li><strong>Half-Normal Prior</strong>: e.g., <span class="math inline">\(\tau \sim \text{Half-Normal}(0, 1)\)</span>. Pulls <span class="math inline">\(\tau\)</span> towards zero, acting as a shrinkage prior.</li>
+<li><strong>Informative Priors</strong>: When the network is sparse, it is best practice to use empirical informative priors based on historical meta-analyses (e.g., Turner et al., 2012 for binary outcomes). This provides a realistic estimate of <span class="math inline">\(\tau\)</span> even when the current data has little information about it.</li>
+</ul></li>
+</ol>
+</div>
+</div>
 <p><strong>How Priors and Likelihood Connect in MCMC:</strong></p>
 <p>According to Bayes’ Theorem, the <strong>Posterior</strong> (the target distribution MCMC tries to map) is proportional to the <strong>Likelihood</strong> multiplied by the <strong>Prior</strong>: <span class="math display">\[\text{Posterior} \propto \text{Likelihood} \times \text{Prior}\]</span></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -608,7 +649,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li><strong>Flat Priors</strong>: Because we use a huge variance (1000), the prior distribution is extremely flat. The prior probability of guessing <span class="math inline">\(d_{AB} = 0.982\)</span> is almost identical to guessing <span class="math inline">\(d_{AB} = 10.0\)</span>.</li>
@@ -619,7 +660,7 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -628,7 +669,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
 <li>It is <strong>NOT</strong> a distribution.</li>
@@ -704,7 +745,7 @@ window.Quarto = {
 <h4 data-number="4.4.1" class="anchored" data-anchor-id="bugsjags-implementation"><span class="header-section-number">4.4.1</span> BUGS/JAGS Implementation</h4>
 <p>Here is the actual code used to run this simulation in JAGS:</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -713,7 +754,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3"><pre class="sourceCode R bugs code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a>model {</span>
 <span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -845,7 +886,7 @@ d_AC  0.7770 1.1548 1.363 1.570 2.001</code></pre>
 <h4 data-number="4.4.2" class="anchored" data-anchor-id="stan-implementation"><span class="header-section-number">4.4.2</span> Stan Implementation</h4>
 <p>The exact same functionality can be implemented in Stan. Notice that Stan uses standard deviation instead of precision in its normal distribution, and uses vectorized operations.</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -854,7 +895,7 @@ d_AC  0.7770 1.1548 1.363 1.570 2.001</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5"><pre class="sourceCode stan code-annotation-code code-with-copy code-annotated"><code class="sourceCode stan"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
 <span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; J; <span class="co">// Number of studies</span></span>
@@ -959,7 +1000,7 @@ convergence, Rhat=1).</code></pre>
 在 BUGS/JAGS 中，`dnorm(mean, precision)` 里的第二个参数是**精度**（方差的倒数），而不是标准差或方差。所以 `0.0001` 代表方差是 `10000`，这是一个非常宽的无信息先验。
 -->
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -968,7 +1009,7 @@ convergence, Rhat=1).</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>While the code above is written in the BUGS/JAGS language, it is helpful to understand the differences between the three major MCMC engines used in HEOR:</p>
 <ul>
@@ -980,7 +1021,7 @@ convergence, Rhat=1).</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -989,7 +1030,7 @@ convergence, Rhat=1).</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>BUGS and JAGS are both <strong>standalone software (computational engines)</strong> and <strong>modeling languages</strong>. - <strong>BUGS</strong> (WinBUGS/OpenBUGS) has its own language syntax and originally had a GUI. - <strong>JAGS</strong> is a command-line program with no GUI. In modern HEOR practice, they are almost always used as “plugins” called from R (via packages like <code>rjags</code> or <code>R2jags</code>), rather than run standalone.</p>
 </div>
@@ -1018,11 +1059,19 @@ convergence, Rhat=1).</code></pre>
 </section>
 <section id="convergence-diagnostics" class="level3" data-number="4.5">
 <h3 data-number="4.5" class="anchored" data-anchor-id="convergence-diagnostics"><span class="header-section-number">4.5</span> Convergence Diagnostics</h3>
-<p>When auditing an NMA, always verify:</p>
+<p>When auditing an NMA, always verify the following MCMC diagnostics to ensure the posterior simulation has converged:</p>
 <ul>
-<li><strong>R-hat</strong>: Must be <span class="math inline">\(&lt; 1.05\)</span> for all parameters.</li>
-<li><strong>Trace Plots</strong>: Chains should look like “fat hairy caterpillars,” showing good mixing.</li>
-<li><strong>Auto-correlation</strong>: Should drop to zero quickly.</li>
+<li><strong>R-hat (Gelman-Rubin Diagnostic)</strong>: Must be <span class="math inline">\(&lt; 1.05\)</span> (or strictly <span class="math inline">\(&lt; 1.01\)</span>) for all parameters. It compares between-chain and within-chain variance. Values close to 1 indicate convergence.</li>
+<li><strong>Trace Plots</strong>: Chains should look like “fat hairy caterpillars,” showing good mixing and no trends.</li>
+<li><strong>Auto-correlation</strong>: Should drop to zero quickly as the lag increases. High autocorrelation means the sampler is moving slowly and requires more iterations or thinning.</li>
+<li><strong>Effective Sample Size (ESS)</strong>: Should be sufficiently large (typically <span class="math inline">\(&gt; 400\)</span>, ideally <span class="math inline">\(&gt; 1000\)</span>). For calculating tail probabilities (like ranking probabilities or SUCRA), a larger ESS is required to ensure stability.</li>
+</ul>
+<p>If the model does not converge, potential solutions include:</p>
+<ul>
+<li>Increasing the number of burn-in and iteration steps.</li>
+<li>Checking for data entry errors or extremely sparse data (zero cells).</li>
+<li>Using more informative priors to stabilize the model.</li>
+<li>Reparameterizing the model (e.g., non-centered parameterization in Stan).</li>
 </ul>
 </section>
 </section>
@@ -1067,7 +1116,7 @@ convergence, Rhat=1).</code></pre>
 <section id="6-strategic-qa-interview-prep" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="6-strategic-qa-interview-prep"><span class="header-section-number">6</span> Strategic Q&amp;A: Interview Prep</h2>
 <div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1076,14 +1125,14 @@ convergence, Rhat=1).</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>A consistency model forces all loops to close (e.g., <span class="math inline">\(d_{BC} = d_{AC} - d_{AB}\)</span>). A UME model relaxes this assumption and estimates all relative effects independently. We compare the two to check for network inconsistency.</p>
 </div>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1092,7 +1141,7 @@ convergence, Rhat=1).</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Standard NMA cannot handle disconnected networks. You must either bridge the gap with a common comparator (if possible) or use population adjustment methods like MAIC or ML-NMR if you have IPD for at least one trial.</p>
 </div>

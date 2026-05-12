@@ -260,11 +260,8 @@ window.Quarto = {
   <li><a href="#bugsjags-implementation" id="toc-bugsjags-implementation" class="nav-link" data-scroll-target="#bugsjags-implementation"><span class="header-section-number">4.1</span> BUGS/JAGS Implementation</a></li>
   <li><a href="#stan-implementation-non-centered-parameterization" id="toc-stan-implementation-non-centered-parameterization" class="nav-link" data-scroll-target="#stan-implementation-non-centered-parameterization"><span class="header-section-number">4.2</span> Stan Implementation (Non-Centered Parameterization)</a></li>
   <li><a href="#experiment-doubling-the-number-of-studies-n8" id="toc-experiment-doubling-the-number-of-studies-n8" class="nav-link" data-scroll-target="#experiment-doubling-the-number-of-studies-n8"><span class="header-section-number">4.3</span> Experiment: Doubling the Number of Studies (N=8)</a></li>
-  <li><a href="#drug-ranking-sucra" id="toc-drug-ranking-sucra" class="nav-link" data-scroll-target="#drug-ranking-sucra"><span class="header-section-number">4.4</span> Drug Ranking &amp; SUCRA</a></li>
-  <li><a href="#ranking-and-sucra-calculation-logic" id="toc-ranking-and-sucra-calculation-logic" class="nav-link" data-scroll-target="#ranking-and-sucra-calculation-logic"><span class="header-section-number">4.5</span> Ranking and SUCRA Calculation Logic</a></li>
-  <li><a href="#consistency-check-loop-inconsistency-model" id="toc-consistency-check-loop-inconsistency-model" class="nav-link" data-scroll-target="#consistency-check-loop-inconsistency-model"><span class="header-section-number">4.6</span> Consistency Check (Loop Inconsistency Model)</a></li>
-  <li><a href="#node-splitting-placeholder" id="toc-node-splitting-placeholder" class="nav-link" data-scroll-target="#node-splitting-placeholder">Node Splitting (Placeholder)</a></li>
-  <li><a href="#unrelated-mean-effects-ume-model-placeholder" id="toc-unrelated-mean-effects-ume-model-placeholder" class="nav-link" data-scroll-target="#unrelated-mean-effects-ume-model-placeholder">Unrelated Mean Effects (UME) Model (Placeholder)</a></li>
+  <li><a href="#drug-ranking-and-sucra-calculation-logic" id="toc-drug-ranking-and-sucra-calculation-logic" class="nav-link" data-scroll-target="#drug-ranking-and-sucra-calculation-logic"><span class="header-section-number">4.4</span> Drug Ranking and SUCRA Calculation Logic</a></li>
+  <li><a href="#consistency-check" id="toc-consistency-check" class="nav-link" data-scroll-target="#consistency-check"><span class="header-section-number">4.5</span> Consistency Check</a></li>
   </ul></li>
   <li><a href="#5-results" id="toc-5-results" class="nav-link" data-scroll-target="#5-results"><span class="header-section-number">5</span> Results &amp; Interpretation: Covariate Adjustment</a></li>
   <li><a href="#6-strategic-qa" id="toc-6-strategic-qa" class="nav-link" data-scroll-target="#6-strategic-qa"><span class="header-section-number">6</span> Strategic Q&amp;A: The Limits of AD NMR</a></li>
@@ -958,16 +955,14 @@ convergence, Rhat=1).</code></pre>
 <section id="comparison-table" class="level4" data-number="4.3.3">
 <h4 data-number="4.3.3" class="anchored" data-anchor-id="comparison-table"><span class="header-section-number">4.3.3</span> Comparison Table</h4>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Click to view Comparison Table
+<span class="screen-reader-only">Note</span>Comparison Table
 </div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <table class="caption-top table">
 <colgroup>
@@ -1012,7 +1007,6 @@ convergence, Rhat=1).</code></pre>
 </table>
 </div>
 </div>
-</div>
 <!-- Audit Point: Interpretation of N=4 vs N=8 Comparison
 1. 样本量增加与算法收敛：
 随着样本量增加（从 4 变 8），后验概率分布被数据更强地约束，贝叶斯先验的影响变小，JAGS（Gibbs 抽样）和 Stan（HMC 抽样）这两个不同的算法引擎得出的结果自然高度一致。
@@ -1026,12 +1020,9 @@ tau 代表的是“实验与实验之间的异质性（Between-study heterogenei
 -->
 </section>
 </section>
-<section id="drug-ranking-sucra" class="level3" data-number="4.4">
-<h3 data-number="4.4" class="anchored" data-anchor-id="drug-ranking-sucra"><span class="header-section-number">4.4</span> Drug Ranking &amp; SUCRA</h3>
+<section id="drug-ranking-and-sucra-calculation-logic" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="drug-ranking-and-sucra-calculation-logic"><span class="header-section-number">4.4</span> Drug Ranking and SUCRA Calculation Logic</h3>
 <p>To answer the strategic question “Which drug is the best?”, we calculate the rank probabilities and the <strong>SUCRA (Surface Under the Cumulative Ranking curve)</strong>.</p>
-</section>
-<section id="ranking-and-sucra-calculation-logic" class="level3" data-number="4.5">
-<h3 data-number="4.5" class="anchored" data-anchor-id="ranking-and-sucra-calculation-logic"><span class="header-section-number">4.5</span> Ranking and SUCRA Calculation Logic</h3>
 <p>In the MCMC sampling of Bayesian NMA, each iteration outputs a specific set of values for all parameters. For our constructed comparison matrix: - <code>SoC (A)</code> is hardcoded to the baseline value of <span class="math inline">\(0\)</span> in the R code. - <code>Drug 2 (B)</code> outputs a sampled value in a given iteration (e.g., <span class="math inline">\(0.84\)</span>). - <code>Drug 3 (C)</code> outputs a sampled value in the same iteration (e.g., <span class="math inline">\(1.67\)</span>).</p>
 <p>We compare these three values horizontally in each iteration. Since a larger value represents better efficacy (larger Log-Odds means higher response rate), the drug with the largest value in that iteration receives <strong>Rank 1</strong>. After summarizing thousands of iterations, the proportion of times a drug achieves the first place is its <strong>Rank 1 probability</strong>.</p>
 <p><strong>SUCRA</strong> goes a step further, measuring the average probability of a drug “beating” all other drugs. Its calculation formula is the sum of the first <span class="math inline">\(T-1\)</span> cumulative ranking probabilities divided by <span class="math inline">\(T-1\)</span> (where <span class="math inline">\(T\)</span> is the total number of drugs). A SUCRA closer to <span class="math inline">\(1\)</span> indicates better efficacy.</p>
@@ -1155,10 +1146,17 @@ How the R code calculates it (A mathematical shortcut):
 This yields the exact same result as the physical interpretation above.
 -->
 </section>
-<section id="consistency-check-loop-inconsistency-model" class="level3" data-number="4.6">
-<h3 data-number="4.6" class="anchored" data-anchor-id="consistency-check-loop-inconsistency-model"><span class="header-section-number">4.6</span> Consistency Check (Loop Inconsistency Model)</h3>
-<p>A core assumption of NMA is <strong>consistency</strong>: direct and indirect evidence should agree within any closed loop. Our network forms a closed loop among treatments A, B, and C: - <strong>A vs B</strong>: Studies 1 &amp; 2 - <strong>A vs C</strong>: Study 3 - <strong>B vs C</strong>: Study 4</p>
-<p>To test consistency, we fit an <strong>Inconsistency Model</strong> by adding an inconsistency parameter <span class="math inline">\(\omega\)</span> (omega) to the B vs C comparison in Study 4. In a consistent network, <span class="math inline">\(\omega\)</span> should be close to 0.</p>
+<section id="consistency-check" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="consistency-check"><span class="header-section-number">4.5</span> Consistency Check</h3>
+<p>A core assumption of NMA is <strong>consistency</strong>: direct and indirect evidence should agree within any closed loop. Our network forms a closed loop among treatments A, B, and C:</p>
+<ul>
+<li><strong>A vs B</strong>: Studies 1 &amp; 2</li>
+<li><strong>A vs C</strong>: Study 3</li>
+<li><strong>B vs C</strong>: Study 4</li>
+</ul>
+<section id="loop-inconsistency-model" class="level4" data-number="4.5.1">
+<h4 data-number="4.5.1" class="anchored" data-anchor-id="loop-inconsistency-model"><span class="header-section-number">4.5.1</span> Loop Inconsistency Model</h4>
+<p>To test consistency, we fit an <strong>Inconsistency Model</strong> by adding an inconsistency parameter <strong><span class="math inline">\(\omega\)</span></strong> (omega) to the B vs C comparison in Study 4. In a consistent network, <span class="math inline">\(\omega\)</span> should be close to 0.</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1307,21 +1305,59 @@ convergence, Rhat=1).</code></pre>
 </div>
 <p>If the 95% Credible Interval of <code>omega</code> includes 0, we fail to reject the consistency assumption, meaning the direct and indirect evidence are statistically consistent.</p>
 </section>
-<section id="node-splitting-placeholder" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="node-splitting-placeholder">Node Splitting (Placeholder)</h3>
-<p>Node Splitting is a systematic approach to detect local inconsistency in a network.</p>
+<section id="node-splitting" class="level4" data-number="4.5.2">
+<h4 data-number="4.5.2" class="anchored" data-anchor-id="node-splitting"><span class="header-section-number">4.5.2</span> Node Splitting</h4>
+<p>Node splitting is another method to assess inconsistency in a specific comparison by <strong>separating</strong> the direct and indirect evidence.</p>
+<p><strong>Mathematical Logic:</strong> For a specific comparison between treatment <span class="math inline">\(k\)</span> and <span class="math inline">\(i\)</span>:</p>
+<ol type="1">
+<li><strong>Direct Evidence</strong>: We estimate the treatment effect <span class="math inline">\(d_{ki}^{\text{dir}}\)</span> using only the trials directly comparing <span class="math inline">\(k\)</span> and <span class="math inline">\(i\)</span>.</li>
+<li><strong>Indirect Evidence</strong>: We estimate the treatment effect <span class="math inline">\(d_{ki}^{\text{ind}}\)</span> using the rest of the network (excluding the direct trials for <span class="math inline">\(k\)</span> vs <span class="math inline">\(i\)</span>), leveraging the consistency constraints (e.g., <span class="math inline">\(d_{ki}^{\text{ind}} = d_{1i} - d_{1k}\)</span>).</li>
+<li><strong>Inconsistency Factor</strong>: We calculate the difference <span class="math inline">\(\omega_{ki} = d_{ki}^{\text{dir}} - d_{ki}^{\text{ind}}\)</span>.</li>
+<li><strong>Hypothesis Test</strong>: We test the null hypothesis <span class="math inline">\(H_0: \omega_{ki} = 0\)</span>. If the 95% credible interval of <span class="math inline">\(\omega_{ki}\)</span> excludes 0, or the Bayesian <span class="math inline">\(p\)</span>-value is small (e.g., <span class="math inline">\(&lt; 0.05\)</span>), we conclude there is significant inconsistency for this node.</li>
+</ol>
+<p>This process is repeated for all nodes (comparisons) in the network where both direct and indirect evidence exist.</p>
+</section>
+<section id="unrelated-mean-effects-ume-model" class="level4" data-number="4.5.3">
+<h4 data-number="4.5.3" class="anchored" data-anchor-id="unrelated-mean-effects-ume-model"><span class="header-section-number">4.5.3</span> Unrelated Mean Effects (UME) Model</h4>
+<p>The UME model is a global method to detect inconsistency by relaxing the consistency assumption across the entire network.</p>
+<p><strong>Logic &amp; Implementation:</strong></p>
 <ul>
-<li><strong>Concept</strong>: For any comparison that has both direct and indirect evidence, the model “splits” the evidence and estimates a direct effect and an indirect effect separately.</li>
-<li><strong>Usage</strong>: If the direct and indirect estimates differ significantly (e.g., non-overlapping 95% credible intervals), it indicates inconsistency for that specific comparison. This process is repeated for all eligible comparisons in the network.</li>
+<li>In a <strong>Consistency Model</strong>, we assume <span class="math inline">\(d_{BC} = d_{AC} - d_{AB}\)</span>. We only estimate basic parameters (relative to a common reference).</li>
+<li>In a <strong>UME Model</strong> (also known as the independent effects model), we treat ALL comparisons as independent. We do not enforce the transitivity relation. For a network with <span class="math inline">\(T\)</span> treatments, instead of estimating <span class="math inline">\(T-1\)</span> basic parameters, we estimate all possible pairwise comparisons directly from the data.</li>
+<li><strong>Implementation</strong>: In Stan/JAGS, we remove the constraint <code>delta[3, 2] = d_AC - d_AB</code> and instead estimate <code>delta[3, 2]</code> as an independent parameter (e.g., <code>d_BC</code>).</li>
+<li><strong>Audit Focus</strong>: We compare the fit of the Consistency model and the UME model using DIC. If the UME model has a substantially lower DIC (e.g., <span class="math inline">\(&gt; 5\)</span> points), it indicates that the consistency assumption is violated in the network.</li>
 </ul>
 </section>
-<section id="unrelated-mean-effects-ume-model-placeholder" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="unrelated-mean-effects-ume-model-placeholder">Unrelated Mean Effects (UME) Model (Placeholder)</h3>
-<p>The Unrelated Mean Effects (UME) model is a global approach to detect inconsistency.</p>
+<section id="inconsistency-management-decision-tree" class="level4" data-number="4.5.4">
+<h4 data-number="4.5.4" class="anchored" data-anchor-id="inconsistency-management-decision-tree"><span class="header-section-number">4.5.4</span> Inconsistency Management Decision Tree</h4>
+<p>When inconsistency is detected (via Node Splitting or UME), HTA guidelines (like NICE DSU Technical Support Document 4) recommend the following decision tree:</p>
+<ol type="1">
+<li><strong>Step 1: Check for Data Errors</strong>
 <ul>
-<li><strong>Concept</strong>: Unlike a standard NMA that assumes consistency, the UME model drops this assumption entirely. It treats every comparison between any two treatments as independent (unrelated).</li>
-<li><strong>Usage</strong>: We compare the model fit (e.g., DIC or residual deviance) of the UME model with the standard Consistency model. If the UME model fits significantly better, it implies that the consistency assumption is violated in the network.</li>
-</ul>
+<li>Verify data extraction (arm-level events and sample sizes).</li>
+<li>Ensure consistent definition of outcomes across trials.</li>
+</ul></li>
+<li><strong>Step 2: Assess Clinical and Methodological Heterogeneity (Effect Modifiers)</strong>
+<ul>
+<li>Are there differences in patient baseline characteristics (e.g., age, disease severity)?</li>
+<li>Are there differences in study design (e.g., blinding, follow-up duration)?</li>
+<li>If effect modifiers are distributed unevenly across comparisons, <strong>Network Meta-Regression (NMR)</strong> should be used to adjust for them (as demonstrated in Section 2).</li>
+</ul></li>
+<li><strong>Step 3: Sensitivity Analysis or Subgroup Analysis</strong>
+<ul>
+<li>Can the network be split into more homogeneous subgroups?</li>
+<li>Can outlier studies (e.g., small studies with extreme effects) be removed in a sensitivity analysis?</li>
+</ul></li>
+<li><strong>Step 4: Use a More Flexible Model</strong>
+<ul>
+<li>If heterogeneity cannot be fully explained by covariates, a <strong>Random Effects</strong> model should be used to account for the unexplained variance.</li>
+</ul></li>
+<li><strong>Step 5: Abandon NMA (Last Resort)</strong>
+<ul>
+<li>If inconsistency is severe and cannot be resolved or explained, a full network synthesis may be misleading. Recur to presenting separate pairwise meta-analyses or a qualitative synthesis.</li>
+</ul></li>
+</ol>
+</section>
 </section>
 </section>
 <section id="5-results" class="level2" data-number="5">

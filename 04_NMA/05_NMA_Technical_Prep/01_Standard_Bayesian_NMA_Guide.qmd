@@ -121,6 +121,17 @@ Where $d_{xy}$ is the pooled relative effect (log-odds ratio) of treatment $y$ v
 - **Fixed Effects Model**: Assumes that the true relative effect of treatment $k$ vs $b$ is constant across all studies: $\delta_{jk} = d_{bk}$.
 - **Random Effects Model**: Assumes that the true relative effects vary across studies following a normal distribution: $\delta_{jk} \sim \text{Normal}(d_{bk}, \tau^2)$, where $\tau^2$ is the between-study heterogeneity variance.
 
+::: callout-important
+### Judgment Logic for FE vs. RE (HTA Audit Focus)
+
+Deciding between a Fixed Effects and a Random Effects model is a critical decision in NMA. Here is the standard judgment logic: 
+
+1. **Clinical Plausibility**: Are the trials sufficiently similar in terms of patient populations (e.g., age, baseline severity), treatment protocols, and outcome definitions? If there are obvious differences, an RE model is clinically more plausible. 
+2. **Statistical Heterogeneity**: - Check the estimated between-study standard deviation ($\tau$). Is it large relative to the treatment effects? - Look at the $I^2$ statistic from pairwise meta-analyses. 
+3. **Model Fit (DIC)**: Compare the Deviance Information Criterion (DIC) between FE and RE models. A smaller DIC indicates a better fit. A difference of 3-5 points is usually considered meaningful. If DIC is similar, the simpler FE model is often preferred (principle of parsimony). 
+4. **Network Sparsity**: If the network is sparse (very few studies per comparison), the RE model may struggle to estimate $\tau$ accurately, leading to wide credible intervals. In such cases, an FE model or an RE model with an informative prior for $\tau$ may be necessary.
+:::
+
 ## The Minimal Mock Case: A vs B vs C {#3-the-minimal-mock-case-a-vs-b-vs-c}
 
 - **Treatment A**: Standard of Care (SoC) - Reference
@@ -215,10 +226,22 @@ Now let's look at the specific setup for our 3 studies:
 
 ### Step 2: Assigning Priors (The Bayesian Part)
 
-Since we have no prior knowledge, we use vague (non-informative) priors:
+Since we have no prior knowledge in this mock case, we use vague (non-informative) priors:
 
 - Study baselines: $\mu_1, \mu_2, \mu_3 \sim \text{Normal}(0, 1000)$
 - Treatment effects: $d_{AB}, d_{AC} \sim \text{Normal}(0, 1000)$
+
+::: callout-tip
+### Prior Choice in Real-World NMA
+
+In real HTA submissions, prior choice is heavily scrutinized: 
+
+1. **Priors for Treatment Effects (**$d$): Typically use weakly informative priors like $N(0, 100^2)$ rather than extremely flat priors like $N(0, 1000^2)$, to prevent the sampler from exploring unrealistically large effect sizes while still letting the data dominate. 
+2. **Priors for Heterogeneity (**$\tau$) (in RE models): This is the most sensitive choice! 
+   - **Uniform Prior**: e.g., $\tau \sim \text{Uniform}(0, 2)$ or $\text{Uniform}(0, 5)$. Easy to implement but can place too much weight on large values if data is sparse. 
+   - **Half-Normal Prior**: e.g., $\tau \sim \text{Half-Normal}(0, 1)$. Pulls $\tau$ towards zero, acting as a shrinkage prior. 
+   - **Informative Priors**: When the network is sparse, it is best practice to use empirical informative priors based on historical meta-analyses (e.g., Turner et al., 2012 for binary outcomes). This provides a realistic estimate of $\tau$ even when the current data has little information about it.
+:::
 
 **How Priors and Likelihood Connect in MCMC:**
 
@@ -518,11 +541,19 @@ BUGS and JAGS are both **standalone software (computational engines)** and **mod
 
 ### Convergence Diagnostics
 
-When auditing an NMA, always verify:
+When auditing an NMA, always verify the following MCMC diagnostics to ensure the posterior simulation has converged:
 
-- **R-hat**: Must be $< 1.05$ for all parameters.
-- **Trace Plots**: Chains should look like "fat hairy caterpillars," showing good mixing.
-- **Auto-correlation**: Should drop to zero quickly.
+- **R-hat (Gelman-Rubin Diagnostic)**: Must be $< 1.05$ (or strictly $< 1.01$) for all parameters. It compares between-chain and within-chain variance. Values close to 1 indicate convergence.
+- **Trace Plots**: Chains should look like "fat hairy caterpillars," showing good mixing and no trends.
+- **Auto-correlation**: Should drop to zero quickly as the lag increases. High autocorrelation means the sampler is moving slowly and requires more iterations or thinning.
+- **Effective Sample Size (ESS)**: Should be sufficiently large (typically $> 400$, ideally $> 1000$). For calculating tail probabilities (like ranking probabilities or SUCRA), a larger ESS is required to ensure stability.
+
+If the model does not converge, potential solutions include: 
+
+- Increasing the number of burn-in and iteration steps. 
+- Checking for data entry errors or extremely sparse data (zero cells). 
+- Using more informative priors to stabilize the model. 
+- Reparameterizing the model (e.g., non-centered parameterization in Stan).
 
 ## Results & Interpretation: The League Table {#5-results--interpretation-the-league-table}
 
