@@ -243,36 +243,33 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#standard-bayesian-network-meta-analysis-nma" id="toc-standard-bayesian-network-meta-analysis-nma" class="nav-link active" data-scroll-target="#standard-bayesian-network-meta-analysis-nma">Standard Bayesian Network Meta-Analysis (NMA)</a>
+  <li><a href="#1-executive-summary-the-anatomy-of-a-network" id="toc-1-executive-summary-the-anatomy-of-a-network" class="nav-link active" data-scroll-target="#1-executive-summary-the-anatomy-of-a-network"><span class="header-section-number">1</span> Executive Summary: The Anatomy of a Network</a></li>
+  <li><a href="#2-theoretical-framework-the-calculus-of-consistency" id="toc-2-theoretical-framework-the-calculus-of-consistency" class="nav-link" data-scroll-target="#2-theoretical-framework-the-calculus-of-consistency"><span class="header-section-number">2</span> Theoretical Framework: The Calculus of Consistency</a>
   <ul class="collapse">
-  <li><a href="#1-executive-summary-the-anatomy-of-a-network" id="toc-1-executive-summary-the-anatomy-of-a-network" class="nav-link" data-scroll-target="#1-executive-summary-the-anatomy-of-a-network">1. Executive Summary: The Anatomy of a Network</a></li>
-  <li><a href="#2-theoretical-framework-the-calculus-of-consistency" id="toc-2-theoretical-framework-the-calculus-of-consistency" class="nav-link" data-scroll-target="#2-theoretical-framework-the-calculus-of-consistency">2. Theoretical Framework: The Calculus of Consistency</a>
+  <li><a href="#the-likelihood-binomial-logit-model" id="toc-the-likelihood-binomial-logit-model" class="nav-link" data-scroll-target="#the-likelihood-binomial-logit-model"><span class="header-section-number">2.1</span> The Likelihood (Binomial-Logit Model)</a></li>
+  <li><a href="#the-consistency-assumption-the-core-constraint" id="toc-the-consistency-assumption-the-core-constraint" class="nav-link" data-scroll-target="#the-consistency-assumption-the-core-constraint"><span class="header-section-number">2.2</span> The Consistency Assumption (The Core Constraint)</a></li>
+  <li><a href="#fixed-effects-fe-vs.-random-effects-re" id="toc-fixed-effects-fe-vs.-random-effects-re" class="nav-link" data-scroll-target="#fixed-effects-fe-vs.-random-effects-re"><span class="header-section-number">2.3</span> Fixed Effects (FE) vs.&nbsp;Random Effects (RE)</a></li>
+  </ul></li>
+  <li><a href="#3-the-minimal-mock-case-a-vs-b-vs-c" id="toc-3-the-minimal-mock-case-a-vs-b-vs-c" class="nav-link" data-scroll-target="#3-the-minimal-mock-case-a-vs-b-vs-c"><span class="header-section-number">3</span> The Minimal Mock Case: A vs B vs C</a>
   <ul class="collapse">
-  <li><a href="#the-likelihood-binomial-logit-model" id="toc-the-likelihood-binomial-logit-model" class="nav-link" data-scroll-target="#the-likelihood-binomial-logit-model">2.1 The Likelihood (Binomial-Logit Model)</a></li>
-  <li><a href="#the-consistency-assumption-the-core-constraint" id="toc-the-consistency-assumption-the-core-constraint" class="nav-link" data-scroll-target="#the-consistency-assumption-the-core-constraint">2.2 The Consistency Assumption (The Core Constraint)</a></li>
-  <li><a href="#fixed-effects-fe-vs.-random-effects-re" id="toc-fixed-effects-fe-vs.-random-effects-re" class="nav-link" data-scroll-target="#fixed-effects-fe-vs.-random-effects-re">2.3 Fixed Effects (FE) vs.&nbsp;Random Effects (RE)</a></li>
+  <li><a href="#the-mock-data" id="toc-the-mock-data" class="nav-link" data-scroll-target="#the-mock-data"><span class="header-section-number">3.1</span> The Mock Data</a></li>
+  <li><a href="#the-calculus-of-the-loop" id="toc-the-calculus-of-the-loop" class="nav-link" data-scroll-target="#the-calculus-of-the-loop"><span class="header-section-number">3.2</span> The Calculus of the Loop</a></li>
   </ul></li>
-  <li><a href="#3-the-minimal-mock-case-a-vs-b-vs-c" id="toc-3-the-minimal-mock-case-a-vs-b-vs-c" class="nav-link" data-scroll-target="#3-the-minimal-mock-case-a-vs-b-vs-c">3. The Minimal Mock Case: A vs B vs C</a>
+  <li><a href="#4-mcmc-forensic-audit-implementation--convergence" id="toc-4-mcmc-forensic-audit-implementation--convergence" class="nav-link" data-scroll-target="#4-mcmc-forensic-audit-implementation--convergence"><span class="header-section-number">4</span> MCMC Forensic Audit: How Bayes Actually Solves the Network</a>
   <ul class="collapse">
-  <li><a href="#the-mock-data" id="toc-the-mock-data" class="nav-link" data-scroll-target="#the-mock-data">3.1 The Mock Data</a></li>
-  <li><a href="#the-calculus-of-the-loop" id="toc-the-calculus-of-the-loop" class="nav-link" data-scroll-target="#the-calculus-of-the-loop">3.2 The Calculus of the Loop</a></li>
+  <li><a href="#step-1-setting-up-the-likelihood-and-parameters" id="toc-step-1-setting-up-the-likelihood-and-parameters" class="nav-link" data-scroll-target="#step-1-setting-up-the-likelihood-and-parameters"><span class="header-section-number">4.1</span> Step 1: Setting up the Likelihood and Parameters</a></li>
+  <li><a href="#step-2-assigning-priors-the-bayesian-part" id="toc-step-2-assigning-priors-the-bayesian-part" class="nav-link" data-scroll-target="#step-2-assigning-priors-the-bayesian-part"><span class="header-section-number">4.2</span> Step 2: Assigning Priors (The Bayesian Part)</a></li>
+  <li><a href="#the-iterative-algorithm-and-posterier." id="toc-the-iterative-algorithm-and-posterier." class="nav-link" data-scroll-target="#the-iterative-algorithm-and-posterier."><span class="header-section-number">4.3</span> The Iterative Algorithm and Posterier.</a></li>
+  <li><a href="#model-implementation-bugsjags-stan" id="toc-model-implementation-bugsjags-stan" class="nav-link" data-scroll-target="#model-implementation-bugsjags-stan"><span class="header-section-number">4.4</span> Model Implementation: BUGS/JAGS &amp; Stan</a></li>
+  <li><a href="#convergence-diagnostics" id="toc-convergence-diagnostics" class="nav-link" data-scroll-target="#convergence-diagnostics"><span class="header-section-number">4.5</span> Convergence Diagnostics</a></li>
   </ul></li>
-  <li><a href="#4-mcmc-forensic-audit-implementation--convergence" id="toc-4-mcmc-forensic-audit-implementation--convergence" class="nav-link" data-scroll-target="#4-mcmc-forensic-audit-implementation--convergence">4. MCMC Forensic Audit: How Bayes Actually Solves the Network</a>
+  <li><a href="#5-results--interpretation-the-league-table" id="toc-5-results--interpretation-the-league-table" class="nav-link" data-scroll-target="#5-results--interpretation-the-league-table"><span class="header-section-number">5</span> Results &amp; Interpretation: The League Table</a>
   <ul class="collapse">
-  <li><a href="#step-1-setting-up-the-likelihood-and-parameters" id="toc-step-1-setting-up-the-likelihood-and-parameters" class="nav-link" data-scroll-target="#step-1-setting-up-the-likelihood-and-parameters">4.1 Step 1: Setting up the Likelihood and Parameters</a></li>
-  <li><a href="#step-2-assigning-priors-the-bayesian-part" id="toc-step-2-assigning-priors-the-bayesian-part" class="nav-link" data-scroll-target="#step-2-assigning-priors-the-bayesian-part">4.2 Step 2: Assigning Priors (The Bayesian Part)</a></li>
-  <li><a href="#the-iterative-algorithm-and-posterier." id="toc-the-iterative-algorithm-and-posterier." class="nav-link" data-scroll-target="#the-iterative-algorithm-and-posterier.">4.3 The Iterative Algorithm and Posterier.</a></li>
-  <li><a href="#model-implementation-bugsjags-stan" id="toc-model-implementation-bugsjags-stan" class="nav-link" data-scroll-target="#model-implementation-bugsjags-stan">4.5 Model Implementation: BUGS/JAGS &amp; Stan</a></li>
-  <li><a href="#convergence-diagnostics" id="toc-convergence-diagnostics" class="nav-link" data-scroll-target="#convergence-diagnostics">4.6 Convergence Diagnostics</a></li>
+  <li><a href="#the-league-table-median-or-and-95-cri" id="toc-the-league-table-median-or-and-95-cri" class="nav-link" data-scroll-target="#the-league-table-median-or-and-95-cri"><span class="header-section-number">5.1</span> The League Table (Median OR and 95% CrI)</a></li>
+  <li><a href="#probability-of-being-best" id="toc-probability-of-being-best" class="nav-link" data-scroll-target="#probability-of-being-best"><span class="header-section-number">5.2</span> Probability of Being Best</a></li>
   </ul></li>
-  <li><a href="#5-results--interpretation-the-league-table" id="toc-5-results--interpretation-the-league-table" class="nav-link" data-scroll-target="#5-results--interpretation-the-league-table">5. Results &amp; Interpretation: The League Table</a>
-  <ul class="collapse">
-  <li><a href="#the-league-table-median-or-and-95-cri" id="toc-the-league-table-median-or-and-95-cri" class="nav-link" data-scroll-target="#the-league-table-median-or-and-95-cri">5.1 The League Table (Median OR and 95% CrI)</a></li>
-  <li><a href="#probability-of-being-best" id="toc-probability-of-being-best" class="nav-link" data-scroll-target="#probability-of-being-best">5.2 Probability of Being Best</a></li>
-  </ul></li>
-  <li><a href="#6-strategic-qa-interview-prep" id="toc-6-strategic-qa-interview-prep" class="nav-link" data-scroll-target="#6-strategic-qa-interview-prep">6. Strategic Q&amp;A: Interview Prep</a></li>
-  <li><a href="#7-strategic-conclusion" id="toc-7-strategic-conclusion" class="nav-link" data-scroll-target="#7-strategic-conclusion">7. Strategic Conclusion</a></li>
-  </ul></li>
+  <li><a href="#6-strategic-qa-interview-prep" id="toc-6-strategic-qa-interview-prep" class="nav-link" data-scroll-target="#6-strategic-qa-interview-prep"><span class="header-section-number">6</span> Strategic Q&amp;A: Interview Prep</a></li>
+  <li><a href="#7-strategic-conclusion" id="toc-7-strategic-conclusion" class="nav-link" data-scroll-target="#7-strategic-conclusion"><span class="header-section-number">7</span> Strategic Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -310,8 +307,6 @@ window.Quarto = {
 </header>
 
 
-<section id="standard-bayesian-network-meta-analysis-nma" class="level1">
-<h1>Standard Bayesian Network Meta-Analysis (NMA)</h1>
 <p><em>Mastering Evidence Synthesis through a Minimal Mock Case</em></p>
 <!--
 ## 📑 Table of Contents
@@ -324,8 +319,8 @@ window.Quarto = {
 6.  [**Strategic Q&A: Interview Prep**](#6-strategic-qa-interview-prep)
 7.  [**Strategic Conclusion**](#7-strategic-conclusion)
 -->
-<section id="1-executive-summary-the-anatomy-of-a-network" class="level2">
-<h2 class="anchored" data-anchor-id="1-executive-summary-the-anatomy-of-a-network">1. Executive Summary: The Anatomy of a Network</h2>
+<section id="1-executive-summary-the-anatomy-of-a-network" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="1-executive-summary-the-anatomy-of-a-network"><span class="header-section-number">1</span> Executive Summary: The Anatomy of a Network</h2>
 <p>Network Meta-Analysis (NMA) is the gold standard for evidence synthesis in Health Technology Assessment (HTA). It extends traditional pair-wise meta-analysis by allowing the simultaneous comparison of multiple treatments, even those that have never been compared head-to-head in a clinical trial.</p>
 <!--
 【基础概念】traditional pair-wise meta-analysis（传统两两 Meta 分析）
@@ -357,11 +352,11 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="2-theoretical-framework-the-calculus-of-consistency" class="level2">
-<h2 class="anchored" data-anchor-id="2-theoretical-framework-the-calculus-of-consistency">2. Theoretical Framework: The Calculus of Consistency</h2>
+<section id="2-theoretical-framework-the-calculus-of-consistency" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="2-theoretical-framework-the-calculus-of-consistency"><span class="header-section-number">2</span> Theoretical Framework: The Calculus of Consistency</h2>
 <p>In a Bayesian NMA, we model the data at the study level and connect the treatment effects through a common reference treatment.</p>
-<section id="the-likelihood-binomial-logit-model" class="level3">
-<h3 class="anchored" data-anchor-id="the-likelihood-binomial-logit-model">2.1 The Likelihood (Binomial-Logit Model)</h3>
+<section id="the-likelihood-binomial-logit-model" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="the-likelihood-binomial-logit-model"><span class="header-section-number">2.1</span> The Likelihood (Binomial-Logit Model)</h3>
 <p>For a binary outcome (e.g., responders <span class="math inline">\(r_{jk}\)</span> out of <span class="math inline">\(n_{jk}\)</span> patients in study <span class="math inline">\(j\)</span> for treatment <span class="math inline">\(k\)</span>): <!-- 一个 study 就是指某一种特定的药物 vs 自己的对照组比较的实验 --></p>
 <p>For example, we can have: <span class="math display">\[r_{1,base/control} \sim \text{Binomial}(p_{1b}, n_{1b})\]</span> <span class="math display">\[r_{1,trt} \sim \text{Binomial}(p_{1,trt}, n_{1,trt})\]</span></p>
 <p>We use the logit link function to map probabilities to the real line:</p>
@@ -373,8 +368,8 @@ window.Quarto = {
 <li><span class="math inline">\(\delta_{1,trt}\)</span>: The log-odds ratio of treatment <span class="math inline">\(k\)</span> compared to the study’s control treatment. Note that <span class="math inline">\(\delta_{1,b} = 0\)</span>.</li>
 </ul>
 </section>
-<section id="the-consistency-assumption-the-core-constraint" class="level3">
-<h3 class="anchored" data-anchor-id="the-consistency-assumption-the-core-constraint">2.2 The Consistency Assumption (The Core Constraint)</h3>
+<section id="the-consistency-assumption-the-core-constraint" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="the-consistency-assumption-the-core-constraint"><span class="header-section-number">2.2</span> The Consistency Assumption (The Core Constraint)</h3>
 <p>The defining feature of NMA is the assumption of consistency. We assume that the relative effect of B vs C can be derived from the relative effects of A vs B and A vs C:</p>
 <p><span class="math display">\[d_{BC} = d_{AC} - d_{AB}\]</span></p>
 <p>Where <span class="math inline">\(d_{xy}\)</span> is the pooled relative effect (log-odds ratio) of treatment <span class="math inline">\(y\)</span> vs treatment <span class="math inline">\(x\)</span>.</p>
@@ -402,24 +397,24 @@ window.Quarto = {
    - 试验设计/方法论差异大：例如一个是开放标签（Open-label）试验，另一个是双盲（Double-blind）试验，主观终点可能受到偏倚影响导致不一致。
 -->
 </section>
-<section id="fixed-effects-fe-vs.-random-effects-re" class="level3">
-<h3 class="anchored" data-anchor-id="fixed-effects-fe-vs.-random-effects-re">2.3 Fixed Effects (FE) vs.&nbsp;Random Effects (RE)</h3>
+<section id="fixed-effects-fe-vs.-random-effects-re" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="fixed-effects-fe-vs.-random-effects-re"><span class="header-section-number">2.3</span> Fixed Effects (FE) vs.&nbsp;Random Effects (RE)</h3>
 <ul>
 <li><strong>Fixed Effects Model</strong>: Assumes that the true relative effect of treatment <span class="math inline">\(k\)</span> vs <span class="math inline">\(b\)</span> is constant across all studies: <span class="math inline">\(\delta_{jk} = d_{bk}\)</span>.</li>
 <li><strong>Random Effects Model</strong>: Assumes that the true relative effects vary across studies following a normal distribution: <span class="math inline">\(\delta_{jk} \sim \text{Normal}(d_{bk}, \tau^2)\)</span>, where <span class="math inline">\(\tau^2\)</span> is the between-study heterogeneity variance.</li>
 </ul>
 </section>
 </section>
-<section id="3-the-minimal-mock-case-a-vs-b-vs-c" class="level2">
-<h2 class="anchored" data-anchor-id="3-the-minimal-mock-case-a-vs-b-vs-c">3. The Minimal Mock Case: A vs B vs C</h2>
+<section id="3-the-minimal-mock-case-a-vs-b-vs-c" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="3-the-minimal-mock-case-a-vs-b-vs-c"><span class="header-section-number">3</span> The Minimal Mock Case: A vs B vs C</h2>
 <ul>
 <li><strong>Treatment A</strong>: Standard of Care (SoC) - Reference</li>
 <li><strong>Treatment B</strong>: New Drug 1</li>
 <li><strong>Treatment C</strong>: New Drug 2</li>
 </ul>
 <p>To make this concrete, let’s construct a minimal network with 3 treatments and 3 studies forming a complete loop.</p>
-<section id="the-mock-data" class="level3">
-<h3 class="anchored" data-anchor-id="the-mock-data">3.1 The Mock Data</h3>
+<section id="the-mock-data" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="the-mock-data"><span class="header-section-number">3.1</span> The Mock Data</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 12%">
@@ -494,8 +489,8 @@ window.Quarto = {
    - 全网排名：HTA 机构（如 NICE）需要对网络中所有药物进行优劣排名，而不仅仅是 B 和 C。
 -->
 </section>
-<section id="the-calculus-of-the-loop" class="level3">
-<h3 class="anchored" data-anchor-id="the-calculus-of-the-loop">3.2 The Calculus of the Loop</h3>
+<section id="the-calculus-of-the-loop" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="the-calculus-of-the-loop"><span class="header-section-number">3.2</span> The Calculus of the Loop</h3>
 <p>Let’s calculate the log-odds ratios (LOR) for each study:</p>
 <ol type="1">
 <li><strong>Study 1 (A vs B)</strong>: <span class="math inline">\(\ln(OR_{AB}) = \ln(2.67) \approx 0.982\)</span></li>
@@ -512,11 +507,11 @@ window.Quarto = {
 <p>This difference is very small, indicating a consistent network.</p>
 </section>
 </section>
-<section id="4-mcmc-forensic-audit-implementation--convergence" class="level2">
-<h2 class="anchored" data-anchor-id="4-mcmc-forensic-audit-implementation--convergence">4. MCMC Forensic Audit: How Bayes Actually Solves the Network</h2>
+<section id="4-mcmc-forensic-audit-implementation--convergence" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="4-mcmc-forensic-audit-implementation--convergence"><span class="header-section-number">4</span> MCMC Forensic Audit: How Bayes Actually Solves the Network</h2>
 <p>In this section, we move away from simple arithmetic and look at how the Bayesian MCMC engine actually processes our mock data to find the global solution.</p>
-<section id="step-1-setting-up-the-likelihood-and-parameters" class="level3">
-<h3 class="anchored" data-anchor-id="step-1-setting-up-the-likelihood-and-parameters">4.1 Step 1: Setting up the Likelihood and Parameters</h3>
+<section id="step-1-setting-up-the-likelihood-and-parameters" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="step-1-setting-up-the-likelihood-and-parameters"><span class="header-section-number">4.1</span> Step 1: Setting up the Likelihood and Parameters</h3>
 <p>For our 3 studies, the model views the data as follows. Let <span class="math inline">\(r_{jk}\)</span> be the number of events in study <span class="math inline">\(j\)</span>, arm <span class="math inline">\(k\)</span>, and <span class="math inline">\(n_{jk}\)</span> be the total patients.</p>
 <p>The formal mathematical likelihood <span class="math inline">\(L\)</span> for the entire network is the product of the probability mass functions (PMF) of the independent Binomial distributions for all studies and arms:</p>
 <p><span class="math display">\[L(\mu, d | r, n) = \prod_{j=1}^{3} \prod_{k=1}^{2} \binom{n_{jk}}{r_{jk}} p_{jk}^{r_{jk}} (1 - p_{jk})^{n_{jk} - r_{jk}}\]</span></p>
@@ -594,8 +589,8 @@ window.Quarto = {
 </table>
 <p><strong>The Consistency Constraint (The Golden Rule):</strong> At all times, the model enforces: <span class="math inline">\(d_{BC} = d_{AC} - d_{AB}\)</span>. This means we only have 5 independent parameters to estimate: <span class="math inline">\(\mu_1, \mu_2, \mu_3, d_{AB}, d_{AC}\)</span>. All study data are pooled simultaneously to find the best values for these 5 parameters.</p>
 </section>
-<section id="step-2-assigning-priors-the-bayesian-part" class="level3">
-<h3 class="anchored" data-anchor-id="step-2-assigning-priors-the-bayesian-part">4.2 Step 2: Assigning Priors (The Bayesian Part)</h3>
+<section id="step-2-assigning-priors-the-bayesian-part" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="step-2-assigning-priors-the-bayesian-part"><span class="header-section-number">4.2</span> Step 2: Assigning Priors (The Bayesian Part)</h3>
 <p>Since we have no prior knowledge, we use vague (non-informative) priors:</p>
 <ul>
 <li>Study baselines: <span class="math inline">\(\mu_1, \mu_2, \mu_3 \sim \text{Normal}(0, 1000)\)</span></li>
@@ -680,8 +675,8 @@ window.Quarto = {
 因此，对于绝大多数 HEOR 连续参数模型，Stan 完胜；但对于包含复杂离散隐变量的模型，BUGS/JAGS 仍有优势。
 -->
 </section>
-<section id="the-iterative-algorithm-and-posterier." class="level3">
-<h3 class="anchored" data-anchor-id="the-iterative-algorithm-and-posterier.">4.3 The Iterative Algorithm and Posterier.</h3>
+<section id="the-iterative-algorithm-and-posterier." class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="the-iterative-algorithm-and-posterier."><span class="header-section-number">4.3</span> The Iterative Algorithm and Posterier.</h3>
 <ol type="1">
 <li><strong>Proposal</strong>: The engine guesses values for the parameters.
 <ul>
@@ -702,11 +697,11 @@ window.Quarto = {
 </ul></li>
 </ol>
 </section>
-<section id="model-implementation-bugsjags-stan" class="level3">
-<h3 class="anchored" data-anchor-id="model-implementation-bugsjags-stan">4.5 Model Implementation: BUGS/JAGS &amp; Stan</h3>
+<section id="model-implementation-bugsjags-stan" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="model-implementation-bugsjags-stan"><span class="header-section-number">4.4</span> Model Implementation: BUGS/JAGS &amp; Stan</h3>
 <p>Here we present the implementation of our Fixed Effects NMA model in both the traditional BUGS/JAGS language and the modern Stan language, along with the R code to call them.</p>
-<section id="bugsjags-implementation" class="level4">
-<h4 class="anchored" data-anchor-id="bugsjags-implementation">4.5.1 BUGS/JAGS Implementation</h4>
+<section id="bugsjags-implementation" class="level4" data-number="4.4.1">
+<h4 data-number="4.4.1" class="anchored" data-anchor-id="bugsjags-implementation"><span class="header-section-number">4.4.1</span> BUGS/JAGS Implementation</h4>
 <p>Here is the actual code used to run this simulation in JAGS:</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
@@ -846,8 +841,8 @@ d_AC  0.7770 1.1548 1.363 1.570 2.001</code></pre>
 </div>
 </div>
 </section>
-<section id="stan-implementation" class="level4">
-<h4 class="anchored" data-anchor-id="stan-implementation">4.5.2 Stan Implementation</h4>
+<section id="stan-implementation" class="level4" data-number="4.4.2">
+<h4 data-number="4.4.2" class="anchored" data-anchor-id="stan-implementation"><span class="header-section-number">4.4.2</span> Stan Implementation</h4>
 <p>The exact same functionality can be implemented in Stan. Notice that Stan uses standard deviation instead of precision in its normal distribution, and uses vectorized operations.</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
@@ -1021,8 +1016,8 @@ convergence, Rhat=1).</code></pre>
 -->
 </section>
 </section>
-<section id="convergence-diagnostics" class="level3">
-<h3 class="anchored" data-anchor-id="convergence-diagnostics">4.6 Convergence Diagnostics</h3>
+<section id="convergence-diagnostics" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="convergence-diagnostics"><span class="header-section-number">4.5</span> Convergence Diagnostics</h3>
 <p>When auditing an NMA, always verify:</p>
 <ul>
 <li><strong>R-hat</strong>: Must be <span class="math inline">\(&lt; 1.05\)</span> for all parameters.</li>
@@ -1031,11 +1026,11 @@ convergence, Rhat=1).</code></pre>
 </ul>
 </section>
 </section>
-<section id="5-results--interpretation-the-league-table" class="level2">
-<h2 class="anchored" data-anchor-id="5-results--interpretation-the-league-table">5. Results &amp; Interpretation: The League Table</h2>
+<section id="5-results--interpretation-the-league-table" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="5-results--interpretation-the-league-table"><span class="header-section-number">5</span> Results &amp; Interpretation: The League Table</h2>
 <p>After running the MCMC, we combine the direct and indirect evidence to get the final pooled estimates.</p>
-<section id="the-league-table-median-or-and-95-cri" class="level3">
-<h3 class="anchored" data-anchor-id="the-league-table-median-or-and-95-cri">5.1 The League Table (Median OR and 95% CrI)</h3>
+<section id="the-league-table-median-or-and-95-cri" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="the-league-table-median-or-and-95-cri"><span class="header-section-number">5.1</span> The League Table (Median OR and 95% CrI)</h3>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1059,8 +1054,8 @@ convergence, Rhat=1).</code></pre>
 </table>
 <p><em>How to read</em>: The upper-right triangle shows the OR of the column treatment vs the row treatment. The lower-left triangle shows the inverse.</p>
 </section>
-<section id="probability-of-being-best" class="level3">
-<h3 class="anchored" data-anchor-id="probability-of-being-best">5.2 Probability of Being Best</h3>
+<section id="probability-of-being-best" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="probability-of-being-best"><span class="header-section-number">5.2</span> Probability of Being Best</h3>
 <p>Bayesian NMA allows us to calculate the probability that each treatment is the most effective.</p>
 <ul>
 <li><strong>Treatment C</strong>: ~75%</li>
@@ -1069,8 +1064,8 @@ convergence, Rhat=1).</code></pre>
 </ul>
 </section>
 </section>
-<section id="6-strategic-qa-interview-prep" class="level2">
-<h2 class="anchored" data-anchor-id="6-strategic-qa-interview-prep">6. Strategic Q&amp;A: Interview Prep</h2>
+<section id="6-strategic-qa-interview-prep" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="6-strategic-qa-interview-prep"><span class="header-section-number">6</span> Strategic Q&amp;A: Interview Prep</h2>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1104,14 +1099,13 @@ convergence, Rhat=1).</code></pre>
 </div>
 </div>
 </section>
-<section id="7-strategic-conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="7-strategic-conclusion">7. Strategic Conclusion</h2>
+<section id="7-strategic-conclusion" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="7-strategic-conclusion"><span class="header-section-number">7</span> Strategic Conclusion</h2>
 <p>Mastering Standard Bayesian NMA requires understanding the interplay between direct and indirect evidence. This minimal case demonstrates that when data forms a loop, consistency must be verified.</p>
 <p><strong>Guide Authored by</strong>: Antigravity (Advanced Agentic Coding)<br>
 <strong>Methodological Reference</strong>: NICE DSU TSD 2 &amp; 4</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

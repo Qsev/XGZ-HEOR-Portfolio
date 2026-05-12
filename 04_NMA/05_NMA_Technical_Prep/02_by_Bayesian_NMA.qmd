@@ -10,7 +10,7 @@ format:
     toc-depth: 3
     code-fold: true
     code-summary: "View the code"
-    number-sections: false
+    number-sections: true
 ---
 
 *Handling Heterogeneity and Ecological Bias with Aggregate Data (AD)*
@@ -28,7 +28,7 @@ format:
 -->
 ```
 
-## 1. Executive Summary: The Heterogeneity Problem {#1-executive-summary}
+## Executive Summary: The Heterogeneity Problem {#1-executive-summary}
 
 In the previous guide, we used a **Fixed Effects (FE)** model, which assumes that the true effect of a drug is exactly identical across all studies in the universe. In reality, patient populations, dosing protocols, and baseline severity vary.
 
@@ -46,9 +46,9 @@ Regressing using study-level averages (e.g., the average age of this trial is 55
 -->
 ```
 
-## 2. Theoretical Framework: RE & NMR {#2-theoretical-framework}
+## Theoretical Framework: RE & NMR {#2-theoretical-framework}
 
-### 2.1 The Random Effects Assumption
+### The Random Effects Assumption
 
 Instead of $\delta_{jk} = d_{bk}$ (Fixed Effect), we now assume:
 
@@ -56,7 +56,7 @@ $$\delta_{jk} \sim \text{Normal}(d_{bk}, \tau^2)$$
 
 Where $\tau^2$ is the **between-study variance**. If $\tau = 0$, the RE model collapses back into an FE model.
 
-### 2.2 Network Meta-Regression (The Linear Predictor)
+### Network Meta-Regression (The Linear Predictor)
 
 We expand the logit link function to include covariates as **Effect Modifiers** (interaction terms). Let $I_{jk}$ be an indicator variable that equals $0$ for the study's baseline control arm, and $1$ for the active treatment arm:
 
@@ -75,9 +75,9 @@ After centering, the meaning of $d$ returns to the relative efficacy at the "ave
 -->
 ```
 
-## 3. The Mock Case: Severe Plaque Psoriasis {#3-the-mock-case}
+## The Mock Case: Severe Plaque Psoriasis {#3-the-mock-case}
 
-### 3.1 The Clinical Scenario
+### The Clinical Scenario
 
 - **Disease**: Severe Plaque Psoriasis.
 - **Treatments**:
@@ -85,7 +85,7 @@ After centering, the meaning of $d$ returns to the relative efficacy at the "ave
   - **B**: TNF-$\alpha$ inhibitor (e.g., Adalimumab mock)
   - **C**: IL-17 inhibitor (e.g., Secukinumab mock)
 
-### 3.2 The Aggregate Covariates
+### The Aggregate Covariates
 
 We identified two potential Effect Modifiers:
 
@@ -101,7 +101,7 @@ We identified two potential Effect Modifiers:
 -->
 ```
 
-### 3.3 The Mock Data
+### The Mock Data
 
 To estimate a Random Effect, we need at least one comparison with multiple studies (S1 and S2). We introduce 4 studies:
 
@@ -124,9 +124,9 @@ flowchart LR
 ``` -->
 ````
 
-## 4. MCMC Forensic Audit: JAGS & Stan Implementation {#4-mcmc-forensic-audit}
+## MCMC Forensic Audit: JAGS & Stan Implementation {#4-mcmc-forensic-audit}
 
-### 4.1 BUGS/JAGS Implementation
+### BUGS/JAGS Implementation
 
 Notice how we define the `tau` (standard deviation) and convert it to `prec` (precision) for the normal distribution in BUGS.
 
@@ -226,7 +226,7 @@ summary(samples)
 ```
 :::
 
-### 4.2 Stan Implementation (Non-Centered Parameterization)
+### Stan Implementation (Non-Centered Parameterization)
 
 Stan struggles with centered Random Effects when data is sparse (creating "funnel" geometries in the posterior). We use **Non-Centered Parameterization** to ensure fast, divergence-free sampling.
 
@@ -367,11 +367,11 @@ print(fit, pars = c("d", "beta1", "beta2", "tau"))
 ```
 :::
 
-### 4.3 Experiment: Doubling the Number of Studies (N=8)
+### Experiment: Doubling the Number of Studies (N=8)
 
 To test the hypothesis that increasing the number of studies will reduce the discrepancy between JAGS (Gibbs + Centered) and Stan (NUTS + Non-Centered), we simulate a larger dataset by duplicating our 4 studies. This keeps the data patterns identical but doubles the effective sample size at the study level from $N=4$ to $N=8$.
 
-#### 4.3.1 Running Expanded JAGS
+#### Running Expanded JAGS
 
 ::: {.callout-note collapse="true"}
 ## Click to view Expanded JAGS (N=8) Output
@@ -415,7 +415,7 @@ summary(samples_x2)
 ```
 :::
 
-#### 4.3.2 Running Expanded Stan
+#### Running Expanded Stan
 
 ::: {.callout-note collapse="true"}
 ## Click to view Expanded Stan (N=8) Output
@@ -454,7 +454,7 @@ print(fit_x2, pars = c("d", "beta1", "beta2", "tau"))
 
 Notice if the means of `d[2]`, `d[3]`, and `tau` are now closer between the two engines compared to the 4-study case.
 
-#### 4.3.3 Comparison Table
+#### Comparison Table
 
 ::: {.callout-note collapse="true"}
 ## Click to view Comparison Table
@@ -521,11 +521,11 @@ tau 代表的是“实验与实验之间的异质性（Between-study heterogenei
 -->
 ```
 
-### 4.4 Drug Ranking & SUCRA
+### Drug Ranking & SUCRA
 
 To answer the strategic question "Which drug is the best?", we calculate the rank probabilities and the **SUCRA (Surface Under the Cumulative Ranking curve)**.
 
-### 4.4.1 Ranking and SUCRA Calculation Logic
+### Ranking and SUCRA Calculation Logic
 
 In the MCMC sampling of Bayesian NMA, each iteration outputs a specific set of values for all parameters. For our constructed comparison matrix: - `SoC (A)` is hardcoded to the baseline value of $0$ in the R code. - `Drug 2 (B)` outputs a sampled value in a given iteration (e.g., $0.84$). - `Drug 3 (C)` outputs a sampled value in the same iteration (e.g., $1.67$).
 
@@ -541,18 +541,18 @@ Below, we use the posterior samples from the $N=8$ Stan model for the calculatio
 ```{r}
 #| message: false
 #| warning: false
-# 1. Construct full matrix (SoC fixed at 0, plus samples of d[2] and d[3])
+# Construct full matrix (SoC fixed at 0, plus samples of d[2] and d[3])
 effects_mat <- cbind(
     `SoC (A)` = 0,
     `Drug 2 (B)` = stan_n8_mat[, "d[2]"],
     `Drug 3 (C)` = stan_n8_mat[, "d[3]"]
 )
 
-# 2. Calculate ranks row by row (each iteration). Larger values rank higher (1 is best)
+# Calculate ranks row by row (each iteration). Larger values rank higher (1 is best)
 # R's rank defaults to ascending order, so we rank the negative values
 ranks_mat <- t(apply(-effects_mat, 1, rank))
 
-# 3. Calculate the probability of each drug at each rank
+# Calculate the probability of each drug at each rank
 n_iters <- nrow(ranks_mat)
 n_tx <- ncol(ranks_mat)
 rank_probs <- matrix(0, nrow = n_tx, ncol = n_tx)
@@ -565,7 +565,7 @@ for (i in 1:n_tx) {
     }
 }
 
-# 4. Calculate SUCRA
+# Calculate SUCRA
 sucra <- rep(0, n_tx)
 names(sucra) <- colnames(effects_mat)
 for (i in 1:n_tx) {
@@ -608,7 +608,7 @@ This yields the exact same result as the physical interpretation above.
 -->
 ```
 
-### 4.5 Consistency Check (Loop Inconsistency Model)
+### Consistency Check (Loop Inconsistency Model)
 
 A core assumption of NMA is **consistency**: direct and indirect evidence should agree within any closed loop. Our network forms a closed loop among treatments A, B, and C: - **A vs B**: Studies 1 & 2 - **A vs C**: Study 3 - **B vs C**: Study 4
 
@@ -729,21 +729,21 @@ print(fit_inc, pars = c("omega", "d", "tau"))
 
 If the 95% Credible Interval of `omega` includes 0, we fail to reject the consistency assumption, meaning the direct and indirect evidence are statistically consistent.
 
-### 4.6 Node Splitting (Placeholder) {.unnumbered}
+### Node Splitting (Placeholder) {.unnumbered}
 
 Node Splitting is a systematic approach to detect local inconsistency in a network.
 
 - **Concept**: For any comparison that has both direct and indirect evidence, the model "splits" the evidence and estimates a direct effect and an indirect effect separately.
 - **Usage**: If the direct and indirect estimates differ significantly (e.g., non-overlapping 95% credible intervals), it indicates inconsistency for that specific comparison. This process is repeated for all eligible comparisons in the network.
 
-### 4.7 Unrelated Mean Effects (UME) Model (Placeholder) {.unnumbered}
+### Unrelated Mean Effects (UME) Model (Placeholder) {.unnumbered}
 
 The Unrelated Mean Effects (UME) model is a global approach to detect inconsistency.
 
 - **Concept**: Unlike a standard NMA that assumes consistency, the UME model drops this assumption entirely. It treats every comparison between any two treatments as independent (unrelated).
 - **Usage**: We compare the model fit (e.g., DIC or residual deviance) of the UME model with the standard Consistency model. If the UME model fits significantly better, it implies that the consistency assumption is violated in the network.
 
-## 5. Results & Interpretation: Covariate Adjustment {#5-results}
+## Results & Interpretation: Covariate Adjustment {#5-results}
 
 After extracting the posteriors, we evaluate if $\beta_1$ and $\beta_2$ are significant (e.g., if their 95% CrI crosses 0).
 
@@ -752,7 +752,7 @@ After extracting the posteriors, we evaluate if $\beta_1$ and $\beta_2$ are sign
 
 The final League Table will now represent the comparative efficacy at the **average** covariate levels of the network.
 
-## 6. Strategic Q&A: The Limits of AD NMR {#6-strategic-qa}
+## Strategic Q&A: The Limits of AD NMR {#6-strategic-qa}
 
 ::: {.callout-important collapse="true" appearance="minimal"}
 # If a competitor's trial has 60% Prior Biologic users, but yours only has 10%, can Standard NMR fully fix this?

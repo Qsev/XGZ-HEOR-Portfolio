@@ -9,10 +9,10 @@ format:
     toc-depth: 3          # 目录层级深度
     code-fold: true       # 默认折叠代码块，读者点击可以展开（非常适合作品集）
     code-summary: "View the code" # 折叠代码块的提示文字
-    number-sections: false # 自动为标题编号
+    number-sections: true # 自动为标题编号
 ---
 
-# Standard Bayesian Network Meta-Analysis (NMA)
+
 
 *Mastering Evidence Synthesis through a Minimal Mock Case*
 
@@ -30,7 +30,7 @@ format:
 -->
 ```
 
-## 1. Executive Summary: The Anatomy of a Network {#1-executive-summary-the-anatomy-of-a-network}
+## Executive Summary: The Anatomy of a Network {#1-executive-summary-the-anatomy-of-a-network}
 
 Network Meta-Analysis (NMA) is the gold standard for evidence synthesis in Health Technology Assessment (HTA). It extends traditional pair-wise meta-analysis by allowing the simultaneous comparison of multiple treatments, even those that have never been compared head-to-head in a clinical trial.
 
@@ -60,11 +60,11 @@ This guide is designed to take you from a conceptual understanding to a mastery 
 Focus on the transition from the data likelihood to the network constraints. Understanding how indirect paths are calculated is the key to answering advanced interview questions.
 :::
 
-## 2. Theoretical Framework: The Calculus of Consistency {#2-theoretical-framework-the-calculus-of-consistency}
+## Theoretical Framework: The Calculus of Consistency {#2-theoretical-framework-the-calculus-of-consistency}
 
 In a Bayesian NMA, we model the data at the study level and connect the treatment effects through a common reference treatment.
 
-### 2.1 The Likelihood (Binomial-Logit Model)
+### The Likelihood (Binomial-Logit Model)
 
 For a binary outcome (e.g., responders $r_{jk}$ out of $n_{jk}$ patients in study $j$ for treatment $k$): <!-- 一个 study 就是指某一种特定的药物 vs 自己的对照组比较的实验 -->
 
@@ -81,7 +81,7 @@ $$\text{logit}(p_{1,trt}) - \text{logit}(p_{1b}) = \ln\left( \frac{\frac{p_{1,tr
 - $\mu_1$: The baseline log-odds of response in study $j$ (for the control treatment in that study).
 - $\delta_{1,trt}$: The log-odds ratio of treatment $k$ compared to the study's control treatment. Note that $\delta_{1,b} = 0$.
 
-### 2.2 The Consistency Assumption (The Core Constraint)
+### The Consistency Assumption (The Core Constraint)
 
 The defining feature of NMA is the assumption of consistency. We assume that the relative effect of B vs C can be derived from the relative effects of A vs B and A vs C:
 
@@ -118,12 +118,12 @@ Where $d_{xy}$ is the pooled relative effect (log-odds ratio) of treatment $y$ v
 -->
 ```
 
-### 2.3 Fixed Effects (FE) vs. Random Effects (RE)
+### Fixed Effects (FE) vs. Random Effects (RE)
 
 - **Fixed Effects Model**: Assumes that the true relative effect of treatment $k$ vs $b$ is constant across all studies: $\delta_{jk} = d_{bk}$.
 - **Random Effects Model**: Assumes that the true relative effects vary across studies following a normal distribution: $\delta_{jk} \sim \text{Normal}(d_{bk}, \tau^2)$, where $\tau^2$ is the between-study heterogeneity variance.
 
-## 3. The Minimal Mock Case: A vs B vs C {#3-the-minimal-mock-case-a-vs-b-vs-c}
+## The Minimal Mock Case: A vs B vs C {#3-the-minimal-mock-case-a-vs-b-vs-c}
 
 - **Treatment A**: Standard of Care (SoC) - Reference
 - **Treatment B**: New Drug 1
@@ -131,7 +131,7 @@ Where $d_{xy}$ is the pooled relative effect (log-odds ratio) of treatment $y$ v
 
 To make this concrete, let's construct a minimal network with 3 treatments and 3 studies forming a complete loop.
 
-### 3.1 The Mock Data
+### The Mock Data
 
 | Study       | Arm 1 (Control) | Arm 2 (Active) | $n_1$ | $r_1$ | $n_2$ | $r_2$ | Observed OR |
 |:--------|:--------|:--------|:--------|:--------|:--------|:--------|:--------|
@@ -157,7 +157,7 @@ To make this concrete, let's construct a minimal network with 3 treatments and 3
 -->
 ```
 
-### 3.2 The Calculus of the Loop
+### The Calculus of the Loop
 
 Let's calculate the log-odds ratios (LOR) for each study:
 
@@ -175,11 +175,11 @@ Let's calculate the log-odds ratios (LOR) for each study:
 
 This difference is very small, indicating a consistent network.
 
-## 4. MCMC Forensic Audit: How Bayes Actually Solves the Network {#4-mcmc-forensic-audit-implementation--convergence}
+## MCMC Forensic Audit: How Bayes Actually Solves the Network {#4-mcmc-forensic-audit-implementation--convergence}
 
 In this section, we move away from simple arithmetic and look at how the Bayesian MCMC engine actually processes our mock data to find the global solution.
 
-### 4.1 Step 1: Setting up the Likelihood and Parameters
+### Step 1: Setting up the Likelihood and Parameters
 
 For our 3 studies, the model views the data as follows. Let $r_{jk}$ be the number of events in study $j$, arm $k$, and $n_{jk}$ be the total patients.
 
@@ -215,7 +215,7 @@ Now let's look at the specific setup for our 3 studies:
 
 **The Consistency Constraint (The Golden Rule):** At all times, the model enforces: $d_{BC} = d_{AC} - d_{AB}$. This means we only have 5 independent parameters to estimate: $\mu_1, \mu_2, \mu_3, d_{AB}, d_{AC}$. All study data are pooled simultaneously to find the best values for these 5 parameters.
 
-### 4.2 Step 2: Assigning Priors (The Bayesian Part)
+### Step 2: Assigning Priors (The Bayesian Part)
 
 Since we have no prior knowledge, we use vague (non-informative) priors:
 
@@ -281,7 +281,7 @@ According to Bayes' Theorem, the **Posterior** (the target distribution MCMC tri
 -->
 ```
 
-### 4.3 The Iterative Algorithm and Posterier.
+### The Iterative Algorithm and Posterier.
 
 1.  **Proposal**: The engine guesses values for the parameters.
     - Suppose it guesses: $\mu_1=-1.386, \mu_2=-1.386, \mu_3=-0.847, d_{AB}=0.982, d_{AC}=1.386$.
@@ -295,11 +295,11 @@ According to Bayes' Theorem, the **Posterior** (the target distribution MCMC tri
     - The **median** of the recorded values for $d_{AB}$ becomes our pooled estimate.
     - The 2.5th and 97.5th percentiles become our **95% Credible Interval (CrI)**.
 
-### 4.5 Model Implementation: BUGS/JAGS & Stan
+### Model Implementation: BUGS/JAGS & Stan
 
 Here we present the implementation of our Fixed Effects NMA model in both the traditional BUGS/JAGS language and the modern Stan language, along with the R code to call them.
 
-#### 4.5.1 BUGS/JAGS Implementation
+#### BUGS/JAGS Implementation
 
 Here is the actual code used to run this simulation in JAGS:
 
@@ -389,7 +389,7 @@ samples <- coda.samples(
 summary(samples)
 ```
 
-#### 4.5.2 Stan Implementation
+#### Stan Implementation
 
 The exact same functionality can be implemented in Stan. Notice that Stan uses standard deviation instead of precision in its normal distribution, and uses vectorized operations.
 
@@ -518,7 +518,7 @@ BUGS and JAGS are both **standalone software (computational engines)** and **mod
 -->
 ```
 
-### 4.6 Convergence Diagnostics
+### Convergence Diagnostics
 
 When auditing an NMA, always verify:
 
@@ -526,11 +526,11 @@ When auditing an NMA, always verify:
 - **Trace Plots**: Chains should look like "fat hairy caterpillars," showing good mixing.
 - **Auto-correlation**: Should drop to zero quickly.
 
-## 5. Results & Interpretation: The League Table {#5-results--interpretation-the-league-table}
+## Results & Interpretation: The League Table {#5-results--interpretation-the-league-table}
 
 After running the MCMC, we combine the direct and indirect evidence to get the final pooled estimates.
 
-### 5.1 The League Table (Median OR and 95% CrI)
+### The League Table (Median OR and 95% CrI)
 
 | Treatment A         | 2.67 (1.5, 4.8)     | 4.00 (2.2, 7.3) |
 |:--------------------|:--------------------|:----------------|
@@ -539,7 +539,7 @@ After running the MCMC, we combine the direct and indirect evidence to get the f
 
 *How to read*: The upper-right triangle shows the OR of the column treatment vs the row treatment. The lower-left triangle shows the inverse.
 
-### 5.2 Probability of Being Best
+### Probability of Being Best
 
 Bayesian NMA allows us to calculate the probability that each treatment is the most effective.
 
@@ -547,7 +547,7 @@ Bayesian NMA allows us to calculate the probability that each treatment is the m
 - **Treatment B**: \~24%
 - **Treatment A**: \~1%
 
-## 6. Strategic Q&A: Interview Prep {#6-strategic-qa-interview-prep}
+## Strategic Q&A: Interview Prep {#6-strategic-qa-interview-prep}
 
 ::: {.callout-important collapse="true"}
 # What is the difference between a Consistency Model and an Unrelated Mean Effects (UME) model?
@@ -561,7 +561,7 @@ A consistency model forces all loops to close (e.g., $d_{BC} = d_{AC} - d_{AB}$)
 Standard NMA cannot handle disconnected networks. You must either bridge the gap with a common comparator (if possible) or use population adjustment methods like MAIC or ML-NMR if you have IPD for at least one trial.
 :::
 
-## 7. Strategic Conclusion {#7-strategic-conclusion}
+## Strategic Conclusion {#7-strategic-conclusion}
 
 Mastering Standard Bayesian NMA requires understanding the interplay between direct and indirect evidence. This minimal case demonstrates that when data forms a loop, consistency must be verified.
 
