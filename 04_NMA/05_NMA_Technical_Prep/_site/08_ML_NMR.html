@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Xiaoge Zhang">
-<meta name="dcterms.date" content="2026-05-12">
+<meta name="dcterms.date" content="2026-05-14">
 <meta name="description" content="Resolving Ecological Bias in Population-Adjusted Indirect Comparisons">
 
 <title>Multilevel Network Meta-Regression (ML-NMR) – NMA Technical Portfolio</title>
@@ -4294,19 +4294,23 @@ window.Quarto = {
   <li><a href="#how-the-adjustment-from-55.08-to-45-works" id="toc-how-the-adjustment-from-55.08-to-45-works" class="nav-link" data-scroll-target="#how-the-adjustment-from-55.08-to-45-works"><span class="header-section-number">4.4</span> How the Adjustment from 55.08 to 45 Works</a></li>
   <li><a href="#interpreting-the-results-the-3rd-row" id="toc-interpreting-the-results-the-3rd-row" class="nav-link" data-scroll-target="#interpreting-the-results-the-3rd-row"><span class="header-section-number">4.5</span> Interpreting the Results (The 3rd Row)</a></li>
   </ul></li>
-  <li><a href="#technical-audit-considerations" id="toc-technical-audit-considerations" class="nav-link" data-scroll-target="#technical-audit-considerations"><span class="header-section-number">5</span> Technical Audit Considerations</a>
+  <li><a href="#6-boundaries" id="toc-6-boundaries" class="nav-link" data-scroll-target="#6-boundaries"><span class="header-section-number">5</span> Methodological Boundaries: ML-NMR vs. MAIC</a>
   <ul class="collapse">
-  <li><a href="#fixed-vs.-random-effects" id="toc-fixed-vs.-random-effects" class="nav-link" data-scroll-target="#fixed-vs.-random-effects"><span class="header-section-number">5.1</span> Fixed vs. Random Effects</a></li>
-  <li><a href="#multi-dimensional-integration-correlation-borrowing" id="toc-multi-dimensional-integration-correlation-borrowing" class="nav-link" data-scroll-target="#multi-dimensional-integration-correlation-borrowing"><span class="header-section-number">5.2</span> Multi-Dimensional Integration &amp; Correlation Borrowing</a></li>
+  <li><a href="#the-decision-rule" id="toc-the-decision-rule" class="nav-link" data-scroll-target="#the-decision-rule"><span class="header-section-number">5.1</span> The Decision Rule</a></li>
   </ul></li>
-  <li><a href="#case-study-comparison-mock-case-vs.-ta1013-quizartinib" id="toc-case-study-comparison-mock-case-vs.-ta1013-quizartinib" class="nav-link" data-scroll-target="#case-study-comparison-mock-case-vs.-ta1013-quizartinib"><span class="header-section-number">6</span> Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)</a>
+  <li><a href="#technical-audit-considerations" id="toc-technical-audit-considerations" class="nav-link" data-scroll-target="#technical-audit-considerations"><span class="header-section-number">6</span> Technical Audit Considerations</a>
   <ul class="collapse">
-  <li><a href="#network-structure-evidence-types" id="toc-network-structure-evidence-types" class="nav-link" data-scroll-target="#network-structure-evidence-types"><span class="header-section-number">6.1</span> Network Structure &amp; Evidence Types</a></li>
-  <li><a href="#population-characteristics-baseline-age" id="toc-population-characteristics-baseline-age" class="nav-link" data-scroll-target="#population-characteristics-baseline-age"><span class="header-section-number">6.2</span> Population Characteristics (Baseline Age)</a></li>
-  <li><a href="#statistical-model-link-function" id="toc-statistical-model-link-function" class="nav-link" data-scroll-target="#statistical-model-link-function"><span class="header-section-number">6.3</span> Statistical Model &amp; Link Function</a></li>
-  <li><a href="#treatment-covariate-interactions" id="toc-treatment-covariate-interactions" class="nav-link" data-scroll-target="#treatment-covariate-interactions"><span class="header-section-number">6.4</span> Treatment-Covariate Interactions</a></li>
-  <li><a href="#collinearity-bias-challenges" id="toc-collinearity-bias-challenges" class="nav-link" data-scroll-target="#collinearity-bias-challenges"><span class="header-section-number">6.5</span> Collinearity &amp; Bias Challenges</a></li>
-  <li><a href="#references-nice-ta1013-committee-papers" id="toc-references-nice-ta1013-committee-papers" class="nav-link" data-scroll-target="#references-nice-ta1013-committee-papers"><span class="header-section-number">6.6</span> References (NICE TA1013 Committee Papers)</a></li>
+  <li><a href="#fixed-vs.-random-effects" id="toc-fixed-vs.-random-effects" class="nav-link" data-scroll-target="#fixed-vs.-random-effects"><span class="header-section-number">6.1</span> Fixed vs. Random Effects</a></li>
+  <li><a href="#multi-dimensional-integration-correlation-borrowing" id="toc-multi-dimensional-integration-correlation-borrowing" class="nav-link" data-scroll-target="#multi-dimensional-integration-correlation-borrowing"><span class="header-section-number">6.2</span> Multi-Dimensional Integration &amp; Correlation Borrowing</a></li>
+  </ul></li>
+  <li><a href="#case-study-comparison-mock-case-vs.-ta1013-quizartinib" id="toc-case-study-comparison-mock-case-vs.-ta1013-quizartinib" class="nav-link" data-scroll-target="#case-study-comparison-mock-case-vs.-ta1013-quizartinib"><span class="header-section-number">7</span> Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)</a>
+  <ul class="collapse">
+  <li><a href="#network-structure-evidence-types" id="toc-network-structure-evidence-types" class="nav-link" data-scroll-target="#network-structure-evidence-types"><span class="header-section-number">7.1</span> Network Structure &amp; Evidence Types</a></li>
+  <li><a href="#population-characteristics-baseline-age" id="toc-population-characteristics-baseline-age" class="nav-link" data-scroll-target="#population-characteristics-baseline-age"><span class="header-section-number">7.2</span> Population Characteristics (Baseline Age)</a></li>
+  <li><a href="#statistical-model-link-function" id="toc-statistical-model-link-function" class="nav-link" data-scroll-target="#statistical-model-link-function"><span class="header-section-number">7.3</span> Statistical Model &amp; Link Function</a></li>
+  <li><a href="#treatment-covariate-interactions" id="toc-treatment-covariate-interactions" class="nav-link" data-scroll-target="#treatment-covariate-interactions"><span class="header-section-number">7.4</span> Treatment-Covariate Interactions</a></li>
+  <li><a href="#collinearity-bias-challenges" id="toc-collinearity-bias-challenges" class="nav-link" data-scroll-target="#collinearity-bias-challenges"><span class="header-section-number">7.5</span> Collinearity &amp; Bias Challenges</a></li>
+  <li><a href="#references-nice-ta1013-committee-papers" id="toc-references-nice-ta1013-committee-papers" class="nav-link" data-scroll-target="#references-nice-ta1013-committee-papers"><span class="header-section-number">7.6</span> References (NICE TA1013 Committee Papers)</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -4338,7 +4342,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 12, 2026</p>
+      <p class="date">May 14, 2026</p>
     </div>
   </div>
   
@@ -4703,14 +4707,67 @@ d[Quizartinib]             1.99 0.28  1.46  1.99  2.54  855.93    1</code></pre>
 <hr>
 </section>
 </section>
-<section id="technical-audit-considerations" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="technical-audit-considerations"><span class="header-section-number">5</span> Technical Audit Considerations</h2>
-<section id="fixed-vs.-random-effects" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="fixed-vs.-random-effects"><span class="header-section-number">5.1</span> Fixed vs. Random Effects</h3>
+<section id="6-boundaries" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="6-boundaries"><span class="header-section-number">5</span> Methodological Boundaries: ML-NMR vs. MAIC</h2>
+<p>Following the landmark paper by Phillippo et al. (2020), understanding the boundary conditions between MAIC and ML-NMR is a critical component of any HTA submission strategy. While ML-NMR is technically superior in handling ecological bias and complex networks, both methods have distinct application boundaries:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Dimension</th>
+<th style="text-align: left;">Matching-Adjusted Indirect Comparison (MAIC)</th>
+<th style="text-align: left;">Multilevel Network Meta-Regression (ML-NMR)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Network Complexity</strong></td>
+<td style="text-align: left;">Primarily restricted to 2-study (1-to-1) comparisons. Extending to multi-study networks is complex and requires sequential weighting.</td>
+<td style="text-align: left;">Designed natively for <strong>arbitrarily complex networks</strong> (Multi-study NMA with regression).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Sample Size Loss</strong></td>
+<td style="text-align: left;">Suffers from Effective Sample Size (ESS) reduction. Extreme weights can plummet the ESS, destroying statistical power.</td>
+<td style="text-align: left;"><strong>No loss of sample size</strong>. It uses the full sample size by predicting rather than re-weighting.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Population Overlap</strong></td>
+<td style="text-align: left;">Requires good overlap in covariate distributions. If populations differ too much, ESS drops to near zero.</td>
+<td style="text-align: left;">Can handle poor overlap better by extrapolating via the regression model (though extrapolation risk must be acknowledged).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Model Assumptions</strong></td>
+<td style="text-align: left;">Semi-parametric. Only requires specifying the moments to match; no explicit model for the outcome is strictly required.</td>
+<td style="text-align: left;">Fully parametric. <strong>Requires specifying the exact regression model</strong> for the outcome (e.g., Logistic, Cox PH).</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Ecological Bias</strong></td>
+<td style="text-align: left;">None (Inherently immune because it re-weights individual patients directly).</td>
+<td style="text-align: left;">None (Resolves ecological bias in non-linear models via numerical integration).</td>
+</tr>
+</tbody>
+</table>
+<section id="the-decision-rule" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="the-decision-rule"><span class="header-section-number">5.1</span> The Decision Rule</h3>
+<ul>
+<li><strong>Use MAIC</strong> when: You only need to compare your single trial against one competitor trial, the covariate overlap is good, and you want to minimize parametric assumptions about the outcome.</li>
+<li><strong>Use ML-NMR</strong> when: You are fitting a complex evidence network (more than 2 trials), the populations have poor overlap (and MAIC would destroy your ESS), or you are dealing with non-linear outcomes (where STC would fail due to ecological bias).</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="technical-audit-considerations" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="technical-audit-considerations"><span class="header-section-number">6</span> Technical Audit Considerations</h2>
+<section id="fixed-vs.-random-effects" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="fixed-vs.-random-effects"><span class="header-section-number">6.1</span> Fixed vs. Random Effects</h3>
 <p>In the code above, we used <code>trt_effects = &quot;fixed&quot;</code>. This mathematically forces the relative treatment effect <span class="math inline">\(\theta_{jk}\)</span> to equal the global network effect <span class="math inline">\(d_k\)</span>. If we used <code>random</code>, the formula becomes <span class="math inline">\(\theta_{jk} \sim N(d_k, \tau^2)\)</span>, acknowledging between-study heterogeneity (<span class="math inline">\(\tau\)</span>). In HEOR submissions involving sparse networks (e.g., just 2 or 3 trials), Random Effects models are statistically over-parameterized and usually fail to converge.</p>
 </section>
-<section id="multi-dimensional-integration-correlation-borrowing" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="multi-dimensional-integration-correlation-borrowing"><span class="header-section-number">5.2</span> Multi-Dimensional Integration &amp; Correlation Borrowing</h3>
+<section id="multi-dimensional-integration-correlation-borrowing" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="multi-dimensional-integration-correlation-borrowing"><span class="header-section-number">6.2</span> Multi-Dimensional Integration &amp; Correlation Borrowing</h3>
 <p>If we needed to adjust for two variables (e.g., <code>age</code> and <code>WBC</code>), the Sobol sequence must sample from a 2D space. Because literature rarely reports the correlation (<span class="math inline">\(\rho\)</span>) between variables in the AgD trial, standard practice involves <strong>Correlation Borrowing</strong>:</p>
 <ol type="1">
 <li>Calculate the covariance matrix from the IPD trial.</li>
@@ -4721,46 +4778,46 @@ d[Quizartinib]             1.99 0.28  1.46  1.99  2.54  855.93    1</code></pre>
 <hr>
 </section>
 </section>
-<section id="case-study-comparison-mock-case-vs.-ta1013-quizartinib" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="case-study-comparison-mock-case-vs.-ta1013-quizartinib"><span class="header-section-number">6</span> Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)</h2>
+<section id="case-study-comparison-mock-case-vs.-ta1013-quizartinib" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="case-study-comparison-mock-case-vs.-ta1013-quizartinib"><span class="header-section-number">7</span> Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)</h2>
 <p>To demonstrate the real-world applicability of this minimal mock case, we compare its settings and findings with the actual ML-NMR analysis submitted by Daiichi Sankyo for <strong>TA1013 (Quizartinib)</strong>, as audited by the External Assessment Group (EAG).</p>
-<section id="network-structure-evidence-types" class="level3" data-number="6.1">
-<h3 data-number="6.1" class="anchored" data-anchor-id="network-structure-evidence-types"><span class="header-section-number">6.1</span> Network Structure &amp; Evidence Types</h3>
+<section id="network-structure-evidence-types" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="network-structure-evidence-types"><span class="header-section-number">7.1</span> Network Structure &amp; Evidence Types</h3>
 <ul>
 <li><strong>Mock Case</strong>: Simulates 1 IPD trial (<span class="math inline">\(N=300\)</span>) and 1 AgD trial (<span class="math inline">\(N=300\)</span>).</li>
 <li><strong>TA1013 Reality</strong>: The actual network also relied on just 2 core trials: <strong>QuANTUM-First</strong> (provided IPD for Quizartinib, <span class="math inline">\(N=539\)</span>) and <strong>RATIFY</strong> (only AgD was available for Midostaurin, <span class="math inline">\(N=717\)</span>, with the analyzed FLT3-ITD subgroup being <span class="math inline">\(N=452\)</span>) [1, 2, 6].</li>
 </ul>
 </section>
-<section id="population-characteristics-baseline-age" class="level3" data-number="6.2">
-<h3 data-number="6.2" class="anchored" data-anchor-id="population-characteristics-baseline-age"><span class="header-section-number">6.2</span> Population Characteristics (Baseline Age)</h3>
+<section id="population-characteristics-baseline-age" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="population-characteristics-baseline-age"><span class="header-section-number">7.2</span> Population Characteristics (Baseline Age)</h3>
 <ul>
 <li><strong>Mock Case</strong>: IPD population is younger (mean age 45) and AgD population is older (mean age 65).</li>
 <li><strong>TA1013 Reality</strong>: The direction was reversed, but the extreme mismatch remained. The IPD trial (QuANTUM-First) included older patients (median age ~56), while the AgD trial (RATIFY) included only younger patients aged 18–59 (median age 47) [6, 8].</li>
 </ul>
 </section>
-<section id="statistical-model-link-function" class="level3" data-number="6.3">
-<h3 data-number="6.3" class="anchored" data-anchor-id="statistical-model-link-function"><span class="header-section-number">6.3</span> Statistical Model &amp; Link Function</h3>
+<section id="statistical-model-link-function" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="statistical-model-link-function"><span class="header-section-number">7.3</span> Statistical Model &amp; Link Function</h3>
 <ul>
 <li><strong>Mock Case</strong>: Modeled a binary outcome (CR rate) using a Bernoulli distribution (<code>bernoulli2</code>) and a Logit link function (<code>logit</code>).</li>
 <li><strong>TA1013 Reality</strong>: The company’s actual code for the CR endpoint also specified <code>likelihood = &quot;bernoulli2&quot;</code> and <code>link = &quot;logit&quot;</code> [2].</li>
 </ul>
 </section>
-<section id="treatment-covariate-interactions" class="level3" data-number="6.4">
-<h3 data-number="6.4" class="anchored" data-anchor-id="treatment-covariate-interactions"><span class="header-section-number">6.4</span> Treatment-Covariate Interactions</h3>
+<section id="treatment-covariate-interactions" class="level3" data-number="7.4">
+<h3 data-number="7.4" class="anchored" data-anchor-id="treatment-covariate-interactions"><span class="header-section-number">7.4</span> Treatment-Covariate Interactions</h3>
 <ul>
 <li><strong>Mock Case</strong>: Assumed a shared interaction effect for Age across active treatments (<code>class_interactions = &quot;common&quot;</code>).</li>
 <li><strong>TA1013 Reality</strong>: Because data from only one IPD and one AgD trial was insufficient to estimate independent interaction terms, the company was forced to make the <strong>Shared Effect Modification (SEM)</strong> assumption [7, 9]. They assumed that covariates like Age had the same interaction effect on both Quizartinib and Midostaurin, specifying <code>class_interactions = &quot;common&quot;</code> in their code [2].</li>
 </ul>
 </section>
-<section id="collinearity-bias-challenges" class="level3" data-number="6.5">
-<h3 data-number="6.5" class="anchored" data-anchor-id="collinearity-bias-challenges"><span class="header-section-number">6.5</span> Collinearity &amp; Bias Challenges</h3>
+<section id="collinearity-bias-challenges" class="level3" data-number="7.5">
+<h3 data-number="7.5" class="anchored" data-anchor-id="collinearity-bias-challenges"><span class="header-section-number">7.5</span> Collinearity &amp; Bias Challenges</h3>
 <ul>
 <li><strong>Mock Case</strong>: We observed that missing IPD for the AgD trial caused severe collinearity between baseline risk and treatment effect, leading to an overestimation of Midostaurin’s effect in our simulation.</li>
 <li><strong>TA1013 Reality</strong>: The EAG pointed out that the population adjustments applied within the company’s ML-NMR were biased and tended to overestimate <strong>Quizartinib’s</strong> effect [2]. This led the appraisal committee to conclude that the results “lacked face validity” [3].</li>
 </ul>
 </section>
-<section id="references-nice-ta1013-committee-papers" class="level3" data-number="6.6">
-<h3 data-number="6.6" class="anchored" data-anchor-id="references-nice-ta1013-committee-papers"><span class="header-section-number">6.6</span> References (NICE TA1013 Committee Papers)</h3>
+<section id="references-nice-ta1013-committee-papers" class="level3" data-number="7.6">
+<h3 data-number="7.6" class="anchored" data-anchor-id="references-nice-ta1013-committee-papers"><span class="header-section-number">7.6</span> References (NICE TA1013 Committee Papers)</h3>
 <ul>
 <li><strong>[1]</strong> Document B: Section B.2.4 (Starts on Page 50).</li>
 <li><strong>[2]</strong> Document B: Section B.2.8 (Starts on Page 82).</li>
@@ -5576,70 +5633,89 @@ d[Quizartinib]             1.99 0.28  1.46  1.99  2.54  855.93    1</code></pre>
 <span id="cb6-343"><a href="#cb6-343" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-344"><a href="#cb6-344" aria-hidden="true" tabindex="-1"></a>------------------------------------------------------------------------</span>
 <span id="cb6-345"><a href="#cb6-345" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-346"><a href="#cb6-346" aria-hidden="true" tabindex="-1"></a><span class="fu">## Technical Audit Considerations</span></span>
+<span id="cb6-346"><a href="#cb6-346" aria-hidden="true" tabindex="-1"></a><span class="fu">## Methodological Boundaries: ML-NMR vs. MAIC {#6-boundaries}</span></span>
 <span id="cb6-347"><a href="#cb6-347" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-348"><a href="#cb6-348" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed vs. Random Effects</span></span>
+<span id="cb6-348"><a href="#cb6-348" aria-hidden="true" tabindex="-1"></a>Following the landmark paper by Phillippo et al. (2020), understanding the boundary conditions between MAIC and ML-NMR is a critical component of any HTA submission strategy. While ML-NMR is technically superior in handling ecological bias and complex networks, both methods have distinct application boundaries:</span>
 <span id="cb6-349"><a href="#cb6-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-350"><a href="#cb6-350" aria-hidden="true" tabindex="-1"></a>In the code above, we used <span class="in">`trt_effects = &quot;fixed&quot;`</span>. This mathematically forces the relative treatment effect $\theta_{jk}$ to equal the global network effect $d_k$. If we used <span class="in">`random`</span>, the formula becomes $\theta_{jk} \sim N(d_k, \tau^2)$, acknowledging between-study heterogeneity ($\tau$). In HEOR submissions involving sparse networks (e.g., just 2 or 3 trials), Random Effects models are statistically over-parameterized and usually fail to converge.</span>
-<span id="cb6-351"><a href="#cb6-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-352"><a href="#cb6-352" aria-hidden="true" tabindex="-1"></a><span class="fu">### Multi-Dimensional Integration &amp; Correlation Borrowing</span></span>
-<span id="cb6-353"><a href="#cb6-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-354"><a href="#cb6-354" aria-hidden="true" tabindex="-1"></a>If we needed to adjust for two variables (e.g., <span class="in">`age`</span> and <span class="in">`WBC`</span>), the Sobol sequence must sample from a 2D space. Because literature rarely reports the correlation ($\rho$) between variables in the AgD trial, standard practice involves **Correlation Borrowing**:</span>
-<span id="cb6-355"><a href="#cb6-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-356"><a href="#cb6-356" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>Calculate the covariance matrix from the IPD trial.</span>
-<span id="cb6-357"><a href="#cb6-357" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>Extract the Cholesky decomposition of this matrix.</span>
-<span id="cb6-358"><a href="#cb6-358" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>Apply this Cholesky operator to the AgD Sobol points to stretch the independent 2D grid into a realistic, biologically-correlated elliptical &quot;probability cloud&quot;.</span>
+<span id="cb6-350"><a href="#cb6-350" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Dimension <span class="pp">|</span> Matching-Adjusted Indirect Comparison (MAIC) <span class="pp">|</span> Multilevel Network Meta-Regression (ML-NMR) <span class="pp">|</span></span>
+<span id="cb6-351"><a href="#cb6-351" aria-hidden="true" tabindex="-1"></a><span class="pp">|:-----------------------|:-----------------------|:-----------------------|</span></span>
+<span id="cb6-352"><a href="#cb6-352" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Network Complexity** | Primarily restricted to 2-study (1-to-1) comparisons. Extending to multi-study networks is complex and requires sequential weighting. | Designed natively for **arbitrarily complex networks** (Multi-study NMA with regression). <span class="pp">|</span></span>
+<span id="cb6-353"><a href="#cb6-353" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Sample Size Loss** | Suffers from Effective Sample Size (ESS) reduction. Extreme weights can plummet the ESS, destroying statistical power. | **No loss of sample size**. It uses the full sample size by predicting rather than re-weighting. <span class="pp">|</span></span>
+<span id="cb6-354"><a href="#cb6-354" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Population Overlap** <span class="pp">|</span> Requires good overlap in covariate distributions. If populations differ too much, ESS drops to near zero. <span class="pp">|</span> Can handle poor overlap better by extrapolating via the regression model (though extrapolation risk must be acknowledged). <span class="pp">|</span></span>
+<span id="cb6-355"><a href="#cb6-355" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Model Assumptions** | Semi-parametric. Only requires specifying the moments to match; no explicit model for the outcome is strictly required. | Fully parametric. **Requires specifying the exact regression model** for the outcome (e.g., Logistic, Cox PH). <span class="pp">|</span></span>
+<span id="cb6-356"><a href="#cb6-356" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Ecological Bias** <span class="pp">|</span> None (Inherently immune because it re-weights individual patients directly). <span class="pp">|</span> None (Resolves ecological bias in non-linear models via numerical integration). <span class="pp">|</span></span>
+<span id="cb6-357"><a href="#cb6-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-358"><a href="#cb6-358" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Decision Rule</span></span>
 <span id="cb6-359"><a href="#cb6-359" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-360"><a href="#cb6-360" aria-hidden="true" tabindex="-1"></a>This ensures the integration avatars accurately represent real human physiological profiles, rather than mathematically impossible combinations.</span>
-<span id="cb6-361"><a href="#cb6-361" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-362"><a href="#cb6-362" aria-hidden="true" tabindex="-1"></a>------------------------------------------------------------------------</span>
-<span id="cb6-363"><a href="#cb6-363" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-364"><a href="#cb6-364" aria-hidden="true" tabindex="-1"></a><span class="fu">## Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)</span></span>
-<span id="cb6-365"><a href="#cb6-365" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-366"><a href="#cb6-366" aria-hidden="true" tabindex="-1"></a>To demonstrate the real-world applicability of this minimal mock case, we compare its settings and findings with the actual ML-NMR analysis submitted by Daiichi Sankyo for **TA1013 (Quizartinib)**, as audited by the External Assessment Group (EAG).</span>
-<span id="cb6-367"><a href="#cb6-367" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-368"><a href="#cb6-368" aria-hidden="true" tabindex="-1"></a><span class="fu">### Network Structure &amp; Evidence Types</span></span>
-<span id="cb6-369"><a href="#cb6-369" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-370"><a href="#cb6-370" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: Simulates 1 IPD trial ($N=300$) and 1 AgD trial ($N=300$).</span>
-<span id="cb6-371"><a href="#cb6-371" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: The actual network also relied on just 2 core trials: **QuANTUM-First** (provided IPD for Quizartinib, $N=539$) and **RATIFY** (only AgD was available for Midostaurin, $N=717$, with the analyzed FLT3-ITD subgroup being $N=452$) <span class="sc">\[</span>1, 2, 6<span class="sc">\]</span>.</span>
+<span id="cb6-360"><a href="#cb6-360" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Use MAIC** when: You only need to compare your single trial against one competitor trial, the covariate overlap is good, and you want to minimize parametric assumptions about the outcome.</span>
+<span id="cb6-361"><a href="#cb6-361" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Use ML-NMR** when: You are fitting a complex evidence network (more than 2 trials), the populations have poor overlap (and MAIC would destroy your ESS), or you are dealing with non-linear outcomes (where STC would fail due to ecological bias).</span>
+<span id="cb6-362"><a href="#cb6-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-363"><a href="#cb6-363" aria-hidden="true" tabindex="-1"></a>------------------------------------------------------------------------</span>
+<span id="cb6-364"><a href="#cb6-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-365"><a href="#cb6-365" aria-hidden="true" tabindex="-1"></a><span class="fu">## Technical Audit Considerations</span></span>
+<span id="cb6-366"><a href="#cb6-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-367"><a href="#cb6-367" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed vs. Random Effects</span></span>
+<span id="cb6-368"><a href="#cb6-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-369"><a href="#cb6-369" aria-hidden="true" tabindex="-1"></a>In the code above, we used <span class="in">`trt_effects = &quot;fixed&quot;`</span>. This mathematically forces the relative treatment effect $\theta_{jk}$ to equal the global network effect $d_k$. If we used <span class="in">`random`</span>, the formula becomes $\theta_{jk} \sim N(d_k, \tau^2)$, acknowledging between-study heterogeneity ($\tau$). In HEOR submissions involving sparse networks (e.g., just 2 or 3 trials), Random Effects models are statistically over-parameterized and usually fail to converge.</span>
+<span id="cb6-370"><a href="#cb6-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-371"><a href="#cb6-371" aria-hidden="true" tabindex="-1"></a><span class="fu">### Multi-Dimensional Integration &amp; Correlation Borrowing</span></span>
 <span id="cb6-372"><a href="#cb6-372" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-373"><a href="#cb6-373" aria-hidden="true" tabindex="-1"></a><span class="fu">### Population Characteristics (Baseline Age)</span></span>
+<span id="cb6-373"><a href="#cb6-373" aria-hidden="true" tabindex="-1"></a>If we needed to adjust for two variables (e.g., <span class="in">`age`</span> and <span class="in">`WBC`</span>), the Sobol sequence must sample from a 2D space. Because literature rarely reports the correlation ($\rho$) between variables in the AgD trial, standard practice involves **Correlation Borrowing**:</span>
 <span id="cb6-374"><a href="#cb6-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-375"><a href="#cb6-375" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: IPD population is younger (mean age 45) and AgD population is older (mean age 65).</span>
-<span id="cb6-376"><a href="#cb6-376" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: The direction was reversed, but the extreme mismatch remained. The IPD trial (QuANTUM-First) included older patients (median age \~56), while the AgD trial (RATIFY) included only younger patients aged 18–59 (median age 47) <span class="sc">\[</span>6, 8<span class="sc">\]</span>.</span>
-<span id="cb6-377"><a href="#cb6-377" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-378"><a href="#cb6-378" aria-hidden="true" tabindex="-1"></a><span class="fu">### Statistical Model &amp; Link Function</span></span>
-<span id="cb6-379"><a href="#cb6-379" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-380"><a href="#cb6-380" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: Modeled a binary outcome (CR rate) using a Bernoulli distribution (<span class="in">`bernoulli2`</span>) and a Logit link function (<span class="in">`logit`</span>).</span>
-<span id="cb6-381"><a href="#cb6-381" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: The company&#39;s actual code for the CR endpoint also specified <span class="in">`likelihood = &quot;bernoulli2&quot;`</span> and <span class="in">`link = &quot;logit&quot;`</span> <span class="sc">\[</span>2<span class="sc">\]</span>.</span>
+<span id="cb6-375"><a href="#cb6-375" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>Calculate the covariance matrix from the IPD trial.</span>
+<span id="cb6-376"><a href="#cb6-376" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>Extract the Cholesky decomposition of this matrix.</span>
+<span id="cb6-377"><a href="#cb6-377" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>Apply this Cholesky operator to the AgD Sobol points to stretch the independent 2D grid into a realistic, biologically-correlated elliptical &quot;probability cloud&quot;.</span>
+<span id="cb6-378"><a href="#cb6-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-379"><a href="#cb6-379" aria-hidden="true" tabindex="-1"></a>This ensures the integration avatars accurately represent real human physiological profiles, rather than mathematically impossible combinations.</span>
+<span id="cb6-380"><a href="#cb6-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-381"><a href="#cb6-381" aria-hidden="true" tabindex="-1"></a>------------------------------------------------------------------------</span>
 <span id="cb6-382"><a href="#cb6-382" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-383"><a href="#cb6-383" aria-hidden="true" tabindex="-1"></a><span class="fu">### Treatment-Covariate Interactions</span></span>
+<span id="cb6-383"><a href="#cb6-383" aria-hidden="true" tabindex="-1"></a><span class="fu">## Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)</span></span>
 <span id="cb6-384"><a href="#cb6-384" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-385"><a href="#cb6-385" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: Assumed a shared interaction effect for Age across active treatments (<span class="in">`class_interactions = &quot;common&quot;`</span>).</span>
-<span id="cb6-386"><a href="#cb6-386" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: Because data from only one IPD and one AgD trial was insufficient to estimate independent interaction terms, the company was forced to make the **Shared Effect Modification (SEM)** assumption <span class="sc">\[</span>7, 9<span class="sc">\]</span>. They assumed that covariates like Age had the same interaction effect on both Quizartinib and Midostaurin, specifying <span class="in">`class_interactions = &quot;common&quot;`</span> in their code <span class="sc">\[</span>2<span class="sc">\]</span>.</span>
-<span id="cb6-387"><a href="#cb6-387" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-388"><a href="#cb6-388" aria-hidden="true" tabindex="-1"></a><span class="fu">### Collinearity &amp; Bias Challenges</span></span>
-<span id="cb6-389"><a href="#cb6-389" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-390"><a href="#cb6-390" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: We observed that missing IPD for the AgD trial caused severe collinearity between baseline risk and treatment effect, leading to an overestimation of Midostaurin&#39;s effect in our simulation.</span>
-<span id="cb6-391"><a href="#cb6-391" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: The EAG pointed out that the population adjustments applied within the company&#39;s ML-NMR were biased and tended to overestimate **Quizartinib&#39;s** effect <span class="sc">\[</span>2<span class="sc">\]</span>. This led the appraisal committee to conclude that the results &quot;lacked face validity&quot; <span class="sc">\[</span>3<span class="sc">\]</span>.</span>
-<span id="cb6-392"><a href="#cb6-392" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-393"><a href="#cb6-393" aria-hidden="true" tabindex="-1"></a><span class="fu">### References (NICE TA1013 Committee Papers)</span></span>
-<span id="cb6-394"><a href="#cb6-394" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-395"><a href="#cb6-395" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[1\]** Document B: Section B.2.4 (Starts on Page 50).</span>
-<span id="cb6-396"><a href="#cb6-396" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[2\]** Document B: Section B.2.8 (Starts on Page 82).</span>
-<span id="cb6-397"><a href="#cb6-397" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[3\]** External Assessment Report (EAR) (Separate report by University of York).</span>
-<span id="cb6-398"><a href="#cb6-398" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[6\]** Document B: Section B.2.4.1 (Page 50).</span>
-<span id="cb6-399"><a href="#cb6-399" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[7\]** Document B: Section B.2.7 (Subgroup analysis).</span>
-<span id="cb6-400"><a href="#cb6-400" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[8\]** Document B: Section B.2.8.2 (Page 83).</span>
-<span id="cb6-401"><a href="#cb6-401" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[9\]** Document B: Section B.2.8.7 (Page 111) &amp; Appendix M.</span>
-<span id="cb6-402"><a href="#cb6-402" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-403"><a href="#cb6-403" aria-hidden="true" tabindex="-1"></a>This comparison proves that our mock case, while minimal, perfectly captures the structural constraints, forced statistical compromises, and inherent bias risks of state-of-the-art ML-NMR in real HTA submissions.</span>
-<span id="cb6-404"><a href="#cb6-404" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-405"><a href="#cb6-405" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
-<span id="cb6-406"><a href="#cb6-406" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;!-- Audit Point: ML-NMR Interview Summary</span></span>
-<span id="cb6-407"><a href="#cb6-407" aria-hidden="true" tabindex="-1"></a><span class="in">&quot;ML-NMR is not simply pooling data. It actively isolates study-specific baseline intercepts (\mu_k) from network-shared treatment effects (\beta). By utilizing numerical integration via Sobol sequences, it seamlessly backfills individual-level non-linear signals (IPD) into macro-level target populations (AgD) without incurring the ecological bias inherent to traditional STC.&quot;</span></span>
-<span id="cb6-408"><a href="#cb6-408" aria-hidden="true" tabindex="-1"></a><span class="in">--&gt;</span></span>
-<span id="cb6-409"><a href="#cb6-409" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-385"><a href="#cb6-385" aria-hidden="true" tabindex="-1"></a>To demonstrate the real-world applicability of this minimal mock case, we compare its settings and findings with the actual ML-NMR analysis submitted by Daiichi Sankyo for **TA1013 (Quizartinib)**, as audited by the External Assessment Group (EAG).</span>
+<span id="cb6-386"><a href="#cb6-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-387"><a href="#cb6-387" aria-hidden="true" tabindex="-1"></a><span class="fu">### Network Structure &amp; Evidence Types</span></span>
+<span id="cb6-388"><a href="#cb6-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-389"><a href="#cb6-389" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: Simulates 1 IPD trial ($N=300$) and 1 AgD trial ($N=300$).</span>
+<span id="cb6-390"><a href="#cb6-390" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: The actual network also relied on just 2 core trials: **QuANTUM-First** (provided IPD for Quizartinib, $N=539$) and **RATIFY** (only AgD was available for Midostaurin, $N=717$, with the analyzed FLT3-ITD subgroup being $N=452$) <span class="sc">\[</span>1, 2, 6<span class="sc">\]</span>.</span>
+<span id="cb6-391"><a href="#cb6-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-392"><a href="#cb6-392" aria-hidden="true" tabindex="-1"></a><span class="fu">### Population Characteristics (Baseline Age)</span></span>
+<span id="cb6-393"><a href="#cb6-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-394"><a href="#cb6-394" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: IPD population is younger (mean age 45) and AgD population is older (mean age 65).</span>
+<span id="cb6-395"><a href="#cb6-395" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: The direction was reversed, but the extreme mismatch remained. The IPD trial (QuANTUM-First) included older patients (median age \~56), while the AgD trial (RATIFY) included only younger patients aged 18–59 (median age 47) <span class="sc">\[</span>6, 8<span class="sc">\]</span>.</span>
+<span id="cb6-396"><a href="#cb6-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-397"><a href="#cb6-397" aria-hidden="true" tabindex="-1"></a><span class="fu">### Statistical Model &amp; Link Function</span></span>
+<span id="cb6-398"><a href="#cb6-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-399"><a href="#cb6-399" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: Modeled a binary outcome (CR rate) using a Bernoulli distribution (<span class="in">`bernoulli2`</span>) and a Logit link function (<span class="in">`logit`</span>).</span>
+<span id="cb6-400"><a href="#cb6-400" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: The company&#39;s actual code for the CR endpoint also specified <span class="in">`likelihood = &quot;bernoulli2&quot;`</span> and <span class="in">`link = &quot;logit&quot;`</span> <span class="sc">\[</span>2<span class="sc">\]</span>.</span>
+<span id="cb6-401"><a href="#cb6-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-402"><a href="#cb6-402" aria-hidden="true" tabindex="-1"></a><span class="fu">### Treatment-Covariate Interactions</span></span>
+<span id="cb6-403"><a href="#cb6-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-404"><a href="#cb6-404" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: Assumed a shared interaction effect for Age across active treatments (<span class="in">`class_interactions = &quot;common&quot;`</span>).</span>
+<span id="cb6-405"><a href="#cb6-405" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: Because data from only one IPD and one AgD trial was insufficient to estimate independent interaction terms, the company was forced to make the **Shared Effect Modification (SEM)** assumption <span class="sc">\[</span>7, 9<span class="sc">\]</span>. They assumed that covariates like Age had the same interaction effect on both Quizartinib and Midostaurin, specifying <span class="in">`class_interactions = &quot;common&quot;`</span> in their code <span class="sc">\[</span>2<span class="sc">\]</span>.</span>
+<span id="cb6-406"><a href="#cb6-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-407"><a href="#cb6-407" aria-hidden="true" tabindex="-1"></a><span class="fu">### Collinearity &amp; Bias Challenges</span></span>
+<span id="cb6-408"><a href="#cb6-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-409"><a href="#cb6-409" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mock Case**: We observed that missing IPD for the AgD trial caused severe collinearity between baseline risk and treatment effect, leading to an overestimation of Midostaurin&#39;s effect in our simulation.</span>
+<span id="cb6-410"><a href="#cb6-410" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**TA1013 Reality**: The EAG pointed out that the population adjustments applied within the company&#39;s ML-NMR were biased and tended to overestimate **Quizartinib&#39;s** effect <span class="sc">\[</span>2<span class="sc">\]</span>. This led the appraisal committee to conclude that the results &quot;lacked face validity&quot; <span class="sc">\[</span>3<span class="sc">\]</span>.</span>
+<span id="cb6-411"><a href="#cb6-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-412"><a href="#cb6-412" aria-hidden="true" tabindex="-1"></a><span class="fu">### References (NICE TA1013 Committee Papers)</span></span>
+<span id="cb6-413"><a href="#cb6-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-414"><a href="#cb6-414" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[1\]** Document B: Section B.2.4 (Starts on Page 50).</span>
+<span id="cb6-415"><a href="#cb6-415" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[2\]** Document B: Section B.2.8 (Starts on Page 82).</span>
+<span id="cb6-416"><a href="#cb6-416" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[3\]** External Assessment Report (EAR) (Separate report by University of York).</span>
+<span id="cb6-417"><a href="#cb6-417" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[6\]** Document B: Section B.2.4.1 (Page 50).</span>
+<span id="cb6-418"><a href="#cb6-418" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[7\]** Document B: Section B.2.7 (Subgroup analysis).</span>
+<span id="cb6-419"><a href="#cb6-419" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[8\]** Document B: Section B.2.8.2 (Page 83).</span>
+<span id="cb6-420"><a href="#cb6-420" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**\[9\]** Document B: Section B.2.8.7 (Page 111) &amp; Appendix M.</span>
+<span id="cb6-421"><a href="#cb6-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-422"><a href="#cb6-422" aria-hidden="true" tabindex="-1"></a>This comparison proves that our mock case, while minimal, perfectly captures the structural constraints, forced statistical compromises, and inherent bias risks of state-of-the-art ML-NMR in real HTA submissions.</span>
+<span id="cb6-423"><a href="#cb6-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-424"><a href="#cb6-424" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb6-425"><a href="#cb6-425" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;!-- Audit Point: ML-NMR Interview Summary</span></span>
+<span id="cb6-426"><a href="#cb6-426" aria-hidden="true" tabindex="-1"></a><span class="in">&quot;ML-NMR is not simply pooling data. It actively isolates study-specific baseline intercepts (\mu_k) from network-shared treatment effects (\beta). By utilizing numerical integration via Sobol sequences, it seamlessly backfills individual-level non-linear signals (IPD) into macro-level target populations (AgD) without incurring the ecological bias inherent to traditional STC.&quot;</span></span>
+<span id="cb6-427"><a href="#cb6-427" aria-hidden="true" tabindex="-1"></a><span class="in">--&gt;</span></span>
+<span id="cb6-428"><a href="#cb6-428" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

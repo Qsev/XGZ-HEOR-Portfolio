@@ -341,6 +341,25 @@ By explicitly standardizing the comparison to a shared target covariate profile 
 
 ------------------------------------------------------------------------
 
+## Methodological Boundaries: ML-NMR vs. MAIC {#6-boundaries}
+
+Following the landmark paper by Phillippo et al. (2020), understanding the boundary conditions between MAIC and ML-NMR is a critical component of any HTA submission strategy. While ML-NMR is technically superior in handling ecological bias and complex networks, both methods have distinct application boundaries:
+
+| Dimension | Matching-Adjusted Indirect Comparison (MAIC) | Multilevel Network Meta-Regression (ML-NMR) |
+|:-----------------------|:-----------------------|:-----------------------|
+| **Network Complexity** | Primarily restricted to 2-study (1-to-1) comparisons. Extending to multi-study networks is complex and requires sequential weighting. | Designed natively for **arbitrarily complex networks** (Multi-study NMA with regression). |
+| **Sample Size Loss** | Suffers from Effective Sample Size (ESS) reduction. Extreme weights can plummet the ESS, destroying statistical power. | **No loss of sample size**. It uses the full sample size by predicting rather than re-weighting. |
+| **Population Overlap** | Requires good overlap in covariate distributions. If populations differ too much, ESS drops to near zero. | Can handle poor overlap better by extrapolating via the regression model (though extrapolation risk must be acknowledged). |
+| **Model Assumptions** | Semi-parametric. Only requires specifying the moments to match; no explicit model for the outcome is strictly required. | Fully parametric. **Requires specifying the exact regression model** for the outcome (e.g., Logistic, Cox PH). |
+| **Ecological Bias** | None (Inherently immune because it re-weights individual patients directly). | None (Resolves ecological bias in non-linear models via numerical integration). |
+
+### The Decision Rule
+
+- **Use MAIC** when: You only need to compare your single trial against one competitor trial, the covariate overlap is good, and you want to minimize parametric assumptions about the outcome.
+- **Use ML-NMR** when: You are fitting a complex evidence network (more than 2 trials), the populations have poor overlap (and MAIC would destroy your ESS), or you are dealing with non-linear outcomes (where STC would fail due to ecological bias).
+
+------------------------------------------------------------------------
+
 ## Technical Audit Considerations
 
 ### Fixed vs. Random Effects
