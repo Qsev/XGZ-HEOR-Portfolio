@@ -1,0 +1,173 @@
+---
+title: "Flexible Survival Analysis and Extrapolation"
+description: "Fitting Standard and Flexible Parametric Models for Economic Evaluation"
+author: "Xiaoge Zhang"
+date: "today"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    number-sections: true
+    embed-resources: true
+---
+
+## Executive Summary
+
+Survival extrapolation is one of the most critical skills for a HEOR statistician. Clinical trials usually have limited follow-up, but cost-effectiveness models (like Markov or Partitioned Survival Models) require survival probabilities projected over a lifetime horizon (e.g., 20 or 30 years).
+
+In this chapter, we will: 
+
+1. Generate a mock survival dataset with non-proportional hazards (mimicking immuno-oncology data). 
+1. Fit **6 standard parametric models** (Exponential, Weibull, Gompertz, Log-normal, Log-logistic, and Generalized Gamma). 
+1. Fit a **Flexible Parametric Model (FPM)** using restricted cubic splines. 
+1. Compare models using statistical criteria (AIC/BIC) and discuss the golden rule of HTA: **Clinical Plausibility \> Statistical Fit**.
+
+------------------------------------------------------------------------
+
+## Mock Data Generation
+
+We simulate a trial with 400 patients, where the **true** survival distribution follows a **Log-normal** shape (hazard increases first, then decreases). This non-monotonic hazard is typical in many disease areas and often cannot be captured well by simple models like the Exponential or Weibull.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(flexsurv)
+library(survival)
+library(ggplot2)
+library(dplyr)
+
+set.seed(2026)
+n <- 400
+
+# Generate Log-normal survival times
+t_ctrl <- rlnorm(n / 2, meanlog = 1.5, sdlog = 0.8)
+t_trt <- rlnorm(n / 2, meanlog = 2.0, sdlog = 0.6)
+
+df <- data.frame(
+    time = c(t_ctrl, t_trt),
+    status = 1, # All experience the event initially
+    trt = rep(c("Control", "Treatment"), each = n / 2)
+)
+
+# Add administrative censoring at t = 15 (end of trial follow-up)
+df$status[df$time > 15] <- 0
+df$time[df$time > 15] <- 15
+
+# Create survival object
+surv_obj <- Surv(df$time, df$status)
+```
+
+Let's look at the Kaplan-Meier curve of our simulated data:
+
+```{r km_plot}
+km_fit <- survfit(surv_obj ~ trt, data = df)
+plot(km_fit,
+    col = c("red", "blue"), lty = 1, lwd = 2,
+    xlab = "Time (Years)", ylab = "Survival Probability",
+    main = "Kaplan-Meier Curves (Max Follow-up = 15 Years)"
+)
+legend("topright", legend = c("Control", "Treatment"), col = c("red", "blue"), lty = 1, lwd = 2)
+```
+
+------------------------------------------------------------------------
+
+## Fitting Parametric Models
+
+We will use the `flexsurv` package to fit the models. `flexsurv` is the industry standard because it allows for easy extrapolation and handles complex distributions.
+
+### 1. Standard Parametric Models
+
+We fit the 6 standard distributions recommended by NICE DSU TSD 14.
+
+```{r fit_standard}
+# 1. Exponential
+m_exp <- flexsurvreg(surv_obj ~ trt, data = df, dist = "exp")
+# 2. Weibull
+m_weibull <- flexsurvreg(surv_obj ~ trt, data = df, dist = "weibull")
+# 3. Gompertz
+m_gompertz <- flexsurvreg(surv_obj ~ trt, data = df, dist = "gompertz")
+# 4. Log-normal
+m_lnorm <- flexsurvreg(surv_obj ~ trt, data = df, dist = "lnorm")
+# 5. Log-logistic
+m_llogis <- flexsurvreg(surv_obj ~ trt, data = df, dist = "llogis")
+# 6. Generalized Gamma
+m_gamma <- flexsurvreg(surv_obj ~ trt, data = df, dist = "gamma")
+```
+
+### 2. Flexible Parametric Model (FPM)
+
+When standard models fail to capture complex hazard shapes, we use restricted cubic splines on the log cumulative hazard scale. Here we use 1 internal knot (`k = 1`).
+
+```{r fit_spline}
+m_spline <- flexsurvspline(surv_obj ~ trt, data = df, k = 1)
+```
+
+------------------------------------------------------------------------
+
+## Model Comparison (AIC/BIC)
+
+We extract the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC) to evaluate statistical fit. Lower values indicate better fit.
+
+```{r comparison_table}
+model_names <- c("Exponential", "Weibull", "Gompertz", "Log-normal", "Log-logistic", "Generalized Gamma", "FPM (Spline k=1)")
+
+aic_vals <- c(m_exp$AIC, m_weibull$AIC, m_gompertz$AIC, m_lnorm$AIC, m_llogis$AIC, m_gamma$AIC, m_spline$AIC)
+bic_vals <- c(BIC(m_exp), BIC(m_weibull), BIC(m_gompertz), BIC(m_lnorm), BIC(m_llogis), BIC(m_gamma), BIC(m_spline))
+
+comp_df <- data.frame(
+    Model = model_names,
+    AIC = round(aic_vals, 2),
+    BIC = round(bic_vals, 2)
+)
+
+# Rank by AIC
+comp_df <- comp_df[order(comp_df$AIC), ]
+print(comp_df)
+```
+
+As expected, the **Log-normal** model (which matches the true distribution we simulated) and the **FPM (Spline)** show the best statistical fit.
+
+------------------------------------------------------------------------
+
+## Survival Extrapolation (Extending to 30 Years)
+
+Now we use the fitted models to predict survival up to 30 years, doubling the trial's follow-up period. This is where the models will diverge significantly.
+
+```{r extrapolation}
+# Generate a sequence of time points up to 30 years
+t_extrap <- seq(0, 30, by = 0.5)
+
+# Extract survival predictions for the Treatment group
+get_surv <- function(model, times) {
+    sum_obj <- summary(model, t = times, newdata = data.frame(trt = "Treatment"))
+    return(sum_obj[[1]]$est)
+}
+
+plot(km_fit[2],
+    col = "black", lwd = 2, conf.int = FALSE,
+    xlim = c(0, 30), ylim = c(0, 1),
+    xlab = "Time (Years)", ylab = "Survival Probability",
+    main = "Survival Extrapolation to 30 Years (Treatment Group)"
+)
+
+lines(t_extrap, get_surv(m_exp, t_extrap), col = "orange", lty = 2)
+lines(t_extrap, get_surv(m_weibull, t_extrap), col = "blue", lty = 2)
+lines(t_extrap, get_surv(m_lnorm, t_extrap), col = "green", lty = 1, lwd = 2) # True model
+lines(t_extrap, get_surv(m_spline, t_extrap), col = "red", lty = 1)
+
+legend("topright",
+    legend = c("KM (Trial Data)", "Exponential", "Weibull", "Log-normal (True)", "FPM (Spline)"),
+    col = c("black", "orange", "blue", "green", "red"),
+    lty = c(1, 2, 2, 1, 1), lwd = c(2, 1, 1, 2, 1)
+)
+```
+
+------------------------------------------------------------------------
+
+## Audit Point: Clinical Plausibility \> Statistical Fit
+
+When submitting survival extrapolations to HTA bodies like NICE, the model with the lowest AIC/BIC is **not** automatically accepted. Reviewers look for clinical plausibility:
+
+1.  **The Tail Behavior**: Models like Log-normal and Log-logistic have heavy tails. They may predict that a significant proportion of patients are "cured" or live for a very long time. If clinicians state that this disease is universally fatal by year 10, a Log-normal model with 20% survival at year 20 will be rejected, regardless of its superior AIC score.
+2.  **Extrapolation Risk**: FPMs (Splines) are excellent at fitting the trial data (interpolation), but they can behave wildly outside the data range (extrapolation). Always inspect the hazard plots of spline models to ensure they do not exhibit non-biological oscillations in the long term.
+
+In practice, a structured assessment involving: - Visual inspection of fit. - Statistical criteria (AIC/BIC). - Clinical expert opinion on long-term survival. ...is mandatory for any credible HTA submission.
