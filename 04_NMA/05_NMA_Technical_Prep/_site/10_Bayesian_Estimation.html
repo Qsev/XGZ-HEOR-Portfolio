@@ -4389,6 +4389,7 @@ window.Quarto = {
 <p>Let’s continue with our thought experiment. Suppose we draw 30 numbers from an unknown distribution. We want to find the distribution of the true mean <span class="math inline">\(\theta\)</span>.</p>
 <section id="the-data-likelihood" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="the-data-likelihood"><span class="header-section-number">3.1</span> The Data (Likelihood)</h3>
+<p>To keep this example as simple as possible, suppose we already know the true standard deviation of the distribution (let’s assume it is 1), and we are only trying to estimate the unknown mean <span class="math inline">\(\theta\)</span>.</p>
 <p>The Likelihood function is the product of the Probability Density Functions (PDF) of observing each of the 30 data points <span class="math inline">\(y_i\)</span>:</p>
 <p><span class="math display">\[L(\theta | y) = \prod_{i=1}^{30} f(y_i | \theta) = \prod_{i=1}^{30} \frac{1}{\sqrt{2\pi}} e^{-\frac{(y_i - \theta)^2}{2}}\]</span></p>
 <p>This function allows us to explore different values of <span class="math inline">\(\theta\)</span>. We are looking for values of <span class="math inline">\(\theta\)</span> that make the left-hand side (the likelihood) larger. Essentially, we are assuming that the <strong>data points we actually observed</strong> are <strong>more likely to occur</strong> (having a higher probability) under the true parameter value.</p>

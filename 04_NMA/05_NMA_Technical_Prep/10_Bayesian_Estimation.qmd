@@ -53,6 +53,8 @@ Let's continue with our thought experiment. Suppose we draw 30 numbers from an u
 
 ### The Data (Likelihood)
 
+To keep this example as simple as possible, suppose we already know the true standard deviation of the distribution (let's assume it is 1), and we are only trying to estimate the unknown mean $\theta$.
+
 The Likelihood function is the product of the Probability Density Functions (PDF) of observing each of the 30 data points $y_i$:
 
 $$L(\theta | y) = \prod_{i=1}^{30} f(y_i | \theta) = \prod_{i=1}^{30} \frac{1}{\sqrt{2\pi}} e^{-\frac{(y_i - \theta)^2}{2}}$$
@@ -168,6 +170,7 @@ cat("SD:", round(sd(samples), 3), "\n")
 cat("Quantiles:\n")
 print(round(quantile(samples, probs = c(0.025, 0.5, 0.975)), 3))
 ```
+
 1.  For reproducibility
 2.  The "hidden" true parameter
 3.  sum of log-densities for each of the 30 points
@@ -185,7 +188,7 @@ Notice how the blue histogram and density curve (the MCMC samples) map out the P
 
 ## Moving Beyond Simple Examples: Why we need MCMC in NMA
 
-In our simple example above, we could actually have calculated the posterior directly using math formulas (since the Normal distribution with a Normal prior has a known closed-form solution). 
+In our simple example above, we could actually have calculated the posterior directly using math formulas (since the Normal distribution with a Normal prior has a known closed-form solution).
 
 But in real-world Network Meta-Analysis (NMA), the likelihoods are much more complex (e.g., Logistic regression for binary outcomes, or Cox Proportional Hazards for survival data) and there are many shared parameters across multiple trials. The denominator $P(y) = \int P(y|\theta)P(\theta) d\theta$ becomes a high-dimensional integral that is impossible to solve analytically.
 
@@ -202,9 +205,9 @@ Both tools are simply more sophisticated "walkers" designed to scale up to the d
 
 ## Audit Point: The "Prior" in HTA Submissions
 
-In NICE submissions, the choice of priors is heavily scrutinized: 
+In NICE submissions, the choice of priors is heavily scrutinized:
 
-1. **Vague/Non-informative Priors**: Often used for treatment effects to "let the data speak". 
-2. **Informative Priors**: Used when data is extremely sparse (e.g., rare diseases). We might "borrow" a prior for the between-study heterogeneity variance ($\tau^2$) from a historical database of similar trials (e.g., the Turner or Rhodes priors).
+1.  **Vague/Non-informative Priors**: Often used for treatment effects to "let the data speak".
+2.  **Informative Priors**: Used when data is extremely sparse (e.g., rare diseases). We might "borrow" a prior for the between-study heterogeneity variance ($\tau^2$) from a historical database of similar trials (e.g., the Turner or Rhodes priors).
 
 A credible Bayesian analyst must always perform a **Prior Sensitivity Analysis** to prove that the conclusions are driven by the trial data, not by arbitrary choices of the prior.
