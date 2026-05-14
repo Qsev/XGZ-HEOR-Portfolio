@@ -392,11 +392,38 @@ Based on the Arm-Based Parametric NMA (Approach 2), the estimated Hazard Ratios 
 - **Treatment 2 vs 1**: `r round(exp(median(as.matrix(fit_surv)[, "d[2]"])), 2)`
 - **Treatment 3 vs 1**: `r round(exp(median(as.matrix(fit_surv)[, "d[3]"])), 2)`
 
+## Advanced Survival NMA: Non-Proportional Hazards (FP vs. Splines)
+
+When the Proportional Hazards (PH) assumption is violated (e.g., crossing Kaplan-Meier curves frequently seen in immunotherapy), standard models like Weibull or Contrast-Based HR synthesis are no longer appropriate. HTA guidelines (such as NICE DSU Technical Support Document 18) recommend moving to more flexible models like **Fractional Polynomials (FP)** or **Restricted Cubic Splines**.
+
+### Fractional Polynomials (FP)
+
+Fractional Polynomials model the hazard function by adding powers of time.
+
+- **Mathematical Logic**: Instead of assuming a constant log-hazard ratio, the treatment effect is modeled as a function of time: $\ln(h_k(t)) = \mu_j + \beta_0 + \beta_1 t^p + \beta_2 t^q$. The powers $p$ and $q$ are chosen from a predefined set (e.g., $-2, -1, -0.5, 0, 0.5, 1, 2, 3$).
+- **Selection Criteria**:
+  - **Clinical Plausibility of Extrapolation**: This is the most critical criterion in HTA. Fractional polynomials can sometimes produce implausible shapes (e.g., hazard rates dropping to zero or shooting to infinity) in the extrapolated period.
+  - **Statistical Fit**: Use DIC or WAIC to compare different combinations of powers.
+
+### Restricted Cubic Splines
+
+Splines offer even greater flexibility by dividing the time axis into segments separated by "knots".
+
+- **Mathematical Logic**: Within each segment, a cubic polynomial is fitted. Constraints are applied at the knots to ensure the overall curve is smooth (continuous up to the second derivative). "Restricted" means the curve is constrained to be linear beyond the boundary knots, which helps stabilize extrapolation.
+- **Selection Criteria**:
+  - **Number and Location of Knots**: More knots allow for more complex shapes but increase the risk of overfitting. NICE DSU 18 suggests using 1 to 3 knots based on visual inspection and fit statistics.
+  - **Risk of Overfitting**: If the spline fits the within-trial data too perfectly, the extrapolation can become highly unstable and sensitive to small changes in knot placement.
+
+**Summary of Choice**:
+
+- Use **Fractional Polynomials** if the hazard shape is relatively simple and monotonic, and you want to align with standard NICE DSU templates.
+- Use **Splines** if the hazard has complex turning points or delayed treatment effects, but exercise extreme caution during extrapolation.
+
 ## Connecting to Economic Models (HTA Focus) {#5-connecting-to-economic}
 
 Why do we go through the pain of curve fitting? Because Cost-Effectiveness Models (CEMs) require the **extrapolation of survival time over a lifetime horizon** to calculate mean time spent in each health state.
 
-### Partitioned Survival Models (PSM) {.unnumbered}
+### Partitioned Survival Models (PSM)
 
 In a 3-state PSM (Progression-Free, Progressed Disease, Dead), the health states are driven directly by two survival curves:
 
@@ -404,16 +431,24 @@ In a 3-state PSM (Progression-Free, Progressed Disease, Dead), the health states
 - **OS Curve**: Defines the proportion of patients alive.
 - **Progressed Disease State**: Calculated as the area between the OS and PFS curves.
 
-By running a Parametric Survival NMA, we extract the posterior distributions of the curve parameters (e.g., Weibull scale and shape). We then plug these parameters into the PSM in Excel or R to calculate Quality-Adjusted Life Years (QALYs) over a lifetime horizon.
+By running a Parametric Survival NMA, we extract the posterior distributions of the curve parameters (e.g., Weibull scale and shape, or FP coefficients). We calculate the survival probability $S(t)$ at each cycle (e.g., monthly) for a lifetime horizon (e.g., 40 years).
 
-```{=html}
-<!-- Audit Point: Transition Probabilities (Markov Models)
-If using a Markov Model instead of a PSM, the survival parameters can be mathematically transformed into time-dependent transition probabilities. 
-For example, the probability of dying in cycle $t$ is calculated from the cumulative hazard $H(t)$:
+### Markov State-Transition Models
+
+If using a Markov Model instead of a PSM, the survival parameters must be transformed into discrete **Transition Probabilities** for each cycle.
+
+For a specific cycle from time $t_1$ to $t_2$, the probability of transitioning from "Alive" to "Dead" is derived from the survival function:
+
 $P(\text{event between } t_1 \text{ and } t_2) = 1 - \exp(-(H(t_2) - H(t_1)))$
-This precise linkage between Bayesian Evidence Synthesis and Health Economics is exactly what distinguishes a senior HEOR statistician from a general biostatistician.
--->
-```
+
+Where $H(t)$ is the cumulative hazard at time $t$. For a Weibull model, $H(t) = \lambda t^\gamma$.
+
+### Probabilistic Sensitivity Analysis (PSA) and Uncertainty Propagation
+
+A critical failure in many HTA submissions is failing to propagate the uncertainty from the NMA into the economic model.
+
+- **Incorrect**: Using only the median or mean estimates of the parameters in the economic model.
+- **Correct**: Exporting the full matrix of MCMC posterior samples (e.g., 1000 iterations of all parameters) from Stan/JAGS. In the economic model's PSA, for each iteration of the PSA loop, you use the corresponding row of parameters from the NMA posterior. This ensures that the correlation between parameters (e.g., between scale and shape) and the full parameter uncertainty are perfectly preserved in the cost-effectiveness results.
 
 ------------------------------------------------------------------------
 

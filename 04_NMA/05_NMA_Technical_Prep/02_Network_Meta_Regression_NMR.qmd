@@ -456,7 +456,7 @@ Notice if the means of `d[2]`, `d[3]`, and `tau` are now closer between the two 
 
 #### Comparison Table
 
-::: {.callout-note}
+::: callout-note
 # Comparison Table
 
 ```{r}
@@ -520,6 +520,7 @@ tau 从 2.37 暴跌到 0.13 并不是因为样本量变大，而是因为我们�
 tau 代表的是“实验与实验之间的异质性（Between-study heterogeneity）”。我们将 4 个实验原封不动地复制了一遍，导致模型看到了 4 对完全一模一样、毫无差异的“双胞胎”实验。模型会错误地认为实验之间的随机误差几乎为零，因此 tau 被人工地拉低了。如果增加的是真实的、带有随机误差的新实验，tau 会稳定在一个合理的真实水平。
 -->
 ```
+
 ### Drug Ranking and SUCRA Calculation Logic
 
 To answer the strategic question "Which drug is the best?", we calculate the rank probabilities and the **SUCRA (Surface Under the Cumulative Ranking curve)**.
@@ -607,15 +608,15 @@ This yields the exact same result as the physical interpretation above.
 
 ### Consistency Check
 
-A core assumption of NMA is **consistency**: direct and indirect evidence should agree within any closed loop. Our network forms a closed loop among treatments A, B, and C: 
+A core assumption of NMA is **consistency**: direct and indirect evidence should agree within any closed loop. Our network forms a closed loop among treatments A, B, and C:
 
-- **A vs B**: Studies 1 & 2 
-- **A vs C**: Study 3 
+- **A vs B**: Studies 1 & 2
+- **A vs C**: Study 3
 - **B vs C**: Study 4
 
 #### Loop Inconsistency Model
 
-To test consistency, we fit an **Inconsistency Model** by adding an inconsistency parameter **$\omega$** (omega) to the B vs C comparison in Study 4. In a consistent network, $\omega$ should be close to 0.
+To test consistency, we fit an **Inconsistency Model** by adding an inconsistency parameter $\omega$ (omega) to the B vs C comparison in Study 4. In a consistent network, $\omega$ should be close to 0.
 
 ::: {.callout-note collapse="true" appearance="minimal"}
 # STAN RE_NMR_inconsistency_model.stan
@@ -736,13 +737,12 @@ If the 95% Credible Interval of `omega` includes 0, we fail to reject the consis
 
 Node splitting is another method to assess inconsistency in a specific comparison by **separating** the direct and indirect evidence.
 
-**Mathematical Logic:**
-For a specific comparison between treatment $k$ and $i$:
+**Mathematical Logic:** For a specific comparison between treatment $k$ and $i$:
 
-1. **Direct Evidence**: We estimate the treatment effect $d_{ki}^{\text{dir}}$ using only the trials directly comparing $k$ and $i$.
-2. **Indirect Evidence**: We estimate the treatment effect $d_{ki}^{\text{ind}}$ using the rest of the network (excluding the direct trials for $k$ vs $i$), leveraging the consistency constraints (e.g., $d_{ki}^{\text{ind}} = d_{1i} - d_{1k}$).
-3. **Inconsistency Factor**: We calculate the difference $\omega_{ki} = d_{ki}^{\text{dir}} - d_{ki}^{\text{ind}}$.
-4. **Hypothesis Test**: We test the null hypothesis $H_0: \omega_{ki} = 0$. If the 95% credible interval of $\omega_{ki}$ excludes 0, or the Bayesian $p$-value is small (e.g., $< 0.05$), we conclude there is significant inconsistency for this node.
+1.  **Direct Evidence**: We estimate the treatment effect $d_{ki}^{\text{dir}}$ using only the trials directly comparing $k$ and $i$.
+2.  **Indirect Evidence**: We estimate the treatment effect $d_{ki}^{\text{ind}}$ using the rest of the network (excluding the direct trials for $k$ vs $i$), leveraging the consistency constraints (e.g., $d_{ki}^{\text{ind}} = d_{1i} - d_{1k}$).
+3.  **Inconsistency Factor**: We calculate the difference $\omega_{ki} = d_{ki}^{\text{dir}} - d_{ki}^{\text{ind}}$.
+4.  **Hypothesis Test**: We test the null hypothesis $H_0: \omega_{ki} = 0$. If the 95% credible interval of $\omega_{ki}$ excludes 0, or the Bayesian $p$-value is small (e.g., $< 0.05$), we conclude there is significant inconsistency for this node.
 
 This process is repeated for all nodes (comparisons) in the network where both direct and indirect evidence exist.
 
@@ -753,28 +753,28 @@ The UME model is a global method to detect inconsistency by relaxing the consist
 **Logic & Implementation:**
 
 - In a **Consistency Model**, we assume $d_{BC} = d_{AC} - d_{AB}$. We only estimate basic parameters (relative to a common reference).
-- In a **UME Model** (also known as the independent effects model), we treat ALL comparisons as independent. We do not enforce the transitivity relation. For a network with $T$ treatments, instead of estimating $T-1$ basic parameters, we estimate all possible pairwise comparisons directly from the data.
-- **Implementation**: In Stan/JAGS, we remove the constraint `delta[3, 2] = d_AC - d_AB` and instead estimate `delta[3, 2]` as an independent parameter (e.g., `d_BC`).
-- **Audit Focus**: We compare the fit of the Consistency model and the UME model using DIC. If the UME model has a substantially lower DIC (e.g., $> 5$ points), it indicates that the consistency assumption is violated in the network.
+- In a **UME Model** (also known as the independent effects model), we treat ALL comparisons as independent. We do not enforce the transitivity relation. For a network with $T$ treatments, instead of estimating $T-1$ basic parameters, we estimate **all** possible pairwise comparisons directly from the data.
+- **Implementation**: In Stan/JAGS, we **remove** the constraint `delta[3, 2] = d_AC - d_AB` and instead estimate `delta[3, 2]` as an independent parameter (e.g., `d_BC`).
+- **Audit Focus**: We compare the **fit** of the Consistency model and the UME model using DIC. If the UME model has a substantially lower DIC (e.g., $> 5$ points), it indicates that the consistency assumption is violated in the network.
 
 #### Inconsistency Management Decision Tree
 
 When inconsistency is detected (via Node Splitting or UME), HTA guidelines (like NICE DSU Technical Support Document 4) recommend the following decision tree:
 
-1. **Step 1: Check for Data Errors**
-   - Verify data extraction (arm-level events and sample sizes).
-   - Ensure consistent definition of outcomes across trials.
-2. **Step 2: Assess Clinical and Methodological Heterogeneity (Effect Modifiers)**
-   - Are there differences in patient baseline characteristics (e.g., age, disease severity)?
-   - Are there differences in study design (e.g., blinding, follow-up duration)?
-   - If effect modifiers are distributed unevenly across comparisons, **Network Meta-Regression (NMR)** should be used to adjust for them (as demonstrated in Section 2).
-3. **Step 3: Sensitivity Analysis or Subgroup Analysis**
-   - Can the network be split into more homogeneous subgroups?
-   - Can outlier studies (e.g., small studies with extreme effects) be removed in a sensitivity analysis?
-4. **Step 4: Use a More Flexible Model**
-   - If heterogeneity cannot be fully explained by covariates, a **Random Effects** model should be used to account for the unexplained variance.
-5. **Step 5: Abandon NMA (Last Resort)**
-   - If inconsistency is severe and cannot be resolved or explained, a full network synthesis may be misleading. Recur to presenting separate pairwise meta-analyses or a qualitative synthesis.
+1.  **Step 1: Check for Data Errors**
+    - Verify data extraction (arm-level events and sample sizes).
+    - Ensure consistent definition of outcomes across trials.
+2.  **Step 2: Assess Clinical and Methodological Heterogeneity (Effect Modifiers)**
+    - Are there differences in patient baseline characteristics (e.g., age, disease severity)?
+    - Are there differences in study design (e.g., blinding, follow-up duration)?
+    - If effect modifiers are distributed unevenly across comparisons, Network Meta-Regression (NMR) should be used to adjust for them (as demonstrated in Section 2).
+3.  **Step 3: Sensitivity Analysis or Subgroup Analysis**
+    - Can the network be split into more homogeneous subgroups?
+    - Can outlier studies (e.g., small studies with extreme effects) be removed in a sensitivity analysis?
+4.  **Step 4: Use a More Flexible Model**
+    - If heterogeneity cannot be fully explained by covariates, a **Random Effects** model should be used to account for the unexplained variance.
+5.  **Step 5: Abandon NMA (Last Resort)**
+    - If inconsistency is severe and cannot be resolved or explained, a full network synthesis may be misleading. Recur to presenting separate pairwise meta-analyses or a qualitative synthesis.
 
 ## Results & Interpretation: Covariate Adjustment {#5-results}
 

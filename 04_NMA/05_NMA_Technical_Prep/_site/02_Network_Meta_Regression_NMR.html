@@ -1156,7 +1156,7 @@ This yields the exact same result as the physical interpretation above.
 </ul>
 <section id="loop-inconsistency-model" class="level4" data-number="4.5.1">
 <h4 data-number="4.5.1" class="anchored" data-anchor-id="loop-inconsistency-model"><span class="header-section-number">4.5.1</span> Loop Inconsistency Model</h4>
-<p>To test consistency, we fit an <strong>Inconsistency Model</strong> by adding an inconsistency parameter <strong><span class="math inline">\(\omega\)</span></strong> (omega) to the B vs C comparison in Study 4. In a consistent network, <span class="math inline">\(\omega\)</span> should be close to 0.</p>
+<p>To test consistency, we fit an <strong>Inconsistency Model</strong> by adding an inconsistency parameter <span class="math inline">\(\omega\)</span> (omega) to the B vs C comparison in Study 4. In a consistent network, <span class="math inline">\(\omega\)</span> should be close to 0.</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1323,9 +1323,9 @@ convergence, Rhat=1).</code></pre>
 <p><strong>Logic &amp; Implementation:</strong></p>
 <ul>
 <li>In a <strong>Consistency Model</strong>, we assume <span class="math inline">\(d_{BC} = d_{AC} - d_{AB}\)</span>. We only estimate basic parameters (relative to a common reference).</li>
-<li>In a <strong>UME Model</strong> (also known as the independent effects model), we treat ALL comparisons as independent. We do not enforce the transitivity relation. For a network with <span class="math inline">\(T\)</span> treatments, instead of estimating <span class="math inline">\(T-1\)</span> basic parameters, we estimate all possible pairwise comparisons directly from the data.</li>
-<li><strong>Implementation</strong>: In Stan/JAGS, we remove the constraint <code>delta[3, 2] = d_AC - d_AB</code> and instead estimate <code>delta[3, 2]</code> as an independent parameter (e.g., <code>d_BC</code>).</li>
-<li><strong>Audit Focus</strong>: We compare the fit of the Consistency model and the UME model using DIC. If the UME model has a substantially lower DIC (e.g., <span class="math inline">\(&gt; 5\)</span> points), it indicates that the consistency assumption is violated in the network.</li>
+<li>In a <strong>UME Model</strong> (also known as the independent effects model), we treat ALL comparisons as independent. We do not enforce the transitivity relation. For a network with <span class="math inline">\(T\)</span> treatments, instead of estimating <span class="math inline">\(T-1\)</span> basic parameters, we estimate <strong>all</strong> possible pairwise comparisons directly from the data.</li>
+<li><strong>Implementation</strong>: In Stan/JAGS, we <strong>remove</strong> the constraint <code>delta[3, 2] = d_AC - d_AB</code> and instead estimate <code>delta[3, 2]</code> as an independent parameter (e.g., <code>d_BC</code>).</li>
+<li><strong>Audit Focus</strong>: We compare the <strong>fit</strong> of the Consistency model and the UME model using DIC. If the UME model has a substantially lower DIC (e.g., <span class="math inline">\(&gt; 5\)</span> points), it indicates that the consistency assumption is violated in the network.</li>
 </ul>
 </section>
 <section id="inconsistency-management-decision-tree" class="level4" data-number="4.5.4">
@@ -1341,7 +1341,7 @@ convergence, Rhat=1).</code></pre>
 <ul>
 <li>Are there differences in patient baseline characteristics (e.g., age, disease severity)?</li>
 <li>Are there differences in study design (e.g., blinding, follow-up duration)?</li>
-<li>If effect modifiers are distributed unevenly across comparisons, <strong>Network Meta-Regression (NMR)</strong> should be used to adjust for them (as demonstrated in Section 2).</li>
+<li>If effect modifiers are distributed unevenly across comparisons, Network Meta-Regression (NMR) should be used to adjust for them (as demonstrated in Section 2).</li>
 </ul></li>
 <li><strong>Step 3: Sensitivity Analysis or Subgroup Analysis</strong>
 <ul>
