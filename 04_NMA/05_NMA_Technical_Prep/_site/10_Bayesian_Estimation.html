@@ -4183,9 +4183,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      NMA Technical Portfolio
-      </li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./10_Bayesian_Estimation.html">Methodological Foundations</a></li><li class="breadcrumb-item"><a href="./10_Bayesian_Estimation.html">The Core of Bayesian Estimation</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -4213,12 +4211,29 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Technical Guides</span></a>
+ <span class="menu-text">Methodological Foundations</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10_Bayesian_Estimation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">The Core of Bayesian Estimation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Advanced NMA Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./01_Standard_Bayesian_NMA_Guide.html" class="sidebar-item-text sidebar-link">
@@ -4267,6 +4282,12 @@ window.Quarto = {
  <span class="menu-text">Multilevel Network Meta-Regression (ML-NMR)</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_Flexible_Survival.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Flexible Survival Analysis and Extrapolation</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -4296,7 +4317,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./10_Bayesian_Estimation.html">Methodological Foundations</a></li><li class="breadcrumb-item"><a href="./10_Bayesian_Estimation.html">The Core of Bayesian Estimation</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">The Core of Bayesian Estimation</h1>
 </div>
@@ -4368,7 +4389,7 @@ window.Quarto = {
 <p>Let’s continue with our thought experiment. Suppose we draw 30 numbers from an unknown distribution. We want to find the distribution of the true mean <span class="math inline">\(\theta\)</span>.</p>
 <section id="the-data-likelihood" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="the-data-likelihood"><span class="header-section-number">3.1</span> The Data (Likelihood)</h3>
-<p>For a Normal distribution, the Likelihood function is the product of the Probability Density Functions (PDF) of observing each of the 30 data points <span class="math inline">\(y_i\)</span>:</p>
+<p>The Likelihood function is the product of the Probability Density Functions (PDF) of observing each of the 30 data points <span class="math inline">\(y_i\)</span>:</p>
 <p><span class="math display">\[L(\theta | y) = \prod_{i=1}^{30} f(y_i | \theta) = \prod_{i=1}^{30} \frac{1}{\sqrt{2\pi}} e^{-\frac{(y_i - \theta)^2}{2}}\]</span></p>
 <p>This function allows us to explore different values of <span class="math inline">\(\theta\)</span>. We are looking for values of <span class="math inline">\(\theta\)</span> that make the left-hand side (the likelihood) larger. Essentially, we are assuming that the <strong>data points we actually observed</strong> are <strong>more likely to occur</strong> (having a higher probability) under the true parameter value.</p>
 <p>If we take the Frequentist approach, our task ends here. Since we have the actual values of <span class="math inline">\(y_i\)</span>, this becomes a simple mathematical problem of finding the maximum of a function. The value of <span class="math inline">\(\theta\)</span> that maximizes this likelihood is what we traditionally call <strong>Maximum Likelihood Estimation (MLE)</strong>.</p>

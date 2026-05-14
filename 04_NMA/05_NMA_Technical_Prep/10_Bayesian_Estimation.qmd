@@ -53,7 +53,7 @@ Let's continue with our thought experiment. Suppose we draw 30 numbers from an u
 
 ### The Data (Likelihood)
 
-For a Normal distribution, the Likelihood function is the product of the Probability Density Functions (PDF) of observing each of the 30 data points $y_i$:
+The Likelihood function is the product of the Probability Density Functions (PDF) of observing each of the 30 data points $y_i$:
 
 $$L(\theta | y) = \prod_{i=1}^{30} f(y_i | \theta) = \prod_{i=1}^{30} \frac{1}{\sqrt{2\pi}} e^{-\frac{(y_i - \theta)^2}{2}}$$
 

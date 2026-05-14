@@ -7,7 +7,10 @@ website:
     style: "docked"
     search: true
     contents:
-      - section: "Technical Guides"
+      - section: "Methodological Foundations"
+        contents:
+          - 10_Bayesian_Estimation.qmd
+      - section: "Advanced NMA Models"
         contents:
           - 01_Standard_Bayesian_NMA_Guide.qmd
           - 02_Network_Meta_Regression_NMR.qmd
@@ -17,6 +20,7 @@ website:
           - 06_MAIC.qmd
           - 07_STC.qmd
           - 08_ML_NMR.qmd
+          - 09_Flexible_Survival.qmd
 
 format:
   html:
