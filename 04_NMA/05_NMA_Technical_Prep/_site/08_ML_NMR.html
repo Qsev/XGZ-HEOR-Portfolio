@@ -4379,7 +4379,7 @@ window.Quarto = {
 </ul>
 <p>Let’s generate the mock datasets.</p>
 <div class="cell">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-1"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(multinma)</span>
@@ -4513,7 +4513,7 @@ Because N determines the "weight" or statistical gravity of the evidence. A 40% 
 <h3 data-number="4.1" class="anchored" data-anchor-id="network-construction-and-integration-points"><span class="header-section-number">4.1</span> Network Construction and Integration Points</h3>
 <p>First, we tell the model who the baseline comparator is, and we generate the Sobol integration points for the AgD trial.</p>
 <div class="cell">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add treatment classes to share interaction effects</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ipd_data<span class="sc">$</span>class <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(ipd_data<span class="sc">$</span>trt <span class="sc">==</span> <span class="st">&quot;Placebo&quot;</span>, <span class="st">&quot;Placebo&quot;</span>, <span class="st">&quot;Active&quot;</span>)</span>
@@ -4538,7 +4538,7 @@ Because N determines the "weight" or statistical gravity of the evidence. A 40% 
 <h3 data-number="4.2" class="anchored" data-anchor-id="fitting-the-ml-nmr-model"><span class="header-section-number">4.2</span> Fitting the ML-NMR Model</h3>
 <p>We instruct Stan to fit a regression model including the interaction between treatment and age (<code>~ age * .trt</code>). We will use Fixed Effects (FE) for this sparse network.</p>
 <div class="cell">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Fit ML-NMR (using a short chain for demonstration)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fit_mlnmr <span class="ot">&lt;-</span> <span class="fu">nma</span>(net,</span>
@@ -4667,7 +4667,7 @@ d[Quizartinib]             1.99 0.28  1.46  1.99  2.54  855.93    1</code></pre>
 <p><strong>This is the true power of ML-NMR:</strong> By decomposing the effects, ML-NMR mathematically “transplants” Midostaurin into a younger body (35 years old), revealing a potential <strong>96%</strong> Complete Remission (CR) rate. We then compare this against Quizartinib’s performance <em>in the exact same patient profile</em>. This guarantees a rigorous, apples-to-apples comparison.</p>
 <p>To calculate this in <code>multinma</code>, the <code>relative_effects</code> function performs this exact integration over the target age distribution:</p>
 <div class="cell">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Extract Relative Effects specifically for the Trial 1 population</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>releff_trial1 <span class="ot">&lt;-</span> <span class="fu">relative_effects</span>(fit_mlnmr,</span>

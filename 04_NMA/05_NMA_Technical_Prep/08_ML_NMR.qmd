@@ -7,7 +7,7 @@ format:
   html:
     toc: true
     toc-depth: 3
-    code-fold: show
+    code-fold: true
     number-sections: true
     embed-resources: true
 ---

@@ -1,0 +1,210 @@
+---
+title: "The Core of Bayesian Estimation"
+description: "An Intuitive and Mathematical Deep Dive into Bayes' Theorem and MCMC"
+author: "Xiaoge Zhang"
+date: "today"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true
+    embed-resources: true
+---
+
+## A Simple Thought Experiment
+
+Suppose we draw 30 numbers from an unknown Normal distribution. Our goal is to "guess" the true mean of this distribution.
+
+- **The Frequentist approach**: Uses methods like Maximum Likelihood Estimation (MLE), Method of Moments (MOM), or Generalized Method of Moments (GMM) to find the parameter value based purely on the observed 30 numbers. If we draw another 30 numbers, the estimate changes based on the new sample.
+- **The Bayesian approach**: Also considers the likelihood of the data. However, instead of finding the single parameter value that maximizes the likelihood (like MLE), it combines the likelihood with a **Prior** to capture how the probability changes across all possible parameter values. Thus, the Bayesian approach yields a **full distribution** (the Posterior) of the parameter, rather than a single point estimate.
+
+Almost **all** parameter estimations in statistics are variations of this simple game, including those used in HTA or HEOR. In Health Technology Assessment (HTA), this Bayesian philosophy has become the cornerstone of advanced evidence synthesis (like Network Meta-Analysis). It allows us to naturally propagate uncertainty through complex decision models, rather than relying on the frequentist concept of repeating experiments to infinity.
+
+In this chapter, we will:
+
+1.  Explain the fundamental equation of Bayesian estimation.
+2.  Use a simple Normal distribution example to show the concept.
+3.  Visualize how the Prior and Likelihood merge into the Posterior.
+4.  Explain why we need Markov Chain Monte Carlo (MCMC) for complex models like NMA.
+
+## The Fundamental Equation
+
+At the heart of Bayesian estimation is Bayes' Theorem:
+
+$$P(\theta | y) = \frac{P(y | \theta) P(\theta)}{P(y)}$$
+
+Where:
+
+- $P(\theta | y)$ is the **Posterior**: What we believe about the parameter $\theta$ after seeing the data $y$.
+- $P(y | \theta)$ is the **Likelihood**: How likely the data $y$ is, given a specific parameter $\theta$.
+- $P(\theta)$ is the **Prior**: What we believed about the parameter $\theta$ before seeing the data.
+- $P(y)$ is the **Marginal Likelihood** (or Evidence): A normalizing constant that ensures the posterior integrates to 1.
+
+Since $P(y)$ is a constant with respect to $\theta$, we often write the relationship as a proportionality:
+
+$$\text{Posterior} \propto \text{Likelihood} \times \text{Prior}$$
+
+------------------------------------------------------------------------
+
+## Minimal Case: Guessing the Mean (Without Analytical Solutions)
+
+Let's continue with our thought experiment. Suppose we draw 30 numbers from an unknown distribution. We want to find the distribution of the true mean $\theta$.
+
+### The Data (Likelihood)
+
+For a Normal distribution, the Likelihood function is the product of the Probability Density Functions (PDF) of observing each of the 30 data points $y_i$:
+
+$$L(\theta | y) = \prod_{i=1}^{30} f(y_i | \theta) = \prod_{i=1}^{30} \frac{1}{\sqrt{2\pi}} e^{-\frac{(y_i - \theta)^2}{2}}$$
+
+This function allows us to explore different values of $\theta$. We are looking for values of $\theta$ that make the left-hand side (the likelihood) larger. Essentially, we are assuming that the **data points we actually observed** are **more likely to occur** (having a higher probability) under the true parameter value.
+
+If we take the Frequentist approach, our task ends here. Since we have the actual values of $y_i$, this becomes a simple mathematical problem of finding the maximum of a function. The value of $\theta$ that maximizes this likelihood is what we traditionally call **Maximum Likelihood Estimation (MLE)**.
+
+A Bayesian, on the other hand, does not simply solve this equation for a single maximum point. Instead, they use the same core idea but ask a broader question: "What does the entire distribution of $\theta$ look like to make the likelihood of our data as large as possible?" Thus, the Bayesian approach seeks the distribution of the parameter, rather than a single peak.
+
+### The Prior (Our Guess)
+
+Suppose through some other channels (such as previous literature or domain knowledge), we believe that these 30 numbers are drawn from a distribution with a mean around **0** (e.g., $N(0, 1)$), or at least we guess the shape of the distribution of $\theta$ is like $N(0, 1)$. We express this belief as our Prior distribution.
+
+Recall that the Likelihood function $L(\theta | y)$ above is simply a product of 30 PDF values. According to Bayes' Theorem ($\text{Posterior} \propto \text{Likelihood} \times \text{Prior}$), we now take that product and multiply it by the PDF of our Prior (here it takes the form of $N(0, 1)$), $f_{prior}(\theta)$.
+
+$$P(\theta | y) \propto \prod_{i=1}^{30} f(y_i | \theta) \times f_{prior}(\theta)$$
+
+This forms an even larger product of probability densities. Our ultimate goal is to find what kind of distribution of $\theta$ makes this combined PDF (this new joint probability) as large as possible. This is how the Prior "pulls" the final estimate towards itself.
+
+So, what kind of $\theta$ will make this joint density larger? It either needs to make the left part (the Likelihood) larger, or make the Prior density larger, or ideally both. These are the values of $\theta$ that will make our joint probability (the Posterior) larger.
+
+If we have no prior thoughts or guesses about this $\theta$, we can also replace this Prior with a constant (like 1), or a Uniform Distribution, or a Normal Distribution with a very large variance. In that case, the Prior provides no "pull", and the Bayesian estimate reduces to the Maximum Likelihood Estimate (MLE).
+
+### The Posterior (The Final Distribution)
+
+Now, how do we actually find this group of $\theta$ values that make the joint density large?
+
+In this simple example, we can calculate it directly. But for complex real-world models (like Network Meta-Analysis), finding the perfect mathematical formula is impossible. This is where **Markov Chain Monte Carlo (MCMC)** comes in.
+
+MCMC is a simulation method. Instead of solving equations, it simply "tries" different values of $\theta$ to see which ones result in a higher joint density. In a formal expression, it takes a random walk through different values of $\theta$. Crucially, it is designed to obtain those $\theta$ values that are in regions where the joint density (Likelihood $\times$ Prior) is higher. By collecting thousands of samples of $\theta$ from this walk, we "map out" the entire shape of the **Posterior distribution**.
+
+By multiplying the Prior and the Likelihood, we get this final distribution. We don't need a single "best guess" number; we want the entire shape of this new distribution to understand our uncertainty.
+
+------------------------------------------------------------------------
+
+## Visualizing the Update in R: A Simple MCMC Simulation
+
+Instead of using math formulas to draw the Posterior, let's write a simple **Markov Chain Monte Carlo (MCMC)** algorithm (the Metropolis algorithm) to "find" the posterior distribution, just like we described above.
+
+We will define our target as the product of the Likelihood and the Prior. Then we let the algorithm take random walks to map it out.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+
+# 1. Generate the 30 observed numbers from a "true" distribution
+set.seed(42) # <1>
+true_theta <- 1.5 # <2>
+y <- rnorm(30, mean = true_theta, sd = 1)
+
+# 2. Define the Target (Log-Posterior)
+log_target <- function(theta) {
+    log_like <- sum(dnorm(y, mean = theta, sd = 1, log = TRUE)) # <3>
+    log_prior <- dnorm(theta, mean = 0, sd = 1, log = TRUE) # <4>
+    return(log_like + log_prior) # <5>
+}
+
+# 3. Metropolis Algorithm
+n_iter <- 10000
+samples <- numeric(n_iter)
+current_theta <- 0 # <6>
+
+set.seed(42)
+for (i in 1:n_iter) {
+    # Propose a new theta (random walk)
+    proposed_theta <- current_theta + rnorm(1, 0, 0.5)
+
+    # Calculate acceptance ratio (on log scale)
+    log_acc_ratio <- log_target(proposed_theta) - log_target(current_theta)
+
+    # Accept or reject
+    if (log(runif(1)) < log_acc_ratio) { # <7>
+        current_theta <- proposed_theta
+    }
+    samples[i] <- current_theta
+}
+
+# 4. Plot the Results
+df_samples <- data.frame(theta = samples)
+theta_seq <- seq(-3, 4, length.out = 200) # <8>
+prior_dens <- dnorm(theta_seq, 0, 1)
+
+df_curves <- data.frame(
+    theta = theta_seq,
+    density = prior_dens,
+    type = "Prior (Theta ~ N(0,1))"
+)
+
+ggplot() +
+    # MCMC Samples (Posterior)
+    geom_histogram(
+        data = df_samples, aes(x = theta, y = ..density..),
+        bins = 50, fill = "lightblue", color = "white", alpha = 0.7
+    ) +
+    geom_density(data = df_samples, aes(x = theta, color = "Posterior (MCMC Samples)"), size = 1.2) +
+    # Prior Curve
+    geom_line(data = df_curves, aes(x = theta, y = density, color = type), linetype = "dashed", size = 1) +
+    theme_minimal() +
+    labs(
+        title = "The Bayesian Update Process via MCMC",
+        subtitle = "Histogram shows MCMC samples mapping the Posterior",
+        x = "True Mean (Theta)",
+        y = "Density",
+        color = "Component"
+    ) +
+    scale_color_manual(values = c("Posterior (MCMC Samples)" = "blue", "Prior (Theta ~ N(0,1))" = "orange"))
+
+# 5. Summary of the Posterior
+cat("\n--- Posterior Summary ---\n")
+cat("Mean:", round(mean(samples), 3), "\n")
+cat("SD:", round(sd(samples), 3), "\n")
+cat("Quantiles:\n")
+print(round(quantile(samples, probs = c(0.025, 0.5, 0.975)), 3))
+```
+1.  For reproducibility
+2.  The "hidden" true parameter
+3.  sum of log-densities for each of the 30 points
+4.  Log-prior: Guess = 0, SD = 1
+5.  Log of the Product of Likelihoods for each data point \* Prior
+6.  Starting Point of random walk of $\theta$
+7.  Random threshold to allow "downhill" moves proportional to probability
+8.  Generate Prior curve for comparison
+
+Notice how the blue histogram and density curve (the MCMC samples) map out the Posterior distribution. It forms a compromise: it is pulled away from our Prior guess (0) towards the region supported by the data. The algorithm spent more time in the high-probability region, successfully "mapping" the Posterior without using any integration or analytical formulas.
+
+*Note: With 30 samples, the data provides stronger evidence. If you reduce the sample size to 10, you will see the posterior peak drift more due to random sampling error, as the likelihood becomes less sharp and the prior at 0 exerts a relatively stronger pull.*
+
+------------------------------------------------------------------------
+
+## Moving Beyond Simple Examples: Why we need MCMC in NMA
+
+In our simple example above, we could actually have calculated the posterior directly using math formulas (since the Normal distribution with a Normal prior has a known closed-form solution). 
+
+But in real-world Network Meta-Analysis (NMA), the likelihoods are much more complex (e.g., Logistic regression for binary outcomes, or Cox Proportional Hazards for survival data) and there are many shared parameters across multiple trials. The denominator $P(y) = \int P(y|\theta)P(\theta) d\theta$ becomes a high-dimensional integral that is impossible to solve analytically.
+
+This is why we use advanced MCMC software like **JAGS** or **Stan**. It is important to realize that **they are doing exactly the same thing we demonstrated in our simple R code above**. The underlying logic remains unchanged: evaluating the relative height of the numerator ($\text{Likelihood} \times \text{Prior}$) to decide which parameter values to keep or discard, thereby mapping the distribution.
+
+The primary difference lies in their **search and iteration methods** (how they propose the next step):
+
+- **JAGS** relies heavily on **Gibbs Sampling** (and Metropolis-Hastings). It typically updates one parameter at a time. This is like taking random walks along the axes of the parameter space. While effective for simpler models, it can be slow and struggle to converge in complex, highly correlated NMA models.
+- **Stan** uses **Hamiltonian Monte Carlo (HMC)**. Instead of taking blind random walks, it calculates the *gradient* of the log-posterior (the slope of the probability hill) and uses physical simulation concepts to glide efficiently through the parameter space.
+
+Both tools are simply more sophisticated "walkers" designed to scale up to the dozens or hundreds of parameters required in professional HTA submissions.
+
+------------------------------------------------------------------------
+
+## Audit Point: The "Prior" in HTA Submissions
+
+In NICE submissions, the choice of priors is heavily scrutinized: 
+
+1. **Vague/Non-informative Priors**: Often used for treatment effects to "let the data speak". 
+2. **Informative Priors**: Used when data is extremely sparse (e.g., rare diseases). We might "borrow" a prior for the between-study heterogeneity variance ($\tau^2$) from a historical database of similar trials (e.g., the Turner or Rhodes priors).
+
+A credible Bayesian analyst must always perform a **Prior Sensitivity Analysis** to prove that the conclusions are driven by the trial data, not by arbitrary choices of the prior.
