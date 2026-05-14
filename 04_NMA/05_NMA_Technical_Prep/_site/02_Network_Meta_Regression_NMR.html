@@ -248,6 +248,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#the-random-effects-assumption" id="toc-the-random-effects-assumption" class="nav-link" data-scroll-target="#the-random-effects-assumption"><span class="header-section-number">2.1</span> The Random Effects Assumption</a></li>
   <li><a href="#network-meta-regression-the-linear-predictor" id="toc-network-meta-regression-the-linear-predictor" class="nav-link" data-scroll-target="#network-meta-regression-the-linear-predictor"><span class="header-section-number">2.2</span> Network Meta-Regression (The Linear Predictor)</a></li>
+  <li><a href="#identification-of-effect-modifiers-hta-audit-point" id="toc-identification-of-effect-modifiers-hta-audit-point" class="nav-link" data-scroll-target="#identification-of-effect-modifiers-hta-audit-point"><span class="header-section-number">2.3</span> Identification of Effect Modifiers (HTA Audit Point)</a></li>
   </ul></li>
   <li><a href="#3-the-mock-case" id="toc-3-the-mock-case" class="nav-link" data-scroll-target="#3-the-mock-case"><span class="header-section-number">3</span> The Mock Case: Severe Plaque Psoriasis</a>
   <ul class="collapse">
@@ -347,6 +348,15 @@ Centering: subtracting the mean $\bar{X}$ of all studies.
 Without centering, the meaning of the model intercept $\mu$ and relative effect $d$ would become the effect size when the "absolute value of the covariate is 0". For example, the efficacy of the drug when the average age is 0 years old or the baseline PASI is 0, which is clinically absurd.
 After centering, the meaning of $d$ returns to the relative efficacy at the "average baseline state of the network", which has perfect clinical interpretability.
 -->
+</section>
+<section id="identification-of-effect-modifiers-hta-audit-point" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="identification-of-effect-modifiers-hta-audit-point"><span class="header-section-number">2.3</span> Identification of Effect Modifiers (HTA Audit Point)</h3>
+<p>In HTA audits, you cannot arbitrarily include covariates in a regression model. The identification of valid effect modifiers typically follows three core principles:</p>
+<ol type="1">
+<li><strong>Clinical and Biological Plausibility</strong>: The covariate must be justified by <strong>clinical experts</strong> or previous literature as a potential factor influencing treatment effect (e.g., baseline disease severity, prior treatment history).</li>
+<li><strong>Imbalance across Studies</strong>: If a covariate is balanced across all studies in the network (e.g., mean age is 55-57 years in all trials), it cannot explain heterogeneity or inconsistency and does not need to be included in the regression. It is the imbalance across studies that warrants adjustment.</li>
+<li><strong>Statistical Support</strong>: Adding the covariate should ideally lead to a meaningful reduction in the model’s DIC or between-study heterogeneity (<span class="math inline">\(\tau\)</span>).</li>
+</ol>
 </section>
 </section>
 <section id="3-the-mock-case" class="level2" data-number="3">
@@ -1384,6 +1394,38 @@ convergence, Rhat=1).</code></pre>
 <div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><strong>No.</strong> While NMR attempts to adjust the intercept based on the study average, it suffers from the <strong>Ecological Fallacy</strong>. Adjusting based on a trial’s average 60% rate is a crude proxy. It assumes every patient has a “60% probability” of being a prior user, completely ignoring the patient-level joint distribution (e.g., maybe all the prior biologic users are also the oldest patients). To truly adjust for this without bias, you need to use <strong>MAIC</strong> to reweight your IPD to match their baseline characteristics, or use <strong>ML-NMR</strong> to integrate over the full patient parameter space.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-simple callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>What is the difference between Aggregate-level and IPD-level regression?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>This is a classic comparison in HTA audits regarding evidence synthesis:</p>
+<ol type="1">
+<li><strong>Aggregate-level (Study level) Regression</strong>:
+<ul>
+<li><strong>Data</strong>: Uses the mean value of covariates reported in the publication (e.g., the average age of patients in trial A is 55 years).</li>
+<li><strong>Limitation</strong>: Subject to the <strong>Ecological Fallacy</strong>. We can only explore <strong>between-study</strong> heterogeneity. It assumes the relationship at the study level holds at the patient level, which is often not true.</li>
+</ul></li>
+<li><strong>IPD-level (Patient level) Regression</strong>:
+<ul>
+<li><strong>Data</strong>: Uses the individual characteristics of each patient.</li>
+<li><strong>Advantage</strong>: Can accurately estimate how individual characteristics affect treatment response, completely avoiding the Ecological Fallacy. It can simultaneously explore both <strong>within-study</strong> and <strong>between-study</strong> interactions.</li>
+</ul></li>
+<li><strong>The Reality in HTA</strong>:
+<ul>
+<li>Usually, a manufacturer has IPD for their own trials but only Aggregate Data (AD) extracted from publications for competitor trials. This data asymmetry prevents running a full IPD NMA and leads to the need for population adjustment methods like <strong>MAIC</strong> or <strong>ML-NMR</strong> (which will be covered in files 06 and 08).</li>
+</ul></li>
+</ol>
 </div>
 </div>
 </div>

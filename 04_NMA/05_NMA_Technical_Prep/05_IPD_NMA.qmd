@@ -38,6 +38,26 @@ When processing trial-level summaries, we cannot accurately adjust for patient-l
 2.  Standardize outcome definitions and follow-up times across different trials.
 3.  Conduct reliable subgroup analyses (e.g., precise treatment effect estimation in patients with biomarker X).
 
+### Data Acquisition Paths: How to get Competitor IPD?
+
+In HTA submissions, a manufacturer usually possesses the IPD for their own product's trials. However, obtaining the IPD for competitor trials is a major challenge. The industry-standard paths for lawful data acquisition include:
+
+1. **Independent Data Sharing Platforms**:
+   - **YODA (Yale University Open Data Access)**: Yale partners with companies like Johnson & Johnson to share clinical trial data.
+   - **CSDR (ClinicalStudyDataRequest.com)**: A multi-sponsor platform sharing data from companies like GSK, Novartis, and Roche.
+   - **Project Data Sphere**: A platform specifically focused on sharing historical patient-level data from oncology trials.
+   - **Vivli**: One of the largest global platforms for searching and requesting clinical trial data.
+2. **The Acquisition Process**: Access is not guaranteed and requires submitting a detailed **Statistical Analysis Plan (SAP)**. Once approved by an independent review panel, researchers typically analyze the data within a secure, closed cloud environment (sandbox) where data downloading is strictly prohibited.
+
+### Methodological Differences: IPD vs. AD NMA
+
+The transition from Aggregate Data (AD) to Individual Patient Data (IPD) represents a fundamental shift in evidence synthesis methodology:
+
+- **Data Granularity**: AD uses summary statistics (e.g., a trial's average age is 55). IPD uses the exact characteristics of every single patient (e.g., Patient A is 45, Patient B is 65).
+- **Ecological Fallacy**: AD models are vulnerable to ecological bias when estimating treatment-by-covariate interactions. IPD models are immune to this fallacy by analyzing within-trial patient variability.
+- **Covariate Adjustment**: In AD NMA, meta-regression is underpowered because the sample size is the number of studies. In IPD NMA, the sample size is the total number of patients, providing massive statistical power to detect effect modifiers.
+- **Endpoint Standardization**: AD NMA is forced to use whatever outcome definitions were published in the papers (which often vary). IPD NMA allows researchers to apply a single, unified cleaning rule to raw data across all trials to calculate perfectly standardized endpoints.
+
 ```{=html}
 <!-- Audit Point: Understanding the Ecological Fallacy
 The **Ecological Fallacy** occurs when we assume that a relationship observed at the group/aggregate level also holds true at the individual level.

@@ -75,6 +75,14 @@ After centering, the meaning of $d$ returns to the relative efficacy at the "ave
 -->
 ```
 
+### Identification of Effect Modifiers (HTA Audit Point)
+
+In HTA audits, you cannot arbitrarily include covariates in a regression model. The identification of valid effect modifiers typically follows three core principles:
+
+1. **Clinical and Biological Plausibility**: The covariate must be justified by **clinical experts** or previous literature as a potential factor influencing treatment effect (e.g., baseline disease severity, prior treatment history).
+2. **Imbalance across Studies**: If a covariate is balanced across all studies in the network (e.g., mean age is 55-57 years in all trials), it cannot explain heterogeneity or inconsistency and does not need to be included in the regression. It is the imbalance across studies that warrants adjustment.
+3. **Statistical Support**: Adding the covariate should ideally lead to a meaningful reduction in the model's DIC or between-study heterogeneity ($\tau$).
+
 ## The Mock Case: Severe Plaque Psoriasis {#3-the-mock-case}
 
 ### The Clinical Scenario
@@ -791,6 +799,21 @@ The final League Table will now represent the comparative efficacy at the **aver
 # If a competitor's trial has 60% Prior Biologic users, but yours only has 10%, can Standard NMR fully fix this?
 
 **No.** While NMR attempts to adjust the intercept based on the study average, it suffers from the **Ecological Fallacy**. Adjusting based on a trial's average 60% rate is a crude proxy. It assumes every patient has a "60% probability" of being a prior user, completely ignoring the patient-level joint distribution (e.g., maybe all the prior biologic users are also the oldest patients). To truly adjust for this without bias, you need to use **MAIC** to reweight your IPD to match their baseline characteristics, or use **ML-NMR** to integrate over the full patient parameter space.
+:::
+
+::: {.callout-important collapse="true" appearance="minimal"}
+# What is the difference between Aggregate-level and IPD-level regression?
+
+This is a classic comparison in HTA audits regarding evidence synthesis:
+
+1. **Aggregate-level (Study level) Regression**:
+   - **Data**: Uses the mean value of covariates reported in the publication (e.g., the average age of patients in trial A is 55 years).
+   - **Limitation**: Subject to the **Ecological Fallacy**. We can only explore **between-study** heterogeneity. It assumes the relationship at the study level holds at the patient level, which is often not true.
+2. **IPD-level (Patient level) Regression**:
+   - **Data**: Uses the individual characteristics of each patient.
+   - **Advantage**: Can accurately estimate how individual characteristics affect treatment response, completely avoiding the Ecological Fallacy. It can simultaneously explore both **within-study** and **between-study** interactions.
+3. **The Reality in HTA**:
+   - Usually, a manufacturer has IPD for their own trials but only Aggregate Data (AD) extracted from publications for competitor trials. This data asymmetry prevents running a full IPD NMA and leads to the need for population adjustment methods like **MAIC** or **ML-NMR** (which will be covered in files 06 and 08).
 :::
 
 ------------------------------------------------------------------------

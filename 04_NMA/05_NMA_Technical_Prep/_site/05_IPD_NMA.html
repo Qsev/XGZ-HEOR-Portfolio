@@ -243,7 +243,11 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#1-executive-summary" id="toc-1-executive-summary" class="nav-link active" data-scroll-target="#1-executive-summary"><span class="header-section-number">1</span> Executive Summary: Why IPD is the Gold Standard</a></li>
+  <li><a href="#1-executive-summary" id="toc-1-executive-summary" class="nav-link active" data-scroll-target="#1-executive-summary"><span class="header-section-number">1</span> Executive Summary: Why IPD is the Gold Standard</a>
+  <ul class="collapse">
+  <li><a href="#data-acquisition-paths-how-to-get-competitor-ipd" id="toc-data-acquisition-paths-how-to-get-competitor-ipd" class="nav-link" data-scroll-target="#data-acquisition-paths-how-to-get-competitor-ipd"><span class="header-section-number">1.1</span> Data Acquisition Paths: How to get Competitor IPD?</a></li>
+  <li><a href="#methodological-differences-ipd-vs.-ad-nma" id="toc-methodological-differences-ipd-vs.-ad-nma" class="nav-link" data-scroll-target="#methodological-differences-ipd-vs.-ad-nma"><span class="header-section-number">1.2</span> Methodological Differences: IPD vs.&nbsp;AD NMA</a></li>
+  </ul></li>
   <li><a href="#2-mock-case" id="toc-2-mock-case" class="nav-link" data-scroll-target="#2-mock-case"><span class="header-section-number">2</span> The Minimal Mock Case: Binary Outcomes with Patient Covariates</a>
   <ul class="collapse">
   <li><a href="#the-scenario-treatments" id="toc-the-scenario-treatments" class="nav-link" data-scroll-target="#the-scenario-treatments"><span class="header-section-number">2.1</span> The Scenario &amp; Treatments</a></li>
@@ -314,6 +318,29 @@ window.Quarto = {
 <li>Standardize outcome definitions and follow-up times across different trials.</li>
 <li>Conduct reliable subgroup analyses (e.g., precise treatment effect estimation in patients with biomarker X).</li>
 </ol>
+<section id="data-acquisition-paths-how-to-get-competitor-ipd" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="data-acquisition-paths-how-to-get-competitor-ipd"><span class="header-section-number">1.1</span> Data Acquisition Paths: How to get Competitor IPD?</h3>
+<p>In HTA submissions, a manufacturer usually possesses the IPD for their own product’s trials. However, obtaining the IPD for competitor trials is a major challenge. The industry-standard paths for lawful data acquisition include:</p>
+<ol type="1">
+<li><strong>Independent Data Sharing Platforms</strong>:
+<ul>
+<li><strong>YODA (Yale University Open Data Access)</strong>: Yale partners with companies like Johnson &amp; Johnson to share clinical trial data.</li>
+<li><strong>CSDR (ClinicalStudyDataRequest.com)</strong>: A multi-sponsor platform sharing data from companies like GSK, Novartis, and Roche.</li>
+<li><strong>Project Data Sphere</strong>: A platform specifically focused on sharing historical patient-level data from oncology trials.</li>
+<li><strong>Vivli</strong>: One of the largest global platforms for searching and requesting clinical trial data.</li>
+</ul></li>
+<li><strong>The Acquisition Process</strong>: Access is not guaranteed and requires submitting a detailed <strong>Statistical Analysis Plan (SAP)</strong>. Once approved by an independent review panel, researchers typically analyze the data within a secure, closed cloud environment (sandbox) where data downloading is strictly prohibited.</li>
+</ol>
+</section>
+<section id="methodological-differences-ipd-vs.-ad-nma" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="methodological-differences-ipd-vs.-ad-nma"><span class="header-section-number">1.2</span> Methodological Differences: IPD vs.&nbsp;AD NMA</h3>
+<p>The transition from Aggregate Data (AD) to Individual Patient Data (IPD) represents a fundamental shift in evidence synthesis methodology:</p>
+<ul>
+<li><strong>Data Granularity</strong>: AD uses summary statistics (e.g., a trial’s average age is 55). IPD uses the exact characteristics of every single patient (e.g., Patient A is 45, Patient B is 65).</li>
+<li><strong>Ecological Fallacy</strong>: AD models are vulnerable to ecological bias when estimating treatment-by-covariate interactions. IPD models are immune to this fallacy by analyzing within-trial patient variability.</li>
+<li><strong>Covariate Adjustment</strong>: In AD NMA, meta-regression is underpowered because the sample size is the number of studies. In IPD NMA, the sample size is the total number of patients, providing massive statistical power to detect effect modifiers.</li>
+<li><strong>Endpoint Standardization</strong>: AD NMA is forced to use whatever outcome definitions were published in the papers (which often vary). IPD NMA allows researchers to apply a single, unified cleaning rule to raw data across all trials to calculate perfectly standardized endpoints.</li>
+</ul>
 <!-- Audit Point: Understanding the Ecological Fallacy
 The **Ecological Fallacy** occurs when we assume that a relationship observed at the group/aggregate level also holds true at the individual level.
 In NMA, if we run a trial-level meta-regression and find that "studies with a higher average age show a lower treatment effect," it is an ecological fallacy to conclude that "older individual patients benefit less from the drug." 
@@ -323,6 +350,7 @@ The study-level trend can be confounded by other trial-specific factors (e.g., d
 NICE and other HTA agencies strongly prefer IPD NMA whenever the data is available. If a manufacturer owns the IPD for their own trials (e.g., Trial A vs Placebo) and can access the IPD for a competitor's trial (e.g., via data-sharing platforms like Project Data Sphere or Yale YODA), submitting an IPD NMA is expected. 
 When IPD is only available for the manufacturer's own drug but not for the competitor's drug, methods like MAIC or ML-NMR (which we cover in later chapters) are used to bridge the IPD-to-AD gap. Pure IPD NMA is strictly used when IPD is available across the relevant network.
 -->
+</section>
 </section>
 <section id="2-mock-case" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="2-mock-case"><span class="header-section-number">2</span> The Minimal Mock Case: Binary Outcomes with Patient Covariates</h2>
@@ -651,7 +679,7 @@ d[2]       1.17    0.01 0.48    0.25    0.84    1.16    1.48    2.15  2433    1
 d[3]       1.90    0.01 0.48    0.93    1.57    1.90    2.22    2.85  2719    1
 lp__    -110.50    0.04 1.62 -114.45 -111.33 -110.14 -109.31 -108.37  1967    1
 
-Samples were drawn using NUTS(diag_e) at Tue May 12 20:10:47 2026.
+Samples were drawn using NUTS(diag_e) at Thu May 14 11:59:24 2026.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>

@@ -27,25 +27,27 @@ format:
 -->
 ```
 
-## Executive Summary: When NMA Fails {#1-executive-summary}
+## Executive Summary: Bridging Data Asymmetry in HTA {#1-executive-summary}
 
-Standard Network Meta-Analysis (NMA) requires a connected network of trials (usually connected via a common comparator like Placebo or Standard of Care). However, in many real-world Health Technology Assessment (HTA) submissions, the network is **broken**.
+In real-world Health Technology Assessment (HTA) submissions to bodies like NICE, we often face a critical data asymmetry when trying to compare a new drug with its competitors:
 
-A common scenario is when a pharmaceutical company conducts a single-arm trial for their new drug (Drug A), while the competitor drug (Drug B) also only has published single-arm trial data. Since there is no common comparator, standard NMA is mathematically impossible. Furthermore, direct naive comparison of the two single arms is severely biased if the patient populations differ (e.g., Trial A enrolled younger patients with lower disease severity than Trial B, as is often the case in real-world clinical practice).
+1. **Our Drug (Drug A)**: We have conducted a randomized controlled trial (Drug A vs. Standard of Care) and possess the full **Individual Patient Data (IPD)**.
+2. **Competitor Drug (Drug B)**: The competitor has also run a trial against the same Standard of Care, but we only have access to the published **Aggregate Data (AgD)** from their literature.
 
-**Matching-Adjusted Indirect Comparison (MAIC)** is a form of Population-Adjusted Indirect Comparison (PAIC) designed specifically for this scenario. It requires:
+While the evidence network is technically connected via the common comparator (Standard of Care), a standard Network Meta-Analysis (NMA) relies on the assumption that the patient populations across these trials are similar. In reality, they almost always differ (e.g., Trial A enrolled younger, healthier patients than Trial B). Directly pooling the relative effects without adjusting for these population differences yields biased estimates.
 
-1.  **Individual Patient Data (IPD)** for the active treatment (Drug A).
-2.  **Aggregate Data (AgD)** (summary statistics) for the comparator treatment (Drug B).
+If we had IPD for both trials, we would perform a gold-standard **Full IPD NMA**. However, constrained by the competitor's aggregate data, we must use a workaround.
 
-MAIC works by assigning a statistical weight to every individual patient in Trial A, such that the *weighted* baseline characteristics of Trial A perfectly match the *published* aggregate characteristics of Trial B. Once matched, the outcomes can be compared directly.
+**Matching-Adjusted Indirect Comparison (MAIC)** is a statistical workaround designed precisely for this "asymmetric data" scenario (specifically **Anchored MAIC**). It utilizes the flexibility of our IPD to adjust for population differences. MAIC assigns a statistical weight to every individual patient in Trial A such that the *weighted* baseline characteristics perfectly match the *published* aggregate characteristics of Trial B. Once the populations are aligned, we compare the relative treatment effects against the common comparator.
+
+In essence, MAIC is a **"pseudo-IPD" method**. It steps down to the lowest common denominator (aggregate level) to facilitate a fair, covariate-adjusted comparison that would otherwise be impossible due to data limitations.
 
 ```{=html}
 <!-- Audit Point: Anchored vs Unanchored MAIC
 NICE DSU Technical Support Document (TSD) 18 outlines two types of MAIC:
 1. **Unanchored MAIC**: Used when there is no common comparator (e.g., comparing two single-arm trials). This relies on a very strong assumption: *all* relative effect modifiers and prognostic factors must be accounted for.
 2. **Anchored MAIC**: Used when both trials have a common comparator (e.g., Placebo), but we still want to adjust for population differences. This only requires accounting for relative effect modifiers, making it the preferred method by HTA bodies whenever possible.
-In this chapter, we demonstrate the mathematical mechanism of weighting using the simpler Unanchored scenario.
+In this chapter, we demonstrate the mathematical mechanism of weighting using the simpler Unanchored scenario to focus purely on the weighting mechanics.
 -->
 ```
 
@@ -95,11 +97,28 @@ To understand the workflow of finding weights, think of it as a 3-step process:
 -->
 ```
 
-After finding the optimal weights, a crucial metric evaluated is the **Effective Sample Size (ESS)**:
+### Entropy Balancing vs. Inverse Probability Weighting (IPW)
+
+While MAIC is often categorized broadly as a propensity score method, its mathematical engine is distinct from traditional Inverse Probability Weighting (IPW):
+
+- **IPW (Propensity Score Weighting)**:
+  - **Mechanism**: Estimates the probability of a patient belonging to Trial A vs. Trial B (usually via logistic regression) and applies weights proportional to `1/PS`.
+  - **Limitations**: Requires Individual Patient Data (IPD) for both trials. Furthermore, it does not guarantee exact moment matching in small samples; it only achieves balance asymptotically.
+- **Entropy Balancing (The MAIC Approach)**:
+  - **Mechanism**: Directly searches for weights that satisfy the moment conditions (e.g., sample mean of A = published mean of B) while keeping the weights as close to uniform as possible (maximizing the entropy of the weights).
+  - **Advantages**: Only requires IPD for the index trial and Aggregate Data (AgD) for the target trial. It guarantees **perfect alignment** of the specified moments by design.
+
+### Effective Sample Size (ESS) Diagnosis
+
+After calculating the MAIC weights, the most critical diagnostic metric to evaluate is the **Effective Sample Size (ESS)**:
 
 $$ESS = \frac{(\sum w_i)^2}{\sum w_i^2}$$
 
-A severe drop in ESS (e.g., from 200 patients down to an ESS of 20) indicates that the populations are too distinct, and the matching relies heavily on just a few outlier patients in Trial A.
+In HTA audits, the ESS is scrutinized under the following principles:
+
+1.  **The Threshold of Validity**: A severe drop in ESS (e.g., from 200 patients down to an ESS of 20, or \<15% of the original sample size) indicates that the populations of Trial A and Trial B have very little overlap.
+2.  **Weight Distribution**: If the ESS is small, the matching relies heavily on just a few outlier patients in Trial A who happen to look like the average patient in Trial B. These patients will receive massive weights, making the final comparison highly unstable and unrepresentative.
+3.  **Reporting Requirements**: Manufacturers are required to report both the original sample size and the ESS, alongside **histograms of the weight distribution** to prove that no single patient dominates the analysis.
 
 ## Custom R Implementation: Calculating Weights from Scratch {#4-custom-r-implementation}
 
@@ -311,3 +330,24 @@ With the point estimate and the bootstrapped standard error, we can now present 
 While bootstrapping is universally accepted by HTA bodies like NICE, it can be computationally intensive, especially with large datasets or complex models. An alternative is the **Sandwich Estimator** (Robust Standard Errors), which calculates the variance analytically without simulation. The `maicplus` package supports both methods.
 -->
 ```
+
+## Sensitivity Analysis in MAIC {#7-sensitivity}
+
+HTA agencies (such as NICE) rarely accept a single MAIC result. Because the method relies on the unverified assumption that all effect modifiers have been accounted for, rigorous sensitivity analyses are mandatory:
+
+```{=html}
+<!-- Audit Point: Covariate Selection and the Bias-Variance Trade-off
+In our simple mock case, we only have one covariate (Age), so there is no choice to make. However, in real-world HTA submissions, the competitor's publication might report a dozen baseline characteristics. 
+Modellers face a severe "Bias-Variance Trade-off":
+- Matching on all available covariates guarantees perfect balance but often causes the ESS to plummet to an unacceptably low number (as extreme weights are assigned to a few patients to achieve balance in a high-dimensional space).
+- Matching on too few covariates preserves a large ESS but risks leaving residual confounding.
+This is why presenting multiple "Covariate Selection Scenarios" is a mandatory part of any MAIC sensitivity analysis requested by agencies like NICE.
+-->
+```
+
+1.  **Covariate Selection Scenarios**: Modellers must present results using different sets of matching covariates:
+    - Base Case: Matching only on covariates agreed upon in the Statistical Analysis Plan (SAP) or clinical consensus.
+    - Scenario A: Adding borderline prognostic factors.
+    - Scenario B: Dropping covariates with high missingness.
+2.  **Matching Higher Moments**: Standard MAIC matches the means (first moment). Sensitivity analysis involves matching both the means and the variances (second moment, by including squared terms of covariates in the matching algorithm) to ensure the distribution shapes are comparable.
+3.  **The Bias-Variance Trade-off Curve**: As more covariates are added to the matching algorithm, bias decreases but the weights become more extreme, causing the ESS to plummet (variance inflates). Presenting a curve of Treatment Effect vs. ESS helps reviewers judge the robustness of the matching strategy.

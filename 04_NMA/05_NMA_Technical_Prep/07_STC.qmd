@@ -169,7 +169,7 @@ If you fit a logistic regression model on Trial A, and then plug in the *mean ag
 
 However, what you *actually want* is the average probability of the event across the entire Trial B population, which is $E[f(X)]$.
 
-Because STC plugs aggregate means into non-linear equations, it produces systematically biased population-level estimates. This mathematical flaw is the exact reason why **Multilevel Network Meta-Regression (ML-NMR)** was invented—to perform numerical integration over the distribution of $X$ to correctly calculate $E[f(X)]$ without ecological bias.
+Because STC plugs aggregate means into non-linear equations, it produces systematically biased population-level estimates. **Quantifying this bias is impossible within the STC framework** because it requires knowing the full distribution (variance and covariance) of the baseline characteristics in Trial B, which are not reported in the aggregate data. This mathematical inevitability is the exact reason why **Multilevel Network Meta-Regression (ML-NMR)** was invented—to perform numerical integration over simulated patient distributions to correctly calculate $E[f(X)]$ without ecological bias.
 
 ```{=html}
 <!-- Audit Point: Common Misconceptions Regarding STC and Jensen's Inequality
@@ -189,15 +189,18 @@ Because STC plugs aggregate means into non-linear equations, it produces systema
 -->
 ```
 
-```{=html}
-<!-- Audit Point: Is STC practically useless due to Ecological Bias?
-Your intuition is sharp: for Oncology and survival outcomes (which are non-linear), STC is heavily criticized by NICE. However, STC is STILL widely used in practice for two reasons:
+## Why STC is Still Alive {#7-why-stc-alive}
 
-1. Valid Linear Scenarios: There are many disease areas where the primary clinical endpoint IS continuous (modeled via OLS linear regression). In these cases, the link function is linear, Jensen's Inequality does not trigger Ecological Bias, and STC is mathematically perfectly valid. Examples include:
-   - Diabetes: Mean reduction in HbA1c.
-   - Obesity: Mean weight loss (kg).
-   - Rheumatology/Psychiatry: Mean change in continuous symptom scores (e.g., PASI, HAQ-DI, MADRS).
+Given the severe criticism regarding Ecological Bias in non-linear models (which are the norm in oncology), one might wonder why STC is still widely used in HTA submissions. There are two primary reasons why STC remains a valid choice or even the *only* choice in certain scenarios:
 
-2. The "Desperation" Scenario: When Trial A and Trial B have almost NO covariate overlap (e.g., matching a very young cohort to a very old cohort), MAIC will drop the Effective Sample Size (ESS) to near zero, destroying statistical power. STC, being a predictive model, does not drop ESS. In desperate cases, sponsors submit STC for non-linear outcomes, arguing that ecological bias is the "lesser evil" compared to a MAIC with an ESS of 2. (Though today, reviewers will demand ML-NMR in this exact situation).
--->
-```
+### 1. Valid Linear Scenarios
+
+There are many disease areas where the primary clinical endpoint is continuous and modeled via standard OLS linear regression. In these cases, the link function is linear, Jensen's Inequality does not trigger, and STC is mathematically perfectly valid (yielding unbiased estimates). Examples include: 
+
+- **Diabetes**: Mean reduction in HbA1c. 
+- **Obesity**: Mean weight loss (kg). 
+- **Rheumatology/Psychiatry**: Mean change in continuous symptom scores (e.g., PASI, HAQ-DI, MADRS).
+
+### 2. The "Desperation" Scenario (Poor Overlap)
+
+When Trial A and Trial B have very little covariate overlap (e.g., matching a very young cohort to a very old cohort), MAIC will drop the Effective Sample Size (ESS) to near zero, destroying statistical power and making the analysis dominated by a few outlier patients. STC, being a predictive regression model, does not rely on weighting and therefore does not suffer from ESS reduction. In these "desperate" cases with poor overlap, sponsors often submit STC even for non-linear outcomes, arguing that the resulting ecological bias is the "lesser evil" compared to a MAIC analysis with an ESS of 2.

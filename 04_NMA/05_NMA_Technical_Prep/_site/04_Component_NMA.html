@@ -248,16 +248,15 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#the-hta-perspective-will-nice-accept-this" id="toc-the-hta-perspective-will-nice-accept-this" class="nav-link" data-scroll-target="#the-hta-perspective-will-nice-accept-this"><span class="header-section-number">2.1</span> The HTA Perspective: Will NICE Accept This?</a></li>
   <li><a href="#unique-real-world-scenarios-for-cnma" id="toc-unique-real-world-scenarios-for-cnma" class="nav-link" data-scroll-target="#unique-real-world-scenarios-for-cnma"><span class="header-section-number">2.2</span> Unique Real-World Scenarios for CNMA</a></li>
+  <li><a href="#verification-of-the-additive-assumption" id="toc-verification-of-the-additive-assumption" class="nav-link" data-scroll-target="#verification-of-the-additive-assumption"><span class="header-section-number">2.3</span> Verification of the Additive Assumption</a></li>
+  <li><a href="#boundaries-of-applicability" id="toc-boundaries-of-applicability" class="nav-link" data-scroll-target="#boundaries-of-applicability"><span class="header-section-number">2.4</span> Boundaries of Applicability</a></li>
+  <li><a href="#the-scenario-treatments" id="toc-the-scenario-treatments" class="nav-link" data-scroll-target="#the-scenario-treatments"><span class="header-section-number">2.5</span> The Scenario &amp; Treatments</a></li>
+  <li><a href="#extracted-data" id="toc-extracted-data" class="nav-link" data-scroll-target="#extracted-data"><span class="header-section-number">2.6</span> Extracted Data</a></li>
+  <li><a href="#regression-input-data" id="toc-regression-input-data" class="nav-link" data-scroll-target="#regression-input-data"><span class="header-section-number">2.7</span> Regression Input Data</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">2.8</span> Results</a></li>
   </ul></li>
-  <li><a href="#3-design-matrix" id="toc-3-design-matrix" class="nav-link" data-scroll-target="#3-design-matrix"><span class="header-section-number">3</span> The Minimal Mock Case: Advanced Melanoma Combination Therapy</a>
-  <ul class="collapse">
-  <li><a href="#the-scenario-treatments" id="toc-the-scenario-treatments" class="nav-link" data-scroll-target="#the-scenario-treatments"><span class="header-section-number">3.1</span> The Scenario &amp; Treatments</a></li>
-  <li><a href="#extracted-data" id="toc-extracted-data" class="nav-link" data-scroll-target="#extracted-data"><span class="header-section-number">3.2</span> Extracted Data</a></li>
-  <li><a href="#regression-input-data" id="toc-regression-input-data" class="nav-link" data-scroll-target="#regression-input-data"><span class="header-section-number">3.3</span> Regression Input Data</a></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">3.4</span> Results</a></li>
-  </ul></li>
-  <li><a href="#4-stan-model" id="toc-4-stan-model" class="nav-link" data-scroll-target="#4-stan-model"><span class="header-section-number">4</span> The Stan Model for CNMA</a></li>
-  <li><a href="#5-simulation" id="toc-5-simulation" class="nav-link" data-scroll-target="#5-simulation"><span class="header-section-number">5</span> Simulating and Executing CNMA in R</a></li>
+  <li><a href="#4-stan-model" id="toc-4-stan-model" class="nav-link" data-scroll-target="#4-stan-model"><span class="header-section-number">3</span> The Stan Model for CNMA</a></li>
+  <li><a href="#5-simulation" id="toc-5-simulation" class="nav-link" data-scroll-target="#5-simulation"><span class="header-section-number">4</span> Simulating and Executing CNMA in R</a></li>
   </ul>
 </nav>
     </div>
@@ -341,12 +340,41 @@ This misunderstanding stems from confusing the scales. In CNMA, additivity is as
 <li><strong>Disentangling Heterogeneous “Standard of Care” (SoC) Baselines</strong>: In many disease areas, the “control” arm is the investigator’s choice of SoC, which varies across trials (e.g., SoC in Trial 1 contains components X and Y; SoC in Trial 2 contains components X and Z). Standard NMA treats these as different nodes or ignores the difference. CNMA can adjust for the specific components present in the background therapy of each trial.</li>
 </ol>
 </section>
+<section id="verification-of-the-additive-assumption" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="verification-of-the-additive-assumption"><span class="header-section-number">2.3</span> Verification of the Additive Assumption</h3>
+<p>In HTA audits, the additive assumption is the most scrutinized part of a CNMA. It must be verified using both clinical arguments and statistical tests:</p>
+<ol type="1">
+<li><strong>The Interaction Model</strong>:
+<ul>
+<li>To test the additive assumption, we can fit an expanded model that includes an interaction term for the combination: <span class="math inline">\(\theta_{AB} = \theta_A + \theta_B + \theta_{A*B}\)</span>.</li>
+<li>If the 95% Credible Interval (CrI) of the interaction term <span class="math inline">\(\theta_{A*B}\)</span> crosses 0, it suggests that the data does not provide strong evidence against the additive assumption.</li>
+</ul></li>
+<li><strong>Model Comparison (DIC/WAIC)</strong>:
+<ul>
+<li>Compare the Deviance Information Criterion (DIC) or WAIC of the pure additive model with the interaction model.</li>
+<li>If adding the interaction term does not lead to a meaningful reduction in DIC (e.g., by more than 3 to 5 points), the principle of parsimony favors the simpler <strong>pure additive model</strong>.</li>
+</ul></li>
+</ol>
 </section>
-<section id="3-design-matrix" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="3-design-matrix"><span class="header-section-number">3</span> The Minimal Mock Case: Advanced Melanoma Combination Therapy</h2>
+<section id="boundaries-of-applicability" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="boundaries-of-applicability"><span class="header-section-number">2.4</span> Boundaries of Applicability</h3>
+<p>Component NMA is a powerful tool, but it is not universally applicable. Its boundaries are defined by:</p>
+<ul>
+<li><strong>When to Use (Green Flags)</strong>:
+<ul>
+<li><strong>Pharmacological Independence</strong>: The components have different mechanisms of action and are not expected to interact biologically.</li>
+<li><strong>Sparse Networks</strong>: When treating combinations as independent nodes results in a disconnected or extremely sparse network, and CNMA is the only way to facilitate indirect comparisons.</li>
+</ul></li>
+<li><strong>When NOT to Use (Red Flags)</strong>:
+<ul>
+<li><strong>Known Synergy or Antagonism</strong>: In areas like oncology where combinations (e.g., IO + Chemo) are explicitly designed to be synergistic, a pure additive model is clinically invalid and will be rejected by agencies like NICE.</li>
+<li><strong>Data Inseparability</strong>: If the network lacks trials comparing the combination directly with its components (e.g., missing trials of A+B vs A or A+B vs B), the interaction term cannot be mathematically identified. Running CNMA in such “thin” networks relies purely on the unverified additive assumption. ## The Minimal Mock Case: Advanced Melanoma Combination Therapy {#3-design-matrix}</li>
+</ul></li>
+</ul>
 <p>To make the Component NMA (CNMA) operation clear, let’s ground it in a concrete clinical scenario answering the specific workflow questions.</p>
-<section id="the-scenario-treatments" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="the-scenario-treatments"><span class="header-section-number">3.1</span> The Scenario &amp; Treatments</h3>
+</section>
+<section id="the-scenario-treatments" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="the-scenario-treatments"><span class="header-section-number">2.5</span> The Scenario &amp; Treatments</h3>
 <p>We are analyzing clinical trials for <strong>Advanced Melanoma</strong>. The network evaluates 3 distinct components:</p>
 <ul>
 <li><strong>Component 1</strong>: Placebo (Reference, effect set to 0).</li>
@@ -361,8 +389,8 @@ This misunderstanding stems from confusing the scales. In CNMA, additivity is as
 <li><strong>Trt 4</strong>: Drug A + Drug B combination.</li>
 </ul>
 </section>
-<section id="extracted-data" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="extracted-data"><span class="header-section-number">3.2</span> Extracted Data</h3>
+<section id="extracted-data" class="level3" data-number="2.6">
+<h3 data-number="2.6" class="anchored" data-anchor-id="extracted-data"><span class="header-section-number">2.6</span> Extracted Data</h3>
 <p>Instead of individual patient data, we <strong>extract aggregate effect sizes</strong> (e.g., Log-Hazard Ratios) from <strong>published papers</strong>:</p>
 <ul>
 <li><strong>Study 1</strong> (Trt 1 vs 2): Observed effect = -0.5 (SE = 0.1).</li>
@@ -370,8 +398,8 @@ This misunderstanding stems from confusing the scales. In CNMA, additivity is as
 <li><strong>Study 3</strong> (Trt 2 vs 4): Observed effect = -0.3 (SE = 0.1).</li>
 </ul>
 </section>
-<section id="regression-input-data" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="regression-input-data"><span class="header-section-number">3.3</span> Regression Input Data</h3>
+<section id="regression-input-data" class="level3" data-number="2.7">
+<h3 data-number="2.7" class="anchored" data-anchor-id="regression-input-data"><span class="header-section-number">2.7</span> Regression Input Data</h3>
 <p>We do not treat the 4 treatments as independent categories. We break them down into a <strong>Design Matrix</strong> <span class="math inline">\(X\)</span> based on their components:</p>
 <table class="caption-top table">
 <thead>
@@ -413,8 +441,8 @@ This misunderstanding stems from confusing the scales. In CNMA, additivity is as
 <p>The linear predictor for Treatment <span class="math inline">\(k\)</span> in Study <span class="math inline">\(j\)</span> becomes: <span class="math display">\[\theta_{jk} = \mu_j + X_{k,2}\delta_2 + X_{k,3}\delta_3\]</span></p>
 <p>Where: - <span class="math inline">\(X_{k,2}\)</span> and <span class="math inline">\(X_{k,3}\)</span> are <strong>indicator variables</strong> (values 0 or 1) from the Design Matrix. - <span class="math inline">\(\delta_2\)</span> and <span class="math inline">\(\delta_3\)</span> are the <strong>true underlying marginal effects</strong> of Component 2 and Component 3.</p>
 </section>
-<section id="results" class="level3" data-number="3.4">
-<h3 data-number="3.4" class="anchored" data-anchor-id="results"><span class="header-section-number">3.4</span> Results</h3>
+<section id="results" class="level3" data-number="2.8">
+<h3 data-number="2.8" class="anchored" data-anchor-id="results"><span class="header-section-number">2.8</span> Results</h3>
 <p>The regression outputs the independent, marginal effects of the components: - <span class="math inline">\(\delta_2\)</span>: The effect of Drug A (estimated to be around -0.5). - <span class="math inline">\(\delta_3\)</span>: The effect of Drug B (estimated to be around -0.3).</p>
 <p>With these, we can predict the effect of the combination (Trt 4) relative to Placebo as <span class="math inline">\(\delta_2 + \delta_3 = -0.8\)</span>, even if no trial directly compared Trt 1 vs Trt 4.</p>
 <!-- Audit Point: Why Include Study 3? The Value of Indirect Evidence
@@ -425,8 +453,8 @@ The answer lies in **Information Borrowing** and Precision:
 -->
 </section>
 </section>
-<section id="4-stan-model" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="4-stan-model"><span class="header-section-number">4</span> The Stan Model for CNMA</h2>
+<section id="4-stan-model" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="4-stan-model"><span class="header-section-number">3</span> The Stan Model for CNMA</h2>
 <p>We implement a standard Normal likelihood (Continuous Data) CNMA model in Stan.</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
@@ -477,8 +505,8 @@ Instead of hardcoding `X2*d2 + X3*d3`, we use vector multiplication `dot_product
 This makes the Stan code highly scalable. Whether we have 2 components or 10 components, the Stan model code remains exactly the same; we only change the dimension of the input matrix X.
 -->
 </section>
-<section id="5-simulation" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="5-simulation"><span class="header-section-number">5</span> Simulating and Executing CNMA in R</h2>
+<section id="5-simulation" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="5-simulation"><span class="header-section-number">4</span> Simulating and Executing CNMA in R</h2>
 <p>We simulate a mock network where Drug A has a true effect of -0.5, Drug B has a true effect of -0.3, and their combination is exactly additive (-0.8).</p>
 <!-- Audit Point: Why Simulate Data Instead of Using Real Data?
 A common challenge from applied statisticians is: "We never know `d_true` in reality. We just extract `y_obs` from papers. Why are we doing this simulation?"

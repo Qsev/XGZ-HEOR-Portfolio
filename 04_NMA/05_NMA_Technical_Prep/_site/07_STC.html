@@ -254,6 +254,11 @@ window.Quarto = {
   <li><a href="#final-results" id="toc-final-results" class="nav-link" data-scroll-target="#final-results"><span class="header-section-number">5.3</span> Final Results</a></li>
   </ul></li>
   <li><a href="#6-ecological-bias" id="toc-6-ecological-bias" class="nav-link" data-scroll-target="#6-ecological-bias"><span class="header-section-number">6</span> The Fatal Flaw: Ecological Bias in Non-Linear Models</a></li>
+  <li><a href="#7-why-stc-alive" id="toc-7-why-stc-alive" class="nav-link" data-scroll-target="#7-why-stc-alive"><span class="header-section-number">7</span> Why STC is Still Alive</a>
+  <ul class="collapse">
+  <li><a href="#valid-linear-scenarios" id="toc-valid-linear-scenarios" class="nav-link" data-scroll-target="#valid-linear-scenarios"><span class="header-section-number">7.1</span> 1. Valid Linear Scenarios</a></li>
+  <li><a href="#the-desperation-scenario-poor-overlap" id="toc-the-desperation-scenario-poor-overlap" class="nav-link" data-scroll-target="#the-desperation-scenario-poor-overlap"><span class="header-section-number">7.2</span> 2. The “Desperation” Scenario (Poor Overlap)</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -472,7 +477,7 @@ Therefore, plugging the mean of X (E[X]) directly into the fitted model yields a
 <p><span class="math display">\[ f(E[X]) \neq E[f(X)] \]</span></p>
 <p>If you fit a logistic regression model on Trial A, and then plug in the <em>mean age</em> of Trial B (<span class="math inline">\(\bar{X}_B = 65\)</span>), you are calculating <span class="math inline">\(f(E[X])\)</span>. This predicts the probability of an event for a single hypothetical patient who is exactly 65 years old.</p>
 <p>However, what you <em>actually want</em> is the average probability of the event across the entire Trial B population, which is <span class="math inline">\(E[f(X)]\)</span>.</p>
-<p>Because STC plugs aggregate means into non-linear equations, it produces systematically biased population-level estimates. This mathematical flaw is the exact reason why <strong>Multilevel Network Meta-Regression (ML-NMR)</strong> was invented—to perform numerical integration over the distribution of <span class="math inline">\(X\)</span> to correctly calculate <span class="math inline">\(E[f(X)]\)</span> without ecological bias.</p>
+<p>Because STC plugs aggregate means into non-linear equations, it produces systematically biased population-level estimates. <strong>Quantifying this bias is impossible within the STC framework</strong> because it requires knowing the full distribution (variance and covariance) of the baseline characteristics in Trial B, which are not reported in the aggregate data. This mathematical inevitability is the exact reason why <strong>Multilevel Network Meta-Regression (ML-NMR)</strong> was invented—to perform numerical integration over simulated patient distributions to correctly calculate <span class="math inline">\(E[f(X)]\)</span> without ecological bias.</p>
 <!-- Audit Point: Common Misconceptions Regarding STC and Jensen's Inequality
 1. Direction of Simulation: 
    STC does NOT predict "how Drug B would perform in Trial A's population." Since we only have IPD for Trial A, we can only build a regression model for Drug A. STC predicts "how Drug A would perform in Trial B's population" by plugging Trial B's aggregate baseline into Drug A's model.
@@ -488,18 +493,25 @@ Therefore, plugging the mean of X (E[X]) directly into the fitted model yields a
      However, what you truly want is "the average mortality probability of the entire Trial B population (where some are 40 and some are 90, averaging 65)." This is E[f(X)].
      Because the function is non-linear, f(E[X]) != E[f(X)]. The predicted probability using the average age will never equal the true average probability of the population. This mathematical inevitability is Ecological Bias.
 -->
-<!-- Audit Point: Is STC practically useless due to Ecological Bias?
-Your intuition is sharp: for Oncology and survival outcomes (which are non-linear), STC is heavily criticized by NICE. However, STC is STILL widely used in practice for two reasons:
+</section>
+<section id="7-why-stc-alive" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="7-why-stc-alive"><span class="header-section-number">7</span> Why STC is Still Alive</h2>
+<p>Given the severe criticism regarding Ecological Bias in non-linear models (which are the norm in oncology), one might wonder why STC is still widely used in HTA submissions. There are two primary reasons why STC remains a valid choice or even the <em>only</em> choice in certain scenarios:</p>
+<section id="valid-linear-scenarios" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="valid-linear-scenarios"><span class="header-section-number">7.1</span> 1. Valid Linear Scenarios</h3>
+<p>There are many disease areas where the primary clinical endpoint is continuous and modeled via standard OLS linear regression. In these cases, the link function is linear, Jensen’s Inequality does not trigger, and STC is mathematically perfectly valid (yielding unbiased estimates). Examples include:</p>
+<ul>
+<li><strong>Diabetes</strong>: Mean reduction in HbA1c.</li>
+<li><strong>Obesity</strong>: Mean weight loss (kg).</li>
+<li><strong>Rheumatology/Psychiatry</strong>: Mean change in continuous symptom scores (e.g., PASI, HAQ-DI, MADRS).</li>
+</ul>
+</section>
+<section id="the-desperation-scenario-poor-overlap" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="the-desperation-scenario-poor-overlap"><span class="header-section-number">7.2</span> 2. The “Desperation” Scenario (Poor Overlap)</h3>
+<p>When Trial A and Trial B have very little covariate overlap (e.g., matching a very young cohort to a very old cohort), MAIC will drop the Effective Sample Size (ESS) to near zero, destroying statistical power and making the analysis dominated by a few outlier patients. STC, being a predictive regression model, does not rely on weighting and therefore does not suffer from ESS reduction. In these “desperate” cases with poor overlap, sponsors often submit STC even for non-linear outcomes, arguing that the resulting ecological bias is the “lesser evil” compared to a MAIC analysis with an ESS of 2.</p>
 
-1. Valid Linear Scenarios: There are many disease areas where the primary clinical endpoint IS continuous (modeled via OLS linear regression). In these cases, the link function is linear, Jensen's Inequality does not trigger Ecological Bias, and STC is mathematically perfectly valid. Examples include:
-   - Diabetes: Mean reduction in HbA1c.
-   - Obesity: Mean weight loss (kg).
-   - Rheumatology/Psychiatry: Mean change in continuous symptom scores (e.g., PASI, HAQ-DI, MADRS).
 
-2. The "Desperation" Scenario: When Trial A and Trial B have almost NO covariate overlap (e.g., matching a very young cohort to a very old cohort), MAIC will drop the Effective Sample Size (ESS) to near zero, destroying statistical power. STC, being a predictive model, does not drop ESS. In desperate cases, sponsors submit STC for non-linear outcomes, arguing that ecological bias is the "lesser evil" compared to a MAIC with an ESS of 2. (Though today, reviewers will demand ML-NMR in this exact situation).
--->
-
-
+</section>
 </section>
 
 </main> <!-- /main -->

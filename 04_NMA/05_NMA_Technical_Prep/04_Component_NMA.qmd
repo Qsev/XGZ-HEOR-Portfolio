@@ -70,6 +70,27 @@ Beyond simply increasing sample size or precision, CNMA is uniquely required in 
 2.  **Connecting Disconnected Networks**: In Standard NMA, treatments are distinct nodes. If Study 1 compares `Drug A vs Drug B` and Study 2 compares `Drug C vs Drug C + Drug D`, these networks are disconnected in standard NMA. You cannot compare A or B with D. CNMA breaks treatments down into components. If `Drug A` and `Drug C` share a common component, CNMA can bridge the network at the component level.
 3.  **Disentangling Heterogeneous "Standard of Care" (SoC) Baselines**: In many disease areas, the "control" arm is the investigator's choice of SoC, which varies across trials (e.g., SoC in Trial 1 contains components X and Y; SoC in Trial 2 contains components X and Z). Standard NMA treats these as different nodes or ignores the difference. CNMA can adjust for the specific components present in the background therapy of each trial.
 
+### Verification of the Additive Assumption
+
+In HTA audits, the additive assumption is the most scrutinized part of a CNMA. It must be verified using both clinical arguments and statistical tests:
+
+1. **The Interaction Model**:
+   - To test the additive assumption, we can fit an expanded model that includes an interaction term for the combination: $\theta_{AB} = \theta_A + \theta_B + \theta_{A*B}$.
+   - If the 95% Credible Interval (CrI) of the interaction term $\theta_{A*B}$ crosses 0, it suggests that the data does not provide strong evidence against the additive assumption.
+2. **Model Comparison (DIC/WAIC)**:
+   - Compare the Deviance Information Criterion (DIC) or WAIC of the pure additive model with the interaction model.
+   - If adding the interaction term does not lead to a meaningful reduction in DIC (e.g., by more than 3 to 5 points), the principle of parsimony favors the simpler **pure additive model**.
+
+### Boundaries of Applicability
+
+Component NMA is a powerful tool, but it is not universally applicable. Its boundaries are defined by:
+
+- **When to Use (Green Flags)**:
+  - **Pharmacological Independence**: The components have different mechanisms of action and are not expected to interact biologically.
+  - **Sparse Networks**: When treating combinations as independent nodes results in a disconnected or extremely sparse network, and CNMA is the only way to facilitate indirect comparisons.
+- **When NOT to Use (Red Flags)**:
+  - **Known Synergy or Antagonism**: In areas like oncology where combinations (e.g., IO + Chemo) are explicitly designed to be synergistic, a pure additive model is clinically invalid and will be rejected by agencies like NICE.
+  - **Data Inseparability**: If the network lacks trials comparing the combination directly with its components (e.g., missing trials of A+B vs A or A+B vs B), the interaction term cannot be mathematically identified. Running CNMA in such "thin" networks relies purely on the unverified additive assumption.
 ## The Minimal Mock Case: Advanced Melanoma Combination Therapy {#3-design-matrix}
 
 To make the Component NMA (CNMA) operation clear, let's ground it in a concrete clinical scenario answering the specific workflow questions.
