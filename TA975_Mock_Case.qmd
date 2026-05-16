@@ -1,0 +1,53 @@
+---
+title: "NICE TA975 (Tisagenlecleucel) HEOR Mock Case"
+author: "Xiaoge Zhang"
+date: "`r Sys.Date()`"
+format: 
+  html:
+    toc: true
+    code-fold: true
+---
+
+## 1. Cohort Settings & Decision Tree Parameters
+
+Before constructing the cost-utility model, it is essential to establish the baseline characteristics of the patient cohort and the underlying spatio-temporal framework of the model. This model simulates a cohort of patients with relapsed or refractory B-cell acute lymphoblastic leukemia (R/R B-cell ALL) with an average age of **12 years** and a weight of approximately **41.5 kg**.
+
+### Parameter Significance
+- **Baseline Characteristics**: The age, sex, weight, and Body Surface Area (BSA) of the patients not only determine the setting of background mortality rates but also directly influence the costs of drug treatments measured by BSA or weight.
+- **Time Horizon & Discounting**: A **88-year** lifetime horizon is used to fully capture the potential curative effects of CAR-T therapy. A **3.5%** annual discount rate follows NICE appraisal standards to adjust the present value of future costs and health gains.
+- **Decision Tree Structure**: CAR-T therapy has a unique manufacturing turnaround period. During the process from apheresis to infusion, patients may discontinue due to disease progression, death, or manufacturing failure. Establishing a decision tree allows for the accurate quantification of economic expenditures and survival losses for this "Intention-to-Treat (ITT)" population during the waiting period before entering the Partitioned Survival Model (PSM) states.
+
+```{r}
+# ==============================================================================
+# 1.1 Global Variables and Cohort Settings
+# ==============================================================================
+
+# Patient Baseline Characteristics (Base Case)
+age_start <- 12 # Starting age (years)
+prop_female <- 0.4304 # Proportion of female patients
+avg_bsa <- 1.25 # Average Body Surface Area (m2)
+avg_weight <- 41.52 # Average body weight (kg)
+
+# Model Framework Parameters
+time_horizon <- 88 # Time horizon (years)
+discount_rate <- 0.035 # Annual discount rate for costs and utilities
+days_in_month <- 30.4375 # Average days per month
+cycle_length <- 1 # Model cycle length (1 month)
+
+# ==============================================================================
+# 1.2 Decision Tree Probabilities (Tisagenlecleucel Arm)
+# ==============================================================================
+p_infusion_success <- 0.814 #<1>
+
+# Probability of discontinuing due to manufacturing failure or AEs
+p_discontinue_fail <- 0.113 #<2>
+
+# Probability of death before infusion
+p_death_pre_infusion <- 1 - (p_infusion_success + p_discontinue_fail) #<3>
+
+# Validation check
+stopifnot(abs(sum(p_infusion_success, p_discontinue_fail, p_death_pre_infusion) - 1) < 1e-6)
+```
+1. Probability of successfully proceeding to infusion (enters PSM)
+2. These patients typically switch to comparator therapies
+3. Adjusted to ensure sum is 1.0 (original provided: 0.072, sum was 0.999)
