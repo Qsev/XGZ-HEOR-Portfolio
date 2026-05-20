@@ -596,6 +596,27 @@ In this final section, we integrate healthcare resource costs with the clinical 
 All financial inputs are derived from the NICE TA975 appraisal documentation (Document B, Tables 65 and 43-47):
 
 #### One-Time Initial Treatment Costs
+
+##### Table 1: Initial Drug Acquisition and Hospital Service Costs
+| Cost Item | Cohort(s) | Value | Description / Note |
+| :--- | :--- | :--- | :--- |
+| **Tisagenlecleucel List Price** | Tisagenlecleucel | £282,000.00 | List price (before Patient Access Scheme discount) |
+| **NHS CAR-T Service Tariff** | Tisagenlecleucel | £41,101.00 | Covers leukapheresis, cell infusion, and early monitoring/AEs up to 100 days |
+| **Blinatumomab Treatment Cost** | Blinatumomab | £89,436.21 | Total treatment cost (drug, admin, and hospitalization) |
+| **Salvage Chemotherapy (FLAG-IDA)** | Salvage Chemotherapy | £21,660.00 | Total treatment cost (drug, admin, and hospitalization) |
+
+##### Table 2: Pre-treatment, Adverse Events, and Transplantation Costs
+| Cost Item | Value | Applied To / Rate | Description |
+| :--- | :--- | :--- | :--- |
+| **Bridging Chemotherapy** | £1,394.57 | Tisagenlecleucel (pre-treatment) | Non-tariff covered pre-treatment bridging therapy |
+| **Lymphodepleting Chemotherapy** | £404.52 | Tisagenlecleucel (pre-treatment) | Non-tariff covered pre-treatment lymphodepleting |
+| **Leukapheresis (uninfused only)** | £2,575.70 | Tisagenlecleucel (uninfused) | Applied only to patients discontinuing prior to infusion |
+| **Long-term AE Monitoring (IVIg)** | £11,176.85 | Tisagenlecleucel (infused) | Long-term monitoring/management for B-cell aplasia |
+| **Short-term AE Management (Blina)** | £2,847.49 | Blinatumomab | Management of short-term adverse events |
+| **Short-term AE Management (Chemo)** | £1,802.56 | Salvage Chemotherapy | Management of short-term adverse events |
+| **Subsequent allo-SCT Cost** | £151,227.43 | Tisa: 22.78%<br>Blina: 34.29%<br>Chemo: 14.75% | Applied as a one-time cost to patients undergoing subsequent stem cell transplant |
+
+##### Original List for Verification
 - **Tisagenlecleucel List Price**: £282,000.00
 - **NHS CAR-T Service Tariff**: £41,101.00 (covers leukapheresis, cell infusion, and early monitoring/AEs up to 100 days)
 - **Pre-treatment / Pre-infusion Costs**:
@@ -611,7 +632,7 @@ All financial inputs are derived from the NICE TA975 appraisal documentation (Do
 
 #### Monthly Health State Follow-up Costs
 
-| Cohort | Health State | Months 1–12 | Months 13–24 | Months 25–60 | Months >60 |
+| Cohort | Health State | M 1–12 | M 13–24 | M 25–60 | M >60 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Tisagenlecleucel** | Event-Free Survival (EFS) | £472.58 | £111.87 | £56.18 | £27.47 |
 | | Progressed Disease (PD) | £191.00 | £263.00 | £263.00 | £27.47 |
@@ -619,13 +640,6 @@ All financial inputs are derived from the NICE TA975 appraisal documentation (Do
 | | Progressed Disease (PD) | £263.00 | £263.00 | £263.00 | £27.47 |
 
 *Note: Terminal Care Cost is £13,198.42 (applied to deaths occurring within the first 5 years; for infused tisagenlecleucel, early deaths within 100 days post-infusion are covered by the NHS service tariff and therefore excluded).*
-
-##### Original List for Verification
-- **Tisagenlecleucel (EFS state)**: Months 1-12 = £472.58; Months 13-24 = £111.87; Months 25-60 = £56.18; >60 months = £27.47
-- **Comparators (EFS state)**: Months 1-12 = £263.00; Months 13-24 = £110.86; Months 25-60 = £55.43; >60 months = £27.47
-- **Tisagenlecleucel (PD state)**: Months 1-12 = £191.00; Months 13-60 = £263.00; >60 months = £27.47
-- **Comparators (PD state)**: Months 1-60 = £263.00; >60 months = £27.47
-- **Terminal Care Cost**: £13,198.42 (applied to deaths occurring within the first 5 years; for infused tisagenlecleucel, early deaths within 100 days post-infusion are covered by the NHS service tariff and therefore excluded).
 
 ### ICER Calculation and PAS Price Optimization
 
