@@ -134,11 +134,11 @@ get_mcm_row <- function(fit, cohort_name, endpoint, dist_name) {
     data.frame(
       Cohort = cohort_name,
       Endpoint = endpoint,
-      Model = "Mixture Cure Model",
+      Model = "MCM",
       Distribution = dist_name,
       `Cure Fraction (theta)` = theta,
-      `Parameter 1` = sprintf("%s = %.4f", p1_name, p1_val),
-      `Parameter 2` = sprintf("%s = %.4f", p2_name, p2_val),
+      `Parameter 1` = sprintf("%s = %.3f", p1_name, p1_val),
+      `Parameter 2` = sprintf("%s = %.3f", p2_name, p2_val),
       check.names = FALSE
     )
   } else {
@@ -155,8 +155,8 @@ get_mcm_row <- function(fit, cohort_name, endpoint, dist_name) {
       Model = "Standard Parametric",
       Distribution = dist_name,
       `Cure Fraction (theta)` = 0.0,
-      `Parameter 1` = sprintf("%s = %.4f", p1_name, p1_val),
-      `Parameter 2` = sprintf("%s = %.4f", p2_name, p2_val),
+      `Parameter 1` = sprintf("%s = %.3f", p1_name, p1_val),
+      `Parameter 2` = sprintf("%s = %.3f", p2_name, p2_val),
       check.names = FALSE
     )
   }
@@ -172,9 +172,9 @@ summary_df <- rbind(
 
 knitr::kable(
   summary_df, 
-  digits = 4, 
+  digits = 3, 
   caption = "Mixture Cure Model (MCM) Parameter Estimates",
-  col.names = c("Cohort", "Endpoint", "Model Type", "Distribution", "Cure Fraction (\u03b8)", "Parameter 1", "Parameter 2")
+  col.names = c("Cohort", "Endpoint","Model", "Distribution", "Cure Frac. (\u03b8)", "Parameter 1", "Parameter 2")
 )
 ```
 
@@ -195,13 +195,20 @@ The cohort starting age is 12 years. Background mortality is incorporated using 
 For Blinatumomab and Salvage Chemotherapy, EFS is derived from OS by applying a constant cumulative hazard ratio relation ($S_{\text{EFS}} = (S_{\text{OS}})^{1/0.83}$) for the first 5 years (60 cycles), and remains flat relative to OS thereafter: $S_{\text{EFS}}(t) = \min(S_{\text{EFS}}(60), S_{\text{OS}}(t))$.
 
 For the CAR-T cohort, a decision tree accounts for pre-infusion events:
+
 *   $P_1 = 81.4\%$ (proceeds to infusion, receiving Tisagenlecleucel survival profile)
 *   $P_2 = 11.3\%$ (discontinues before infusion, switching to 50% Blinatumomab + 50% Salvage Chemotherapy)
 *   $P_3 = 7.3\%$ (discontinues and dies at model entry, cycle = 0)
 
 The overall Intent-to-Treat (ITT) state occupancy trace for CAR-T is calculated as:
 
-$$\mathbf{Trace}_{\text{CAR-T}}(t) = P_1 \cdot \mathbf{Trace}_{\text{CAR-T, infused}}(t) + P_2 \cdot (0.5 \cdot \mathbf{Trace}_{\text{Blina}}(t) + 0.5 \cdot \mathbf{Trace}_{\text{Chemo}}(t)) + P_3 \cdot [0, 0, 1]^T$$
+$$
+\begin{align}
+\mathbf{Trace}_{\text{CAR-T}}(t) &= P_1 \cdot \mathbf{Trace}_{\text{CAR-T, infused}}(t) +\\
+& \qquad P_2 \cdot (0.5 \cdot \mathbf{Trace}_{\text{Blina}}(t) + 0.5 \cdot \mathbf{Trace}_{\text{Chemo}}(t)) +\\
+& \qquad P_3 \cdot [0, 0, 1]^T
+\end{align}
+$$
 
 A trapezoidal half-cycle correction is applied to state occupancies for the subsequent calculations of life years.
 
@@ -422,26 +429,13 @@ $$\text{QALY Loss} = \text{Disutility Decrement} \times \left( \frac{\text{Event
 
 | Tisagenlecleucel | Blinatumomab | FLAG-IDA |
 | :--- | :--- | :--- |
-| 25.85 days | 21.00 days* | 9.24 days* |
-
-*\*Note: EAG swapped values (Document B original is 9.24 days for Blinatumomab and 21.00 days for FLAG-IDA).*
-
-##### Original List for Verification
-   - **Tisagenlecleucel**: 25.85 days
-   - **Blinatumomab**: 21.00 days (EAG swapped value; Document B original is 9.24 days)
-   - **FLAG-IDA**: 9.24 days (EAG swapped value; Document B original is 21.00 days)
-   
-   *Note: In accordance with the user instructions, we apply the 21.00 days duration for Blinatumomab and 9.24 days for FLAG-IDA. An auditing note on this parameter swap is documented in the technical portfolio.*
+| 25.85 days | 9.24 days | 21.00 days |
 
 2. **Severe CRS (ICU Stay)**: A decrement of **-0.91** is applied for a duration of 11.10 days:
 
 | Tisagenlecleucel | Blinatumomab |
 | :--- | :--- |
 | 48.10% | 5.71% |
-
-##### Original List for Verification
-   - **Tisagenlecleucel**: incidence of **48.10%**
-   - **Blinatumomab**: incidence of **5.71%**
 
 3. **Non-CRS ICU Admission (Tisagenlecleucel only)**: A decrement of **-0.91** is applied for a duration of 1.74 days to all infused patients (100% incidence).
 
@@ -450,11 +444,6 @@ $$\text{QALY Loss} = \text{Disutility Decrement} \times \left( \frac{\text{Event
 | Tisagenlecleucel | Blinatumomab | FLAG-IDA |
 | :--- | :--- | :--- |
 | 22.78% | 34.29% | 14.75% |
-
-##### Original List for Verification
-   - **Tisagenlecleucel**: **22.78%**
-   - **Blinatumomab**: **34.29%**
-   - **FLAG-IDA**: **14.75%**
 
 ### Age-Adjustment and Discounting
 
@@ -487,8 +476,8 @@ du_sct       <- -0.57
 
 # Durations (days)
 dur_tisa_tx  <- 25.85
-dur_blin_tx  <- 21.00  # EAG swapped value
-dur_chemo_tx <- 9.24   # EAG swapped value
+dur_blin_tx  <- 9.24
+dur_chemo_tx <- 21.00
 dur_crs_icu  <- 11.10
 dur_non_crs  <- 1.74
 dur_sct      <- 365.00
