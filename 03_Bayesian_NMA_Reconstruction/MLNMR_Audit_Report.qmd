@@ -1,5 +1,5 @@
 ---
-title: "🛡️ Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR)"
+title: "Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR)"
 subtitle: "Forensic Evidence Synthesis and Population Alignment for HTA Appraisals"
 author: "Xiaoge Zhang, PhD (York)"
 date: last-modified
@@ -19,7 +19,6 @@ This report documents the forensic reconstruction of the **Multilevel Network Me
 
 *Narrative Bridge: To bridge this population gap and achieve true alignment, we must move beyond aggregate weighting and deconstruct the evidence at the foundational likelihood level.*
 
----
 
 ## Theoretical Framework: The Calculus of Integration
 
@@ -124,8 +123,6 @@ When defending this model to NICE, the key argument is that ML-NMR avoids the ma
 
 *Narrative Bridge: However, even a mathematically perfect joint likelihood function will crash if the data geometry lacks sufficient overlap. This brings us to the forensic MCMC audit.*
 
----
-
 ## Multidimensional Synthesis: The Joint Distribution
 
 When addressing **WBC (White Blood Cell)** counts alongside Age, the integration space expands to a 2D plane. Analysing Age and WBC in isolation leads to the "double-counting" of risk.
@@ -146,8 +143,6 @@ net <- add_integration(net,
   n_int = 64
 )
 ```
-
----
 
 ## MCMC Forensic Audit: A Narrative of Convergence
 
@@ -185,9 +180,6 @@ fit_mini <- nma(net,
   control = list(adapt_delta = 0.99),
   refresh = 0
 )
-```
-
-```{r}
 #| label: fig-traceplot
 #| fig-cap: "MCMC trace plots demonstrating perfect chain interweaving post-remediation (R-hat = 1.00), a prerequisite for regulatory-grade evidence synthesis."
 #| message: false
@@ -204,8 +196,6 @@ ggplot2::ggsave("visuals/MCMC_Trace_Plot.png", plot = trace_p, width = 10, heigh
 Non-convergence in Bayesian evidence synthesis is typically a symptom of geometric incompatibility in the data—not a model specification error. MCMC divergences in NMA most commonly arise from a lack of covariate overlap (Extrapolation Gaps), where the sampler is forced to extrapolate across regions of the predictor space with no empirical support. Restoring common support, as demonstrated in Phase 3, instantly resolves R-hat failures. This confirms that technical stability is ultimately a function of clinical plausibility.
 
 *Narrative Bridge: With the MCMC chains successfully converged, we can now extract the shared parameters ($\beta$) to perform the ultimate goal of ML-NMR: counterfactual projection.*
-
----
 
 ## Counterfactual Projection: Reclaiming Commercial Value
 
@@ -236,8 +226,6 @@ knitr::kable(releff_df, digits = 3, caption = "Aligned Relative Effects (Populat
 The 80.1% survival difference was a structural byproduct of population demographics, not therapeutic inferiority. ML-NMR "reclaims" this commercial value, proving that the drug's literature performance was penalized by an elderly baseline. This directly impacts the numerator ($\Delta E$) in the ICER calculation.
 :::
 
----
-
 ## Auditor’s Stress Test: Strategic Q&A
 
 **Q1: Why use 64 Sobol points specifically?**
@@ -247,8 +235,6 @@ The 80.1% survival difference was a structural byproduct of population demograph
 **Q2: Why assume common interactions ($\beta_{age:trt}$) across different drugs?**
 
 > *Response*: This is a **Mechanism of Action (MoA)** argument. As both drugs are TKIs, we assume the biological decay of drug efficacy follows a similar pathway—a standard "Exchangeability" assumption required by NICE DSU TSD 18 for sparse networks.
-
----
 
 ## Strategic Conclusion
 

@@ -1,0 +1,4 @@
+/* Remove the default border-bottom from h2 headings in the cosmo theme */
+h2 {
+  border-bottom: none !important;
+}

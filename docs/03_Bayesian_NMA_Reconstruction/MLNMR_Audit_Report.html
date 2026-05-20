@@ -9,7 +9,7 @@
 <meta name="author" content="Xiaoge Zhang, PhD (York)">
 <meta name="dcterms.date" content="2026-05-20">
 
-<title>🛡️ Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR) – HEOR Technical Portfolio</title>
+<title>Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR) – HEOR Technical Portfolio</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -137,6 +137,7 @@ window.Quarto = {
 };
 </script>
 
+<link rel="stylesheet" href="../custom.css">
 </head>
 
 <body class="nav-fixed quarto-light">
@@ -275,7 +276,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">🛡️ Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR)</h1>
+<h1 class="title">Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR)</h1>
 <p class="subtitle lead">Forensic Evidence Synthesis and Population Alignment for HTA Appraisals</p>
 </div>
 
@@ -310,7 +311,6 @@ window.Quarto = {
 <p>In modern Health Technology Assessments (e.g., <strong>NICE TA1013</strong>), indirect treatment comparisons (ITC) are frequently compromised by severe population imbalances between Individual Patient Data (IPD) and Aggregate Data (AgD). For instance, projecting survival results from a 20-year-old “Trainee” cohort onto a 70-year-old “Senior” literature population requires more than simple propensity weighting; it requires a structural reconstruction of the evidence network.</p>
 <p>This report documents the forensic reconstruction of the <strong>Multilevel Network Meta-Regression (ML-NMR)</strong> framework. By isolating study-specific baseline risks from shared therapeutic effects through rigorous numerical integration, we have established a <strong>defensible evidence chain</strong> that ensures comparative effectiveness estimates are population-aligned and robust against structural uncertainty.</p>
 <p><em>Narrative Bridge: To bridge this population gap and achieve true alignment, we must move beyond aggregate weighting and deconstruct the evidence at the foundational likelihood level.</em></p>
-<hr>
 </section>
 <section id="theoretical-framework-the-calculus-of-integration" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="theoretical-framework-the-calculus-of-integration"><span class="header-section-number">2</span> Theoretical Framework: The Calculus of Integration</h2>
@@ -411,7 +411,6 @@ window.Quarto = {
 </div>
 </div>
 <p><em>Narrative Bridge: However, even a mathematically perfect joint likelihood function will crash if the data geometry lacks sufficient overlap. This brings us to the forensic MCMC audit.</em></p>
-<hr>
 </section>
 </section>
 <section id="multidimensional-synthesis-the-joint-distribution" class="level2" data-number="3">
@@ -431,7 +430,6 @@ window.Quarto = {
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<hr>
 </section>
 <section id="mcmc-forensic-audit-a-narrative-of-convergence" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="mcmc-forensic-audit-a-narrative-of-convergence"><span class="header-section-number">4</span> MCMC Forensic Audit: A Narrative of Convergence</h2>
@@ -469,36 +467,31 @@ window.Quarto = {
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_intercept =</span> <span class="fu">normal</span>(<span class="at">scale =</span> <span class="dv">5</span>),</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.99</span>),</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">0</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>stan_obj <span class="ot">&lt;-</span> fit_mini<span class="sc">$</span>stanfit</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>trace_p <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">stan_trace</span>(stan_obj, <span class="at">pars =</span> <span class="st">"d"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(trace_p)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Also archive the plot locally</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="st">"visuals"</span>)) <span class="fu">dir.create</span>(<span class="st">"visuals"</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggsave</span>(<span class="st">"visuals/MCMC_Trace_Plot.png"</span>, <span class="at">plot =</span> trace_p, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-traceplot</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "MCMC trace plots demonstrating perfect chain interweaving post-remediation (R-hat = 1.00), a prerequisite for regulatory-grade evidence synthesis."</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>stan_obj <span class="ot">&lt;-</span> fit_mini<span class="sc">$</span>stanfit</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>trace_p <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">stan_trace</span>(stan_obj, <span class="at">pars =</span> <span class="st">"d"</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(trace_p)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-traceplot" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-traceplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="MLNMR_Audit_Report_files/figure-html/fig-traceplot-1.png" class="img-fluid figure-img" width="672">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-traceplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-remediation (R-hat = 1.00), a prerequisite for regulatory-grade evidence synthesis.
-</figcaption>
+<div>
+<figure class="figure">
+<p><img src="MLNMR_Audit_Report_files/figure-html/model-fitting-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Also archive the plot locally</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="st">"visuals"</span>)) <span class="fu">dir.create</span>(<span class="st">"visuals"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggsave</span>(<span class="st">"visuals/MCMC_Trace_Plot.png"</span>, <span class="at">plot =</span> trace_p, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 <p>Non-convergence in Bayesian evidence synthesis is typically a symptom of geometric incompatibility in the data—not a model specification error. MCMC divergences in NMA most commonly arise from a lack of covariate overlap (Extrapolation Gaps), where the sampler is forced to extrapolate across regions of the predictor space with no empirical support. Restoring common support, as demonstrated in Phase 3, instantly resolves R-hat failures. This confirms that technical stability is ultimately a function of clinical plausibility.</p>
 <p><em>Narrative Bridge: With the MCMC chains successfully converged, we can now extract the shared parameters (<span class="math inline">\(\beta\)</span>) to perform the ultimate goal of ML-NMR: counterfactual projection.</em></p>
-<hr>
 </section>
 </section>
 <section id="counterfactual-projection-reclaiming-commercial-value" class="level2" data-number="5">
@@ -657,7 +650,6 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <p>The 80.1% survival difference was a structural byproduct of population demographics, not therapeutic inferiority. ML-NMR “reclaims” this commercial value, proving that the drug’s literature performance was penalized by an elderly baseline. This directly impacts the numerator (<span class="math inline">\(\Delta E\)</span>) in the ICER calculation.</p>
 </div>
 </div>
-<hr>
 </section>
 <section id="auditors-stress-test-strategic-qa" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="auditors-stress-test-strategic-qa"><span class="header-section-number">6</span> Auditor’s Stress Test: Strategic Q&amp;A</h2>
@@ -669,7 +661,6 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <blockquote class="blockquote">
 <p><em>Response</em>: This is a <strong>Mechanism of Action (MoA)</strong> argument. As both drugs are TKIs, we assume the biological decay of drug efficacy follows a similar pathway—a standard “Exchangeability” assumption required by NICE DSU TSD 18 for sparse networks.</p>
 </blockquote>
-<hr>
 </section>
 <section id="strategic-conclusion" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="strategic-conclusion"><span class="header-section-number">7</span> Strategic Conclusion</h2>
