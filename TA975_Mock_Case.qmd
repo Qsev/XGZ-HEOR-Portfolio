@@ -44,9 +44,6 @@ p_discontinue_fail <- 0.113 #<2>
 
 # Probability of death before infusion
 p_death_pre_infusion <- 1 - (p_infusion_success + p_discontinue_fail) #<3>
-
-# Validation check
-stopifnot(abs(sum(p_infusion_success, p_discontinue_fail, p_death_pre_infusion) - 1) < 1e-6)
 ```
 1. Probability of successfully proceeding to infusion (enters PSM)
 2. These patients typically switch to comparator therapies
