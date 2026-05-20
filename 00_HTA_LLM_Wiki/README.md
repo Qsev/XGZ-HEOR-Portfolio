@@ -1,3 +1,7 @@
+---
+number-sections: false
+---
+
 # 🧠 HTA Methodology Wiki: An LLM-Native Strategic Intelligence Hub
 
 > **"Knowledge should not be re-derived on every query; it should be compiled into a persistent, compounding codebase."**
