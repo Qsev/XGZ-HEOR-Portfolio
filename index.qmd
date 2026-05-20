@@ -76,25 +76,49 @@ A comprehensive suite of technical guidelines and code templates for diverse Net
 ::: {.grid}
 
 ::: {.g-col-12 .g-col-md-4}
-**Fundamentals & Standard NMA**
-- [Bayesian Estimation Basics](./04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd)
-- [Standard Bayesian NMA](./04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd)
-- [MCMC Metropolis-Hastings Logic](./03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md)
+::: {.card .h-100 .shadow-sm .library-card}
+::: {.card-header .bg-transparent .border-bottom-0 .pt-4 .pb-0}
+<h5 class="fw-bold"><i class="bi bi-journal-code text-primary"></i> Fundamentals</h5>
+:::
+::: {.card-body}
+<div class="list-group list-group-flush">
+  <a href="./04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd" class="list-group-item list-group-item-action border-0 px-0">Bayesian Estimation Basics</a>
+  <a href="./04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd" class="list-group-item list-group-item-action border-0 px-0">Standard Bayesian NMA</a>
+  <a href="./03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md" class="list-group-item list-group-item-action border-0 px-0">MCMC Metropolis-Hastings</a>
+</div>
+:::
+:::
 :::
 
 ::: {.g-col-12 .g-col-md-4}
-**Population Adjustment (ITC)**
-- [MAIC (Matching-Adjusted Indirect Comparison)](./04_NMA/05_NMA_Technical_Prep/06_MAIC.qmd)
-- [STC (Simulated Treatment Comparison)](./04_NMA/05_NMA_Technical_Prep/07_STC.qmd)
-- [ML-NMR Framework](./04_NMA/05_NMA_Technical_Prep/08_ML_NMR.qmd)
+::: {.card .h-100 .shadow-sm .library-card}
+::: {.card-header .bg-transparent .border-bottom-0 .pt-4 .pb-0}
+<h5 class="fw-bold"><i class="bi bi-people-fill text-success"></i> Population Adjust</h5>
+:::
+::: {.card-body}
+<div class="list-group list-group-flush">
+  <a href="./04_NMA/05_NMA_Technical_Prep/06_MAIC.qmd" class="list-group-item list-group-item-action border-0 px-0">MAIC Framework</a>
+  <a href="./04_NMA/05_NMA_Technical_Prep/07_STC.qmd" class="list-group-item list-group-item-action border-0 px-0">STC Methodology</a>
+  <a href="./04_NMA/05_NMA_Technical_Prep/08_ML_NMR.qmd" class="list-group-item list-group-item-action border-0 px-0">ML-NMR Framework</a>
+</div>
+:::
+:::
 :::
 
 ::: {.g-col-12 .g-col-md-4}
-**Advanced Synthesis Modalities**
-- [Survival NMA](./04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.qmd)
-- [Network Meta-Regression (NMR)](./04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd)
-- [Component NMA](./04_NMA/05_NMA_Technical_Prep/04_Component_NMA.qmd)
-- [IPD NMA](./04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.qmd)
+::: {.card .h-100 .shadow-sm .library-card}
+::: {.card-header .bg-transparent .border-bottom-0 .pt-4 .pb-0}
+<h5 class="fw-bold"><i class="bi bi-diagram-3 text-danger"></i> Advanced Synthesis</h5>
+:::
+::: {.card-body}
+<div class="list-group list-group-flush">
+  <a href="./04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.qmd" class="list-group-item list-group-item-action border-0 px-0">Survival NMA</a>
+  <a href="./04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd" class="list-group-item list-group-item-action border-0 px-0">Network Meta-Regression</a>
+  <a href="./04_NMA/05_NMA_Technical_Prep/04_Component_NMA.qmd" class="list-group-item list-group-item-action border-0 px-0">Component NMA</a>
+  <a href="./04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.qmd" class="list-group-item list-group-item-action border-0 px-0">IPD NMA</a>
+</div>
+:::
+:::
 :::
 
 :::

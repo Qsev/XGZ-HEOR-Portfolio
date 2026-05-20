@@ -767,6 +767,6 @@
     "href": "index.html#the-technical-library",
     "title": "Xiaoge Zhang, PhD",
     "section": "📚 The Technical Library",
-    "text": "📚 The Technical Library\n\nEvidence Synthesis & NMA Knowledge Base\nA comprehensive suite of technical guidelines and code templates for diverse Network Meta-Analysis challenges.\n\n\nFundamentals & Standard NMA - Bayesian Estimation Basics - Standard Bayesian NMA - MCMC Metropolis-Hastings Logic\n\n\nPopulation Adjustment (ITC) - MAIC (Matching-Adjusted Indirect Comparison) - STC (Simulated Treatment Comparison) - ML-NMR Framework\n\n\nAdvanced Synthesis Modalities - Survival NMA - Network Meta-Regression (NMR) - Component NMA - IPD NMA"
+    "text": "📚 The Technical Library\n\nEvidence Synthesis & NMA Knowledge Base\nA comprehensive suite of technical guidelines and code templates for diverse Network Meta-Analysis challenges.\n\n\n\n\n\n Fundamentals\n\n\n\n\nBayesian Estimation Basics Standard Bayesian NMA MCMC Metropolis-Hastings\n\n\n\n\n\n\n\n\n Population Adjust\n\n\n\n\nMAIC Framework STC Methodology ML-NMR Framework\n\n\n\n\n\n\n\n\n Advanced Synthesis\n\n\n\n\nSurvival NMA Network Meta-Regression Component NMA IPD NMA"
   }
 ]
