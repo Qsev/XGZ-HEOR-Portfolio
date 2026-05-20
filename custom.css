@@ -6,7 +6,7 @@ h2 {
 /* Homepage Hero Banner */
 .hero-banner {
   text-align: center;
-  padding: 4rem 1rem;
+  padding: 2rem 1rem;
   background-color: #f8f9fa;
   border-radius: 12px;
   margin-bottom: 3rem;
@@ -16,8 +16,8 @@ h2 {
 .hero-banner h1 {
   font-weight: 800;
   color: #1a202c;
-  margin-bottom: 1.5rem;
-  font-size: 2.8rem;
+  margin-bottom: 1.2rem;
+  font-size: 2.2rem;
 }
 
 .hero-banner p {
@@ -66,4 +66,13 @@ h2 {
   background-color: #f8f9fa !important;
   color: #0d6efd !important;
   padding-left: 10px !important;
+}
+
+.library-chevron {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.list-group-item-action:hover .library-chevron {
+  transform: translateX(4px);
+  color: #0d6efd !important;
 }

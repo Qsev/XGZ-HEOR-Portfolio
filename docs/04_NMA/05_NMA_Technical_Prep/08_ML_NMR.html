@@ -4171,7 +4171,7 @@ border-bottom: none !important;
 
 .hero-banner {
 text-align: center;
-padding: 4rem 1rem;
+padding: 2rem 1rem;
 background-color: #f8f9fa;
 border-radius: 12px;
 margin-bottom: 3rem;
@@ -4180,8 +4180,8 @@ box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
 .hero-banner h1 {
 font-weight: 800;
 color: #1a202c;
-margin-bottom: 1.5rem;
-font-size: 2.8rem;
+margin-bottom: 1.2rem;
+font-size: 2.2rem;
 }
 .hero-banner p {
 font-size: 1.2rem;
@@ -4223,6 +4223,13 @@ background-color: #f8f9fa !important;
 color: #0d6efd !important;
 padding-left: 10px !important;
 }
+.library-chevron {
+transition: transform 0.2s ease, color 0.2s ease;
+}
+.list-group-item-action:hover .library-chevron {
+transform: translateX(4px);
+color: #0d6efd !important;
+}
 </style>
 </head>
 
@@ -4247,15 +4254,15 @@ padding-left: 10px !important;
     <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../TA975_Mock_Case.html"> 
-<span class="menu-text">NICE TA975 (CAR-T) Case</span></a>
-  </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-projects" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Projects</span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-flagship-audits" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Flagship Audits</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-projects">    
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-flagship-audits">    
+        <li>
+    <a class="dropdown-item" href="../../TA975_Mock_Case.html">
+ <span class="dropdown-text">NICE TA975 (CAR-T) Case</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../../01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.html">
  <span class="dropdown-text">Oncology PartSM Audit</span></a>
@@ -4271,10 +4278,10 @@ padding-left: 10px !important;
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-nma-portfolio" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">NMA Portfolio</span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-technical-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Technical Library</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-nma-portfolio">    
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-technical-library">    
         <li>
     <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.html">
  <span class="dropdown-text">Bayesian Estimation</span></a>
@@ -4317,6 +4324,10 @@ padding-left: 10px !important;
   </li>  
     </ul>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../00_HTA_LLM_Wiki/README.html"> 
+<span class="menu-text">Methodology Wiki</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
