@@ -419,6 +419,14 @@ $$\text{QALY Loss} = \text{Disutility Decrement} \times \left( \frac{\text{Event
 #### Disutility Parameters:
 
 1. **Base Treatment Disutility (Hospitalization)**: A decrement of **-0.42** (based on Sung et al., 2003) is applied for the duration of treatment hospitalization:
+
+| Tisagenlecleucel | Blinatumomab | FLAG-IDA |
+| :--- | :--- | :--- |
+| 25.85 days | 21.00 days* | 9.24 days* |
+
+*\*Note: EAG swapped values (Document B original is 9.24 days for Blinatumomab and 21.00 days for FLAG-IDA).*
+
+##### Original List for Verification
    - **Tisagenlecleucel**: 25.85 days
    - **Blinatumomab**: 21.00 days (EAG swapped value; Document B original is 9.24 days)
    - **FLAG-IDA**: 9.24 days (EAG swapped value; Document B original is 21.00 days)
@@ -426,12 +434,24 @@ $$\text{QALY Loss} = \text{Disutility Decrement} \times \left( \frac{\text{Event
    *Note: In accordance with the user instructions, we apply the 21.00 days duration for Blinatumomab and 9.24 days for FLAG-IDA. An auditing note on this parameter swap is documented in the technical portfolio.*
 
 2. **Severe CRS (ICU Stay)**: A decrement of **-0.91** is applied for a duration of 11.10 days:
+
+| Tisagenlecleucel | Blinatumomab |
+| :--- | :--- |
+| 48.10% | 5.71% |
+
+##### Original List for Verification
    - **Tisagenlecleucel**: incidence of **48.10%**
    - **Blinatumomab**: incidence of **5.71%**
 
 3. **Non-CRS ICU Admission (Tisagenlecleucel only)**: A decrement of **-0.91** is applied for a duration of 1.74 days to all infused patients (100% incidence).
 
 4. **Subsequent Stem Cell Transplant (allo-SCT)**: A decrement of **-0.57** is applied for a duration of 365 days, weighted by the proportion of patients receiving subsequent transplant:
+
+| Tisagenlecleucel | Blinatumomab | FLAG-IDA |
+| :--- | :--- | :--- |
+| 22.78% | 34.29% | 14.75% |
+
+##### Original List for Verification
    - **Tisagenlecleucel**: **22.78%**
    - **Blinatumomab**: **34.29%**
    - **FLAG-IDA**: **14.75%**
@@ -597,7 +617,7 @@ All financial inputs are derived from the NICE TA975 appraisal documentation (Do
 
 #### One-Time Initial Treatment Costs
 
-##### Table 1: Initial Drug Acquisition and Hospital Service Costs
+##### Table 1: Initial Drug Acquisition and Hospital Service Costs {.unnumbered}
 | Cost Item | Cohort(s) | Value | Description / Note |
 | :--- | :--- | :--- | :--- |
 | **Tisagenlecleucel List Price** | Tisagenlecleucel | £282,000.00 | List price (before Patient Access Scheme discount) |
@@ -605,7 +625,7 @@ All financial inputs are derived from the NICE TA975 appraisal documentation (Do
 | **Blinatumomab Treatment Cost** | Blinatumomab | £89,436.21 | Total treatment cost (drug, admin, and hospitalization) |
 | **Salvage Chemotherapy (FLAG-IDA)** | Salvage Chemotherapy | £21,660.00 | Total treatment cost (drug, admin, and hospitalization) |
 
-##### Table 2: Pre-treatment, Adverse Events, and Transplantation Costs
+##### Table 2: Pre-treatment, Adverse Events, and Transplantation Costs {.unnumbered}
 | Cost Item | Value | Applied To / Rate | Description |
 | :--- | :--- | :--- | :--- |
 | **Bridging Chemotherapy** | £1,394.57 | Tisagenlecleucel (pre-treatment) | Non-tariff covered pre-treatment bridging therapy |
@@ -615,20 +635,6 @@ All financial inputs are derived from the NICE TA975 appraisal documentation (Do
 | **Short-term AE Management (Blina)** | £2,847.49 | Blinatumomab | Management of short-term adverse events |
 | **Short-term AE Management (Chemo)** | £1,802.56 | Salvage Chemotherapy | Management of short-term adverse events |
 | **Subsequent allo-SCT Cost** | £151,227.43 | Tisa: 22.78%<br>Blina: 34.29%<br>Chemo: 14.75% | Applied as a one-time cost to patients undergoing subsequent stem cell transplant |
-
-##### Original List for Verification
-- **Tisagenlecleucel List Price**: £282,000.00
-- **NHS CAR-T Service Tariff**: £41,101.00 (covers leukapheresis, cell infusion, and early monitoring/AEs up to 100 days)
-- **Pre-treatment / Pre-infusion Costs**:
-  - Bridging chemotherapy: £1,394.57
-  - Lymphodepleting chemotherapy: £404.52
-  - Leukapheresis (only for uninfused patients): £2,575.70
-- **Tisagenlecleucel Long-term AE Monitoring (B-cell aplasia / IVIg)**: £11,176.85
-- **Subsequent Allogeneic Stem Cell Transplant (allo-SCT)**: £151,227.43 (applied to transplant rates: Tisa = 22.78%, Blina = 34.29%, Chemotherapy = 14.75%)
-- **Comparator Total Treatment Costs (drug + admin + hospitalization)**:
-  - Blinatumomab: £89,436.21
-  - Salvage Chemotherapy (FLAG-IDA): £21,660.00
-- **Comparator Short-Term AE Management**: Blina = £2,847.49; Chemotherapy = £1,802.56
 
 #### Monthly Health State Follow-up Costs
 
@@ -824,7 +830,7 @@ summary_pas <- data.frame(
 
 ### Cost-Utility Results
 
-#### CUA under List Price (£282,000)
+#### CUA under List Price (£282,000) {.unnumbered}
 
 The table below shows the cost-effectiveness results under the list price of tisagenlecleucel.
 
@@ -836,7 +842,7 @@ knitr::kable(
 )
 ```
 
-#### Reverse-Engineered PAS Price and CUA Results
+#### Reverse-Engineered PAS Price and CUA Results {.unnumbered}
 
 Through root-finding optimization, the estimated PAS price for tisagenlecleucel is calculated.
 
