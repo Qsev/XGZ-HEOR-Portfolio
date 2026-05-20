@@ -40,7 +40,7 @@ vignettes/*.pdf
 .Renviron
 
 # pkgdown site
-docs/
+# docs/
 
 # translation temp files
 po/*~
@@ -52,3 +52,5 @@ rsconnect/
 scratch/
 # 04_NMA/
 .DS_Store
+/.quarto/
+**/*.quarto_ipynb

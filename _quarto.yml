@@ -1,0 +1,70 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - TA975_Mock_Case.qmd
+    - 01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md
+    - 02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md
+    - 03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md
+    - 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.md
+    - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
+    - 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
+    - 04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd
+    - 04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.qmd
+    - 04_NMA/05_NMA_Technical_Prep/04_Component_NMA.qmd
+    - 04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.qmd
+    - 04_NMA/05_NMA_Technical_Prep/06_MAIC.qmd
+    - 04_NMA/05_NMA_Technical_Prep/07_STC.qmd
+    - 04_NMA/05_NMA_Technical_Prep/08_ML_NMR.qmd
+    - 04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.qmd
+
+website:
+  title: "HEOR Technical Portfolio"
+  navbar:
+    background: primary
+    left:
+      - href: index.qmd
+        text: "Home"
+      - href: TA975_Mock_Case.qmd
+        text: "NICE TA975 (CAR-T) Case"
+      - text: "Projects"
+        menu:
+          - href: 01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md
+            text: "Oncology PartSM Audit"
+          - href: 02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md
+            text: "RWE Causal Inference"
+          - href: 03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md
+            text: "Bayesian NMA MH Logic"
+          - href: 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.md
+            text: "MLNMR Audit Report"
+      - text: "NMA Portfolio"
+        menu:
+          - href: 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
+            text: "Bayesian Estimation"
+          - href: 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
+            text: "Standard Bayesian NMA"
+          - href: 04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd
+            text: "Network Meta-Regression"
+          - href: 04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.qmd
+            text: "Survival NMA"
+          - href: 04_NMA/05_NMA_Technical_Prep/04_Component_NMA.qmd
+            text: "Component NMA"
+          - href: 04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.qmd
+            text: "IPD NMA"
+          - href: 04_NMA/05_NMA_Technical_Prep/06_MAIC.qmd
+            text: "MAIC"
+          - href: 04_NMA/05_NMA_Technical_Prep/07_STC.qmd
+            text: "STC"
+          - href: 04_NMA/05_NMA_Technical_Prep/08_ML_NMR.qmd
+            text: "ML-NMR"
+          - href: 04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.qmd
+            text: "Flexible Survival"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true

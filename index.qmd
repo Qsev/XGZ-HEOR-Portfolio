@@ -1,0 +1,34 @@
+# Xiaoge Zhang's HEOR Technical Portfolio {.unnumbered}
+
+This repository serves as a professional technical showcase for bridging academic econometrics with industrial Health Technology Assessment (HTA) standards. It is structured as a series of high-fidelity case studies designed for senior consultancy-level review.
+
+---
+
+## 📂 Project Directory
+
+### [00: HTA Methodology & Technical Wiki](./00_HTA_LLM_Wiki/README.md)
+>
+> **The Foundation**: A curated knowledge base of HTA principles, NICE/SMC/AWMSG guidelines, and technical modeling standards. Focuses on the "how" and "why" behind submission-ready models.
+
+### [01: Oncology PartSM & Strategic Audit](./01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md)
+>
+> **The Case Study**: Forensic audit and technical remediation of a 3-state oncology model in RRMM. Includes complex hazard-based treatment waning logic and full PSA validation.
+
+### [02: RWE Causal Inference Pipeline](./02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md)
+>
+> **The Analytics**: An advanced R-based pipeline for real-world evidence. Implements IPTW, AIPW, and TMLE with SuperLearner to eliminate unobserved clinical confounding.
+
+### [03: Bayesian NMA Reconstruction](./03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md)
+>
+> **The Synthesis**: High-stakes evidence synthesis using Bayesian hierarchical models in Stan. Features non-centered parameterization for robust MCMC convergence.
+
+---
+
+## 🛠️ Tech Stack & Methodologies
+
+- **Economic Modeling**: Excel (VBA/PowerQuery), R (HEEMOD).
+- **Statistics**: R (tidyverse, SuperLearner, MatchIt), Stan.
+- **Standards**: NICE DSU Technical Support Documents, SMC Submission Guidelines.
+
+---
+**Contact:** [linkedin.com/in/xg-zhang](https://www.linkedin.com/in/xgzhang2026) | [xgzhang.com](http://xgzhang.com)
