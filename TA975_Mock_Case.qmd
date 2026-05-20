@@ -447,15 +447,15 @@ $$\text{QALY Loss} = \text{Disutility Decrement} \times \left( \frac{\text{Event
 
 ### Age-Adjustment and Discounting
 
-#### Age-Related Utility Multipliers
+#### Age-Related Utility Multipliers {.unnumbered}
 To account for natural aging, baseline health state utilities are adjusted by age-specific multipliers derived from the Health Survey for England (HSE) 2014. These multipliers scale down health state utility as the cohort ages (extrapolated linearly for ages > 75).
 
-#### Discounting
+#### Discounting {.unnumbered}
 An annual discount rate of **3.5%** is applied to both life years and QALYs, converted to a monthly discount factor:
 
 $$\text{Discount Factor}(t) = \frac{1}{(1 + 0.035)^{t/12}}$$
 
-### Lifetime QALY Accumulation and Results
+### Lifetime QALY Accumulation and Results 
 
 The code block below defines the utility parameters, calculates the one-time QALY losses, applies the dynamic age-adjusted utility weights, and aggregates the lifetime QALYs for the three cohorts.
 
@@ -514,26 +514,10 @@ loss_tisa_itt <- p_infusion_success * loss_tisa_infused +
 # 3. Dynamic Age-Adjustment and Baseline Utility Vector Generation
 # Vectorized HSE 2014 age multipliers
 get_age_multiplier <- function(age) {
-  case_when(
-    age <= 22 ~ 1.00,
-    age <= 29 ~ 0.99,
-    age <= 34 ~ 0.98,
-    age <= 39 ~ 0.97,
-    age <= 43 ~ 0.96,
-    age <= 47 ~ 0.95,
-    age <= 50 ~ 0.94,
-    age <= 53 ~ 0.93,
-    age <= 56 ~ 0.92,
-    age <= 59 ~ 0.91,
-    age <= 62 ~ 0.90,
-    age <= 64 ~ 0.89,
-    age <= 67 ~ 0.88,
-    age <= 69 ~ 0.87,
-    age <= 71 ~ 0.86,
-    age <= 73 ~ 0.85,
-    age <= 75 ~ 0.84,
-    TRUE      ~ pmax(0.84 - floor((age - 75) / 2) * 0.01, 0.50)
-  )
+  breaks <- c(-Inf, 22, 29, 34, 39, 43, 47, 50, 53, 56, 59, 62, 64, 67, 69, 71, 73, 75)
+  values <- seq(1.00, 0.84, by = -0.01)
+  idx <- findInterval(age, breaks, left.open = TRUE)
+  ifelse(idx <= 17, values[idx], pmax(0.84 - floor((age - 75) / 2) * 0.01, 0.50))
 }
 
 # Generate age multiplier vector for all cycles (0 to 1056)
