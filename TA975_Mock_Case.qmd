@@ -6,10 +6,10 @@ format:
   html:
     toc: true
     code-fold: true
+    number-sections: true
 ---
 
-## 1. Cohort Settings & Decision Tree Parameters
-
+## Cohort Settings & Decision Tree Parameters
 Before constructing the cost-utility model, it is essential to establish the baseline characteristics of the patient cohort and the underlying spatio-temporal framework of the model. This model simulates a cohort of patients with relapsed or refractory B-cell acute lymphoblastic leukemia (R/R B-cell ALL) with an average age of **12 years** and a weight of approximately **41.5 kg**.
 
 ### Parameter Significance
@@ -49,7 +49,7 @@ p_death_pre_infusion <- 1 - (p_infusion_success + p_discontinue_fail) #<3>
 2. These patients typically switch to comparator therapies
 3. Adjusted to ensure sum is 1.0 (original provided: 0.072, sum was 0.999)
 
-## 2. Kaplan-Meier Curve Digitization & Pseudo-Individual Patient Data (IPD) Reconstruction
+## Kaplan-Meier Curve Digitization & Pseudo-Individual Patient Data (IPD) Reconstruction
 
 In this assessment, clinical survival coordinates were extracted with high precision from Kaplan-Meier curves using computer vision (HSV color filtering and manual anchor boundary constraints). Pseudo-IPD datasets were then reconstructed for the following 4 cohorts using the deterministic Guyot (2012) algorithm:
 
@@ -59,7 +59,7 @@ In this assessment, clinical survival coordinates were extracted with high preci
 
 These reconstructed patient-level datasets serve as the foundation for the subsequent parametric survival analyses and state transition Markov/PSM models.
 
-## 3. Parametric Survival Analysis & Mixture Cure Models (MCM) Fitting
+## Parametric Survival Analysis & Mixture Cure Models (MCM) Fitting
 
 Based on the core economic model settings submitted by the manufacturer, we fit Mixture Cure Models (MCM) to the pseudo-IPD using the `flexsurvcure` package. MCM assumes that the patient population consists of two groups: a statistically "cured" fraction ($\theta$) that is subject only to age-matched general population background mortality, and an "uncured" fraction ($1 - \theta$) whose survival follows a specific parametric distribution.
 
@@ -178,11 +178,11 @@ knitr::kable(
 )
 ```
 
-## 4. Economic Model Structure (Decision Tree & Partitioned Survival Model)
+## Economic Model Structure (Decision Tree & Partitioned Survival Model)
 
 This section implements the partitioned survival model (PSM) structure and decision tree to calculate lifetime health state occupancy traces for each treatment arm.
 
-### 4.1 Model Structure & Assumptions
+### Model Structure & Assumptions
 
 The economic model utilizes a Partitioned Survival Model (PSM) framework consisting of three mutually exclusive health states: Event-Free Survival (EFS), Progressed Disease (PD), and Death (Dead). The state occupancy at cycle $t$ is calculated directly from the Overall Survival ($S_{\text{OS}}(t)$) and Event-Free Survival ($S_{\text{EFS}}(t)$) functions:
 
@@ -205,7 +205,7 @@ $$\mathbf{Trace}_{\text{CAR-T}}(t) = P_1 \cdot \mathbf{Trace}_{\text{CAR-T, infu
 
 A trapezoidal half-cycle correction is applied to state occupancies for the subsequent calculations of life years.
 
-### 4.2 PSM Matrix Construction & Visualization
+### PSM Matrix Construction & Visualization
 
 ```{r}
 #| label: economic-model-structure
@@ -394,11 +394,11 @@ ggplot(plot_data, aes(x = Cycle / 12, y = Proportion, fill = State)) +
   )
 ```
 
-## 5. Health State Utilities and Adverse Event Disutilities
+## Health State Utilities and Adverse Event Disutilities
 
 To evaluate the clinical benefit of each treatment strategy in terms of quality-adjusted survival, the Markov trace state occupancies are combined with health-related quality of life (HRQoL) weights. The Quality-Adjusted Life Years (QALYs) are accumulated over the cohort's lifetime, adjusting for age-related utility decline, short-term treatment/adverse event disutility penalties, and annual discounting.
 
-### 5.1 Baseline Health State Utilities & Cure Assumption
+### Baseline Health State Utilities & Cure Assumption
 
 Base utilities are derived from the published literature (Kelly et al., 2015):
 
@@ -408,7 +408,7 @@ Base utilities are derived from the published literature (Kelly et al., 2015):
 #### Cure Assumption (Long-term Survivor Utility)
 For patients surviving past 5 years (60 monthly cycles), a "cure" is assumed. Beyond this point, survivors from both EFS and PD states are assumed to achieve a long-term survivor utility of **0.91**, representing a return to near-normal health state values.
 
-### 5.2 Short-Term Adverse Event and Treatment Disutilities
+### Short-Term Adverse Event and Treatment Disutilities
 
 Short-term disutilities represent acute quality of life decrements associated with treatment administration, intensive care unit (ICU) admissions, cytokine release syndrome (CRS), and subsequent allogeneic stem cell transplantation (allo-SCT). These disutilities are modeled as one-time QALY penalties subtracted in the first model cycle (Cycle 1).
 
@@ -436,7 +436,7 @@ $$\text{QALY Loss} = \text{Disutility Decrement} \times \left( \frac{\text{Event
    - **Blinatumomab**: **34.29%**
    - **FLAG-IDA**: **14.75%**
 
-### 5.3 Age-Adjustment and Discounting
+### Age-Adjustment and Discounting
 
 #### Age-Related Utility Multipliers
 To account for natural aging, baseline health state utilities are adjusted by age-specific multipliers derived from the Health Survey for England (HSE) 2014. These multipliers scale down health state utility as the cohort ages (extrapolated linearly for ages > 75).
@@ -446,7 +446,7 @@ An annual discount rate of **3.5%** is applied to both life years and QALYs, con
 
 $$\text{Discount Factor}(t) = \frac{1}{(1 + 0.035)^{t/12}}$$
 
-### 5.4 Lifetime QALY Accumulation and Results
+### Lifetime QALY Accumulation and Results
 
 The code block below defines the utility parameters, calculates the one-time QALY losses, applies the dynamic age-adjusted utility weights, and aggregates the lifetime QALYs for the three cohorts.
 
@@ -587,11 +587,11 @@ knitr::kable(
 )
 ```
 
-## 6. Costs, ICER and PAS Price Reverse Engineering
+## Costs, ICER and PAS Price Reverse Engineering
 
 In this final section, we integrate healthcare resource costs with the clinical benefits calculated in previous steps to conduct a cost-utility analysis (CUA). We evaluate the Incremental Cost-Effectiveness Ratio (ICER) under list price, and subsequently use a root-finding algorithm to reverse-engineer the confidential Patient Access Scheme (PAS) discount price of tisagenlecleucel that aligns with official NICE decision metrics.
 
-### 6.1 Cost Input Parameters and Formulation
+### Cost Input Parameters and Formulation
 
 All financial inputs are derived from the NICE TA975 appraisal documentation (Document B, Tables 65 and 43-47):
 
@@ -610,13 +610,24 @@ All financial inputs are derived from the NICE TA975 appraisal documentation (Do
 - **Comparator Short-Term AE Management**: Blina = £2,847.49; Chemotherapy = £1,802.56
 
 #### Monthly Health State Follow-up Costs
+
+| Cohort | Health State | Months 1–12 | Months 13–24 | Months 25–60 | Months >60 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Tisagenlecleucel** | Event-Free Survival (EFS) | £472.58 | £111.87 | £56.18 | £27.47 |
+| | Progressed Disease (PD) | £191.00 | £263.00 | £263.00 | £27.47 |
+| **Comparators** | Event-Free Survival (EFS) | £263.00 | £110.86 | £55.43 | £27.47 |
+| | Progressed Disease (PD) | £263.00 | £263.00 | £263.00 | £27.47 |
+
+*Note: Terminal Care Cost is £13,198.42 (applied to deaths occurring within the first 5 years; for infused tisagenlecleucel, early deaths within 100 days post-infusion are covered by the NHS service tariff and therefore excluded).*
+
+##### Original List for Verification
 - **Tisagenlecleucel (EFS state)**: Months 1-12 = £472.58; Months 13-24 = £111.87; Months 25-60 = £56.18; >60 months = £27.47
 - **Comparators (EFS state)**: Months 1-12 = £263.00; Months 13-24 = £110.86; Months 25-60 = £55.43; >60 months = £27.47
 - **Tisagenlecleucel (PD state)**: Months 1-12 = £191.00; Months 13-60 = £263.00; >60 months = £27.47
 - **Comparators (PD state)**: Months 1-60 = £263.00; >60 months = £27.47
 - **Terminal Care Cost**: £13,198.42 (applied to deaths occurring within the first 5 years; for infused tisagenlecleucel, early deaths within 100 days post-infusion are covered by the NHS service tariff and therefore excluded).
 
-### 6.2 ICER Calculation and PAS Price Optimization
+### ICER Calculation and PAS Price Optimization
 
 Using the monthly half-cycle corrected state occupancies and the survival curves, we aggregate discounted lifetime costs. We then compute the baseline ICER compared to Blinatumomab and Salvage Chemotherapy.
 
@@ -797,9 +808,9 @@ summary_pas <- data.frame(
 )
 ```
 
-### 6.3 Cost-Utility Results
+### Cost-Utility Results
 
-#### 6.3.1 CUA under List Price (£282,000)
+#### CUA under List Price (£282,000)
 
 The table below shows the cost-effectiveness results under the list price of tisagenlecleucel.
 
@@ -811,7 +822,7 @@ knitr::kable(
 )
 ```
 
-#### 6.3.2 Reverse-Engineered PAS Price and CUA Results
+#### Reverse-Engineered PAS Price and CUA Results
 
 Through root-finding optimization, the estimated PAS price for tisagenlecleucel is calculated.
 
