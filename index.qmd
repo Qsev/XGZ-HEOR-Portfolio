@@ -3,6 +3,7 @@ title: "Xiaoge Zhang, PhD"
 subtitle: "HEOR Technical Portfolio & Knowledge Base"
 page-layout: full
 toc: false
+number-sections: false
 ---
 
 ::: {.hero-banner}

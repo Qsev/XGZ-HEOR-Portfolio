@@ -409,8 +409,8 @@
     "objectID": "index.html#tech-stack-methodologies",
     "href": "index.html#tech-stack-methodologies",
     "title": "Xiaoge Zhang, PhD",
-    "section": "1.3 🛠️ Tech Stack & Methodologies",
-    "text": "1.3 🛠️ Tech Stack & Methodologies\n\nR (HEEMOD, multinma, tidyverse) Stan / Bayesian Inference Excel (VBA / PowerQuery) NICE DSU TSD Guidelines SuperLearner / TMLE"
+    "section": "🛠️ Tech Stack & Methodologies",
+    "text": "🛠️ Tech Stack & Methodologies\n\nR (HEEMOD, multinma, tidyverse) Stan / Bayesian Inference Excel (VBA / PowerQuery) NICE DSU TSD Guidelines SuperLearner / TMLE"
   },
   {
     "objectID": "01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.html",
@@ -759,14 +759,14 @@
     "objectID": "index.html#flagship-case-studies",
     "href": "index.html#flagship-case-studies",
     "title": "Xiaoge Zhang, PhD",
-    "section": "1.1 🚀 Flagship Case Studies",
-    "text": "1.1 🚀 Flagship Case Studies\n\n\n\n\n\nNICE TA975 (CAR-T) Case Study\n\n\nFull Submission Replication\n\n\nA complete end-to-end reconstruction of a CAR-T therapy appraisal (Tisagenlecleucel). Features state-transition modeling, parametric survival fitting, and ICER calculations via Patient Access Schemes (PAS).\n\nView Case Study →\n\n\n\n\n\n\n\nOncology PartSM Audit\n\n\nRelapsed/Refractory Multiple Myeloma\n\n\nForensic audit and technical remediation of a 3-state partitioned survival model. Showcases complex hazard-based treatment waning logic and full Probabilistic Sensitivity Analysis (PSA) validation.\n\nView Audit Memo →\n\n\n\n\n\n\n\nML-NMR Reconstruction\n\n\nPopulation Alignment & Synthesis\n\n\nA deep dive into Multilevel Network Meta-Regression. Solves the “Extrapolation Gap” using 64-point Sobol integration and Cholesky decomposition to bridge IPD and AgD seamlessly in a Bayesian framework.\n\nView ML-NMR Report →\n\n\n\n\n\n\n\nRWE Causal Inference\n\n\nObservational Data Pipeline\n\n\nAn advanced R-based pipeline for real-world evidence processing. Implements IPTW, AIPW, and TMLE with SuperLearner ensembles to eliminate unobserved clinical confounding.\n\nView Pipeline →"
+    "section": "🚀 Flagship Case Studies",
+    "text": "🚀 Flagship Case Studies\n\n\n\n\n\nNICE TA975 (CAR-T) Case Study\n\n\nFull Submission Replication\n\n\nA complete end-to-end reconstruction of a CAR-T therapy appraisal (Tisagenlecleucel). Features state-transition modeling, parametric survival fitting, and ICER calculations via Patient Access Schemes (PAS).\n\nView Case Study →\n\n\n\n\n\n\n\nOncology PartSM Audit\n\n\nRelapsed/Refractory Multiple Myeloma\n\n\nForensic audit and technical remediation of a 3-state partitioned survival model. Showcases complex hazard-based treatment waning logic and full Probabilistic Sensitivity Analysis (PSA) validation.\n\nView Audit Memo →\n\n\n\n\n\n\n\nML-NMR Reconstruction\n\n\nPopulation Alignment & Synthesis\n\n\nA deep dive into Multilevel Network Meta-Regression. Solves the “Extrapolation Gap” using 64-point Sobol integration and Cholesky decomposition to bridge IPD and AgD seamlessly in a Bayesian framework.\n\nView ML-NMR Report →\n\n\n\n\n\n\n\nRWE Causal Inference\n\n\nObservational Data Pipeline\n\n\nAn advanced R-based pipeline for real-world evidence processing. Implements IPTW, AIPW, and TMLE with SuperLearner ensembles to eliminate unobserved clinical confounding.\n\nView Pipeline →"
   },
   {
     "objectID": "index.html#the-technical-library",
     "href": "index.html#the-technical-library",
     "title": "Xiaoge Zhang, PhD",
-    "section": "1.2 📚 The Technical Library",
-    "text": "1.2 📚 The Technical Library\n\n1.2.1 Evidence Synthesis & NMA Knowledge Base\nA comprehensive suite of technical guidelines and code templates for diverse Network Meta-Analysis challenges.\n\n\nFundamentals & Standard NMA - Bayesian Estimation Basics - Standard Bayesian NMA - MCMC Metropolis-Hastings Logic\n\n\nPopulation Adjustment (ITC) - MAIC (Matching-Adjusted Indirect Comparison) - STC (Simulated Treatment Comparison) - ML-NMR Framework\n\n\nAdvanced Synthesis Modalities - Survival NMA - Network Meta-Regression (NMR) - Component NMA - IPD NMA"
+    "section": "📚 The Technical Library",
+    "text": "📚 The Technical Library\n\nEvidence Synthesis & NMA Knowledge Base\nA comprehensive suite of technical guidelines and code templates for diverse Network Meta-Analysis challenges.\n\n\nFundamentals & Standard NMA - Bayesian Estimation Basics - Standard Bayesian NMA - MCMC Metropolis-Hastings Logic\n\n\nPopulation Adjustment (ITC) - MAIC (Matching-Adjusted Indirect Comparison) - STC (Simulated Treatment Comparison) - ML-NMR Framework\n\n\nAdvanced Synthesis Modalities - Survival NMA - Network Meta-Regression (NMR) - Component NMA - IPD NMA"
   }
 ]
