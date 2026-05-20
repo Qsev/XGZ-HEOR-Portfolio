@@ -5,8 +5,6 @@ project:
     - index.qmd
     - TA975_Mock_Case.qmd
     - 00_HTA_LLM_Wiki/README.md
-    - 01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md
-    - 02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md
     - 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd
     - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
     - 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
@@ -31,10 +29,6 @@ website:
         menu:
           - href: TA975_Mock_Case.qmd
             text: "NICE TA975 (CAR-T) Case"
-          - href: 01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md
-            text: "Oncology PartSM Audit"
-          - href: 02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md
-            text: "RWE Causal Inference"
           - href: 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd
             text: "MLNMR Audit Report"
       - text: "Technical Library"

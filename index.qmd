@@ -30,16 +30,7 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 :::
 :::
 
-::: {.g-col-12 .g-col-md-6}
-::: {.card .h-100 .shadow-sm}
-::: {.card-body}
-<h3 class="card-title">Oncology PartSM Audit</h3>
-<h6 class="card-subtitle text-muted mb-2">Relapsed/Refractory Multiple Myeloma</h6>
-<p class="card-text">Forensic audit and technical remediation of a 3-state partitioned survival model. Showcases complex hazard-based treatment waning logic and full Probabilistic Sensitivity Analysis (PSA) validation.</p>
-<a href="./01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md" class="stretched-link">View Audit Memo &rarr;</a>
-:::
-:::
-:::
+
 
 ::: {.g-col-12 .g-col-md-6}
 ::: {.card .h-100 .shadow-sm}
@@ -52,16 +43,7 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 :::
 :::
 
-::: {.g-col-12 .g-col-md-6}
-::: {.card .h-100 .shadow-sm}
-::: {.card-body}
-<h3 class="card-title">RWE Causal Inference</h3>
-<h6 class="card-subtitle text-muted mb-2">Observational Data Pipeline</h6>
-<p class="card-text">An advanced R-based pipeline for real-world evidence processing. Implements IPTW, AIPW, and TMLE with SuperLearner ensembles to eliminate unobserved clinical confounding.</p>
-<a href="./02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md" class="stretched-link">View Pipeline &rarr;</a>
-:::
-:::
-:::
+
 
 :::
 
