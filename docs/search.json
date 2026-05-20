@@ -394,9 +394,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Xiaoge Zhang’s HEOR Technical Portfolio",
+    "title": "Xiaoge Zhang, PhD",
     "section": "",
-    "text": "This repository serves as a professional technical showcase for bridging academic econometrics with industrial Health Technology Assessment (HTA) standards. It is structured as a series of high-fidelity case studies designed for senior consultancy-level review.\n\n\n\n\n\n\nThe Foundation: A curated knowledge base of HTA principles, NICE/SMC/AWMSG guidelines, and technical modeling standards. Focuses on the “how” and “why” behind submission-ready models.\n\n\n\n\n\nThe Case Study: Forensic audit and technical remediation of a 3-state oncology model in RRMM. Includes complex hazard-based treatment waning logic and full PSA validation.\n\n\n\n\n\nThe Analytics: An advanced R-based pipeline for real-world evidence. Implements IPTW, AIPW, and TMLE with SuperLearner to eliminate unobserved clinical confounding.\n\n\n\n\n\nThe Synthesis: High-stakes evidence synthesis using Bayesian hierarchical models in Stan. Features non-centered parameterization for robust MCMC convergence.\n\n\n\n\n\n\n\nEconomic Modeling: Excel (VBA/PowerQuery), R (HEEMOD).\nStatistics: R (tidyverse, SuperLearner, MatchIt), Stan.\nStandards: NICE DSU Technical Support Documents, SMC Submission Guidelines.\n\n\nContact: linkedin.com/in/xg-zhang | xgzhang.com"
+    "text": "A professional showcase of high-fidelity health economic modeling, Bayesian evidence synthesis, and real-world causal inference designed for senior consultancy-level review and NICE/SMC submissions.\n LinkedIn  xgzhang.com"
   },
   {
     "objectID": "index.html#project-directory",
@@ -408,9 +408,9 @@
   {
     "objectID": "index.html#tech-stack-methodologies",
     "href": "index.html#tech-stack-methodologies",
-    "title": "Xiaoge Zhang’s HEOR Technical Portfolio",
-    "section": "",
-    "text": "Economic Modeling: Excel (VBA/PowerQuery), R (HEEMOD).\nStatistics: R (tidyverse, SuperLearner, MatchIt), Stan.\nStandards: NICE DSU Technical Support Documents, SMC Submission Guidelines.\n\n\nContact: linkedin.com/in/xg-zhang | xgzhang.com"
+    "title": "Xiaoge Zhang, PhD",
+    "section": "1.3 🛠️ Tech Stack & Methodologies",
+    "text": "1.3 🛠️ Tech Stack & Methodologies\n\nR (HEEMOD, multinma, tidyverse) Stan / Bayesian Inference Excel (VBA / PowerQuery) NICE DSU TSD Guidelines SuperLearner / TMLE"
   },
   {
     "objectID": "01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.html",
@@ -754,5 +754,19 @@
     "title": "Multilevel Network Meta-Regression (ML-NMR)",
     "section": "7 Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)",
     "text": "7 Case Study Comparison: Mock Case vs. TA1013 (Quizartinib)\nTo demonstrate the real-world applicability of this minimal mock case, we compare its settings and findings with the actual ML-NMR analysis submitted by Daiichi Sankyo for TA1013 (Quizartinib), as audited by the External Assessment Group (EAG).\n\n7.1 Network Structure & Evidence Types\n\nMock Case: Simulates 1 IPD trial (\\(N=300\\)) and 1 AgD trial (\\(N=300\\)).\nTA1013 Reality: The actual network also relied on just 2 core trials: QuANTUM-First (provided IPD for Quizartinib, \\(N=539\\)) and RATIFY (only AgD was available for Midostaurin, \\(N=717\\), with the analyzed FLT3-ITD subgroup being \\(N=452\\)) [1, 2, 6].\n\n\n\n7.2 Population Characteristics (Baseline Age)\n\nMock Case: IPD population is younger (mean age 45) and AgD population is older (mean age 65).\nTA1013 Reality: The direction was reversed, but the extreme mismatch remained. The IPD trial (QuANTUM-First) included older patients (median age ~56), while the AgD trial (RATIFY) included only younger patients aged 18–59 (median age 47) [6, 8].\n\n\n\n7.3 Statistical Model & Link Function\n\nMock Case: Modeled a binary outcome (CR rate) using a Bernoulli distribution (bernoulli2) and a Logit link function (logit).\nTA1013 Reality: The company’s actual code for the CR endpoint also specified likelihood = \"bernoulli2\" and link = \"logit\" [2].\n\n\n\n7.4 Treatment-Covariate Interactions\n\nMock Case: Assumed a shared interaction effect for Age across active treatments (class_interactions = \"common\").\nTA1013 Reality: Because data from only one IPD and one AgD trial was insufficient to estimate independent interaction terms, the company was forced to make the Shared Effect Modification (SEM) assumption [7, 9]. They assumed that covariates like Age had the same interaction effect on both Quizartinib and Midostaurin, specifying class_interactions = \"common\" in their code [2].\n\n\n\n7.5 Collinearity & Bias Challenges\n\nMock Case: We observed that missing IPD for the AgD trial caused severe collinearity between baseline risk and treatment effect, leading to an overestimation of Midostaurin’s effect in our simulation.\nTA1013 Reality: The EAG pointed out that the population adjustments applied within the company’s ML-NMR were biased and tended to overestimate Quizartinib’s effect [2]. This led the appraisal committee to conclude that the results “lacked face validity” [3].\n\n\n\n7.6 References (NICE TA1013 Committee Papers)\n\n[1] Document B: Section B.2.4 (Starts on Page 50).\n[2] Document B: Section B.2.8 (Starts on Page 82).\n[3] External Assessment Report (EAR) (Separate report by University of York).\n[6] Document B: Section B.2.4.1 (Page 50).\n[7] Document B: Section B.2.7 (Subgroup analysis).\n[8] Document B: Section B.2.8.2 (Page 83).\n[9] Document B: Section B.2.8.7 (Page 111) & Appendix M.\n\nThis comparison proves that our mock case, while minimal, perfectly captures the structural constraints, forced statistical compromises, and inherent bias risks of state-of-the-art ML-NMR in real HTA submissions."
+  },
+  {
+    "objectID": "index.html#flagship-case-studies",
+    "href": "index.html#flagship-case-studies",
+    "title": "Xiaoge Zhang, PhD",
+    "section": "1.1 🚀 Flagship Case Studies",
+    "text": "1.1 🚀 Flagship Case Studies\n\n\n\n\n\nNICE TA975 (CAR-T) Case Study\n\n\nFull Submission Replication\n\n\nA complete end-to-end reconstruction of a CAR-T therapy appraisal (Tisagenlecleucel). Features state-transition modeling, parametric survival fitting, and ICER calculations via Patient Access Schemes (PAS).\n\nView Case Study →\n\n\n\n\n\n\n\nOncology PartSM Audit\n\n\nRelapsed/Refractory Multiple Myeloma\n\n\nForensic audit and technical remediation of a 3-state partitioned survival model. Showcases complex hazard-based treatment waning logic and full Probabilistic Sensitivity Analysis (PSA) validation.\n\nView Audit Memo →\n\n\n\n\n\n\n\nML-NMR Reconstruction\n\n\nPopulation Alignment & Synthesis\n\n\nA deep dive into Multilevel Network Meta-Regression. Solves the “Extrapolation Gap” using 64-point Sobol integration and Cholesky decomposition to bridge IPD and AgD seamlessly in a Bayesian framework.\n\nView ML-NMR Report →\n\n\n\n\n\n\n\nRWE Causal Inference\n\n\nObservational Data Pipeline\n\n\nAn advanced R-based pipeline for real-world evidence processing. Implements IPTW, AIPW, and TMLE with SuperLearner ensembles to eliminate unobserved clinical confounding.\n\nView Pipeline →"
+  },
+  {
+    "objectID": "index.html#the-technical-library",
+    "href": "index.html#the-technical-library",
+    "title": "Xiaoge Zhang, PhD",
+    "section": "1.2 📚 The Technical Library",
+    "text": "1.2 📚 The Technical Library\n\n1.2.1 Evidence Synthesis & NMA Knowledge Base\nA comprehensive suite of technical guidelines and code templates for diverse Network Meta-Analysis challenges.\n\n\nFundamentals & Standard NMA - Bayesian Estimation Basics - Standard Bayesian NMA - MCMC Metropolis-Hastings Logic\n\n\nPopulation Adjustment (ITC) - MAIC (Matching-Adjusted Indirect Comparison) - STC (Simulated Treatment Comparison) - ML-NMR Framework\n\n\nAdvanced Synthesis Modalities - Survival NMA - Network Meta-Regression (NMR) - Component NMA - IPD NMA"
   }
 ]

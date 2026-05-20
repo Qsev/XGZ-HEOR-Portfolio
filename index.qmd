@@ -1,34 +1,111 @@
-# Xiaoge Zhang's HEOR Technical Portfolio {.unnumbered}
+---
+title: "Xiaoge Zhang, PhD"
+subtitle: "HEOR Technical Portfolio & Knowledge Base"
+page-layout: full
+toc: false
+---
 
-This repository serves as a professional technical showcase for bridging academic econometrics with industrial Health Technology Assessment (HTA) standards. It is structured as a series of high-fidelity case studies designed for senior consultancy-level review.
+::: {.hero-banner}
+# Bridging Academic Econometrics with Industrial HTA Standards
+A professional showcase of high-fidelity health economic modeling, Bayesian evidence synthesis, and real-world causal inference designed for senior consultancy-level review and NICE/SMC submissions.
+
+[<i class="bi bi-linkedin"></i> LinkedIn](https://www.linkedin.com/in/xgzhang2026){.btn .btn-primary .btn-lg role="button" target="_blank"}
+[<i class="bi bi-globe"></i> xgzhang.com](http://xgzhang.com){.btn .btn-outline-primary .btn-lg role="button" target="_blank"}
+:::
 
 ---
 
-## 📂 Project Directory
+## 🚀 Flagship Case Studies
 
-### [00: HTA Methodology & Technical Wiki](./00_HTA_LLM_Wiki/README.md)
->
-> **The Foundation**: A curated knowledge base of HTA principles, NICE/SMC/AWMSG guidelines, and technical modeling standards. Focuses on the "how" and "why" behind submission-ready models.
+::: {.grid}
 
-### [01: Oncology PartSM & Strategic Audit](./01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md)
->
-> **The Case Study**: Forensic audit and technical remediation of a 3-state oncology model in RRMM. Includes complex hazard-based treatment waning logic and full PSA validation.
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+<h3 class="card-title">NICE TA975 (CAR-T) Case Study</h3>
+<h6 class="card-subtitle text-muted mb-2">Full Submission Replication</h6>
+<p class="card-text">A complete end-to-end reconstruction of a CAR-T therapy appraisal (Tisagenlecleucel). Features state-transition modeling, parametric survival fitting, and ICER calculations via Patient Access Schemes (PAS).</p>
+<a href="./TA975_Mock_Case.qmd" class="stretched-link">View Case Study &rarr;</a>
+:::
+:::
+:::
 
-### [02: RWE Causal Inference Pipeline](./02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md)
->
-> **The Analytics**: An advanced R-based pipeline for real-world evidence. Implements IPTW, AIPW, and TMLE with SuperLearner to eliminate unobserved clinical confounding.
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+<h3 class="card-title">Oncology PartSM Audit</h3>
+<h6 class="card-subtitle text-muted mb-2">Relapsed/Refractory Multiple Myeloma</h6>
+<p class="card-text">Forensic audit and technical remediation of a 3-state partitioned survival model. Showcases complex hazard-based treatment waning logic and full Probabilistic Sensitivity Analysis (PSA) validation.</p>
+<a href="./01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md" class="stretched-link">View Audit Memo &rarr;</a>
+:::
+:::
+:::
 
-### [03: Bayesian NMA Reconstruction](./03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md)
->
-> **The Synthesis**: High-stakes evidence synthesis using Bayesian hierarchical models in Stan. Features non-centered parameterization for robust MCMC convergence.
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+<h3 class="card-title">ML-NMR Reconstruction</h3>
+<h6 class="card-subtitle text-muted mb-2">Population Alignment & Synthesis</h6>
+<p class="card-text">A deep dive into Multilevel Network Meta-Regression. Solves the "Extrapolation Gap" using 64-point Sobol integration and Cholesky decomposition to bridge IPD and AgD seamlessly in a Bayesian framework.</p>
+<a href="./03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd" class="stretched-link">View ML-NMR Report &rarr;</a>
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+<h3 class="card-title">RWE Causal Inference</h3>
+<h6 class="card-subtitle text-muted mb-2">Observational Data Pipeline</h6>
+<p class="card-text">An advanced R-based pipeline for real-world evidence processing. Implements IPTW, AIPW, and TMLE with SuperLearner ensembles to eliminate unobserved clinical confounding.</p>
+<a href="./02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md" class="stretched-link">View Pipeline &rarr;</a>
+:::
+:::
+:::
+
+:::
+
+---
+
+## 📚 The Technical Library
+
+### Evidence Synthesis & NMA Knowledge Base
+A comprehensive suite of technical guidelines and code templates for diverse Network Meta-Analysis challenges.
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-4}
+**Fundamentals & Standard NMA**
+- [Bayesian Estimation Basics](./04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd)
+- [Standard Bayesian NMA](./04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd)
+- [MCMC Metropolis-Hastings Logic](./03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md)
+:::
+
+::: {.g-col-12 .g-col-md-4}
+**Population Adjustment (ITC)**
+- [MAIC (Matching-Adjusted Indirect Comparison)](./04_NMA/05_NMA_Technical_Prep/06_MAIC.qmd)
+- [STC (Simulated Treatment Comparison)](./04_NMA/05_NMA_Technical_Prep/07_STC.qmd)
+- [ML-NMR Framework](./04_NMA/05_NMA_Technical_Prep/08_ML_NMR.qmd)
+:::
+
+::: {.g-col-12 .g-col-md-4}
+**Advanced Synthesis Modalities**
+- [Survival NMA](./04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.qmd)
+- [Network Meta-Regression (NMR)](./04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd)
+- [Component NMA](./04_NMA/05_NMA_Technical_Prep/04_Component_NMA.qmd)
+- [IPD NMA](./04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.qmd)
+:::
+
+:::
 
 ---
 
 ## 🛠️ Tech Stack & Methodologies
 
-- **Economic Modeling**: Excel (VBA/PowerQuery), R (HEEMOD).
-- **Statistics**: R (tidyverse, SuperLearner, MatchIt), Stan.
-- **Standards**: NICE DSU Technical Support Documents, SMC Submission Guidelines.
-
----
-**Contact:** [linkedin.com/in/xg-zhang](https://www.linkedin.com/in/xgzhang2026) | [xgzhang.com](http://xgzhang.com)
+<div class="tech-stack-container">
+  <span class="badge bg-primary rounded-pill px-3 py-2 me-2 mb-2 fs-6">R (HEEMOD, multinma, tidyverse)</span>
+  <span class="badge bg-danger rounded-pill px-3 py-2 me-2 mb-2 fs-6">Stan / Bayesian Inference</span>
+  <span class="badge bg-success rounded-pill px-3 py-2 me-2 mb-2 fs-6">Excel (VBA / PowerQuery)</span>
+  <span class="badge bg-secondary rounded-pill px-3 py-2 me-2 mb-2 fs-6">NICE DSU TSD Guidelines</span>
+  <span class="badge bg-dark rounded-pill px-3 py-2 me-2 mb-2 fs-6">SuperLearner / TMLE</span>
+</div>
