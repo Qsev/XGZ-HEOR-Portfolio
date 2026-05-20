@@ -53,7 +53,7 @@ p_death_pre_infusion <- 1 - (p_infusion_success + p_discontinue_fail) #<3>
 
 In this assessment, clinical survival coordinates were extracted with high precision from Kaplan-Meier curves using computer vision (HSV color filtering and manual anchor boundary constraints). Pseudo-IPD datasets were then reconstructed for the following 4 cohorts using the deterministic Guyot (2012) algorithm:
 
-1. Tisagenlecleucel arm: OS and EFS (pooled ELIANA/ENSIGN cohort)
+1. Tisagenlecleucel arm: OS and EFS (pooled ELIANA/ENSIGN/B2101J cohort)
 2. Blinatumomab arm: OS
 3. Salvage Chemotherapy arm: OS
 
