@@ -23,6 +23,7 @@ website:
   title: "HEOR Technical Portfolio"
   navbar:
     background: primary
+    pinned: true
     left:
       - href: index.qmd
         text: "Home"
