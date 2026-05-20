@@ -1,6 +1,6 @@
 ---
 title: "Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR)"
-subtitle: "Forensic Evidence Synthesis and Population Alignment for HTA Appraisals"
+subtitle: "Evidence Synthesis and Population Alignment for HTA Appraisals"
 author: "Xiaoge Zhang, PhD (York)"
 date: last-modified
 format:
@@ -15,7 +15,7 @@ format:
 
 In modern Health Technology Assessments (e.g., **NICE TA1013**), indirect treatment comparisons (ITC) are frequently compromised by severe population imbalances between Individual Patient Data (IPD) and Aggregate Data (AgD). For instance, projecting survival results from a 20-year-old "Trainee" cohort onto a 70-year-old "Senior" literature population requires more than simple propensity weighting; it requires a structural reconstruction of the evidence network.
 
-This report documents the forensic reconstruction of the **Multilevel Network Meta-Regression (ML-NMR)** framework. By isolating study-specific baseline risks from shared therapeutic effects through rigorous numerical integration, we have established a **defensible evidence chain** that ensures comparative effectiveness estimates are population-aligned and robust against structural uncertainty.
+This report documents the  reconstruction of the **Multilevel Network Meta-Regression (ML-NMR)** framework. By isolating study-specific baseline risks from shared therapeutic effects through rigorous numerical integration, we have established a **defensible evidence chain** that ensures comparative effectiveness estimates are population-aligned and robust against structural uncertainty.
 
 *Narrative Bridge: To bridge this population gap and achieve true alignment, we must move beyond aggregate weighting and deconstruct the evidence at the foundational likelihood level.*
 
@@ -121,7 +121,7 @@ This forces the model to find the unique equilibrium point that explains both in
 When defending this model to NICE, the key argument is that ML-NMR avoids the massive Effective Sample Size (ESS) shrinkage seen in MAIC. Instead of dropping patients to force baseline matching, it uses integration to leverage the **full information content** of both trials, resulting in significantly narrower Credible Intervals for the ICER.
 :::
 
-*Narrative Bridge: However, even a mathematically perfect joint likelihood function will crash if the data geometry lacks sufficient overlap. This brings us to the forensic MCMC audit.*
+*Narrative Bridge: However, even a mathematically perfect joint likelihood function will crash if the data geometry lacks sufficient overlap. This brings us to the  MCMC audit.*
 
 ## Multidimensional Synthesis: The Joint Distribution
 
@@ -144,7 +144,7 @@ net <- add_integration(net,
 )
 ```
 
-## MCMC Forensic Audit: A Narrative of Convergence
+## MCMC  Audit: A Narrative of Convergence
 
 Running Bayesian evidence synthesis on sparse networks often leads to algorithmic failure. Our audit simulated and resolved these failure modes:
 
@@ -230,11 +230,11 @@ The 80.1% survival difference was a structural byproduct of population demograph
 
 **Q1: Why use 64 Sobol points specifically?**
 
-> *Response*: It provides the optimal balance between computational efficiency and numerical precision. It is equivalent to ~2,000 random Monte Carlo points, ensuring every "bend" of the logit S-curve is captured without grid-aliasing.
+> It provides the optimal balance between computational efficiency and numerical precision. It is equivalent to ~2,000 random Monte Carlo points, ensuring every "bend" of the logit S-curve is captured without grid-aliasing.
 
 **Q2: Why assume common interactions ($\beta_{age:trt}$) across different drugs?**
 
-> *Response*: This is a **Mechanism of Action (MoA)** argument. As both drugs are TKIs, we assume the biological decay of drug efficacy follows a similar pathway—a standard "Exchangeability" assumption required by NICE DSU TSD 18 for sparse networks.
+> This is a **Mechanism of Action (MoA)** argument. As both drugs are TKIs, we assume the biological decay of drug efficacy follows a similar pathway—a standard "Exchangeability" assumption required by NICE DSU TSD 18 for sparse networks.
 
 ## Strategic Conclusion
 

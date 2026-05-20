@@ -259,7 +259,7 @@ window.Quarto = {
   <li><a href="#the-joint-evidence-synthesis-l_joint" id="toc-the-joint-evidence-synthesis-l_joint" class="nav-link" data-scroll-target="#the-joint-evidence-synthesis-l_joint"><span class="header-section-number">2.3</span> The Joint Evidence Synthesis (<span class="math inline">\(L_{Joint}\)</span>)</a></li>
   </ul></li>
   <li><a href="#multidimensional-synthesis-the-joint-distribution" id="toc-multidimensional-synthesis-the-joint-distribution" class="nav-link" data-scroll-target="#multidimensional-synthesis-the-joint-distribution"><span class="header-section-number">3</span> Multidimensional Synthesis: The Joint Distribution</a></li>
-  <li><a href="#mcmc-forensic-audit-a-narrative-of-convergence" id="toc-mcmc-forensic-audit-a-narrative-of-convergence" class="nav-link" data-scroll-target="#mcmc-forensic-audit-a-narrative-of-convergence"><span class="header-section-number">4</span> MCMC Forensic Audit: A Narrative of Convergence</a>
+  <li><a href="#mcmc-audit-a-narrative-of-convergence" id="toc-mcmc-audit-a-narrative-of-convergence" class="nav-link" data-scroll-target="#mcmc-audit-a-narrative-of-convergence"><span class="header-section-number">4</span> MCMC Audit: A Narrative of Convergence</a>
   <ul class="collapse">
   <li><a href="#phase-1-information-deficit-the-crash" id="toc-phase-1-information-deficit-the-crash" class="nav-link" data-scroll-target="#phase-1-information-deficit-the-crash"><span class="header-section-number">4.1</span> Phase 1: Information Deficit (The Crash)</a></li>
   <li><a href="#phase-2-the-extrapolation-trap-the-no-overlap-crisis" id="toc-phase-2-the-extrapolation-trap-the-no-overlap-crisis" class="nav-link" data-scroll-target="#phase-2-the-extrapolation-trap-the-no-overlap-crisis"><span class="header-section-number">4.2</span> Phase 2: The Extrapolation Trap (The No-Overlap Crisis)</a></li>
@@ -277,7 +277,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR)</h1>
-<p class="subtitle lead">Forensic Evidence Synthesis and Population Alignment for HTA Appraisals</p>
+<p class="subtitle lead">Evidence Synthesis and Population Alignment for HTA Appraisals</p>
 </div>
 
 
@@ -309,7 +309,7 @@ window.Quarto = {
 <section id="executive-summary-addressing-the-population-gap" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="executive-summary-addressing-the-population-gap"><span class="header-section-number">1</span> Executive Summary: Addressing the Population Gap</h2>
 <p>In modern Health Technology Assessments (e.g., <strong>NICE TA1013</strong>), indirect treatment comparisons (ITC) are frequently compromised by severe population imbalances between Individual Patient Data (IPD) and Aggregate Data (AgD). For instance, projecting survival results from a 20-year-old “Trainee” cohort onto a 70-year-old “Senior” literature population requires more than simple propensity weighting; it requires a structural reconstruction of the evidence network.</p>
-<p>This report documents the forensic reconstruction of the <strong>Multilevel Network Meta-Regression (ML-NMR)</strong> framework. By isolating study-specific baseline risks from shared therapeutic effects through rigorous numerical integration, we have established a <strong>defensible evidence chain</strong> that ensures comparative effectiveness estimates are population-aligned and robust against structural uncertainty.</p>
+<p>This report documents the reconstruction of the <strong>Multilevel Network Meta-Regression (ML-NMR)</strong> framework. By isolating study-specific baseline risks from shared therapeutic effects through rigorous numerical integration, we have established a <strong>defensible evidence chain</strong> that ensures comparative effectiveness estimates are population-aligned and robust against structural uncertainty.</p>
 <p><em>Narrative Bridge: To bridge this population gap and achieve true alignment, we must move beyond aggregate weighting and deconstruct the evidence at the foundational likelihood level.</em></p>
 </section>
 <section id="theoretical-framework-the-calculus-of-integration" class="level2" data-number="2">
@@ -410,7 +410,7 @@ window.Quarto = {
 <p>When defending this model to NICE, the key argument is that ML-NMR avoids the massive Effective Sample Size (ESS) shrinkage seen in MAIC. Instead of dropping patients to force baseline matching, it uses integration to leverage the <strong>full information content</strong> of both trials, resulting in significantly narrower Credible Intervals for the ICER.</p>
 </div>
 </div>
-<p><em>Narrative Bridge: However, even a mathematically perfect joint likelihood function will crash if the data geometry lacks sufficient overlap. This brings us to the forensic MCMC audit.</em></p>
+<p><em>Narrative Bridge: However, even a mathematically perfect joint likelihood function will crash if the data geometry lacks sufficient overlap. This brings us to the MCMC audit.</em></p>
 </section>
 </section>
 <section id="multidimensional-synthesis-the-joint-distribution" class="level2" data-number="3">
@@ -431,8 +431,8 @@ window.Quarto = {
 </details>
 </div>
 </section>
-<section id="mcmc-forensic-audit-a-narrative-of-convergence" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="mcmc-forensic-audit-a-narrative-of-convergence"><span class="header-section-number">4</span> MCMC Forensic Audit: A Narrative of Convergence</h2>
+<section id="mcmc-audit-a-narrative-of-convergence" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="mcmc-audit-a-narrative-of-convergence"><span class="header-section-number">4</span> MCMC Audit: A Narrative of Convergence</h2>
 <p>Running Bayesian evidence synthesis on sparse networks often leads to algorithmic failure. Our audit simulated and resolved these failure modes:</p>
 <section id="phase-1-information-deficit-the-crash" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="phase-1-information-deficit-the-crash"><span class="header-section-number">4.1</span> Phase 1: Information Deficit (The Crash)</h3>
@@ -655,11 +655,11 @@ window.Quarto = {
 <h2 data-number="6" class="anchored" data-anchor-id="auditors-stress-test-strategic-qa"><span class="header-section-number">6</span> Auditor’s Stress Test: Strategic Q&amp;A</h2>
 <p><strong>Q1: Why use 64 Sobol points specifically?</strong></p>
 <blockquote class="blockquote">
-<p><em>Response</em>: It provides the optimal balance between computational efficiency and numerical precision. It is equivalent to ~2,000 random Monte Carlo points, ensuring every “bend” of the logit S-curve is captured without grid-aliasing.</p>
+<p>It provides the optimal balance between computational efficiency and numerical precision. It is equivalent to ~2,000 random Monte Carlo points, ensuring every “bend” of the logit S-curve is captured without grid-aliasing.</p>
 </blockquote>
 <p><strong>Q2: Why assume common interactions (<span class="math inline">\(\beta_{age:trt}\)</span>) across different drugs?</strong></p>
 <blockquote class="blockquote">
-<p><em>Response</em>: This is a <strong>Mechanism of Action (MoA)</strong> argument. As both drugs are TKIs, we assume the biological decay of drug efficacy follows a similar pathway—a standard “Exchangeability” assumption required by NICE DSU TSD 18 for sparse networks.</p>
+<p>This is a <strong>Mechanism of Action (MoA)</strong> argument. As both drugs are TKIs, we assume the biological decay of drug efficacy follows a similar pathway—a standard “Exchangeability” assumption required by NICE DSU TSD 18 for sparse networks.</p>
 </blockquote>
 </section>
 <section id="strategic-conclusion" class="level2" data-number="7">
