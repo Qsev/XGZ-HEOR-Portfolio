@@ -7,7 +7,7 @@ project:
     - 01_Oncology_PartSM_Audit/Technical_Audit_Memo_RRMM.md
     - 02_RWE_Causal_Inference_Pipeline/RWE_Forensic_Checklist.md
     - 03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md
-    - 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.md
+    - 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd
     - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
     - 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
     - 04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd
@@ -37,7 +37,7 @@ website:
             text: "RWE Causal Inference"
           - href: 03_Bayesian_NMA_Reconstruction/Bayesian_Fundamentals_MH_Logic.md
             text: "Bayesian NMA MH Logic"
-          - href: 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.md
+          - href: 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd
             text: "MLNMR Audit Report"
       - text: "NMA Portfolio"
         menu:

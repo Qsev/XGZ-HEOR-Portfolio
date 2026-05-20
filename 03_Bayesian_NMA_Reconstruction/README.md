@@ -16,7 +16,7 @@ This repository showcases a **forensic reconstruction** of the ML-NMR framework.
 
 ### 1. [Flagship] ML-NMR Counterfactual Pipeline
 
-* **File:** [`MLNMR_Pipeline.R`](./MLNMR_Pipeline.R)
+* **File:** [`MLNMR_Counterfactual_Pipeline.R`](./MLNMR_Counterfactual_Pipeline.R)
 * **Core Implementation:** A fully functional Bayesian pipeline using `multinma` and `rstan` to bridge IPD and AgD.
 * **Technical Edge:**
   * **Numerical Integration:** Implemented 64-point **Sobol sequences** to solve the non-linear logit integral.
@@ -25,7 +25,7 @@ This repository showcases a **forensic reconstruction** of the ML-NMR framework.
 
 ### 2. Forensic Audit & Convergence Report
 
-* **File:** [`MLNMR_Audit_Report.md`](./MLNMR_Audit_Report.md)
+* **File:** [`MLNMR_Audit_Report.qmd`](./MLNMR_Audit_Report.qmd)
 * **Narrative:** A technical white paper documenting the "Extrapolation Gap" failure and subsequent remediation.
 * **Key Findings:** Demonstrates the reclamation of **80%+ survival value** by adjusting for population-level age penalties.
 

@@ -1,7 +1,7 @@
 # ==============================================================================
 # 🧪 Project: ML-NMR Miniature Challenge (Synthetic Case Study)
 # Objective: Replicating Counterfactual Projections using a hybrid dataset.
-# Forensic Alignment: 100% Mirrored with [MLNMR_Audit_Report.md]
+# Forensic Alignment: 100% Mirrored with [MLNMR_Audit_Report.qmd]
 # ==============================================================================
 
 options(mc.cores = parallel::detectCores()) # 🚀 [Performance]: Parallel MCMC sampling
