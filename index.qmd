@@ -8,7 +8,7 @@ number-sections: false
 
 ::: {.hero-banner}
 # Bridging Academic Econometrics with Industrial HTA Standards
-A professional showcase of high-fidelity health economic modeling, Bayesian evidence synthesis, and real-world causal inference designed for senior consultancy-level review and NICE/SMC submissions.
+A professional showcase of high-fidelity health economic modeling, Bayesian evidence synthesis, and real-world causal inference, tailored for advanced HTA applications and NICE/SMC submissions.
 
 [<i class="bi bi-linkedin"></i> LinkedIn](https://www.linkedin.com/in/xgzhang2026){.btn .btn-primary .btn-lg role="button" target="_blank"}
 :::
