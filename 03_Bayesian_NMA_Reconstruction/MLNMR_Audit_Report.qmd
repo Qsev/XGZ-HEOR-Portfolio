@@ -17,11 +17,6 @@ In modern Health Technology Assessments (e.g., **NICE TA1013**), indirect treatm
 
 This report documents the forensic reconstruction of the **Multilevel Network Meta-Regression (ML-NMR)** framework. By isolating study-specific baseline risks from shared therapeutic effects through rigorous numerical integration, we have established a **defensible evidence chain** that ensures comparative effectiveness estimates are population-aligned and robust against structural uncertainty.
 
-::: {.callout-tip}
-## Technical Asset
-This methodological audit is fully reproducible using the engineered R/Stan pipeline (`MLNMR_Pipeline.R`) integrated directly as executable code blocks within this document.
-:::
-
 *Narrative Bridge: To bridge this population gap and achieve true alignment, we must move beyond aggregate weighting and deconstruct the evidence at the foundational likelihood level.*
 
 ---
@@ -42,6 +37,11 @@ $$\text{logit}(P_{ik}) = \ln\left(\frac{P_{ik}}{1-P_{ik}}\right) = \mu_k + (\bet
 
 **The IPD Likelihood Function ($L_{IPD}$):**
 $$L_{IPD}(\mu_k, \beta) = \prod_{i=1}^{n_k} P_{ik}^{y_{ik}} (1-P_{ik})^{1-y_{ik}}$$
+
+::: {.callout-tip}
+## Reproducibility Note
+All results in this document are fully reproducible. The R/Stan pipeline is executed live within each code block below. The standalone script is also available at [`MLNMR_Counterfactual_Pipeline.R`](MLNMR_Counterfactual_Pipeline.R){target="_blank"}.
+:::
 
 Below, we provision the simulated IPD and AgD data and configure our network structure in R.
 
@@ -118,7 +118,7 @@ $$L_{Joint}(\beta, \mu) = L_{IPD}(\mu_{IPD}, \beta) \times L_{AgD}(\mu_{AgD}, \b
 This forces the model to find the unique equilibrium point that explains both individual granularities and aggregate outcomes simultaneously.
 
 ::: {.callout-note}
-## Senior Consultant Reflection
+## Regulatory Positioning Note
 When defending this model to NICE, the key argument is that ML-NMR avoids the massive Effective Sample Size (ESS) shrinkage seen in MAIC. Instead of dropping patients to force baseline matching, it uses integration to leverage the **full information content** of both trials, resulting in significantly narrower Credible Intervals for the ICER.
 :::
 
@@ -201,12 +201,7 @@ if (!dir.exists("visuals")) dir.create("visuals")
 ggplot2::ggsave("visuals/MCMC_Trace_Plot.png", plot = trace_p, width = 10, height = 6)
 ```
 
-::: {.callout-note}
-## Interview Spotlight
-**Q: How do you handle non-convergence in evidence synthesis?**
-
-A: "I investigate the geometry of the data. MCMC divergences in NMA often stem from a lack of covariate overlap (Extrapolation Gaps). In this audit, I demonstrated that restoring common support instantly resolves R-hat failures, proving that technical stability is ultimately a function of clinical plausibility."
-:::
+Non-convergence in Bayesian evidence synthesis is typically a symptom of geometric incompatibility in the data—not a model specification error. MCMC divergences in NMA most commonly arise from a lack of covariate overlap (Extrapolation Gaps), where the sampler is forced to extrapolate across regions of the predictor space with no empirical support. Restoring common support, as demonstrated in Phase 3, instantly resolves R-hat failures. This confirms that technical stability is ultimately a function of clinical plausibility.
 
 *Narrative Bridge: With the MCMC chains successfully converged, we can now extract the shared parameters ($\beta$) to perform the ultimate goal of ML-NMR: counterfactual projection.*
 
@@ -225,8 +220,15 @@ The "Shared Universe Parameters" ($\beta$) allow us to project drug efficacy acr
 #| label: relative-effects
 #| message: false
 #| warning: false
-releff <- relative_effects(fit_mini, all_contrasts = TRUE)
-knitr::kable(as.data.frame(releff), digits = 3, caption = "Aligned Relative Effects")
+releff_df <- as.data.frame(relative_effects(fit_mini, all_contrasts = TRUE))
+
+# Shorten parameter labels and drop Q1/Q3 columns
+releff_df$parameter <- gsub("d\\[(.+): (.+) vs\\. (.+)\\]", "\\2 vs. \\3", releff_df$parameter)
+releff_df$parameter <- gsub("Midostaurin", "Mido.", releff_df$parameter)
+releff_df$parameter <- gsub("Quizartinib", "Quiz.", releff_df$parameter)
+releff_df <- releff_df[, !names(releff_df) %in% c("25%", "75%")]
+
+knitr::kable(releff_df, digits = 3, caption = "Aligned Relative Effects (Population-Aligned Log-OR)")
 ```
 
 ::: {.callout-tip}

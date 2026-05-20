@@ -309,19 +309,6 @@ window.Quarto = {
 <h2 data-number="1" class="anchored" data-anchor-id="executive-summary-addressing-the-population-gap"><span class="header-section-number">1</span> Executive Summary: Addressing the Population Gap</h2>
 <p>In modern Health Technology Assessments (e.g., <strong>NICE TA1013</strong>), indirect treatment comparisons (ITC) are frequently compromised by severe population imbalances between Individual Patient Data (IPD) and Aggregate Data (AgD). For instance, projecting survival results from a 20-year-old “Trainee” cohort onto a 70-year-old “Senior” literature population requires more than simple propensity weighting; it requires a structural reconstruction of the evidence network.</p>
 <p>This report documents the forensic reconstruction of the <strong>Multilevel Network Meta-Regression (ML-NMR)</strong> framework. By isolating study-specific baseline risks from shared therapeutic effects through rigorous numerical integration, we have established a <strong>defensible evidence chain</strong> that ensures comparative effectiveness estimates are population-aligned and robust against structural uncertainty.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Technical Asset
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This methodological audit is fully reproducible using the engineered R/Stan pipeline (<code>MLNMR_Pipeline.R</code>) integrated directly as executable code blocks within this document.</p>
-</div>
-</div>
 <p><em>Narrative Bridge: To bridge this population gap and achieve true alignment, we must move beyond aggregate weighting and deconstruct the evidence at the foundational likelihood level.</em></p>
 <hr>
 </section>
@@ -337,6 +324,19 @@ window.Quarto = {
 <li><strong><span class="math inline">\(\beta\)</span> (Shared Parameters)</strong>: These are the “universal gears” bridging the trials. We assume the biological decay of drug efficacy with age (<span class="math inline">\(\beta_{age:trt}\)</span>) is consistent across the network.</li>
 </ol>
 <p><strong>The IPD Likelihood Function (<span class="math inline">\(L_{IPD}\)</span>):</strong> <span class="math display">\[L_{IPD}(\mu_k, \beta) = \prod_{i=1}^{n_k} P_{ik}^{y_{ik}} (1-P_{ik})^{1-y_{ik}}\]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Reproducibility Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All results in this document are fully reproducible. The R/Stan pipeline is executed live within each code block below. The standalone script is also available at <a href="MLNMR_Counterfactual_Pipeline.R" target="_blank"><code>MLNMR_Counterfactual_Pipeline.R</code></a>.</p>
+</div>
+</div>
 <p>Below, we provision the simulated IPD and AgD data and configure our network structure in R.</p>
 <div class="cell">
 <details class="code-fold">
@@ -403,7 +403,7 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Senior Consultant Reflection
+<span class="screen-reader-only">Note</span>Regulatory Positioning Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -496,20 +496,7 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 </div>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Interview Spotlight
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><strong>Q: How do you handle non-convergence in evidence synthesis?</strong></p>
-<p>A: “I investigate the geometry of the data. MCMC divergences in NMA often stem from a lack of covariate overlap (Extrapolation Gaps). In this audit, I demonstrated that restoring common support instantly resolves R-hat failures, proving that technical stability is ultimately a function of clinical plausibility.”</p>
-</div>
-</div>
+<p>Non-convergence in Bayesian evidence synthesis is typically a symptom of geometric incompatibility in the data—not a model specification error. MCMC divergences in NMA most commonly arise from a lack of covariate overlap (Extrapolation Gaps), where the sampler is forced to extrapolate across regions of the predictor space with no empirical support. Restoring common support, as demonstrated in Phase 3, instantly resolves R-hat failures. This confirms that technical stability is ultimately a function of clinical plausibility.</p>
 <p><em>Narrative Bridge: With the MCMC chains successfully converged, we can now extract the shared parameters (<span class="math inline">\(\beta\)</span>) to perform the ultimate goal of ML-NMR: counterfactual projection.</em></p>
 <hr>
 </section>
@@ -525,27 +512,32 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>releff <span class="ot">&lt;-</span> <span class="fu">relative_effects</span>(fit_mini, <span class="at">all_contrasts =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">as.data.frame</span>(releff), <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Aligned Relative Effects"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>releff_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">relative_effects</span>(fit_mini, <span class="at">all_contrasts =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Shorten parameter labels and drop Q1/Q3 columns</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>parameter <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"d</span><span class="sc">\\</span><span class="st">[(.+): (.+) vs</span><span class="sc">\\</span><span class="st">. (.+)</span><span class="sc">\\</span><span class="st">]"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">2 vs. </span><span class="sc">\\</span><span class="st">3"</span>, releff_df<span class="sc">$</span>parameter)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>parameter <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Midostaurin"</span>, <span class="st">"Mido."</span>, releff_df<span class="sc">$</span>parameter)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>parameter <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Quizartinib"</span>, <span class="st">"Quiz."</span>, releff_df<span class="sc">$</span>parameter)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>releff_df <span class="ot">&lt;-</span> releff_df[, <span class="sc">!</span><span class="fu">names</span>(releff_df) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"25%"</span>, <span class="st">"75%"</span>)]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(releff_df, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Aligned Relative Effects (Population-Aligned Log-OR)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Aligned Relative Effects</caption>
+<caption>Aligned Relative Effects (Population-Aligned Log-OR)</caption>
 <colgroup>
+<col style="width: 7%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 16%">
+<col style="width: 6%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 6%">
 <col style="width: 5%">
 <col style="width: 8%">
 <col style="width: 8%">
-<col style="width: 27%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 6%">
-<col style="width: 6%">
-<col style="width: 4%">
+<col style="width: 5%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -556,9 +548,7 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <th style="text-align: right;">mean</th>
 <th style="text-align: right;">sd</th>
 <th style="text-align: right;">2.5%</th>
-<th style="text-align: right;">25%</th>
 <th style="text-align: right;">50%</th>
-<th style="text-align: right;">75%</th>
 <th style="text-align: right;">97.5%</th>
 <th style="text-align: right;">Bulk_ESS</th>
 <th style="text-align: right;">Tail_ESS</th>
@@ -570,13 +560,11 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <td style="text-align: left;">QuANTUM</td>
 <td style="text-align: left;">Midostaurin</td>
 <td style="text-align: left;">Placebo</td>
-<td style="text-align: left;">d[QuANTUM: Midostaurin vs.&nbsp;Placebo]</td>
+<td style="text-align: left;">Mido. vs.&nbsp;Placebo</td>
 <td style="text-align: right;">3.833</td>
 <td style="text-align: right;">2.229</td>
 <td style="text-align: right;">-0.223</td>
-<td style="text-align: right;">2.331</td>
 <td style="text-align: right;">3.651</td>
-<td style="text-align: right;">5.245</td>
 <td style="text-align: right;">8.534</td>
 <td style="text-align: right;">1243.986</td>
 <td style="text-align: right;">1641.935</td>
@@ -586,13 +574,11 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <td style="text-align: left;">QuANTUM</td>
 <td style="text-align: left;">Quizartinib</td>
 <td style="text-align: left;">Placebo</td>
-<td style="text-align: left;">d[QuANTUM: Quizartinib vs.&nbsp;Placebo]</td>
+<td style="text-align: left;">Quiz. vs.&nbsp;Placebo</td>
 <td style="text-align: right;">0.670</td>
 <td style="text-align: right;">1.774</td>
 <td style="text-align: right;">-2.778</td>
-<td style="text-align: right;">-0.530</td>
 <td style="text-align: right;">0.625</td>
-<td style="text-align: right;">1.815</td>
 <td style="text-align: right;">4.331</td>
 <td style="text-align: right;">2590.325</td>
 <td style="text-align: right;">2516.726</td>
@@ -602,13 +588,11 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <td style="text-align: left;">QuANTUM</td>
 <td style="text-align: left;">Quizartinib</td>
 <td style="text-align: left;">Midostaurin</td>
-<td style="text-align: left;">d[QuANTUM: Quizartinib vs.&nbsp;Midostaurin]</td>
+<td style="text-align: left;">Quiz. vs.&nbsp;Mido.</td>
 <td style="text-align: right;">-3.162</td>
 <td style="text-align: right;">2.451</td>
 <td style="text-align: right;">-8.070</td>
-<td style="text-align: right;">-4.845</td>
 <td style="text-align: right;">-3.146</td>
-<td style="text-align: right;">-1.480</td>
 <td style="text-align: right;">1.524</td>
 <td style="text-align: right;">1657.494</td>
 <td style="text-align: right;">2170.711</td>
@@ -618,13 +602,11 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <td style="text-align: left;">RATIFY</td>
 <td style="text-align: left;">Midostaurin</td>
 <td style="text-align: left;">Placebo</td>
-<td style="text-align: left;">d[RATIFY: Midostaurin vs.&nbsp;Placebo]</td>
+<td style="text-align: left;">Mido. vs.&nbsp;Placebo</td>
 <td style="text-align: right;">1.818</td>
 <td style="text-align: right;">0.846</td>
 <td style="text-align: right;">0.378</td>
-<td style="text-align: right;">1.244</td>
 <td style="text-align: right;">1.727</td>
-<td style="text-align: right;">2.301</td>
 <td style="text-align: right;">3.787</td>
 <td style="text-align: right;">2239.758</td>
 <td style="text-align: right;">2066.181</td>
@@ -634,13 +616,11 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <td style="text-align: left;">RATIFY</td>
 <td style="text-align: left;">Quizartinib</td>
 <td style="text-align: left;">Placebo</td>
-<td style="text-align: left;">d[RATIFY: Quizartinib vs.&nbsp;Placebo]</td>
+<td style="text-align: left;">Quiz. vs.&nbsp;Placebo</td>
 <td style="text-align: right;">-1.345</td>
 <td style="text-align: right;">2.549</td>
 <td style="text-align: right;">-6.385</td>
-<td style="text-align: right;">-3.105</td>
 <td style="text-align: right;">-1.308</td>
-<td style="text-align: right;">0.382</td>
 <td style="text-align: right;">3.538</td>
 <td style="text-align: right;">1710.387</td>
 <td style="text-align: right;">2342.338</td>
@@ -650,13 +630,11 @@ Figure&nbsp;1: MCMC trace plots demonstrating perfect chain interweaving post-re
 <td style="text-align: left;">RATIFY</td>
 <td style="text-align: left;">Quizartinib</td>
 <td style="text-align: left;">Midostaurin</td>
-<td style="text-align: left;">d[RATIFY: Quizartinib vs.&nbsp;Midostaurin]</td>
+<td style="text-align: left;">Quiz. vs.&nbsp;Mido.</td>
 <td style="text-align: right;">-3.162</td>
 <td style="text-align: right;">2.451</td>
 <td style="text-align: right;">-8.070</td>
-<td style="text-align: right;">-4.845</td>
 <td style="text-align: right;">-3.146</td>
-<td style="text-align: right;">-1.480</td>
 <td style="text-align: right;">1.524</td>
 <td style="text-align: right;">1657.494</td>
 <td style="text-align: right;">2170.711</td>
