@@ -9,6 +9,7 @@ project:
     - 05_TA975_CAR-T_Case/TA975_Mock_Case.qmd
     - 02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.qmd
     - 03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.qmd
+    - 01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.qmd
     - 00_HTA_LLM_Wiki/README.md
     - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
     - 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
@@ -37,6 +38,8 @@ website:
             text: "ML-NMR: AML Population Alignment"
           - href: 02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.qmd
             text: "RWE ECA: R/R DLBCL"
+          - href: 01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.qmd
+            text: "PartSM: Survival Extrapolation in RRMM"
       - text: "Technical Library"
         menu:
           - href: 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd

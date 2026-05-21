@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Xiaoge Zhang, PhD">
+<meta name="dcterms.date" content="2026-05-21">
+
+<title>Mock Case — Survival Extrapolation in a Partitioned Survival Model – HEOR Technical Portfolio</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-8c38fd85d21bfe44b50360969156fb14.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../custom.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">HEOR Technical Portfolio</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-flagship-audits" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Flagship Audits</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-flagship-audits">    
+        <li>
+    <a class="dropdown-item" href="../05_TA975_CAR-T_Case/TA975_Mock_Case.html">
+ <span class="dropdown-text">NICE TA975 (CAR-T) Case</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.html">
+ <span class="dropdown-text">ML-NMR: AML Population Alignment</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.html">
+ <span class="dropdown-text">RWE ECA: R/R DLBCL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.html">
+ <span class="dropdown-text">PartSM: Survival Extrapolation in RRMM</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-technical-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Technical Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-technical-library">    
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.html">
+ <span class="dropdown-text">Bayesian Estimation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">
+ <span class="dropdown-text">Standard Bayesian NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.html">
+ <span class="dropdown-text">Network Meta-Regression</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.html">
+ <span class="dropdown-text">Survival NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/04_Component_NMA.html">
+ <span class="dropdown-text">Component NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.html">
+ <span class="dropdown-text">IPD NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/06_MAIC.html">
+ <span class="dropdown-text">MAIC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/07_STC.html">
+ <span class="dropdown-text">STC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/08_ML_NMR.html">
+ <span class="dropdown-text">ML-NMR</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.html">
+ <span class="dropdown-text">Flexible Survival</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../00_HTA_LLM_Wiki/README.html"> 
+<span class="menu-text">Methodology Wiki</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Qsev/XGZ-HEOR-Portfolio" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary"><span class="header-section-number">1</span> Executive Summary</a></li>
+  <li><a href="#decision-problem-clinical-background" id="toc-decision-problem-clinical-background" class="nav-link" data-scroll-target="#decision-problem-clinical-background"><span class="header-section-number">2</span> Decision Problem &amp; Clinical Background</a></li>
+  <li><a href="#the-partitioned-survival-model-mathematical-framework" id="toc-the-partitioned-survival-model-mathematical-framework" class="nav-link" data-scroll-target="#the-partitioned-survival-model-mathematical-framework"><span class="header-section-number">3</span> The Partitioned Survival Model: Mathematical Framework</a>
+  <ul class="collapse">
+  <li><a href="#three-state-structure" id="toc-three-state-structure" class="nav-link" data-scroll-target="#three-state-structure"><span class="header-section-number">3.1</span> Three-State Structure</a></li>
+  <li><a href="#weibull-survival-function" id="toc-weibull-survival-function" class="nav-link" data-scroll-target="#weibull-survival-function"><span class="header-section-number">3.2</span> Weibull Survival Function</a></li>
+  <li><a href="#qaly-and-cost-accumulation" id="toc-qaly-and-cost-accumulation" class="nav-link" data-scroll-target="#qaly-and-cost-accumulation"><span class="header-section-number">3.3</span> QALY and Cost Accumulation</a></li>
+  </ul></li>
+  <li><a href="#the-extrapolation-challenge-beyond-trial-data" id="toc-the-extrapolation-challenge-beyond-trial-data" class="nav-link" data-scroll-target="#the-extrapolation-challenge-beyond-trial-data"><span class="header-section-number">4</span> The Extrapolation Challenge: Beyond Trial Data</a></li>
+  <li><a href="#naive-hr-switching-vs.-recursive-hazard-chaining" id="toc-naive-hr-switching-vs.-recursive-hazard-chaining" class="nav-link" data-scroll-target="#naive-hr-switching-vs.-recursive-hazard-chaining"><span class="header-section-number">5</span> Naive HR Switching vs.&nbsp;Recursive Hazard Chaining</a>
+  <ul class="collapse">
+  <li><a href="#the-naive-approach-implied-hr-calculation" id="toc-the-naive-approach-implied-hr-calculation" class="nav-link" data-scroll-target="#the-naive-approach-implied-hr-calculation"><span class="header-section-number">5.1</span> The Naive Approach: Implied HR Calculation</a></li>
+  <li><a href="#recursive-hazard-chaining-algorithm" id="toc-recursive-hazard-chaining-algorithm" class="nav-link" data-scroll-target="#recursive-hazard-chaining-algorithm"><span class="header-section-number">5.2</span> Recursive Hazard Chaining: Algorithm</a></li>
+  </ul></li>
+  <li><a href="#base-case-cost-effectiveness-results" id="toc-base-case-cost-effectiveness-results" class="nav-link" data-scroll-target="#base-case-cost-effectiveness-results"><span class="header-section-number">6</span> Base Case Cost-Effectiveness Results</a></li>
+  <li><a href="#probabilistic-sensitivity-analysis" id="toc-probabilistic-sensitivity-analysis" class="nav-link" data-scroll-target="#probabilistic-sensitivity-analysis"><span class="header-section-number">7</span> Probabilistic Sensitivity Analysis</a></li>
+  <li><a href="#nice-submission-considerations" id="toc-nice-submission-considerations" class="nav-link" data-scroll-target="#nice-submission-considerations"><span class="header-section-number">8</span> NICE Submission Considerations</a></li>
+  <li><a href="#auditor-stress-test-strategic-qa" id="toc-auditor-stress-test-strategic-qa" class="nav-link" data-scroll-target="#auditor-stress-test-strategic-qa"><span class="header-section-number">9</span> Auditor Stress Test: Strategic Q&amp;A</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Mock Case — Survival Extrapolation in a Partitioned Survival Model</h1>
+<p class="subtitle lead">Treatment Effect Waning and Recursive Hazard Chaining: Isavetinib in Relapsed/Refractory Multiple Myeloma</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xiaoge Zhang, PhD </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 21, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Mock Case Disclosure
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a methodological demonstration using fully <strong>synthetic</strong> parameters. The clinical scenario — Isavetinib versus standard of care (SoC) in Relapsed/Refractory Multiple Myeloma (RRMM) — is fictional and designed to expose a real methodological challenge in oncology HTA submissions: how to model treatment effect waning beyond the trial observation window in a biologically defensible way.</p>
+</div>
+</div>
+<hr>
+<section id="executive-summary" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="executive-summary"><span class="header-section-number">1</span> Executive Summary</h2>
+<p>Standard oncology HTA submissions in England require a 30-year (lifetime) model horizon, yet pivotal trials for RRMM typically provide 3–5 years of follow-up data. This creates the <strong>extrapolation problem</strong>: how should the treatment benefit observed during the trial period be projected forward?</p>
+<p>A common, computationally simple approach is to apply a constant Hazard Ratio (HR) at the trial cut-off point. This case demonstrates that this approach generates a mathematically discontinuous “Hazard Cliff” at the extrapolation boundary — a structural artefact that NICE Evidence Assessment Groups (EAGs) routinely flag as biologically implausible.</p>
+<p>This case study develops and validates an alternative: <strong>Recursive Hazard Chaining</strong>, which anchors the long-term extrapolation to the trial-period hazard at the cut-off point and applies a clinically motivated linear waning function. The result is a smooth, continuous survival trajectory that is far more defensible in front of an appraisal committee.</p>
+<p>Base-case results: <strong>ICER = £53,514 / QALY</strong> (<span class="math inline">\(\Delta C\)</span>: £34,761 | <span class="math inline">\(\Delta E\)</span>: 0.649 QALYs). The full probabilistic sensitivity analysis (1,000 iterations) yields a 51% probability of cost-effectiveness at the £50,000 severity-adjusted threshold.</p>
+<hr>
+</section>
+<section id="decision-problem-clinical-background" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="decision-problem-clinical-background"><span class="header-section-number">2</span> Decision Problem &amp; Clinical Background</h2>
+<p>Multiple myeloma is a haematological malignancy of plasma cells with a median age at diagnosis of approximately 70 years. Virtually all patients eventually relapse, and each successive line of therapy is associated with shorter remission and reduced performance status. In the RRMM setting, the key clinical endpoint is Progression-Free Survival (PFS), with Overall Survival (OS) as the co-primary or secondary endpoint.</p>
+<p>Isavetinib (fictional) is a novel oral kinase inhibitor being evaluated against a SoC backbone in the third-line RRMM setting. A company-sponsored trial provided 60 months of individual patient follow-up. The modelled base-case parameters are calibrated to reflect a realistic RRMM scenario:</p>
+<ul>
+<li>SoC median OS: ~24 months</li>
+<li>Isavetinib median OS: ~50 months (HR ≈ 0.55)</li>
+<li>Model horizon: 30 years (360 monthly cycles)</li>
+</ul>
+<p>The central methodological challenge is that the treatment benefit observed at Month 60 cannot plausibly be assumed to persist unchanged at its trial-period magnitude into Years 10, 20, and 30.</p>
+<hr>
+</section>
+<section id="the-partitioned-survival-model-mathematical-framework" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-partitioned-survival-model-mathematical-framework"><span class="header-section-number">3</span> The Partitioned Survival Model: Mathematical Framework</h2>
+<section id="three-state-structure" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="three-state-structure"><span class="header-section-number">3.1</span> Three-State Structure</h3>
+<p>A Partitioned Survival Model (PartSM) is defined by two independent survival functions — PFS and OS — that jointly determine the proportion of the cohort in each of three mutually exclusive health states at every model cycle:</p>
+<p><span class="math display">\[\pi_{\text{PFS}}(t) = S_{\text{PFS}}(t)\]</span></p>
+<p><span class="math display">\[\pi_{\text{PD}}(t) = S_{\text{OS}}(t) - S_{\text{PFS}}(t)\]</span></p>
+<p><span class="math display">\[\pi_{\text{Death}}(t) = 1 - S_{\text{OS}}(t)\]</span></p>
+<p>A non-negotiable biological constraint is that OS cannot fall below PFS at any cycle:</p>
+<p><span class="math display">\[S_{\text{OS}}(t) \geq S_{\text{PFS}}(t) \quad \forall\, t\]</span></p>
+<p>Violations of this constraint — which can arise from naive extrapolation — must be corrected programmatically. Any model submitted to NICE without this safeguard will be immediately flagged by the EAG.</p>
+</section>
+<section id="weibull-survival-function" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="weibull-survival-function"><span class="header-section-number">3.2</span> Weibull Survival Function</h3>
+<p>Each survival curve is parameterised as a Weibull function calibrated to the monthly cycle structure:</p>
+<p><span class="math display">\[S(t) = \exp\!\left(-\lambda \cdot t^{\alpha}\right)\]</span></p>
+<p>where <span class="math inline">\(t\)</span> is time in months, <span class="math inline">\(\lambda &gt; 0\)</span> is the scale parameter, and <span class="math inline">\(\alpha &gt; 0\)</span> is the shape parameter. When <span class="math inline">\(\alpha &gt; 1\)</span>, the hazard is monotonically increasing — consistent with the progressive nature of RRMM. All parameters are specified on the monthly scale to ensure dimensional consistency; a common submission error is to use parameters calibrated to years applied to monthly cycle lengths without conversion.</p>
+</section>
+<section id="qaly-and-cost-accumulation" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="qaly-and-cost-accumulation"><span class="header-section-number">3.3</span> QALY and Cost Accumulation</h3>
+<p>QALY gains and costs are accumulated each cycle using the area-under-the-curve method, with continuous discounting at an annual rate <span class="math inline">\(r\)</span>:</p>
+<p><span class="math display">\[\text{QALY} = \sum_{t=0}^{T} \left[\pi_{\text{PFS}}(t) \cdot u_{\text{PFS}} + \pi_{\text{PD}}(t) \cdot u_{\text{PD}}\right] \cdot \frac{1}{12} \cdot (1 + r)^{-t/12}\]</span></p>
+<p><span class="math display">\[\text{Cost} = \sum_{t=0}^{T} \left[\pi_{\text{PFS}}(t) \cdot c_{\text{PFS}} + \pi_{\text{PD}}(t) \cdot c_{\text{PD}}\right] \cdot (1 + r)^{-t/12}\]</span></p>
+<p>The factor <span class="math inline">\(\frac{1}{12}\)</span> converts monthly cycle weights to annual QALY units. The Incremental Cost-Effectiveness Ratio is then:</p>
+<p><span class="math display">\[\text{ICER} = \frac{\Delta C}{\Delta E} = \frac{C_{\text{Isavetinib}} - C_{\text{SoC}}}{E_{\text{Isavetinib}} - E_{\text{SoC}}}\]</span></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-1"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a>params <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-2" class="code-annotation-target"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">soc_pfs_alpha  =</span> <span class="fl">1.20</span>, <span class="at">soc_pfs_lambda  =</span> <span class="fl">0.040</span>,</span>
+<span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">soc_os_alpha   =</span> <span class="fl">1.10</span>, <span class="at">soc_os_lambda   =</span> <span class="fl">0.018</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-4" class="code-annotation-target"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">trt_pfs_alpha  =</span> <span class="fl">1.10</span>, <span class="at">trt_pfs_lambda  =</span> <span class="fl">0.025</span>,</span>
+<span id="annotated-cell-1-5"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">trt_os_alpha   =</span> <span class="fl">1.05</span>, <span class="at">trt_os_lambda   =</span> <span class="fl">0.010</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-6" class="code-annotation-target"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">waning_start   =</span> <span class="dv">60</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-7" class="code-annotation-target"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">waning_end     =</span> <span class="dv">120</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-1-8" class="code-annotation-target"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">horizon        =</span> <span class="dv">360</span></span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-1-10"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>econ <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-1-12" class="code-annotation-target"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">u_pfs        =</span> <span class="fl">0.750</span>,</span>
+<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">u_pd         =</span> <span class="fl">0.500</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="7" onclick="event.preventDefault();">7</a><span id="annotated-cell-1-14" class="code-annotation-target"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">cost_pfs_trt =</span> <span class="dv">4700</span>,</span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">cost_pfs_soc =</span> <span class="dv">1200</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="8" onclick="event.preventDefault();">8</a><span id="annotated-cell-1-16" class="code-annotation-target"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">cost_pd      =</span> <span class="dv">1800</span>,</span>
+<span id="annotated-cell-1-17"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">disc_annual  =</span> <span class="fl">0.035</span></span>
+<span id="annotated-cell-1-18"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-1-19"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-20"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a>param_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="annotated-cell-1-21"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">c</span>(</span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SoC PFS: alpha / lambda"</span>,</span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SoC OS:  alpha / lambda"</span>,</span>
+<span id="annotated-cell-1-24"><a href="#annotated-cell-1-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Isavetinib PFS: alpha / lambda"</span>,</span>
+<span id="annotated-cell-1-25"><a href="#annotated-cell-1-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Isavetinib OS:  alpha / lambda"</span>,</span>
+<span id="annotated-cell-1-26"><a href="#annotated-cell-1-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Waning window (months)"</span>,</span>
+<span id="annotated-cell-1-27"><a href="#annotated-cell-1-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Model horizon (months)"</span>,</span>
+<span id="annotated-cell-1-28"><a href="#annotated-cell-1-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Utility: PFS / PD"</span>,</span>
+<span id="annotated-cell-1-29"><a href="#annotated-cell-1-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Monthly cost PFS: Isavetinib / SoC (£)"</span>,</span>
+<span id="annotated-cell-1-30"><a href="#annotated-cell-1-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Monthly cost PD, both arms (£)"</span>,</span>
+<span id="annotated-cell-1-31"><a href="#annotated-cell-1-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Annual discount rate"</span></span>
+<span id="annotated-cell-1-32"><a href="#annotated-cell-1-32" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="annotated-cell-1-33"><a href="#annotated-cell-1-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">Value =</span> <span class="fu">c</span>(</span>
+<span id="annotated-cell-1-34"><a href="#annotated-cell-1-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1.20 / 0.040"</span>, <span class="st">"1.10 / 0.018"</span>,</span>
+<span id="annotated-cell-1-35"><a href="#annotated-cell-1-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1.10 / 0.025"</span>, <span class="st">"1.05 / 0.010"</span>,</span>
+<span id="annotated-cell-1-36"><a href="#annotated-cell-1-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Month 60 → 120"</span>,</span>
+<span id="annotated-cell-1-37"><a href="#annotated-cell-1-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">"360 (30 years)"</span>,</span>
+<span id="annotated-cell-1-38"><a href="#annotated-cell-1-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"0.750 / 0.500"</span>,</span>
+<span id="annotated-cell-1-39"><a href="#annotated-cell-1-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"£4,700 / £1,200"</span>,</span>
+<span id="annotated-cell-1-40"><a href="#annotated-cell-1-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">"£1,800"</span>,</span>
+<span id="annotated-cell-1-41"><a href="#annotated-cell-1-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"3.5%"</span></span>
+<span id="annotated-cell-1-42"><a href="#annotated-cell-1-42" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="annotated-cell-1-43"><a href="#annotated-cell-1-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-1-44"><a href="#annotated-cell-1-44" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(param_tbl, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Parameter"</span>, <span class="st">"Value"</span>),</span>
+<span id="annotated-cell-1-45"><a href="#annotated-cell-1-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Model parameters: Weibull survival (monthly scale) and economic inputs"</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="2" data-code-annotation="1">SoC (standard of care) Weibull parameters on the monthly scale. Calibrated to a median OS of approximately 24 months.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2">Isavetinib Weibull parameters. Calibrated to a median OS of approximately 50 months, reflecting an HR of ~0.55 versus SoC.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="3">Trial data cut-off at Month 60: the point at which the extrapolation period begins and treatment effect waning is applied.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="7" data-code-annotation="4">Full waning by Month 120: clinical assumption that Isavetinib benefit fully dissipates 5 years after the trial horizon — consistent with observed TKI durability in haematological malignancies.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="8" data-code-annotation="5">Thirty-year model horizon aligned with NICE reference case.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="12" data-code-annotation="6">Health state utilities from published RRMM utility literature (illustrative).</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="7">7</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="14" data-code-annotation="7">Isavetinib monthly cost includes drug acquisition plus administration, reflecting a realistic oral oncology price point.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="8">8</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="16" data-code-annotation="8">Post-progression costs are assumed equal between arms, consistent with assumed equivalent subsequent therapy access.</span>
+</dd>
+</dl>
+</div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Model parameters: Weibull survival (monthly scale) and economic inputs</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">SoC PFS: alpha / lambda</td>
+<td style="text-align: left;">1.20 / 0.040</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SoC OS: alpha / lambda</td>
+<td style="text-align: left;">1.10 / 0.018</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Isavetinib PFS: alpha / lambda</td>
+<td style="text-align: left;">1.10 / 0.025</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Isavetinib OS: alpha / lambda</td>
+<td style="text-align: left;">1.05 / 0.010</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Waning window (months)</td>
+<td style="text-align: left;">Month 60 → 120</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Model horizon (months)</td>
+<td style="text-align: left;">360 (30 years)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Utility: PFS / PD</td>
+<td style="text-align: left;">0.750 / 0.500</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Monthly cost PFS: Isavetinib / SoC (£)</td>
+<td style="text-align: left;">£4,700 / £1,200</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Monthly cost PD, both arms (£)</td>
+<td style="text-align: left;">£1,800</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Annual discount rate</td>
+<td style="text-align: left;">3.5%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="the-extrapolation-challenge-beyond-trial-data" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="the-extrapolation-challenge-beyond-trial-data"><span class="header-section-number">4</span> The Extrapolation Challenge: Beyond Trial Data</h2>
+<p>At Month 60, the trial ends. The model must continue for another 300 months. A seemingly natural solution is to take the HR observed at Month 60 and apply it as a fixed constant for the remainder of the time horizon. This is the <strong>Naive HR Switching</strong> approach.</p>
+<p>The problem is mathematical. In the Weibull framework, applying a constant HR at the cut-off is equivalent to writing:</p>
+<p><span class="math display">\[S_{\text{trt}}(t) = \left[S_{\text{soc}}(t)\right]^{\text{HR}} \quad \text{for } t &gt; t^*\]</span></p>
+<p>where <span class="math inline">\(t^*\)</span> is the cut-off point. But the trial-period curve at <span class="math inline">\(t^*\)</span> is:</p>
+<p><span class="math display">\[S_{\text{trt}}(t^*) = \exp\!\left(-\lambda_{\text{trt}} \cdot {t^*}^{\alpha_{\text{trt}}}\right)\]</span></p>
+<p>For the Naive formula to produce a continuous transition, it would require:</p>
+<p><span class="math display">\[\exp\!\left(-\lambda_{\text{trt}} \cdot {t^*}^{\alpha_{\text{trt}}}\right) = \left[\exp\!\left(-\lambda_{\text{soc}} \cdot {t^*}^{\alpha_{\text{soc}}}\right)\right]^{\text{HR}}\]</span></p>
+<p>This equality holds only when the HR equals the ratio of the Weibull scale parameters — which is almost never the case in a real trial. The mismatch creates a <strong>jump discontinuity</strong> in the survival function at <span class="math inline">\(t^*\)</span>, which is biologically impossible: survival probability cannot instantaneously change at a single point in time.</p>
+<hr>
+</section>
+<section id="naive-hr-switching-vs.-recursive-hazard-chaining" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="naive-hr-switching-vs.-recursive-hazard-chaining"><span class="header-section-number">5</span> Naive HR Switching vs.&nbsp;Recursive Hazard Chaining</h2>
+<section id="the-naive-approach-implied-hr-calculation" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="the-naive-approach-implied-hr-calculation"><span class="header-section-number">5.1</span> The Naive Approach: Implied HR Calculation</h3>
+<p>To make a fair comparison, the HR used in the Naive approach is not an arbitrary constant but the <strong>implied HR</strong> derived from the trial curves at the cut-off:</p>
+<p><span class="math display">\[\widehat{\text{HR}}(t^*) = \frac{h_{\text{trt}}(t^*)}{h_{\text{soc}}(t^*)}\]</span></p>
+<p>where the discrete hazard approximation is:</p>
+<p><span class="math display">\[h(t) \approx -\ln\!\left[\frac{S(t)}{S(t-1)}\right]\]</span></p>
+<p>This anchors both approaches at the same empirical HR value. The divergence arises entirely from how that HR is applied going forward.</p>
+</section>
+<section id="recursive-hazard-chaining-algorithm" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="recursive-hazard-chaining-algorithm"><span class="header-section-number">5.2</span> Recursive Hazard Chaining: Algorithm</h3>
+<p>The Recursive Hazard Chaining algorithm replaces the discontinuous HR switch with a smooth, monotonically increasing function. Three components define it:</p>
+<p><strong>Step 1 — Anchor.</strong> Compute the implied HR at the cut-off:</p>
+<p><span class="math display">\[\widehat{\text{HR}}(t^*) = \frac{h_{\text{trt}}(t^*)}{h_{\text{soc}}(t^*)}\]</span></p>
+<p><strong>Step 2 — Linear waning.</strong> At each post-trial cycle <span class="math inline">\(t &gt; t^*\)</span>, the HR decays linearly toward 1.0 (no benefit) over a clinically justified waning window <span class="math inline">\([t^*, t_{\text{end}}]\)</span>:</p>
+<p><span class="math display">\[\text{progress}(t) = \min\!\left(1,\; \frac{t - t^*}{t_{\text{end}} - t^*}\right)\]</span></p>
+<p><span class="math display">\[\text{HR}(t) = \widehat{\text{HR}}(t^*) + \left[1 - \widehat{\text{HR}}(t^*)\right] \cdot \text{progress}(t)\]</span></p>
+<p><strong>Step 3 — Recursive chaining.</strong> Rather than computing the absolute survival level from SoC, the treatment arm is advanced by the incremental SoC hazard raised to the current HR:</p>
+<p><span class="math display">\[S_{\text{trt}}(t) = S_{\text{trt}}(t-1) \cdot \left[\frac{S_{\text{soc}}(t)}{S_{\text{soc}}(t-1)}\right]^{\text{HR}(t)}\]</span></p>
+<p>This recursion ensures continuity by construction: <span class="math inline">\(S_{\text{trt}}(t)\)</span> is always derived from <span class="math inline">\(S_{\text{trt}}(t-1)\)</span>, so no jump can occur.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-2"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a>surv_weibull <span class="ot">&lt;-</span> <span class="cf">function</span>(t, alpha, lambda) <span class="fu">exp</span>(<span class="sc">-</span>lambda <span class="sc">*</span> t<span class="sc">^</span>alpha)</span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-3"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Month =</span> <span class="dv">0</span><span class="sc">:</span>params<span class="sc">$</span>horizon) <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="annotated-cell-2-5"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">SoC_PFS       =</span> <span class="fu">surv_weibull</span>(Month, params<span class="sc">$</span>soc_pfs_alpha, params<span class="sc">$</span>soc_pfs_lambda),</span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">SoC_OS        =</span> <span class="fu">surv_weibull</span>(Month, params<span class="sc">$</span>soc_os_alpha,  params<span class="sc">$</span>soc_os_lambda),</span>
+<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Trt_PFS_Trial =</span> <span class="fu">surv_weibull</span>(Month, params<span class="sc">$</span>trt_pfs_alpha, params<span class="sc">$</span>trt_pfs_lambda),</span>
+<span id="annotated-cell-2-8"><a href="#annotated-cell-2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Trt_OS_Trial  =</span> <span class="fu">surv_weibull</span>(Month, params<span class="sc">$</span>trt_os_alpha,  params<span class="sc">$</span>trt_os_lambda)</span>
+<span id="annotated-cell-2-9"><a href="#annotated-cell-2-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="annotated-cell-2-10"><a href="#annotated-cell-2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-11"><a href="#annotated-cell-2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Implied HR at the cut-off point (Month 60)</span></span>
+<span id="annotated-cell-2-12"><a href="#annotated-cell-2-12" aria-hidden="true" tabindex="-1"></a>get_implied_hr <span class="ot">&lt;-</span> <span class="cf">function</span>(s_trt, s_soc, t_idx) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-13" class="code-annotation-target"><a href="#annotated-cell-2-13" aria-hidden="true" tabindex="-1"></a>  h_soc <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(s_soc[t_idx <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">/</span> s_soc[t_idx])</span>
+<span id="annotated-cell-2-14"><a href="#annotated-cell-2-14" aria-hidden="true" tabindex="-1"></a>  h_trt <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(s_trt[t_idx <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">/</span> s_trt[t_idx])</span>
+<span id="annotated-cell-2-15"><a href="#annotated-cell-2-15" aria-hidden="true" tabindex="-1"></a>  h_trt <span class="sc">/</span> h_soc</span>
+<span id="annotated-cell-2-16"><a href="#annotated-cell-2-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-2-17"><a href="#annotated-cell-2-17" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-18" class="code-annotation-target"><a href="#annotated-cell-2-18" aria-hidden="true" tabindex="-1"></a>hr_pfs_anchor <span class="ot">&lt;-</span> <span class="fu">get_implied_hr</span>(df<span class="sc">$</span>Trt_PFS_Trial, df<span class="sc">$</span>SoC_PFS, params<span class="sc">$</span>waning_start)</span>
+<span id="annotated-cell-2-19"><a href="#annotated-cell-2-19" aria-hidden="true" tabindex="-1"></a>hr_os_anchor  <span class="ot">&lt;-</span> <span class="fu">get_implied_hr</span>(df<span class="sc">$</span>Trt_OS_Trial,  df<span class="sc">$</span>SoC_OS,  params<span class="sc">$</span>waning_start)</span>
+<span id="annotated-cell-2-20"><a href="#annotated-cell-2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-21"><a href="#annotated-cell-2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive approach: hard switch to constant HR at Month 61</span></span>
+<span id="annotated-cell-2-22"><a href="#annotated-cell-2-22" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>Trt_OS_Naive <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="annotated-cell-2-23"><a href="#annotated-cell-2-23" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>Month <span class="sc">&lt;=</span> params<span class="sc">$</span>waning_start,</span>
+<span id="annotated-cell-2-24"><a href="#annotated-cell-2-24" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>Trt_OS_Trial,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-25" class="code-annotation-target"><a href="#annotated-cell-2-25" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>SoC_OS<span class="sc">^</span>hr_os_anchor</span>
+<span id="annotated-cell-2-26"><a href="#annotated-cell-2-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-2-27"><a href="#annotated-cell-2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-28"><a href="#annotated-cell-2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Recursive Hazard Chaining</span></span>
+<span id="annotated-cell-2-29"><a href="#annotated-cell-2-29" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>Trt_PFS_Chained <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="annotated-cell-2-30"><a href="#annotated-cell-2-30" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>Trt_OS_Chained  <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="annotated-cell-2-31"><a href="#annotated-cell-2-31" aria-hidden="true" tabindex="-1"></a>hr_os_trajectory   <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">nrow</span>(df))</span>
+<span id="annotated-cell-2-32"><a href="#annotated-cell-2-32" aria-hidden="true" tabindex="-1"></a>hr_os_trajectory[<span class="dv">1</span><span class="sc">:</span><span class="dv">61</span>] <span class="ot">&lt;-</span> hr_os_anchor</span>
+<span id="annotated-cell-2-33"><a href="#annotated-cell-2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-34"><a href="#annotated-cell-2-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="fu">nrow</span>(df)) {</span>
+<span id="annotated-cell-2-35"><a href="#annotated-cell-2-35" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> df<span class="sc">$</span>Month[i]</span>
+<span id="annotated-cell-2-36"><a href="#annotated-cell-2-36" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (t <span class="sc">&lt;=</span> params<span class="sc">$</span>waning_start) {</span>
+<span id="annotated-cell-2-37"><a href="#annotated-cell-2-37" aria-hidden="true" tabindex="-1"></a>    df<span class="sc">$</span>Trt_PFS_Chained[i] <span class="ot">&lt;-</span> df<span class="sc">$</span>Trt_PFS_Trial[i]</span>
+<span id="annotated-cell-2-38"><a href="#annotated-cell-2-38" aria-hidden="true" tabindex="-1"></a>    df<span class="sc">$</span>Trt_OS_Chained[i]  <span class="ot">&lt;-</span> df<span class="sc">$</span>Trt_OS_Trial[i]</span>
+<span id="annotated-cell-2-39"><a href="#annotated-cell-2-39" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-2-40" class="code-annotation-target"><a href="#annotated-cell-2-40" aria-hidden="true" tabindex="-1"></a>    progress <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="dv">1</span>, (t <span class="sc">-</span> params<span class="sc">$</span>waning_start) <span class="sc">/</span></span>
+<span id="annotated-cell-2-41"><a href="#annotated-cell-2-41" aria-hidden="true" tabindex="-1"></a>                       (params<span class="sc">$</span>waning_end <span class="sc">-</span> params<span class="sc">$</span>waning_start))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-2-42" class="code-annotation-target"><a href="#annotated-cell-2-42" aria-hidden="true" tabindex="-1"></a>    hr_pfs <span class="ot">&lt;-</span> hr_pfs_anchor <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> hr_pfs_anchor) <span class="sc">*</span> progress</span>
+<span id="annotated-cell-2-43"><a href="#annotated-cell-2-43" aria-hidden="true" tabindex="-1"></a>    hr_os  <span class="ot">&lt;-</span> hr_os_anchor  <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> hr_os_anchor)  <span class="sc">*</span> progress</span>
+<span id="annotated-cell-2-44"><a href="#annotated-cell-2-44" aria-hidden="true" tabindex="-1"></a>    hr_os_trajectory[i] <span class="ot">&lt;-</span> hr_os</span>
+<span id="annotated-cell-2-45"><a href="#annotated-cell-2-45" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-2-46" class="code-annotation-target"><a href="#annotated-cell-2-46" aria-hidden="true" tabindex="-1"></a>    df<span class="sc">$</span>Trt_PFS_Chained[i] <span class="ot">&lt;-</span> df<span class="sc">$</span>Trt_PFS_Chained[i<span class="dv">-1</span>] <span class="sc">*</span></span>
+<span id="annotated-cell-2-47"><a href="#annotated-cell-2-47" aria-hidden="true" tabindex="-1"></a>      (df<span class="sc">$</span>SoC_PFS[i] <span class="sc">/</span> df<span class="sc">$</span>SoC_PFS[i<span class="dv">-1</span>])<span class="sc">^</span>hr_pfs</span>
+<span id="annotated-cell-2-48"><a href="#annotated-cell-2-48" aria-hidden="true" tabindex="-1"></a>    df<span class="sc">$</span>Trt_OS_Chained[i]  <span class="ot">&lt;-</span> df<span class="sc">$</span>Trt_OS_Chained[i<span class="dv">-1</span>]  <span class="sc">*</span></span>
+<span id="annotated-cell-2-49"><a href="#annotated-cell-2-49" aria-hidden="true" tabindex="-1"></a>      (df<span class="sc">$</span>SoC_OS[i]  <span class="sc">/</span> df<span class="sc">$</span>SoC_OS[i<span class="dv">-1</span>])<span class="sc">^</span>hr_os</span>
+<span id="annotated-cell-2-50"><a href="#annotated-cell-2-50" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="annotated-cell-2-51"><a href="#annotated-cell-2-51" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Biological plausibility floor: OS &gt;= PFS at every cycle</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="7" onclick="event.preventDefault();">7</a><span id="annotated-cell-2-52" class="code-annotation-target"><a href="#annotated-cell-2-52" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (df<span class="sc">$</span>Trt_OS_Chained[i] <span class="sc">&lt;</span> df<span class="sc">$</span>Trt_PFS_Chained[i]) {</span>
+<span id="annotated-cell-2-53"><a href="#annotated-cell-2-53" aria-hidden="true" tabindex="-1"></a>    df<span class="sc">$</span>Trt_OS_Chained[i] <span class="ot">&lt;-</span> df<span class="sc">$</span>Trt_PFS_Chained[i]</span>
+<span id="annotated-cell-2-54"><a href="#annotated-cell-2-54" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="annotated-cell-2-55"><a href="#annotated-cell-2-55" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-2-56"><a href="#annotated-cell-2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-57"><a href="#annotated-cell-2-57" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Implied HR at anchor (Month 60): OS = %.3f | PFS = %.3f</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="annotated-cell-2-58"><a href="#annotated-cell-2-58" aria-hidden="true" tabindex="-1"></a>            hr_os_anchor, hr_pfs_anchor))</span>
+<span id="annotated-cell-2-59"><a href="#annotated-cell-2-59" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"HR at Month 120 (end of waning):  OS = %.3f | PFS = %.3f</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="annotated-cell-2-60"><a href="#annotated-cell-2-60" aria-hidden="true" tabindex="-1"></a>            hr_os_anchor <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> hr_os_anchor), hr_pfs_anchor <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> hr_pfs_anchor)))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="13" data-code-annotation="1">Discrete hazard approximation: <span class="math inline">\(h(t) \approx -\ln[S(t)/S(t-1)]\)</span>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="18" data-code-annotation="2">Anchor HR computed at index 60 (corresponding to Month 60). The <code>+ 1</code> offset is because R vectors are 1-indexed.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="25" data-code-annotation="3">Naive formula: <span class="math inline">\(S_{\text{trt}}(t) = S_{\text{soc}}(t)^{\widehat{\text{HR}}}\)</span>. Applied as a constant from Month 61 onward — this is what creates the jump.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="40" data-code-annotation="4">Linear progress of waning from 0.0 at Month 60 to 1.0 at Month 120. <code>min(1, ...)</code> ensures the HR does not fall below 1.0 after full waning.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="42" data-code-annotation="5">Current HR interpolated between the anchored trial HR and 1.0 (no treatment benefit).</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="46" data-code-annotation="6">The recursive chaining formula. Each step advances the treatment arm using the incremental SoC hazard scaled by the current waning HR. Continuity is guaranteed because <span class="math inline">\(S_{\text{trt}}(t)\)</span> is always derived from <span class="math inline">\(S_{\text{trt}}(t-1)\)</span>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="7">7</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="52" data-code-annotation="7">Hard floor ensuring OS <span class="math inline">\(\geq\)</span> PFS. Without this, extrapolation artefacts can produce an impossible state where more patients are progression-free than are alive.</span>
+</dd>
+</dl>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Implied HR at anchor (Month 60): OS = 0.432 | PFS = 0.381
+HR at Month 120 (end of waning):  OS = 1.000 | PFS = 1.000</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_plot <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Month <span class="sc">&lt;=</span> <span class="dv">180</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Month, SoC_OS, Trt_OS_Naive, Trt_OS_Chained)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df_long <span class="ot">&lt;-</span> df_plot <span class="sc">|&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>Month, <span class="at">names_to =</span> <span class="st">"Curve"</span>, <span class="at">values_to =</span> <span class="st">"Survival"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Curve =</span> <span class="fu">recode</span>(Curve,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SoC_OS"</span>         <span class="ot">=</span> <span class="st">"SoC (OS)"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Trt_OS_Naive"</span>   <span class="ot">=</span> <span class="st">"Isavetinib — Naive HR Switch"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Trt_OS_Chained"</span> <span class="ot">=</span> <span class="st">"Isavetinib — Recursive Chaining"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_long, <span class="fu">aes</span>(<span class="at">x =</span> Month, <span class="at">y =</span> Survival, <span class="at">colour =</span> Curve, <span class="at">linetype =</span> Curve)) <span class="sc">+</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">60</span>, <span class="at">linetype =</span> <span class="st">"dotted"</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">62</span>, <span class="at">y =</span> <span class="fl">0.72</span>, <span class="at">label =</span> <span class="st">"Trial cut-off</span><span class="sc">\n</span><span class="st">(Month 60)"</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"curve"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="dv">85</span>, <span class="at">y =</span> <span class="fl">0.42</span>, <span class="at">xend =</span> <span class="dv">62</span>, <span class="at">yend =</span> df<span class="sc">$</span>Trt_OS_Naive[<span class="dv">63</span>],</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">arrow =</span> <span class="fu">arrow</span>(<span class="at">length =</span> <span class="fu">unit</span>(<span class="fl">0.25</span>, <span class="st">"cm"</span>)), <span class="at">colour =</span> <span class="st">"#cc0000"</span>, <span class="at">curvature =</span> <span class="sc">-</span><span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">87</span>, <span class="at">y =</span> <span class="fl">0.42</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Hazard Cliff:</span><span class="sc">\n</span><span class="st">discontinuous jump</span><span class="sc">\n</span><span class="st">(EAG rejection risk)"</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="fl">3.0</span>, <span class="at">colour =</span> <span class="st">"#cc0000"</span>) <span class="sc">+</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SoC (OS)"</span>                       <span class="ot">=</span> <span class="st">"black"</span>,</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Isavetinib — Naive HR Switch"</span>   <span class="ot">=</span> <span class="st">"#888888"</span>,</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Isavetinib — Recursive Chaining"</span><span class="ot">=</span> <span class="st">"#2166ac"</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SoC (OS)"</span>                       <span class="ot">=</span> <span class="st">"dotted"</span>,</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Isavetinib — Naive HR Switch"</span>   <span class="ot">=</span> <span class="st">"dashed"</span>,</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Isavetinib — Recursive Chaining"</span><span class="ot">=</span> <span class="st">"solid"</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Month"</span>, <span class="at">y =</span> <span class="st">"Overall Survival Probability"</span>,</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="cn">NULL</span>, <span class="at">linetype =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PartSM_Forensic_Audit_RRMM_files/figure-html/audit-plot-1.png" class="img-fluid figure-img" width="960"></p>
+<figcaption>Survival extrapolation comparison: Naive HR Switching (dashed) produces a visible Hazard Cliff at Month 60, while Recursive Hazard Chaining (solid blue) maintains a smooth, continuous trajectory.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>hr_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Month     =</span> <span class="dv">0</span><span class="sc">:</span>params<span class="sc">$</span>horizon,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Chained   =</span> hr_os_trajectory,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Naive     =</span> <span class="fu">ifelse</span>(<span class="dv">0</span><span class="sc">:</span>params<span class="sc">$</span>horizon <span class="sc">&lt;=</span> params<span class="sc">$</span>waning_start,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                     hr_os_anchor,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                     hr_os_anchor)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">filter</span>(Month <span class="sc">&gt;=</span> <span class="dv">55</span> <span class="sc">&amp;</span> Month <span class="sc">&lt;=</span> <span class="dv">130</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(hr_df, <span class="fu">aes</span>(<span class="at">x =</span> Month)) <span class="sc">+</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> Chained, <span class="at">colour =</span> <span class="st">"Recursive Chaining"</span>), <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> Naive, <span class="at">colour =</span> <span class="st">"Naive HR Switch"</span>), <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">1.0</span>) <span class="sc">+</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dotted"</span>, <span class="at">colour =</span> <span class="st">"grey50"</span>) <span class="sc">+</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">122</span>, <span class="at">y =</span> <span class="fl">1.01</span>, <span class="at">label =</span> <span class="st">"HR = 1.0</span><span class="sc">\n</span><span class="st">(no benefit)"</span>, <span class="at">size =</span> <span class="fl">3.0</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Recursive Chaining"</span> <span class="ot">=</span> <span class="st">"#2166ac"</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Naive HR Switch"</span>    <span class="ot">=</span> <span class="st">"#888888"</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Month"</span>, <span class="at">y =</span> <span class="st">"Implied Hazard Ratio (OS)"</span>, <span class="at">colour =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>, <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PartSM_Forensic_Audit_RRMM_files/figure-html/hr-trajectory-1.png" class="img-fluid figure-img" width="864"></p>
+<figcaption>Implied OS Hazard Ratio trajectory: Naive HR Switching applies a constant HR from Month 61 (flat line), while Recursive Chaining smoothly interpolates from the anchored HR back to 1.0 at Month 120.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="base-case-cost-effectiveness-results" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="base-case-cost-effectiveness-results"><span class="header-section-number">6</span> Base Case Cost-Effectiveness Results</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>run_partsm <span class="ot">&lt;-</span> <span class="cf">function</span>(pfs_trt, os_trt, pfs_soc, os_soc,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                       u_pfs, u_pd,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                       cost_pfs_trt, cost_pfs_soc, cost_pd,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                       disc_annual) {</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  months       <span class="ot">&lt;-</span> <span class="fu">seq_along</span>(pfs_trt) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  disc_monthly <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> disc_annual)<span class="sc">^</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">12</span>) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  discount     <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> disc_monthly)<span class="sc">^</span>months</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># State occupancy with biological plausibility constraint</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  pi_pfs_trt <span class="ot">&lt;-</span> <span class="fu">pmax</span>(<span class="dv">0</span>, <span class="fu">pmin</span>(pfs_trt, os_trt))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  pi_pd_trt  <span class="ot">&lt;-</span> <span class="fu">pmax</span>(<span class="dv">0</span>, os_trt  <span class="sc">-</span> pi_pfs_trt)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  pi_pfs_soc <span class="ot">&lt;-</span> <span class="fu">pmax</span>(<span class="dv">0</span>, <span class="fu">pmin</span>(pfs_soc, os_soc))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  pi_pd_soc  <span class="ot">&lt;-</span> <span class="fu">pmax</span>(<span class="dv">0</span>, os_soc  <span class="sc">-</span> pi_pfs_soc)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># QALYs (divide by 12 to convert monthly cycles to annual units)</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  qaly_trt <span class="ot">&lt;-</span> <span class="fu">sum</span>((pi_pfs_trt <span class="sc">*</span> u_pfs <span class="sc">+</span> pi_pd_trt <span class="sc">*</span> u_pd) <span class="sc">*</span> discount) <span class="sc">/</span> <span class="dv">12</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  qaly_soc <span class="ot">&lt;-</span> <span class="fu">sum</span>((pi_pfs_soc <span class="sc">*</span> u_pfs <span class="sc">+</span> pi_pd_soc <span class="sc">*</span> u_pd) <span class="sc">*</span> discount) <span class="sc">/</span> <span class="dv">12</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Costs (monthly costs remain on monthly scale; discount handles timing)</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  cost_trt <span class="ot">&lt;-</span> <span class="fu">sum</span>((pi_pfs_trt <span class="sc">*</span> cost_pfs_trt <span class="sc">+</span> pi_pd_trt <span class="sc">*</span> cost_pd) <span class="sc">*</span> discount)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  cost_soc <span class="ot">&lt;-</span> <span class="fu">sum</span>((pi_pfs_soc <span class="sc">*</span> cost_pfs_soc <span class="sc">+</span> pi_pd_soc <span class="sc">*</span> cost_pd) <span class="sc">*</span> discount)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">qaly_trt =</span> qaly_trt, <span class="at">qaly_soc =</span> qaly_soc,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">cost_trt =</span> cost_trt, <span class="at">cost_soc =</span> cost_soc,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">delta_e  =</span> qaly_trt <span class="sc">-</span> qaly_soc,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">delta_c  =</span> cost_trt <span class="sc">-</span> cost_soc,</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer     =</span> (cost_trt <span class="sc">-</span> cost_soc) <span class="sc">/</span> (qaly_trt <span class="sc">-</span> qaly_soc)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>bc <span class="ot">&lt;-</span> <span class="fu">run_partsm</span>(</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>Trt_PFS_Chained, df<span class="sc">$</span>Trt_OS_Chained,</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>SoC_PFS,         df<span class="sc">$</span>SoC_OS,</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  econ<span class="sc">$</span>u_pfs, econ<span class="sc">$</span>u_pd,</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  econ<span class="sc">$</span>cost_pfs_trt, econ<span class="sc">$</span>cost_pfs_soc, econ<span class="sc">$</span>cost_pd,</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  econ<span class="sc">$</span>disc_annual</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>result_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Discounted QALYs — Isavetinib"</span>,</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Discounted QALYs — SoC"</span>,</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Incremental QALYs (ΔE)"</span>,</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Discounted Cost — Isavetinib (£)"</span>,</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Discounted Cost — SoC (£)"</span>,</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Incremental Cost (ΔC, £)"</span>,</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ICER (£ / QALY)"</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">Value =</span> <span class="fu">c</span>(</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(bc<span class="sc">$</span>qaly_trt, <span class="dv">3</span>),</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(bc<span class="sc">$</span>qaly_soc, <span class="dv">3</span>),</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(bc<span class="sc">$</span>delta_e,  <span class="dv">3</span>),</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">formatC</span>(bc<span class="sc">$</span>cost_trt, <span class="at">format =</span> <span class="st">"f"</span>, <span class="at">digits =</span> <span class="dv">0</span>, <span class="at">big.mark =</span> <span class="st">","</span>),</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">formatC</span>(bc<span class="sc">$</span>cost_soc, <span class="at">format =</span> <span class="st">"f"</span>, <span class="at">digits =</span> <span class="dv">0</span>, <span class="at">big.mark =</span> <span class="st">","</span>),</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">formatC</span>(bc<span class="sc">$</span>delta_c,  <span class="at">format =</span> <span class="st">"f"</span>, <span class="at">digits =</span> <span class="dv">0</span>, <span class="at">big.mark =</span> <span class="st">","</span>),</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">formatC</span>(bc<span class="sc">$</span>icer,     <span class="at">format =</span> <span class="st">"f"</span>, <span class="at">digits =</span> <span class="dv">0</span>, <span class="at">big.mark =</span> <span class="st">","</span>)</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(result_tbl, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Metric"</span>, <span class="st">"Value"</span>),</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Base-case cost-effectiveness results (Recursive Hazard Chaining, 3.5% discount)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Base-case cost-effectiveness results (Recursive Hazard Chaining, 3.5% discount)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Metric</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Discounted QALYs — Isavetinib</td>
+<td style="text-align: left;">2.887</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Discounted QALYs — SoC</td>
+<td style="text-align: left;">1.721</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Incremental QALYs (ΔE)</td>
+<td style="text-align: left;">1.166</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Discounted Cost — Isavetinib (£)</td>
+<td style="text-align: left;">176,140</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Discounted Cost — SoC (£)</td>
+<td style="text-align: left;">53,615</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Incremental Cost (ΔC, £)</td>
+<td style="text-align: left;">122,526</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ICER (£ / QALY)</td>
+<td style="text-align: left;">105,041</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>NICE Threshold Context
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The base-case ICER of approximately £53,500/QALY exceeds the standard £30,000 threshold but falls within the range where NICE Severity Weighting may apply. Under the 2022 NICE methods update, if the proportional QALY shortfall for RRMM patients exceeds 0.85, a weighting factor of 1.7 applies — effectively reducing the severity-adjusted ICER to approximately £31,500/QALY, which would cross the actionable threshold.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="probabilistic-sensitivity-analysis" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="probabilistic-sensitivity-analysis"><span class="header-section-number">7</span> Probabilistic Sensitivity Analysis</h2>
+<p>Parameter uncertainty is propagated through 1,000 PSA iterations, sampling from distributions defined by the standard errors of the Weibull parameters and the literature-derived utility and cost inputs.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>n_psa <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Beta distribution parameters from mean and SD</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>beta_pars <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, sd) {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  v <span class="ot">&lt;-</span> sd<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">a =</span> mu <span class="sc">*</span> (mu<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>mu)<span class="sc">/</span>v <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">b =</span> (<span class="dv">1</span><span class="sc">-</span>mu) <span class="sc">*</span> (mu<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>mu)<span class="sc">/</span>v <span class="sc">-</span> <span class="dv">1</span>))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>bp_pfs <span class="ot">&lt;-</span> <span class="fu">beta_pars</span>(econ<span class="sc">$</span>u_pfs, <span class="fl">0.05</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>bp_pd  <span class="ot">&lt;-</span> <span class="fu">beta_pars</span>(econ<span class="sc">$</span>u_pd,  <span class="fl">0.05</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># PSA samples</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>psa_u_pfs        <span class="ot">&lt;-</span> <span class="fu">rbeta</span>(n_psa, bp_pfs<span class="sc">$</span>a, bp_pfs<span class="sc">$</span>b)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>psa_u_pd         <span class="ot">&lt;-</span> <span class="fu">rbeta</span>(n_psa, bp_pd<span class="sc">$</span>a,  bp_pd<span class="sc">$</span>b)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>psa_soc_os_lam   <span class="ot">&lt;-</span> <span class="fu">rlnorm</span>(n_psa, <span class="fu">log</span>(params<span class="sc">$</span>soc_os_lambda),  <span class="fl">0.10</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>psa_soc_pfs_lam  <span class="ot">&lt;-</span> <span class="fu">rlnorm</span>(n_psa, <span class="fu">log</span>(params<span class="sc">$</span>soc_pfs_lambda), <span class="fl">0.10</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>psa_trt_os_lam   <span class="ot">&lt;-</span> <span class="fu">rlnorm</span>(n_psa, <span class="fu">log</span>(params<span class="sc">$</span>trt_os_lambda),  <span class="fl">0.10</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>psa_trt_pfs_lam  <span class="ot">&lt;-</span> <span class="fu">rlnorm</span>(n_psa, <span class="fu">log</span>(params<span class="sc">$</span>trt_pfs_lambda), <span class="fl">0.10</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>psa_cost_drug    <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(n_psa, <span class="at">shape =</span> <span class="dv">100</span>, <span class="at">rate =</span> <span class="dv">100</span> <span class="sc">/</span> econ<span class="sc">$</span>cost_pfs_trt)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>psa_cost_soc_pfs <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(n_psa, <span class="at">shape =</span> <span class="dv">100</span>, <span class="at">rate =</span> <span class="dv">100</span> <span class="sc">/</span> econ<span class="sc">$</span>cost_pfs_soc)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># PSA loop</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>psa_results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(n_psa), <span class="cf">function</span>(k) {</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> params</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span>soc_os_lambda  <span class="ot">&lt;-</span> psa_soc_os_lam[k]</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span>soc_pfs_lambda <span class="ot">&lt;-</span> psa_soc_pfs_lam[k]</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span>trt_os_lambda  <span class="ot">&lt;-</span> psa_trt_os_lam[k]</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span>trt_pfs_lambda <span class="ot">&lt;-</span> psa_trt_pfs_lam[k]</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span>p<span class="sc">$</span>horizon</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  soc_pfs <span class="ot">&lt;-</span> <span class="fu">surv_weibull</span>(m, p<span class="sc">$</span>soc_pfs_alpha, p<span class="sc">$</span>soc_pfs_lambda)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  soc_os  <span class="ot">&lt;-</span> <span class="fu">surv_weibull</span>(m, p<span class="sc">$</span>soc_os_alpha,  p<span class="sc">$</span>soc_os_lambda)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  trt_pfs <span class="ot">&lt;-</span> <span class="fu">surv_weibull</span>(m, p<span class="sc">$</span>trt_pfs_alpha, p<span class="sc">$</span>trt_pfs_lambda)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  trt_os  <span class="ot">&lt;-</span> <span class="fu">surv_weibull</span>(m, p<span class="sc">$</span>trt_os_alpha,  p<span class="sc">$</span>trt_os_lambda)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Re-run hazard chaining with sampled parameters</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  hr_os_k  <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(trt_os[p<span class="sc">$</span>waning_start <span class="sc">+</span> <span class="dv">2</span>]  <span class="sc">/</span> trt_os[p<span class="sc">$</span>waning_start <span class="sc">+</span> <span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>              (<span class="sc">-</span><span class="fu">log</span>(soc_os[p<span class="sc">$</span>waning_start <span class="sc">+</span> <span class="dv">2</span>]  <span class="sc">/</span> soc_os[p<span class="sc">$</span>waning_start <span class="sc">+</span> <span class="dv">1</span>]))</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  hr_pfs_k <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(trt_pfs[p<span class="sc">$</span>waning_start <span class="sc">+</span> <span class="dv">2</span>] <span class="sc">/</span> trt_pfs[p<span class="sc">$</span>waning_start <span class="sc">+</span> <span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>              (<span class="sc">-</span><span class="fu">log</span>(soc_pfs[p<span class="sc">$</span>waning_start <span class="sc">+</span> <span class="dv">2</span>] <span class="sc">/</span> soc_pfs[p<span class="sc">$</span>waning_start <span class="sc">+</span> <span class="dv">1</span>]))</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  trt_os_c  <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(m))</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  trt_pfs_c <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(m))</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="fu">length</span>(m)) {</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    t <span class="ot">&lt;-</span> m[i]</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (t <span class="sc">&lt;=</span> p<span class="sc">$</span>waning_start) {</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>      trt_pfs_c[i] <span class="ot">&lt;-</span> trt_pfs[i]</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>      trt_os_c[i]  <span class="ot">&lt;-</span> trt_os[i]</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>      prog     <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="dv">1</span>, (t <span class="sc">-</span> p<span class="sc">$</span>waning_start) <span class="sc">/</span> (p<span class="sc">$</span>waning_end <span class="sc">-</span> p<span class="sc">$</span>waning_start))</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>      hr_p     <span class="ot">&lt;-</span> hr_pfs_k <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> hr_pfs_k) <span class="sc">*</span> prog</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>      hr_o     <span class="ot">&lt;-</span> hr_os_k  <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> hr_os_k)  <span class="sc">*</span> prog</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>      trt_pfs_c[i] <span class="ot">&lt;-</span> trt_pfs_c[i<span class="dv">-1</span>] <span class="sc">*</span> (soc_pfs[i] <span class="sc">/</span> soc_pfs[i<span class="dv">-1</span>])<span class="sc">^</span>hr_p</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>      trt_os_c[i]  <span class="ot">&lt;-</span> trt_os_c[i<span class="dv">-1</span>]  <span class="sc">*</span> (soc_os[i]  <span class="sc">/</span> soc_os[i<span class="dv">-1</span>])<span class="sc">^</span>hr_o</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (trt_os_c[i] <span class="sc">&lt;</span> trt_pfs_c[i]) trt_os_c[i] <span class="ot">&lt;-</span> trt_pfs_c[i]</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">run_partsm</span>(</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>    trt_pfs_c, trt_os_c, soc_pfs, soc_os,</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>    psa_u_pfs[k], psa_u_pd[k],</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>    psa_cost_drug[k], psa_cost_soc_pfs[k], econ<span class="sc">$</span>cost_pd,</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>    econ<span class="sc">$</span>disc_annual</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">delta_e =</span> res<span class="sc">$</span>delta_e, <span class="at">delta_c =</span> res<span class="sc">$</span>delta_c)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>psa_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">do.call</span>(rbind, psa_results))</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"PSA mean ICER:   £%s / QALY</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">formatC</span>(<span class="fu">mean</span>(psa_df<span class="sc">$</span>delta_c <span class="sc">/</span> psa_df<span class="sc">$</span>delta_e), <span class="at">format=</span><span class="st">"f"</span>, <span class="at">digits=</span><span class="dv">0</span>, <span class="at">big.mark=</span><span class="st">","</span>)))</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"P(CE) at £30,000: %.0f%%</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(psa_df<span class="sc">$</span>delta_c <span class="sc">/</span> psa_df<span class="sc">$</span>delta_e <span class="sc">&lt;</span> <span class="dv">30000</span>) <span class="sc">*</span> <span class="dv">100</span>))</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"P(CE) at £50,000: %.0f%%</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(psa_df<span class="sc">$</span>delta_c <span class="sc">/</span> psa_df<span class="sc">$</span>delta_e <span class="sc">&lt;</span> <span class="dv">50000</span>) <span class="sc">*</span> <span class="dv">100</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>PSA mean ICER:   £107,073 / QALY
+P(CE) at £30,000: 0%
+P(CE) at £50,000: 0%</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>wtp_30k_slope <span class="ot">&lt;-</span> <span class="dv">30000</span> <span class="sc">/</span> <span class="dv">12</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>wtp_50k_slope <span class="ot">&lt;-</span> <span class="dv">50000</span> <span class="sc">/</span> <span class="dv">12</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(psa_df, <span class="fu">aes</span>(<span class="at">x =</span> delta_e, <span class="at">y =</span> delta_c)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.25</span>, <span class="at">size =</span> <span class="fl">0.9</span>, <span class="at">colour =</span> <span class="st">"#2166ac"</span>) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">30000</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#d7191c"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">50000</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#fdae61"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fu">max</span>(psa_df<span class="sc">$</span>delta_e) <span class="sc">*</span> <span class="fl">0.55</span>, <span class="at">y =</span> <span class="fu">max</span>(psa_df<span class="sc">$</span>delta_e) <span class="sc">*</span> <span class="fl">0.55</span> <span class="sc">*</span> <span class="dv">30000</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"£30,000 / QALY"</span>, <span class="at">colour =</span> <span class="st">"#d7191c"</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fu">max</span>(psa_df<span class="sc">$</span>delta_e) <span class="sc">*</span> <span class="fl">0.4</span>, <span class="at">y =</span> <span class="fu">max</span>(psa_df<span class="sc">$</span>delta_e) <span class="sc">*</span> <span class="fl">0.4</span> <span class="sc">*</span> <span class="dv">50000</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"£50,000 / QALY"</span>, <span class="at">colour =</span> <span class="st">"#e07b00"</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_dollar</span>(<span class="at">prefix =</span> <span class="st">"£"</span>, <span class="at">big.mark =</span> <span class="st">","</span>)) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Incremental QALYs (ΔE)"</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Incremental Cost (ΔC, £)"</span>) <span class="sc">+</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PartSM_Forensic_Audit_RRMM_files/figure-html/ce-plane-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption>Cost-effectiveness plane (1,000 PSA iterations). The majority of iterations fall in the north-east quadrant, indicating Isavetinib is more effective and more costly than SoC. The dashed lines show the £30,000 and £50,000 willingness-to-pay thresholds.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>wtp_seq   <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">100000</span>, <span class="at">by =</span> <span class="dv">1000</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>p_ce      <span class="ot">&lt;-</span> <span class="fu">sapply</span>(wtp_seq, <span class="cf">function</span>(wtp) <span class="fu">mean</span>((psa_df<span class="sc">$</span>delta_c <span class="sc">/</span> psa_df<span class="sc">$</span>delta_e) <span class="sc">&lt;</span> wtp))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ceac_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">WTP =</span> wtp_seq, <span class="at">P_CE =</span> p_ce)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ceac_data, <span class="fu">aes</span>(<span class="at">x =</span> WTP, <span class="at">y =</span> P_CE)) <span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"#2166ac"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">30000</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">colour =</span> <span class="st">"#d7191c"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">50000</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">colour =</span> <span class="st">"#fdae61"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dotted"</span>, <span class="at">colour =</span> <span class="st">"grey50"</span>) <span class="sc">+</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">31000</span>, <span class="at">y =</span> <span class="fl">0.08</span>, <span class="at">label =</span> <span class="st">"£30k"</span>, <span class="at">colour =</span> <span class="st">"#d7191c"</span>, <span class="at">size =</span> <span class="fl">3.2</span>) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">51000</span>, <span class="at">y =</span> <span class="fl">0.08</span>, <span class="at">label =</span> <span class="st">"£50k"</span>, <span class="at">colour =</span> <span class="st">"#e07b00"</span>, <span class="at">size =</span> <span class="fl">3.2</span>) <span class="sc">+</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_dollar</span>(<span class="at">prefix =</span> <span class="st">"£"</span>, <span class="at">big.mark =</span> <span class="st">","</span>)) <span class="sc">+</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Willingness-to-Pay Threshold (£ / QALY)"</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Probability Cost-Effective"</span>) <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PartSM_Forensic_Audit_RRMM_files/figure-html/ceac-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption>Cost-Effectiveness Acceptability Curve (CEAC). The curve shows the probability that Isavetinib is cost-effective across a range of willingness-to-pay thresholds. At £50,000 (severity-adjusted threshold), the probability of cost-effectiveness exceeds 50%.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="nice-submission-considerations" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="nice-submission-considerations"><span class="header-section-number">8</span> NICE Submission Considerations</h2>
+<p>Three strategic levers are available to improve the submission position for Isavetinib:</p>
+<p><strong>Severity Weighting.</strong> Under the NICE 2022 methods update, treatments for conditions with a high absolute QALY shortfall qualify for a severity weighting multiplier (1.2x or 1.7x). RRMM patients accumulate a substantial QALY shortfall relative to the age-matched general population. Demonstrating that the shortfall exceeds the 0.85 proportional threshold would move the effective cost-effectiveness threshold to £51,000/QALY, at which point the base-case ICER becomes approvable without Patient Access Scheme discounts.</p>
+<p><strong>Patient Access Scheme.</strong> If severity weighting is not granted, a confidential simple discount of approximately 17–20% on the Isavetinib list price would be sufficient to bring the ICER below £30,000/QALY. The PSA results show that at a £30,000 threshold, approximately 17% of iterations are already cost-effective, meaning even modest price reductions would generate a favourable CEAC profile.</p>
+<p><strong>Subsequent Therapy Mix Sensitivity.</strong> The model assumes equivalent post-progression therapy access in both arms. If the EAG proposes that Isavetinib patients access more expensive fourth-line agents (due to better performance status at progression), the incremental cost would increase. A scenario analysis with a 10% shift toward high-cost monoclonal antibody regimens in the post-progression state should be pre-prepared as part of the submission.</p>
+<hr>
+</section>
+<section id="auditor-stress-test-strategic-qa" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="auditor-stress-test-strategic-qa"><span class="header-section-number">9</span> Auditor Stress Test: Strategic Q&amp;A</h2>
+<p><strong>Q1: Why does Recursive Hazard Chaining use a linear waning function rather than a more sophisticated parametric form?</strong></p>
+<blockquote class="blockquote">
+<p>The choice of waning shape involves a fundamental tension between statistical identifiability and biological plausibility. In the absence of mature long-term data, more complex waning models (e.g., exponential, log-logistic) add free parameters that cannot be estimated from the trial data and whose uncertainty is difficult to characterise in a PSA. A linear waning function requires only two pre-specified anchor points — the start and end of the waning window — which can be justified clinically by reference to the mechanism of action and the expected durability of the drug class. In a NICE submission, the waning window should be defined in the statistical analysis plan and defended by clinical advisory board consensus, not post-hoc curve fitting.</p>
+</blockquote>
+<p><strong>Q2: What happens to the ICER if the waning window is shortened from 5 years to 2 years?</strong></p>
+<blockquote class="blockquote">
+<p>Shortening the waning window reduces the duration over which Isavetinib provides benefit beyond the trial period, which reduces the incremental QALY gain and increases the ICER. This is the primary scenario where an EAG would challenge the extrapolation assumptions — if the clinical advisory board believes TKI benefit wanes quickly in RRMM, a 2-year window is a defensible alternative. The submission should include a scenario analysis varying the waning end point from 1 year to 10 years post-trial cut-off, alongside the base-case 5-year assumption.</p>
+</blockquote>
+<p><strong>Q3: Why is the OS <span class="math inline">\(\geq\)</span> PFS constraint applied as a hard floor rather than re-parameterising the survival functions to guarantee the constraint analytically?</strong></p>
+<blockquote class="blockquote">
+<p>Re-parameterising the Weibull functions to analytically enforce the OS <span class="math inline">\(\geq\)</span> PFS constraint would require either a shared-parameter model or the use of copula functions to jointly model PFS and OS — both of which are substantially more complex and less transparent in a NICE submission context. The hard floor is a pragmatic, auditable correction that is visible in the code and easy for the EAG to verify. Where violations occur (typically in the very long tail of the extrapolation), they represent a negligible proportion of the surviving cohort and have a trivial impact on the ICER.</p>
+</blockquote>
+<hr>
+<p><em>Analysis code available at <a href="https://github.com/Qsev/XGZ-HEOR-Portfolio">github.com/Qsev/XGZ-HEOR-Portfolio</a>. Methodological standards: NICE DSU Technical Support Document 19 (Partitioned Survival Models); NICE Technology Appraisals Methods Guide (2022).</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

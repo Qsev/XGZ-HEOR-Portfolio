@@ -55,6 +55,17 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 :::
 :::
 
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+<h3 class="card-title">PartSM: Survival Extrapolation in RRMM (TA-mirror)</h3>
+<h6 class="card-subtitle text-muted mb-2">Mock Case — Treatment Effect Waning & Recursive Hazard Chaining</h6>
+<p class="card-text">A synthetic-data deep dive into long-term survival extrapolation in a Partitioned Survival Model. Contrasts Naive HR Switching (the Hazard Cliff) against Recursive Hazard Chaining, with full cost-effectiveness analysis and PSA.</p>
+<a href="./01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.qmd" class="stretched-link">View Case Study &rarr;</a>
+:::
+:::
+:::
+
 :::
 
 ---
