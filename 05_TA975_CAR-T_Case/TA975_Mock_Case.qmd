@@ -77,10 +77,10 @@ library(flexsurvcure)
 library(dplyr)
 
 # 3.1 Load Reconstructed Pseudo-IPD Data
-ipd_tisa_os  <- read.csv("scratch/TA975Rplct/TA975_OS_Pooled_PseudoIPD.csv")
-ipd_tisa_efs <- read.csv("scratch/TA975Rplct/TA975_EFS_Pooled_PseudoIPD.csv")
-ipd_blin_os  <- read.csv("scratch/TA975Rplct/Blina_Extraction/TA975_Blina_PseudoIPD.csv")
-ipd_chemo_os <- read.csv("scratch/TA975Rplct/Salvage_Extraction/TA975_Salvage_PseudoIPD.csv")
+ipd_tisa_os  <- read.csv("../scratch/TA975Rplct/TA975_OS_Pooled_PseudoIPD.csv")
+ipd_tisa_efs <- read.csv("../scratch/TA975Rplct/TA975_EFS_Pooled_PseudoIPD.csv")
+ipd_blin_os  <- read.csv("../scratch/TA975Rplct/Blina_Extraction/TA975_Blina_PseudoIPD.csv")
+ipd_chemo_os <- read.csv("../scratch/TA975Rplct/Salvage_Extraction/TA975_Salvage_PseudoIPD.csv")
 
 # Standardize column names to uppercase (TIME, EVENT)
 format_ipd <- function(df) {
