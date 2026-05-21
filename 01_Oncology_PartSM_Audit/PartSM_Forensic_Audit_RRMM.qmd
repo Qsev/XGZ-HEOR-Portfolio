@@ -285,6 +285,8 @@ cat(sprintf("HR at Month 120 (end of waning):  OS = %.3f | PFS = %.3f\n",
 #| fig-cap: "Survival extrapolation comparison: Naive HR Switching (dashed) produces a visible Hazard Cliff at Month 60, while Recursive Hazard Chaining (solid blue) maintains a smooth, continuous trajectory."
 #| fig-width: 10
 #| fig-height: 5.5
+#| warning: false
+#| message: false
 
 df_plot <- df |>
   filter(Month <= 180) |>
@@ -292,10 +294,10 @@ df_plot <- df |>
 
 df_long <- df_plot |>
   pivot_longer(-Month, names_to = "Curve", values_to = "Survival") |>
-  mutate(Curve = recode(Curve,
-    "SoC_OS"         = "SoC (OS)",
-    "Trt_OS_Naive"   = "Isavetinib — Naive HR Switch",
-    "Trt_OS_Chained" = "Isavetinib — Recursive Chaining"
+  mutate(Curve = case_match(Curve,
+    "SoC_OS"          ~ "SoC (OS)",
+    "Trt_OS_Naive"    ~ "Isavetinib — Naive HR Switch",
+    "Trt_OS_Chained"  ~ "Isavetinib — Recursive Chaining"
   ))
 
 ggplot(df_long, aes(x = Month, y = Survival, colour = Curve, linetype = Curve)) +
@@ -331,6 +333,8 @@ ggplot(df_long, aes(x = Month, y = Survival, colour = Curve, linetype = Curve)) 
 #| fig-cap: "Implied OS Hazard Ratio trajectory: Naive HR Switching applies a constant HR from Month 61 (flat line), while Recursive Chaining smoothly interpolates from the anchored HR back to 1.0 at Month 120."
 #| fig-width: 9
 #| fig-height: 4
+#| warning: false
+#| message: false
 
 hr_df <- data.frame(
   Month     = 0:params$horizon,

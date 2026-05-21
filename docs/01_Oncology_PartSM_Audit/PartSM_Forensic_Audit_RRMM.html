@@ -659,10 +659,10 @@ HR at Month 120 (end of waning):  OS = 1.000 | PFS = 1.000</code></pre>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df_long <span class="ot">&lt;-</span> df_plot <span class="sc">|&gt;</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>Month, <span class="at">names_to =</span> <span class="st">"Curve"</span>, <span class="at">values_to =</span> <span class="st">"Survival"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Curve =</span> <span class="fu">recode</span>(Curve,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SoC_OS"</span>         <span class="ot">=</span> <span class="st">"SoC (OS)"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Trt_OS_Naive"</span>   <span class="ot">=</span> <span class="st">"Isavetinib — Naive HR Switch"</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Trt_OS_Chained"</span> <span class="ot">=</span> <span class="st">"Isavetinib — Recursive Chaining"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Curve =</span> <span class="fu">case_match</span>(Curve,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SoC_OS"</span>          <span class="sc">~</span> <span class="st">"SoC (OS)"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Trt_OS_Naive"</span>    <span class="sc">~</span> <span class="st">"Isavetinib — Naive HR Switch"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Trt_OS_Chained"</span>  <span class="sc">~</span> <span class="st">"Isavetinib — Recursive Chaining"</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  ))</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_long, <span class="fu">aes</span>(<span class="at">x =</span> Month, <span class="at">y =</span> Survival, <span class="at">colour =</span> Curve, <span class="at">linetype =</span> Curve)) <span class="sc">+</span></span>
