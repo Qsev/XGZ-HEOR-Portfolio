@@ -57,7 +57,9 @@ The central methodological challenge is that the treatment benefit observed at M
 
 ### Three-State Structure
 
-A Partitioned Survival Model (PartSM) is defined by two independent survival functions — PFS and OS — that jointly determine the proportion of the cohort in each of three mutually exclusive health states at every model cycle:
+A Partitioned Survival Model (PSM) is defined by two independent survival functions — PFS and OS — that jointly determine the proportion of the cohort in each of three mutually exclusive health states at every model cycle.
+
+**Notation.** Let $S_{\text{PFS}}(t)$ and $S_{\text{OS}}(t)$ denote the survival functions for progression-free survival and overall survival respectively, where $S(t) \in [0,1]$ is the probability of not having experienced the corresponding event by time $t$. Let $\pi_k(t)$ denote the **state occupancy probability** for health state $k$ at time $t$ — the proportion of the cohort residing in state $k$ at cycle $t$. The key structural feature of a PSM is that state occupancy is read directly off the survival curves, without requiring an explicit transition probability matrix:
 
 $$\pi_{\text{PFS}}(t) = S_{\text{PFS}}(t)$$
 
@@ -65,11 +67,11 @@ $$\pi_{\text{PD}}(t) = S_{\text{OS}}(t) - S_{\text{PFS}}(t)$$
 
 $$\pi_{\text{Death}}(t) = 1 - S_{\text{OS}}(t)$$
 
-A non-negotiable biological constraint is that OS cannot fall below PFS at any cycle:
+Two constraints are non-negotiable. First, the three states must sum to exactly 1 at every cycle — this follows directly from the definitions above and requires no additional assumption. Second, OS cannot fall below PFS at any cycle, as a patient cannot be progression-free and dead simultaneously:
 
-$$S_{\text{OS}}(t) \geq S_{\text{PFS}}(t) \quad \forall\, t$$
+$$\pi_{\text{PFS}}(t) + \pi_{\text{PD}}(t) + \pi_{\text{Death}}(t) \equiv 1 \qquad S_{\text{OS}}(t) \geq S_{\text{PFS}}(t) \quad \forall\, t$$
 
-Violations of this constraint — which can arise from naive extrapolation — must be corrected programmatically. Any model submitted to NICE without this safeguard will be immediately flagged by the EAG.
+Violations of the second constraint — which can arise from naive extrapolation — must be corrected programmatically. Any model submitted to NICE without this safeguard will be immediately flagged by the EAG.
 
 ### Weibull Survival Function
 
@@ -83,7 +85,7 @@ where $t$ is time in months, $\lambda > 0$ is the scale parameter, and $\alpha >
 
 QALY gains and costs are accumulated each cycle using the area-under-the-curve method, with continuous discounting at an annual rate $r$:
 
-$$\text{QALY} = \sum_{t=0}^{T} \left[\pi_{\text{PFS}}(t) \cdot u_{\text{PFS}} + \pi_{\text{PD}}(t) \cdot u_{\text{PD}}\right] \cdot \frac{1}{12} \cdot (1 + r)^{-t/12}$$
+$$\text{QALY} = \frac{1}{12} \sum_{t=0}^{T} \left[\pi_{\text{PFS}}(t) \cdot u_{\text{PFS}} + \pi_{\text{PD}}(t) \cdot u_{\text{PD}}\right] \cdot (1 + r)^{-t/12}$$
 
 $$\text{Cost} = \sum_{t=0}^{T} \left[\pi_{\text{PFS}}(t) \cdot c_{\text{PFS}} + \pi_{\text{PD}}(t) \cdot c_{\text{PD}}\right] \cdot (1 + r)^{-t/12}$$
 
