@@ -8,8 +8,8 @@ project:
     - index.qmd
     - 05_TA975_CAR-T_Case/TA975_Mock_Case.qmd
     - 02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.qmd
+    - 03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.qmd
     - 00_HTA_LLM_Wiki/README.md
-    - 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd
     - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
     - 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
     - 04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd
@@ -33,8 +33,8 @@ website:
         menu:
           - href: 05_TA975_CAR-T_Case/TA975_Mock_Case.qmd
             text: "NICE TA975 (CAR-T) Case"
-          - href: 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd
-            text: "MLNMR Audit Report"
+          - href: 03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.qmd
+            text: "ML-NMR: AML Population Alignment"
           - href: 02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.qmd
             text: "RWE ECA: R/R DLBCL"
       - text: "Technical Library"
