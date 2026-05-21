@@ -3,6 +3,7 @@ project:
   output-dir: docs
   resources:
     - CV/Xiaoge_Zhang_PhD_Health_Economist_CV.pdf
+    - CNAME
   render:
     - index.qmd
     - 05_TA975_CAR-T_Case/TA975_Mock_Case.qmd
