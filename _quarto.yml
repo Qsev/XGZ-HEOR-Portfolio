@@ -57,6 +57,13 @@ website:
             text: "Flexible Survival"
       - text: "Methodology Wiki"
         href: 00_HTA_LLM_Wiki/README.md
+    right:
+      - icon: github
+        href: https://github.com/Qsev/XGZ-HEOR-Portfolio
+        target: _blank
+
+execute:
+  freeze: auto
 
 format:
   html:

@@ -1,14 +1,25 @@
 #!/bin/bash
 
 # Deploy script for HEOR Technical Portfolio
-# Usage: ./deploy.sh "commit message"
+#
+# Usage:
+#   ./deploy.sh "commit message"           — commit & push only
+#   ./deploy.sh --render "commit message"  — render site first, then commit & push
 
 set -e
 
-MSG=${1:-"Update portfolio content"}
+RENDER=false
+if [ "$1" == "--render" ]; then
+  RENDER=true
+  MSG=${2:-"Update portfolio content"}
+else
+  MSG=${1:-"Update portfolio content"}
+fi
 
-echo "🔨 Rendering Quarto site..."
-quarto render
+if [ "$RENDER" = true ]; then
+  echo "🔨 Rendering Quarto site (changed files only)..."
+  quarto render
+fi
 
 echo "📦 Staging changes..."
 git add -A
