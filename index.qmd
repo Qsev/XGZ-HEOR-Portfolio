@@ -39,7 +39,7 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 <h3 class="card-title">ML-NMR Reconstruction</h3>
 <h6 class="card-subtitle text-muted mb-2">Population Alignment & Synthesis</h6>
 <p class="card-text">A deep dive into Multilevel Network Meta-Regression. Solves the "Extrapolation Gap" using 64-point Sobol integration and Cholesky decomposition to bridge IPD and AgD seamlessly in a Bayesian framework.</p>
-<a href="./03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd" class="stretched-link">View ML-NMR Report &rarr;</a>
+<a href="./03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.qmd" class="stretched-link">View ML-NMR Report &rarr;</a>
 :::
 :::
 :::
