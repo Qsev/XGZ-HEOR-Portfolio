@@ -44,7 +44,16 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 :::
 :::
 
-
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+<h3 class="card-title">RWE External Control Arm: R/R DLBCL</h3>
+<h6 class="card-subtitle text-muted mb-2">Mock Case — Target Trial Emulation & Causal Inference</h6>
+<p class="card-text">A full causal inference pipeline for constructing an External Control Arm in a NICE appraisal context. Implements Target Trial Emulation, IPTW, TMLE (doubly robust), and E-value sensitivity analysis — aligned with the NICE RWE Framework (2022).</p>
+<a href="./02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.qmd" class="stretched-link">View Case Study &rarr;</a>
+:::
+:::
+:::
 
 :::
 

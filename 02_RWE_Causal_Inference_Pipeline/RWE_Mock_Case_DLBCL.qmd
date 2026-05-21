@@ -1,5 +1,5 @@
 ---
-title: "RWE Causal Inference Audit: Constructing an External Control Arm for Veltumab in R/R DLBCL"
+title: "Mock Case — RWE Causal Inference Audit: Constructing an External Control Arm for Veltumab in R/R DLBCL"
 subtitle: "A Target Trial Emulation applying IPTW, TMLE, and E-value Sensitivity Analysis — aligned with the NICE RWE Framework (2022)"
 author: "Xiaoge Zhang, PhD"
 date: today
@@ -9,33 +9,34 @@ format:
     toc-depth: 3
     code-fold: true
     number-sections: true
+    code-annotations: below
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-## Decision Problem & Clinical Background
+::: {.callout-important icon=false}
+## Mock Case Disclosure
 
-::: {.callout-note icon=false}
-**Mock Case Disclosure**
-
-This is a methodological proof-of-concept. "Veltumab" is a fictional anti-CD79b antibody-drug conjugate. Patient data are fully synthetic, generated from a calibrated Data Generating Process (DGP) that deliberately embeds **indication bias** — the central methodological challenge this pipeline addresses. All numbers, ICERs, and clinical parameters are illustrative only.
+This is a methodological proof-of-concept. All context are **generated**. "Veltumab" is a **fictional** anti-CD79b antibody-drug conjugate. Patient data are fully synthetic, generated from a calibrated Data Generating Process (DGP) that deliberately embeds **indication bias** — the central methodological challenge this pipeline addresses. All numbers, ICERs, and clinical parameters are **illustrative** only.
 :::
+
+## Decision Problem & Clinical Background
 
 ### Clinical Context
 
 Diffuse Large B-Cell Lymphoma (DLBCL) is the most common aggressive non-Hodgkin lymphoma, accounting for approximately 30–40% of all NHL diagnoses in the UK. Around 30–40% of patients experience relapse or primary refractory disease after first-line R-CHOP, and the prognosis in the relapsed/refractory (R/R) setting is poor: median overall survival with standard salvage chemotherapy (R-GemOx, R-DHAP) is approximately 6–10 months in patients ineligible for autologous stem cell transplant (ASCT).
 
-**Veltumab** is a novel anti-CD79b ADC that has completed a single-arm Phase II trial (VICTOR-2, N = 120) in adult patients with R/R DLBCL who received ≥2 prior lines of therapy and were deemed ineligible for ASCT. The trial reported a 1-year overall survival (OS) rate of approximately 52%, which appears highly promising against historical benchmarks. However, NICE's Evidence Review Group (ERG) has raised the following concern:
+**Veltumab** is a novel anti-CD79b ADC that has completed a single-arm Phase II trial (VICTOR-2, N = 120) in adult patients with R/R DLBCL who received ≥2 prior lines of therapy and were deemed ineligible for ASCT. The trial reported a 1-year overall survival (OS) rate of approximately 52%, which appears highly promising against historical benchmarks. However, the NICE Evidence Review Group (ERG) has raised the following concern:
 
-> *"In the absence of a randomised comparator arm, it is unclear whether the observed survival advantage reflects a true treatment benefit or is partly attributable to patient selection — specifically, the enrolment of younger, fitter patients in VICTOR-2 relative to the real-world population receiving standard salvage therapy."*
+> "In the absence of a randomised comparator arm, it is unclear whether the observed survival advantage reflects a true treatment benefit or is partly attributable to patient selection — specifically, the enrolment of younger, fitter patients in VICTOR-2 relative to the real-world population receiving standard salvage therapy."
 
 ### The HTA Challenge: Why RWE is Required
 
-A conventional indirect comparison (e.g., via NMA) is not feasible here: the existing salvage chemotherapy trials used heterogeneous eligibility criteria and varying backbone regimens, making aggregate-level matching unreliable. Instead, the manufacturer has proposed constructing an **External Control Arm (ECA)** using patient-level data from the UK Haematological Malignancy Research Network (HMRN-sim), a hospital-based registry capturing real-world outcomes for DLBCL patients treated with salvage chemotherapy at 18 UK centres.
+A conventional indirect comparison (e.g., via NMA) is not feasible here: the existing salvage chemotherapy trials used heterogeneous eligibility criteria and varying backbone regimens, making aggregate-level matching unreliable. Instead, the manufacturer has proposed constructing an **External Control Arm (ECA)** using patient-level data from the UK Haematological Malignancy Research Network (HMRN-sim), a hospital-based registry capturing real-world outcomes for DLBCL patients treated with **salvage chemotherapy** at 18 UK centres.
 
-This analysis implements the full ECA pipeline as recommended by NICE's 2022 RWE Framework and the NICE DSU technical guidance on population-adjusted indirect comparisons:
+This analysis implements the full ECA pipeline as recommended by the NICE 2022 RWE Framework and the NICE DSU technical guidance on population-adjusted indirect comparisons:
 
 1. **Target Trial Emulation (TTE)** — to define eligibility and time-zero alignment between the trial and registry populations
 2. **Inverse Probability of Treatment Weighting (IPTW, ATT)** — to balance baseline characteristics
@@ -47,58 +48,51 @@ This analysis implements the full ECA pipeline as recommended by NICE's 2022 RWE
 ## Data Generating Process: Embedding Indication Bias
 
 ::: {.callout-warning icon=false}
-**Why simulate data rather than use real RWD?**
+## Why simulate data rather than use real RWD?
 
-Synthetic data with a *known* Data Generating Process (DGP) is the gold standard for validating causal estimators: we can calculate "God's Eye" ground truth and directly measure how much bias each estimator recovers. In a real NICE submission, the ECA data would come from an approved registry under a data sharing agreement. The structural logic here — confounders simultaneously driving treatment assignment and survival — faithfully replicates the real-world challenge of indication bias.
+Synthetic data with a known Data Generating Process (DGP) is the gold standard for validating causal estimators: we can calculate the omniscient ground truth and directly measure how much bias each estimator recovers. In a real NICE submission, the ECA data would come from an approved registry under a data sharing agreement. The structural logic here — confounders simultaneously driving treatment assignment and survival — faithfully replicates the real-world challenge of indication bias.
 :::
 
 ### Biological Rationale for the DGP
 
-In UK clinical practice, clinicians are more likely to prescribe novel therapies (including compassionate use or early access schemes) to patients with **worse prognostic profiles** — specifically those with poor ECOG performance status, elevated LDH (a marker of tumour burden), or more lines of prior therapy. This creates a negative correlation between treatment receipt and baseline prognosis: the treated patients (Veltumab in our simulation) are, on average, *sicker* than the untreated control patients at baseline. Without adjustment, this **indication bias** will *underestimate* Veltumab's true benefit.
+In UK clinical practice, clinicians are more likely to prescribe novel therapies (including compassionate use or early access schemes) to patients with **worse prognostic profiles** — specifically those with poor ECOG performance status, elevated LDH (a marker of tumour burden), or more lines of prior therapy. This creates a negative correlation between treatment receipt and baseline prognosis: the treated patients (Veltumab in our simulation) are, on average, **sicker** than the untreated control patients at baseline. Without adjustment, this **indication bias** will **underestimate** the true benefit of Veltumab.
 
 ```{r dgp}
+#| results: hold
 set.seed(2026)
 n <- 600
 
 # --- Baseline Covariates (W) ---
-# Representing a typical R/R DLBCL registry population
-age          <- rnorm(n, mean = 66, sd = 11)          # Median ~66 yrs, consistent with HMRN data
-ecog         <- rbinom(n, 1, prob = 0.45)             # 1 = ECOG 2+, 0 = ECOG 0-1
-ldh_elevated <- rbinom(n, 1, prob = 0.55)             # Elevated LDH (ULN), high-risk feature
-prior_lines  <- rbinom(n, 1, prob = 0.40)             # 1 = ≥3 prior lines, 0 = exactly 2
+age          <- rnorm(n, mean = 66, sd = 11)       # <1>
+ecog         <- rbinom(n, 1, prob = 0.45)           # <2>
+ldh_elevated <- rbinom(n, 1, prob = 0.55)           # <3>
+prior_lines  <- rbinom(n, 1, prob = 0.40)           # <4>
 
 # --- Treatment Assignment Mechanism (Indication Bias) ---
-# Clinicians disproportionately prescribe Veltumab (A=1) to higher-risk patients.
-# Each risk feature increases the log-odds of receiving Veltumab.
-lp_treat <- -2.5 + 0.04 * age + 1.1 * ecog + 0.8 * ldh_elevated + 0.6 * prior_lines
+lp_treat <- -4.2 + 0.04 * age + 1.1 * ecog + 0.8 * ldh_elevated + 0.6 * prior_lines  # <5>
 prob_treat <- plogis(lp_treat)
 treatment  <- rbinom(n, 1, prob = prob_treat)
 
 # --- Potential Outcome Framework (Y1, Y0) ---
-# Survival at 1 year is driven by baseline severity AND treatment.
-# Note: ECOG and LDH both harm survival AND increase Veltumab uptake → classic confounding.
-lp_surv_base <- 2.2 - 0.03 * age - 1.1 * ecog - 0.7 * ldh_elevated - 0.5 * prior_lines
-true_ate_delta_lp <- 0.85  # Veltumab log-OR benefit (true causal effect)
+lp_surv_base      <- 2.2 - 0.03 * age - 1.1 * ecog - 0.7 * ldh_elevated - 0.5 * prior_lines
+true_ate_delta_lp <- 0.85                           # <6>
 
-prob_y1 <- plogis(lp_surv_base + true_ate_delta_lp)  # Potential outcome: if treated
-prob_y0 <- plogis(lp_surv_base)                       # Potential outcome: if untreated
+prob_y1 <- plogis(lp_surv_base + true_ate_delta_lp) # <7>
+prob_y0 <- plogis(lp_surv_base)                      # <8>
 
-# Ground-truth population ATE (Risk Difference scale)
-true_ate_rd <- mean(prob_y1) - mean(prob_y0)
+true_ate_rd  <- mean(prob_y1) - mean(prob_y0)
 
-# Realised outcome under actual treatment assignment
 survival_1yr <- ifelse(treatment == 1,
                        rbinom(n, 1, prob_y1),
                        rbinom(n, 1, prob_y0))
 
-df <- data.frame(age, ecog, ldh_elevated, prior_lines, treatment, survival_1yr)
+df       <- data.frame(age, ecog, ldh_elevated, prior_lines, treatment, survival_1yr)
 df_clean <- df[complete.cases(df), ]
 
-# Naive observed difference (biased)
 naive_rd <- mean(df_clean$survival_1yr[df_clean$treatment == 1]) -
             mean(df_clean$survival_1yr[df_clean$treatment == 0])
 
-cat("=== GOD'S EYE AUDIT ===\n")
+cat("============ GROUND-TRUTH AUDIT ============\n")
 cat(sprintf("True Population ATE (ground truth):  %.4f\n", true_ate_rd))
 cat(sprintf("Naive observed RD (biased):           %.4f\n", naive_rd))
 cat(sprintf("Bias gap (hidden benefit):            %.4f  (%.1f%% of true effect)\n",
@@ -108,13 +102,22 @@ cat(sprintf("N treated (Veltumab arm):             %d\n", sum(df_clean$treatment
 cat(sprintf("N control (Standard salvage):         %d\n", sum(1 - df_clean$treatment)))
 ```
 
-The DGP output above confirms the structural problem: **indication bias is suppressing the apparent benefit of Veltumab**. The naive comparison underestimates the true treatment effect — exactly the scenario the ERG warned about, but in the opposite direction to what is commonly assumed. Here, sicker patients receiving Veltumab drag down the observed benefit, *not* inflate it.
+1. Age drawn from Normal(66, 11) — consistent with median age in UK haematological registry data (HMRN).
+2. ECOG performance status: 1 = ECOG 2+ (poor), 0 = ECOG 0–1 (good). Prevalence of 45% reflects a typical R/R DLBCL registry population.
+3. LDH elevation above upper limit of normal (ULN) — a key marker of tumour burden and independent adverse prognostic factor in DLBCL.
+4. Prior therapy lines: 1 = three or more prior lines, 0 = exactly two prior lines. Affects both treatment eligibility and prognosis.
+5. Logistic linear predictor for treatment assignment. Each risk feature (ECOG, LDH, prior lines, age) increases the log-odds of receiving Veltumab, embedding indication bias. Intercept calibrated so approximately 35% of patients receive Veltumab — realistic for a novel agent under early access.
+6. True log-odds-ratio benefit of Veltumab set by the DGP architect. This value is unknown to the estimators — recovering it is the goal of the causal pipeline.
+7. Potential outcome Y(1): survival probability if every patient received Veltumab (counterfactual).
+8. Potential outcome Y(0): survival probability if every patient received standard salvage chemotherapy (counterfactual).
+
+The DGP output above confirms the structural problem: **indication bias is suppressing the apparent benefit of Veltumab**. The naive comparison underestimates the true treatment effect — exactly the scenario the ERG warned about, but in the opposite direction to what is commonly assumed. Here, sicker patients receiving Veltumab drag down the observed benefit, **not** inflate it.
 
 ---
 
 ## Module 1: Target Trial Emulation (TTE)
 
-Target Trial Emulation (TTE; Hernán & Robins, 2016) provides a formal framework for designing observational analyses that mirror the protocol of a hypothetical randomised trial. Without explicit TTE alignment, observational analyses are susceptible to **immortal time bias** and **time-zero misalignment** — both of which can generate spurious survival advantages independent of the drug's true effect.
+Target Trial Emulation (TTE; Hernán & Robins, 2016) provides a formal framework for designing observational analyses that mirror the protocol of a hypothetical randomised trial. Without explicit TTE alignment, observational analyses are susceptible to **immortal time bias** and **time-zero misalignment** — both of which can generate spurious survival advantages independent of the true drug effect.
 
 For the VICTOR-2 vs. HMRN-sim comparison, the TTE protocol specifies:
 
@@ -128,11 +131,10 @@ For the VICTOR-2 vs. HMRN-sim comparison, the TTE protocol specifies:
 | **Exclusion** | Missing baseline covariates | Same — complete-case analysis |
 
 ```{r tte}
+#| results: hold
 # TTE Step: synchronise population at T0, apply eligibility filters
-# In our synthetic data, all patients are already eligibility-consistent by construction.
-# In a real ECA, this step would involve date-range filtering and covariate completeness checks.
 
-cat(sprintf(">>> TTE Status: Population synchronised at T0.\n"))
+cat(sprintf(">>> TTE Status: Population synchronised at T0.\n")) # <1>
 cat(sprintf("    Total N after TTE cleaning: %d\n", nrow(df_clean)))
 cat(sprintf("    Treated (Veltumab):  %d  |  Control (Salvage): %d\n",
             sum(df_clean$treatment), sum(1 - df_clean$treatment)))
@@ -144,12 +146,13 @@ cat(sprintf("\n    Unadjusted 1-yr OS — Veltumab: %.1f%%  |  Salvage: %.1f%%\n
             surv_treated * 100, surv_control * 100))
 cat(sprintf("    Naive Risk Difference: %.4f  [NB: biased — see Module 2]\n", naive_rd))
 ```
+1. In our synthetic data, all patients are already eligibility-consistent by construction. In a real ECA, this step would involve date-range filtering and covariate completeness checks.
 
 ---
 
 ## Module 2: IPTW Weighting & Covariate Balance Diagnostics
 
-Inverse Probability of Treatment Weighting (IPTW) with **ATT (Average Treatment Effect on the Treated)** estimand is the appropriate choice for ECA construction: we are asking *"what would have happened to Veltumab-treated patients if they had instead received standard salvage?"* — the relevant question for NICE cost-effectiveness modelling.
+Inverse Probability of Treatment Weighting (IPTW) with **ATT (Average Treatment Effect on the Treated)** estimand is the appropriate choice for ECA construction: we are asking "what would have happened to Veltumab-treated patients if they had instead received standard salvage?" — the relevant question for NICE cost-effectiveness modelling.
 
 ### Propensity Score Estimation & Weighting
 
@@ -165,14 +168,40 @@ W_att <- weightit(
   estimand  = "ATT"
 )
 
-summary(W_att)
+# --- Weight Diagnostics Table ---
+w      <- W_att$weights
+trt    <- df_clean$treatment
+w_ctrl <- w[trt == 0]
+n_trt  <- sum(trt == 1)
+n_ctrl <- sum(trt == 0)
+ess_ctrl <- round(sum(w_ctrl)^2 / sum(w_ctrl^2), 1)
+cv_ctrl  <- round(sd(w_ctrl) / mean(w_ctrl), 3)
+
+diag_df <- data.frame(
+  Statistic = c("N (unweighted)", "ESS (after weighting)",
+                "ESS retention", "Max weight", "Coef. of Variation"),
+  Treated   = c(n_trt, n_trt, "100.0%", "1.000", "0.000"),
+  Control   = c(n_ctrl, ess_ctrl,
+                paste0(round(ess_ctrl / n_ctrl * 100, 1), "%"),
+                round(max(w_ctrl), 3), cv_ctrl)
+)
+
+knitr::kable(
+  diag_df,
+  caption   = "IPTW weight diagnostics (ATT estimand). ESS retention below 70% warrants investigation of extreme weights.",
+  col.names = c("Statistic", "Treated (Veltumab)", "Control (Salvage)"),
+  align     = "lrr"
+)
 ```
 
 ### Covariate Balance: Love Plot
 
 NICE RWE Framework and ISPOR guidelines recommend an Absolute Standardised Mean Difference (ASMD) threshold of **< 0.10** for all covariates after weighting. Values ≥ 0.10 indicate residual imbalance that could bias the causal estimate.
 
-```{r love-plot, fig.cap="Love plot showing ASMD before and after ATT weighting. All covariates fall below the 0.10 threshold post-weighting, indicating adequate balance for causal inference.", fig.width=8, fig.height=5}
+```{r love-plot}
+#| fig.cap: "Love plot showing ASMD before and after ATT weighting. All covariates fall below the 0.10 threshold post-weighting, indicating adequate balance for causal inference."
+#| fig.width: 8
+#| fig.height: 5
 lp <- love.plot(
   W_att,
   thresholds   = c(m = 0.1),
@@ -189,7 +218,10 @@ All four covariates (age, ECOG, LDH, prior lines) achieve ASMD < 0.10 after weig
 
 ### Positivity Audit: Propensity Score Overlap
 
-```{r ps-overlap, fig.cap="Propensity score distributions for the Veltumab and salvage arms. Sufficient overlap (common support) confirms that causal estimation is not relying on extrapolation beyond the data.", fig.width=8, fig.height=5}
+```{r ps-overlap}
+#| fig.cap: "Propensity score distributions for the Veltumab and salvage arms. Sufficient overlap (common support) confirms that causal estimation is not relying on extrapolation beyond the data."
+#| fig.width: 8
+#| fig.height: 5
 ps_plot <- bal.plot(
   W_att,
   var.name     = "prop.score",
@@ -216,11 +248,12 @@ The propensity score distributions show reasonable overlap between the Veltumab 
 
 ### Why TMLE over IPTW alone?
 
-IPTW is sensitive to **propensity score model misspecification**: if the PS model omits a non-linear interaction, the weights may be biased. TMLE (Targeted Maximum Likelihood Estimation; van der Laan & Rubin, 2006) provides **double robustness** — the causal estimate remains consistent if *either* the propensity score model *or* the outcome model is correctly specified. Additionally, TMLE's **targeted update step** (the epsilon parameter) fine-tunes the initial estimate to directly optimise the target estimand, yielding semi-parametric efficiency.
+IPTW is sensitive to **propensity score model misspecification**: if the PS model omits a non-linear interaction, the weights may be biased. TMLE (Targeted Maximum Likelihood Estimation; van der Laan & Rubin, 2006) provides **double robustness** — the causal estimate remains consistent if either the propensity score model or the outcome model is correctly specified. Additionally, the TMLE **targeted update step** (the epsilon parameter) fine-tunes the initial estimate to directly optimise the target estimand, yielding semi-parametric efficiency.
 
 We use **SuperLearner** as an ensemble learner for both the propensity score and the outcome model, allowing the data to determine the functional form rather than imposing parametric assumptions.
 
 ```{r tmle, cache=TRUE}
+#| results: hold
 library(tmle)
 library(SuperLearner)
 
@@ -237,7 +270,7 @@ tmle_fit <- tmle(
   family        = "binomial"
 )
 
-cat("=== TMLE RESULTS ===\n")
+cat("============ TMLE RESULTS ============\n")
 cat(sprintf("ATE (Risk Difference):  %.4f\n", tmle_fit$estimates$ATE$psi))
 cat(sprintf("95%% CI:                 [%.4f, %.4f]\n",
             tmle_fit$estimates$ATE$CI[1],
@@ -251,9 +284,13 @@ cat("(epsilon ≈ 0 implies the initial Q estimate was already well-calibrated)\
 
 ## Module 4: Sensitivity Analysis — E-value
 
-Unmeasured confounding is the principal threat to causal validity in any observational study. The **E-value** (VanderWeele & Ding, 2017) quantifies the minimum strength of association that an unmeasured confounder would need to have with *both* treatment and outcome (on the risk ratio scale) to fully explain away the observed treatment effect.
+Unmeasured confounding is the principal threat to causal validity in any observational study. The **E-value** (VanderWeele & Ding, 2017) quantifies the minimum strength of association that an unmeasured confounder would need to have with both treatment and outcome (on the risk ratio scale) to fully explain away the observed treatment effect.
 
-```{r evalue, fig.cap="E-value sensitivity plot. The E-value indicates the minimum confounder-treatment and confounder-outcome association required to reduce the point estimate to the null. The confidence interval E-value shows the same for the lower bound of the 95% CI.", fig.width=7, fig.height=6}
+```{r evalue}
+#| results: hold
+#| fig.cap: "E-value sensitivity plot. The E-value indicates the minimum confounder-treatment and confounder-outcome association required to reduce the point estimate to the null. The confidence interval E-value shows the same for the lower bound of the 95% CI."
+#| fig.width: 7
+#| fig.height: 6
 library(EValue)
 
 # Transform TMLE Risk Difference → Relative Risk for E-value computation
@@ -282,7 +319,7 @@ plot(ev,
 ::: {.callout-note icon=false}
 **E-value Interpretation for the ERG**
 
-An E-value above **2.0** is generally considered to represent meaningful robustness — it means an unmeasured confounder would need to be associated with *both* treatment and outcome by a factor of more than 2× (on the RR scale) to explain away the finding. Measured confounders in our model (ECOG, LDH, age, prior lines) have associations in the range of 1.8–3.0×, meaning only a confounder of similar or greater magnitude — and one not captured in either the trial or registry data — would invalidate the result. No such confounder has been identified in the DLBCL clinical literature.
+An E-value above **2.0** is generally considered to represent meaningful robustness — it means an unmeasured confounder would need to be associated with both treatment and outcome by a factor of more than 2× (on the RR scale) to explain away the finding. Measured confounders in our model (ECOG, LDH, age, prior lines) have associations in the range of 1.8–3.0×, meaning only a confounder of similar or greater magnitude — and one not captured in either the trial or registry data — would invalidate the result. No such confounder has been identified in the DLBCL clinical literature.
 :::
 
 ---
@@ -322,7 +359,7 @@ cat(sprintf("\nGround truth ATE (from DGP): %.4f\n", true_ate_rd))
 cat("TMLE recovers the true ATE most accurately, confirming double-robustness advantage.\n")
 ```
 
-**Interpretation:** The naive comparison underestimates Veltumab's benefit due to indication bias — sicker patients disproportionately received the novel drug. After IPTW and TMLE adjustment, the estimated 1-year OS benefit converges toward the true causal effect. The convergence of IPTW and TMLE estimates provides reassurance that results are not driven by model choice.
+**Interpretation:** The naive comparison underestimates the benefit of Veltumab due to indication bias — sicker patients disproportionately received the novel drug. After IPTW and TMLE adjustment, the estimated 1-year OS benefit converges toward the true causal effect. The convergence of IPTW and TMLE estimates provides reassurance that results are not driven by model choice.
 
 ---
 
@@ -347,9 +384,9 @@ The following checklist replicates the structured review a NICE Evidence Review 
 
 **Question:** Have all major prognostic factors and treatment drivers been captured in the covariate set, satisfying the conditional independence assumption Y^a^ ⊥ A | W?
 
-**Evidence:** Covariates (age, ECOG, LDH, prior lines) align with DLBCL clinical guidelines and the NICE ERG's list of pre-specified effect modifiers. E-value analysis (Module 4) quantifies robustness to any residual unmeasured confounders.
+**Evidence:** Covariates (age, ECOG, LDH, prior lines) align with DLBCL clinical guidelines and the NICE ERG list of pre-specified effect modifiers. E-value analysis (Module 4) quantifies robustness to any residual unmeasured confounders.
 
-**Risk to ICER if failed:** If exchangeability fails, the weighted estimator is contaminated by baseline severity differences. In this oncology context, the primary risk is *underestimation* of Veltumab's benefit — leading to an artificially inflated ICER that penalises clinical innovation.
+**Risk to ICER if failed:** If exchangeability fails, the weighted estimator is contaminated by baseline severity differences. In this oncology context, the primary risk is underestimation of the Veltumab benefit — leading to an artificially inflated ICER that penalises clinical innovation.
 
 **Verdict:** ⚠️ Partially verified — unmeasured confounding (e.g., physician preference, site effects) cannot be ruled out but quantified via E-value.
 :::
@@ -386,7 +423,7 @@ The following checklist replicates the structured review a NICE Evidence Review 
 
 This pipeline demonstrates that navigating indication bias in RWE is less about selecting the "right" estimator and more about building a **transparent, auditable evidence chain**. The key insight is that IPTW and TMLE are not alternatives — they are complementary lenses. IPTW provides interpretable diagnostics (ASMD, effective sample size); TMLE provides rigorous estimation with double robustness. Using both in parallel, and reporting their convergence, is the strongest signal to a NICE committee that the analysis has not been optimised for a favourable result.
 
-The E-value exercise is equally important: it shifts the committee's question from *"could there be unmeasured confounding?"* (always yes) to *"how strong would it need to be?"* — a quantitative, defensible answer.
+The E-value exercise is equally important: it shifts the committee question from "could there be unmeasured confounding?" (always yes) to "how strong would it need to be?" — a quantitative, defensible answer.
 
 In a real submission context, this pipeline would be complemented by:
 
@@ -396,4 +433,4 @@ In a real submission context, this pipeline would be complemented by:
 
 ---
 
-*Analysis code and synthetic data generator available at [github.com/Qsev/XGZ-HEOR-Portfolio](https://github.com/Qsev/XGZ-HEOR-Portfolio).*
+Analysis code and synthetic data generator available at [github.com/Qsev/XGZ-HEOR-Portfolio](https://github.com/Qsev/XGZ-HEOR-Portfolio).

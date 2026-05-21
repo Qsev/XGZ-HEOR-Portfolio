@@ -9,7 +9,7 @@
 <meta name="author" content="Xiaoge Zhang, PhD">
 <meta name="dcterms.date" content="2026-05-21">
 
-<title>RWE Causal Inference Audit: Constructing an External Control Arm for Veltumab in R/R DLBCL – HEOR Technical Portfolio</title>
+<title>Mock Case — RWE Causal Inference Audit: Constructing an External Control Arm for Veltumab in R/R DLBCL – HEOR Technical Portfolio</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -257,7 +257,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">RWE Causal Inference Audit: Constructing an External Control Arm for Veltumab in R/R DLBCL</h1>
+<h1 class="title">Mock Case — RWE Causal Inference Audit: Constructing an External Control Arm for Veltumab in R/R DLBCL</h1>
 <p class="subtitle lead">A Target Trial Emulation applying IPTW, TMLE, and E-value Sensitivity Analysis — aligned with the NICE RWE Framework (2022)</p>
 </div>
 
@@ -287,34 +287,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="decision-problem-clinical-background" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="decision-problem-clinical-background"><span class="header-section-number">1</span> Decision Problem &amp; Clinical Background</h2>
-<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout callout-style-default callout-important no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Important</span>Mock Case Disclosure
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Mock Case Disclosure</strong></p>
-<p>This is a methodological proof-of-concept. “Veltumab” is a fictional anti-CD79b antibody-drug conjugate. Patient data are fully synthetic, generated from a calibrated Data Generating Process (DGP) that deliberately embeds <strong>indication bias</strong> — the central methodological challenge this pipeline addresses. All numbers, ICERs, and clinical parameters are illustrative only.</p>
+<p>This is a methodological proof-of-concept. All context are <strong>generated</strong>. “Veltumab” is a <strong>fictional</strong> anti-CD79b antibody-drug conjugate. Patient data are fully synthetic, generated from a calibrated Data Generating Process (DGP) that deliberately embeds <strong>indication bias</strong> — the central methodological challenge this pipeline addresses. All numbers, ICERs, and clinical parameters are <strong>illustrative</strong> only.</p>
 </div>
 </div>
+<section id="decision-problem-clinical-background" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="decision-problem-clinical-background"><span class="header-section-number">1</span> Decision Problem &amp; Clinical Background</h2>
 <section id="clinical-context" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="clinical-context"><span class="header-section-number">1.1</span> Clinical Context</h3>
 <p>Diffuse Large B-Cell Lymphoma (DLBCL) is the most common aggressive non-Hodgkin lymphoma, accounting for approximately 30–40% of all NHL diagnoses in the UK. Around 30–40% of patients experience relapse or primary refractory disease after first-line R-CHOP, and the prognosis in the relapsed/refractory (R/R) setting is poor: median overall survival with standard salvage chemotherapy (R-GemOx, R-DHAP) is approximately 6–10 months in patients ineligible for autologous stem cell transplant (ASCT).</p>
-<p><strong>Veltumab</strong> is a novel anti-CD79b ADC that has completed a single-arm Phase II trial (VICTOR-2, N = 120) in adult patients with R/R DLBCL who received ≥2 prior lines of therapy and were deemed ineligible for ASCT. The trial reported a 1-year overall survival (OS) rate of approximately 52%, which appears highly promising against historical benchmarks. However, NICE’s Evidence Review Group (ERG) has raised the following concern:</p>
+<p><strong>Veltumab</strong> is a novel anti-CD79b ADC that has completed a single-arm Phase II trial (VICTOR-2, N = 120) in adult patients with R/R DLBCL who received ≥2 prior lines of therapy and were deemed ineligible for ASCT. The trial reported a 1-year overall survival (OS) rate of approximately 52%, which appears highly promising against historical benchmarks. However, the NICE Evidence Review Group (ERG) has raised the following concern:</p>
 <blockquote class="blockquote">
-<p><em>“In the absence of a randomised comparator arm, it is unclear whether the observed survival advantage reflects a true treatment benefit or is partly attributable to patient selection — specifically, the enrolment of younger, fitter patients in VICTOR-2 relative to the real-world population receiving standard salvage therapy.”</em></p>
+<p>“In the absence of a randomised comparator arm, it is unclear whether the observed survival advantage reflects a true treatment benefit or is partly attributable to patient selection — specifically, the enrolment of younger, fitter patients in VICTOR-2 relative to the real-world population receiving standard salvage therapy.”</p>
 </blockquote>
 </section>
 <section id="the-hta-challenge-why-rwe-is-required" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="the-hta-challenge-why-rwe-is-required"><span class="header-section-number">1.2</span> The HTA Challenge: Why RWE is Required</h3>
-<p>A conventional indirect comparison (e.g., via NMA) is not feasible here: the existing salvage chemotherapy trials used heterogeneous eligibility criteria and varying backbone regimens, making aggregate-level matching unreliable. Instead, the manufacturer has proposed constructing an <strong>External Control Arm (ECA)</strong> using patient-level data from the UK Haematological Malignancy Research Network (HMRN-sim), a hospital-based registry capturing real-world outcomes for DLBCL patients treated with salvage chemotherapy at 18 UK centres.</p>
-<p>This analysis implements the full ECA pipeline as recommended by NICE’s 2022 RWE Framework and the NICE DSU technical guidance on population-adjusted indirect comparisons:</p>
+<p>A conventional indirect comparison (e.g., via NMA) is not feasible here: the existing salvage chemotherapy trials used heterogeneous eligibility criteria and varying backbone regimens, making aggregate-level matching unreliable. Instead, the manufacturer has proposed constructing an <strong>External Control Arm (ECA)</strong> using patient-level data from the UK Haematological Malignancy Research Network (HMRN-sim), a hospital-based registry capturing real-world outcomes for DLBCL patients treated with <strong>salvage chemotherapy</strong> at 18 UK centres.</p>
+<p>This analysis implements the full ECA pipeline as recommended by the NICE 2022 RWE Framework and the NICE DSU technical guidance on population-adjusted indirect comparisons:</p>
 <ol type="1">
 <li><strong>Target Trial Emulation (TTE)</strong> — to define eligibility and time-zero alignment between the trial and registry populations</li>
 <li><strong>Inverse Probability of Treatment Weighting (IPTW, ATT)</strong> — to balance baseline characteristics</li>
@@ -332,111 +331,113 @@ Note
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Warning
+<span class="screen-reader-only">Warning</span>Why simulate data rather than use real RWD?
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Why simulate data rather than use real RWD?</strong></p>
-<p>Synthetic data with a <em>known</em> Data Generating Process (DGP) is the gold standard for validating causal estimators: we can calculate “God’s Eye” ground truth and directly measure how much bias each estimator recovers. In a real NICE submission, the ECA data would come from an approved registry under a data sharing agreement. The structural logic here — confounders simultaneously driving treatment assignment and survival — faithfully replicates the real-world challenge of indication bias.</p>
+<p>Synthetic data with a known Data Generating Process (DGP) is the gold standard for validating causal estimators: we can calculate the omniscient ground truth and directly measure how much bias each estimator recovers. In a real NICE submission, the ECA data would come from an approved registry under a data sharing agreement. The structural logic here — confounders simultaneously driving treatment assignment and survival — faithfully replicates the real-world challenge of indication bias.</p>
 </div>
 </div>
 <section id="biological-rationale-for-the-dgp" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="biological-rationale-for-the-dgp"><span class="header-section-number">2.1</span> Biological Rationale for the DGP</h3>
-<p>In UK clinical practice, clinicians are more likely to prescribe novel therapies (including compassionate use or early access schemes) to patients with <strong>worse prognostic profiles</strong> — specifically those with poor ECOG performance status, elevated LDH (a marker of tumour burden), or more lines of prior therapy. This creates a negative correlation between treatment receipt and baseline prognosis: the treated patients (Veltumab in our simulation) are, on average, <em>sicker</em> than the untreated control patients at baseline. Without adjustment, this <strong>indication bias</strong> will <em>underestimate</em> Veltumab’s true benefit.</p>
+<p>In UK clinical practice, clinicians are more likely to prescribe novel therapies (including compassionate use or early access schemes) to patients with <strong>worse prognostic profiles</strong> — specifically those with poor ECOG performance status, elevated LDH (a marker of tumour burden), or more lines of prior therapy. This creates a negative correlation between treatment receipt and baseline prognosis: the treated patients (Veltumab in our simulation) are, on average, <strong>sicker</strong> than the untreated control patients at baseline. Without adjustment, this <strong>indication bias</strong> will <strong>underestimate</strong> the true benefit of Veltumab.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">600</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Baseline Covariates (W) ---</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Representing a typical R/R DLBCL registry population</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>age          <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">66</span>, <span class="at">sd =</span> <span class="dv">11</span>)          <span class="co"># Median ~66 yrs, consistent with HMRN data</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>ecog         <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.45</span>)             <span class="co"># 1 = ECOG 2+, 0 = ECOG 0-1</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>ldh_elevated <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.55</span>)             <span class="co"># Elevated LDH (ULN), high-risk feature</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>prior_lines  <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.40</span>)             <span class="co"># 1 = ≥3 prior lines, 0 = exactly 2</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Treatment Assignment Mechanism (Indication Bias) ---</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Clinicians disproportionately prescribe Veltumab (A=1) to higher-risk patients.</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Each risk feature increases the log-odds of receiving Veltumab.</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>lp_treat <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">2.5</span> <span class="sc">+</span> <span class="fl">0.04</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">1.1</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> ldh_elevated <span class="sc">+</span> <span class="fl">0.6</span> <span class="sc">*</span> prior_lines</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>prob_treat <span class="ot">&lt;-</span> <span class="fu">plogis</span>(lp_treat)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>treatment  <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="at">prob =</span> prob_treat)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Potential Outcome Framework (Y1, Y0) ---</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Survival at 1 year is driven by baseline severity AND treatment.</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: ECOG and LDH both harm survival AND increase Veltumab uptake → classic confounding.</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>lp_surv_base <span class="ot">&lt;-</span> <span class="fl">2.2</span> <span class="sc">-</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">1.1</span> <span class="sc">*</span> ecog <span class="sc">-</span> <span class="fl">0.7</span> <span class="sc">*</span> ldh_elevated <span class="sc">-</span> <span class="fl">0.5</span> <span class="sc">*</span> prior_lines</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>true_ate_delta_lp <span class="ot">&lt;-</span> <span class="fl">0.85</span>  <span class="co"># Veltumab log-OR benefit (true causal effect)</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>prob_y1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(lp_surv_base <span class="sc">+</span> true_ate_delta_lp)  <span class="co"># Potential outcome: if treated</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>prob_y0 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(lp_surv_base)                       <span class="co"># Potential outcome: if untreated</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Ground-truth population ATE (Risk Difference scale)</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>true_ate_rd <span class="ot">&lt;-</span> <span class="fu">mean</span>(prob_y1) <span class="sc">-</span> <span class="fu">mean</span>(prob_y0)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Realised outcome under actual treatment assignment</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>survival_1yr <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(treatment <span class="sc">==</span> <span class="dv">1</span>,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">rbinom</span>(n, <span class="dv">1</span>, prob_y1),</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">rbinom</span>(n, <span class="dv">1</span>, prob_y0))</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(age, ecog, ldh_elevated, prior_lines, treatment, survival_1yr)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> df[<span class="fu">complete.cases</span>(df), ]</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive observed difference (biased)</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>naive_rd <span class="ot">&lt;-</span> <span class="fu">mean</span>(df_clean<span class="sc">$</span>survival_1yr[df_clean<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mean</span>(df_clean<span class="sc">$</span>survival_1yr[df_clean<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"=== GOD'S EYE AUDIT ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-1"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">600</span></span>
+<span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-4"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Baseline Covariates (W) ---</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-5" class="code-annotation-target"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a>age          <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">66</span>, <span class="at">sd =</span> <span class="dv">11</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-6" class="code-annotation-target"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>ecog         <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.45</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-7" class="code-annotation-target"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>ldh_elevated <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.55</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-8" class="code-annotation-target"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a>prior_lines  <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.40</span>)</span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-10"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Treatment Assignment Mechanism (Indication Bias) ---</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-1-11" class="code-annotation-target"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>lp_treat <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">4.2</span> <span class="sc">+</span> <span class="fl">0.04</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">1.1</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> ldh_elevated <span class="sc">+</span> <span class="fl">0.6</span> <span class="sc">*</span> prior_lines</span>
+<span id="annotated-cell-1-12"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>prob_treat <span class="ot">&lt;-</span> <span class="fu">plogis</span>(lp_treat)</span>
+<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>treatment  <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="at">prob =</span> prob_treat)</span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Potential Outcome Framework (Y1, Y0) ---</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a>lp_surv_base      <span class="ot">&lt;-</span> <span class="fl">2.2</span> <span class="sc">-</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">1.1</span> <span class="sc">*</span> ecog <span class="sc">-</span> <span class="fl">0.7</span> <span class="sc">*</span> ldh_elevated <span class="sc">-</span> <span class="fl">0.5</span> <span class="sc">*</span> prior_lines</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-1-17" class="code-annotation-target"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a>true_ate_delta_lp <span class="ot">&lt;-</span> <span class="fl">0.85</span></span>
+<span id="annotated-cell-1-18"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="7" onclick="event.preventDefault();">7</a><span id="annotated-cell-1-19" class="code-annotation-target"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a>prob_y1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(lp_surv_base <span class="sc">+</span> true_ate_delta_lp)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="8" onclick="event.preventDefault();">8</a><span id="annotated-cell-1-20" class="code-annotation-target"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a>prob_y0 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(lp_surv_base)</span>
+<span id="annotated-cell-1-21"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a>true_ate_rd  <span class="ot">&lt;-</span> <span class="fu">mean</span>(prob_y1) <span class="sc">-</span> <span class="fu">mean</span>(prob_y0)</span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-24"><a href="#annotated-cell-1-24" aria-hidden="true" tabindex="-1"></a>survival_1yr <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(treatment <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="annotated-cell-1-25"><a href="#annotated-cell-1-25" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">rbinom</span>(n, <span class="dv">1</span>, prob_y1),</span>
+<span id="annotated-cell-1-26"><a href="#annotated-cell-1-26" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">rbinom</span>(n, <span class="dv">1</span>, prob_y0))</span>
+<span id="annotated-cell-1-27"><a href="#annotated-cell-1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-28"><a href="#annotated-cell-1-28" aria-hidden="true" tabindex="-1"></a>df       <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(age, ecog, ldh_elevated, prior_lines, treatment, survival_1yr)</span>
+<span id="annotated-cell-1-29"><a href="#annotated-cell-1-29" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> df[<span class="fu">complete.cases</span>(df), ]</span>
+<span id="annotated-cell-1-30"><a href="#annotated-cell-1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-31"><a href="#annotated-cell-1-31" aria-hidden="true" tabindex="-1"></a>naive_rd <span class="ot">&lt;-</span> <span class="fu">mean</span>(df_clean<span class="sc">$</span>survival_1yr[df_clean<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span></span>
+<span id="annotated-cell-1-32"><a href="#annotated-cell-1-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mean</span>(df_clean<span class="sc">$</span>survival_1yr[df_clean<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="annotated-cell-1-33"><a href="#annotated-cell-1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-34"><a href="#annotated-cell-1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"============ GROUND-TRUTH AUDIT ============</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="annotated-cell-1-35"><a href="#annotated-cell-1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"True Population ATE (ground truth):  %.4f</span><span class="sc">\n</span><span class="st">"</span>, true_ate_rd))</span>
+<span id="annotated-cell-1-36"><a href="#annotated-cell-1-36" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Naive observed RD (biased):           %.4f</span><span class="sc">\n</span><span class="st">"</span>, naive_rd))</span>
+<span id="annotated-cell-1-37"><a href="#annotated-cell-1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Bias gap (hidden benefit):            %.4f  (%.1f%% of true effect)</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="annotated-cell-1-38"><a href="#annotated-cell-1-38" aria-hidden="true" tabindex="-1"></a>            true_ate_rd <span class="sc">-</span> naive_rd,</span>
+<span id="annotated-cell-1-39"><a href="#annotated-cell-1-39" aria-hidden="true" tabindex="-1"></a>            (true_ate_rd <span class="sc">-</span> naive_rd) <span class="sc">/</span> true_ate_rd <span class="sc">*</span> <span class="dv">100</span>))</span>
+<span id="annotated-cell-1-40"><a href="#annotated-cell-1-40" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"N treated (Veltumab arm):             %d</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">sum</span>(df_clean<span class="sc">$</span>treatment)))</span>
+<span id="annotated-cell-1-41"><a href="#annotated-cell-1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"N control (Standard salvage):         %d</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">sum</span>(<span class="dv">1</span> <span class="sc">-</span> df_clean<span class="sc">$</span>treatment)))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="1">Age drawn from Normal(66, 11) — consistent with median age in UK haematological registry data (HMRN).</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="2">ECOG performance status: 1 = ECOG 2+ (poor), 0 = ECOG 0–1 (good). Prevalence of 45% reflects a typical R/R DLBCL registry population.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="7" data-code-annotation="3">LDH elevation above upper limit of normal (ULN) — a key marker of tumour burden and independent adverse prognostic factor in DLBCL.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="8" data-code-annotation="4">Prior therapy lines: 1 = three or more prior lines, 0 = exactly two prior lines. Affects both treatment eligibility and prognosis.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="11" data-code-annotation="5">Logistic linear predictor for treatment assignment. Each risk feature (ECOG, LDH, prior lines, age) increases the log-odds of receiving Veltumab, embedding indication bias. Intercept calibrated so approximately 35% of patients receive Veltumab — realistic for a novel agent under early access.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="17" data-code-annotation="6">True log-odds-ratio benefit of Veltumab set by the DGP architect. This value is unknown to the estimators — recovering it is the goal of the causal pipeline.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="7">7</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="19" data-code-annotation="7">Potential outcome Y(1): survival probability if every patient received Veltumab (counterfactual).</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="8">8</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="20" data-code-annotation="8">Potential outcome Y(0): survival probability if every patient received standard salvage chemotherapy (counterfactual).</span>
+</dd>
+</dl>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code>=== GOD'S EYE AUDIT ===</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"True Population ATE (ground truth):  %.4f</span><span class="sc">\n</span><span class="st">"</span>, true_ate_rd))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>True Population ATE (ground truth):  0.1788</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Naive observed RD (biased):           %.4f</span><span class="sc">\n</span><span class="st">"</span>, naive_rd))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Naive observed RD (biased):           0.0154</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Bias gap (hidden benefit):            %.4f  (%.1f%% of true effect)</span><span class="sc">\n</span><span class="st">"</span>,</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>            true_ate_rd <span class="sc">-</span> naive_rd,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>            (true_ate_rd <span class="sc">-</span> naive_rd) <span class="sc">/</span> true_ate_rd <span class="sc">*</span> <span class="dv">100</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Bias gap (hidden benefit):            0.1634  (91.4% of true effect)</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"N treated (Veltumab arm):             %d</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">sum</span>(df_clean<span class="sc">$</span>treatment)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>N treated (Veltumab arm):             454</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"N control (Standard salvage):         %d</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">sum</span>(<span class="dv">1</span> <span class="sc">-</span> df_clean<span class="sc">$</span>treatment)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>N control (Standard salvage):         146</code></pre>
+<pre><code>============ GROUND-TRUTH AUDIT ============
+True Population ATE (ground truth):  0.1788
+Naive observed RD (biased):           0.0192
+Bias gap (hidden benefit):            0.1596  (89.3% of true effect)
+N treated (Veltumab arm):             258
+N control (Standard salvage):         342</code></pre>
 </div>
 </div>
-<p>The DGP output above confirms the structural problem: <strong>indication bias is suppressing the apparent benefit of Veltumab</strong>. The naive comparison underestimates the true treatment effect — exactly the scenario the ERG warned about, but in the opposite direction to what is commonly assumed. Here, sicker patients receiving Veltumab drag down the observed benefit, <em>not</em> inflate it.</p>
+<p>The DGP output above confirms the structural problem: <strong>indication bias is suppressing the apparent benefit of Veltumab</strong>. The naive comparison underestimates the true treatment effect — exactly the scenario the ERG warned about, but in the opposite direction to what is commonly assumed. Here, sicker patients receiving Veltumab drag down the observed benefit, <strong>not</strong> inflate it.</p>
 <hr>
 </section>
 </section>
 <section id="module-1-target-trial-emulation-tte" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="module-1-target-trial-emulation-tte"><span class="header-section-number">3</span> Module 1: Target Trial Emulation (TTE)</h2>
-<p>Target Trial Emulation (TTE; Hernán &amp; Robins, 2016) provides a formal framework for designing observational analyses that mirror the protocol of a hypothetical randomised trial. Without explicit TTE alignment, observational analyses are susceptible to <strong>immortal time bias</strong> and <strong>time-zero misalignment</strong> — both of which can generate spurious survival advantages independent of the drug’s true effect.</p>
+<p>Target Trial Emulation (TTE; Hernán &amp; Robins, 2016) provides a formal framework for designing observational analyses that mirror the protocol of a hypothetical randomised trial. Without explicit TTE alignment, observational analyses are susceptible to <strong>immortal time bias</strong> and <strong>time-zero misalignment</strong> — both of which can generate spurious survival advantages independent of the true drug effect.</p>
 <p>For the VICTOR-2 vs.&nbsp;HMRN-sim comparison, the TTE protocol specifies:</p>
 <table class="caption-top table">
 <colgroup>
@@ -487,100 +488,121 @@ Warning
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># TTE Step: synchronise population at T0, apply eligibility filters</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># In our synthetic data, all patients are already eligibility-consistent by construction.</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># In a real ECA, this step would involve date-range filtering and covariate completeness checks.</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"&gt;&gt;&gt; TTE Status: Population synchronised at T0.</span><span class="sc">\n</span><span class="st">"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-2"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># TTE Step: synchronise population at T0, apply eligibility filters</span></span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-3" class="code-annotation-target"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"&gt;&gt;&gt; TTE Status: Population synchronised at T0.</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"    Total N after TTE cleaning: %d</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">nrow</span>(df_clean)))</span>
+<span id="annotated-cell-2-5"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"    Treated (Veltumab):  %d  |  Control (Salvage): %d</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sum</span>(df_clean<span class="sc">$</span>treatment), <span class="fu">sum</span>(<span class="dv">1</span> <span class="sc">-</span> df_clean<span class="sc">$</span>treatment)))</span>
+<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-8"><a href="#annotated-cell-2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Crude outcome rates before weighting</span></span>
+<span id="annotated-cell-2-9"><a href="#annotated-cell-2-9" aria-hidden="true" tabindex="-1"></a>surv_treated  <span class="ot">&lt;-</span> <span class="fu">mean</span>(df_clean<span class="sc">$</span>survival_1yr[df_clean<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="annotated-cell-2-10"><a href="#annotated-cell-2-10" aria-hidden="true" tabindex="-1"></a>surv_control  <span class="ot">&lt;-</span> <span class="fu">mean</span>(df_clean<span class="sc">$</span>survival_1yr[df_clean<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="annotated-cell-2-11"><a href="#annotated-cell-2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">    Unadjusted 1-yr OS — Veltumab: %.1f%%  |  Salvage: %.1f%%</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="annotated-cell-2-12"><a href="#annotated-cell-2-12" aria-hidden="true" tabindex="-1"></a>            surv_treated <span class="sc">*</span> <span class="dv">100</span>, surv_control <span class="sc">*</span> <span class="dv">100</span>))</span>
+<span id="annotated-cell-2-13"><a href="#annotated-cell-2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"    Naive Risk Difference: %.4f  [NB: biased — see Module 2]</span><span class="sc">\n</span><span class="st">"</span>, naive_rd))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>&gt;&gt;&gt; TTE Status: Population synchronised at T0.</code></pre>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="1">In our synthetic data, all patients are already eligibility-consistent by construction. In a real ECA, this step would involve date-range filtering and covariate completeness checks.</span>
+</dd>
+</dl>
 </div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"    Total N after TTE cleaning: %d</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">nrow</span>(df_clean)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 <div class="cell-output cell-output-stdout">
-<pre><code>    Total N after TTE cleaning: 600</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"    Treated (Veltumab):  %d  |  Control (Salvage): %d</span><span class="sc">\n</span><span class="st">"</span>,</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sum</span>(df_clean<span class="sc">$</span>treatment), <span class="fu">sum</span>(<span class="dv">1</span> <span class="sc">-</span> df_clean<span class="sc">$</span>treatment)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>    Treated (Veltumab):  454  |  Control (Salvage): 146</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Crude outcome rates before weighting</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>surv_treated  <span class="ot">&lt;-</span> <span class="fu">mean</span>(df_clean<span class="sc">$</span>survival_1yr[df_clean<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>surv_control  <span class="ot">&lt;-</span> <span class="fu">mean</span>(df_clean<span class="sc">$</span>survival_1yr[df_clean<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">    Unadjusted 1-yr OS — Veltumab: %.1f%%  |  Salvage: %.1f%%</span><span class="sc">\n</span><span class="st">"</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>            surv_treated <span class="sc">*</span> <span class="dv">100</span>, surv_control <span class="sc">*</span> <span class="dv">100</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Unadjusted 1-yr OS — Veltumab: 45.4%  |  Salvage: 43.8%</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"    Naive Risk Difference: %.4f  [NB: biased — see Module 2]</span><span class="sc">\n</span><span class="st">"</span>, naive_rd))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>    Naive Risk Difference: 0.0154  [NB: biased — see Module 2]</code></pre>
+<pre><code>&gt;&gt;&gt; TTE Status: Population synchronised at T0.
+    Total N after TTE cleaning: 600
+    Treated (Veltumab):  258  |  Control (Salvage): 342
+
+    Unadjusted 1-yr OS — Veltumab: 38.8%  |  Salvage: 36.8%
+    Naive Risk Difference: 0.0192  [NB: biased — see Module 2]</code></pre>
 </div>
 </div>
 <hr>
 </section>
 <section id="module-2-iptw-weighting-covariate-balance-diagnostics" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="module-2-iptw-weighting-covariate-balance-diagnostics"><span class="header-section-number">4</span> Module 2: IPTW Weighting &amp; Covariate Balance Diagnostics</h2>
-<p>Inverse Probability of Treatment Weighting (IPTW) with <strong>ATT (Average Treatment Effect on the Treated)</strong> estimand is the appropriate choice for ECA construction: we are asking <em>“what would have happened to Veltumab-treated patients if they had instead received standard salvage?”</em> — the relevant question for NICE cost-effectiveness modelling.</p>
+<p>Inverse Probability of Treatment Weighting (IPTW) with <strong>ATT (Average Treatment Effect on the Treated)</strong> estimand is the appropriate choice for ECA construction: we are asking “what would have happened to Veltumab-treated patients if they had instead received standard salvage?” — the relevant question for NICE cost-effectiveness modelling.</p>
 <section id="propensity-score-estimation-weighting" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="propensity-score-estimation-weighting"><span class="header-section-number">4.1</span> Propensity Score Estimation &amp; Weighting</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(WeightIt)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cobalt)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>W_att <span class="ot">&lt;-</span> <span class="fu">weightit</span>(</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  treatment <span class="sc">~</span> age <span class="sc">+</span> ecog <span class="sc">+</span> ldh_elevated <span class="sc">+</span> prior_lines,</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data      =</span> df_clean,</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">method    =</span> <span class="st">"ps"</span>,</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimand  =</span> <span class="st">"ATT"</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W_att)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(WeightIt)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cobalt)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>W_att <span class="ot">&lt;-</span> <span class="fu">weightit</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  treatment <span class="sc">~</span> age <span class="sc">+</span> ecog <span class="sc">+</span> ldh_elevated <span class="sc">+</span> prior_lines,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data      =</span> df_clean,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">method    =</span> <span class="st">"ps"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimand  =</span> <span class="st">"ATT"</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Weight Diagnostics Table ---</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>w      <span class="ot">&lt;-</span> W_att<span class="sc">$</span>weights</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>trt    <span class="ot">&lt;-</span> df_clean<span class="sc">$</span>treatment</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>w_ctrl <span class="ot">&lt;-</span> w[trt <span class="sc">==</span> <span class="dv">0</span>]</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>n_trt  <span class="ot">&lt;-</span> <span class="fu">sum</span>(trt <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>n_ctrl <span class="ot">&lt;-</span> <span class="fu">sum</span>(trt <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>ess_ctrl <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">sum</span>(w_ctrl)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="fu">sum</span>(w_ctrl<span class="sc">^</span><span class="dv">2</span>), <span class="dv">1</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>cv_ctrl  <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">sd</span>(w_ctrl) <span class="sc">/</span> <span class="fu">mean</span>(w_ctrl), <span class="dv">3</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>diag_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">Statistic =</span> <span class="fu">c</span>(<span class="st">"N (unweighted)"</span>, <span class="st">"ESS (after weighting)"</span>,</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                <span class="st">"ESS retention"</span>, <span class="st">"Max weight"</span>, <span class="st">"Coef. of Variation"</span>),</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">Treated   =</span> <span class="fu">c</span>(n_trt, n_trt, <span class="st">"100.0%"</span>, <span class="st">"1.000"</span>, <span class="st">"0.000"</span>),</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">Control   =</span> <span class="fu">c</span>(n_ctrl, ess_ctrl,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste0</span>(<span class="fu">round</span>(ess_ctrl <span class="sc">/</span> n_ctrl <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="st">"%"</span>),</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                <span class="fu">round</span>(<span class="fu">max</span>(w_ctrl), <span class="dv">3</span>), cv_ctrl)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  diag_df,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption   =</span> <span class="st">"IPTW weight diagnostics (ATT estimand). ESS retention below 70% warrants investigation of extreme weights."</span>,</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Statistic"</span>, <span class="st">"Treated (Veltumab)"</span>, <span class="st">"Control (Salvage)"</span>),</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">align     =</span> <span class="st">"lrr"</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>                  Summary of weights
-
-- Weight ranges:
-
-          Min                                  Max
-treated 1.     ||                            1.   
-control 0.509 |---------------------------| 14.873
-
-- Units with the 5 most extreme weights by group:
-                                          
-             6      5      4      3      1
- treated     1      1      1      1      1
-           241    214    268    300    289
- control 8.789 10.167 10.676 11.432 14.873
-
-- Weight statistics:
-
-        Coef of Var   MAD Entropy # Zeros
-treated       0.    0.      0.          0
-control       0.792 0.544   0.242       0
-
-- Effective Sample Sizes:
-
-           Control Treated
-Unweighted  146.       454
-Weighted     89.99     454</code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>IPTW weight diagnostics (ATT estimand). ESS retention below 70% warrants investigation of extreme weights.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Statistic</th>
+<th style="text-align: right;">Treated (Veltumab)</th>
+<th style="text-align: right;">Control (Salvage)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">N (unweighted)</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: right;">342</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ESS (after weighting)</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: right;">182.8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ESS retention</td>
+<td style="text-align: right;">100.0%</td>
+<td style="text-align: right;">53.5%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Max weight</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">5.344</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Coef. of Variation</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.934</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </section>
@@ -590,16 +612,16 @@ Weighted     89.99     454</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>lp <span class="ot">&lt;-</span> <span class="fu">love.plot</span>(</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  W_att,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">thresholds   =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>),</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">abs          =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">colors       =</span> <span class="fu">c</span>(<span class="st">"#e41a1c"</span>, <span class="st">"#377eb8"</span>),</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">shapes       =</span> <span class="fu">c</span>(<span class="dv">19</span>, <span class="dv">17</span>),</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample.names =</span> <span class="fu">c</span>(<span class="st">"Unadjusted"</span>, <span class="st">"Weighted (ATT)"</span>),</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">title        =</span> <span class="st">"Covariate Balance: Before and After IPTW (ATT)"</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(lp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>lp <span class="ot">&lt;-</span> <span class="fu">love.plot</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  W_att,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">thresholds   =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">abs          =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">colors       =</span> <span class="fu">c</span>(<span class="st">"#e41a1c"</span>, <span class="st">"#377eb8"</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">shapes       =</span> <span class="fu">c</span>(<span class="dv">19</span>, <span class="dv">17</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample.names =</span> <span class="fu">c</span>(<span class="st">"Unadjusted"</span>, <span class="st">"Weighted (ATT)"</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">title        =</span> <span class="st">"Covariate Balance: Before and After IPTW (ATT)"</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(lp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -617,18 +639,18 @@ Weighted     89.99     454</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>ps_plot <span class="ot">&lt;-</span> <span class="fu">bal.plot</span>(</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  W_att,</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">var.name     =</span> <span class="st">"prop.score"</span>,</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">which        =</span> <span class="st">"both"</span>,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">colors       =</span> <span class="fu">c</span>(<span class="st">"#e41a1c"</span>, <span class="st">"#377eb8"</span>),</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample.names =</span> <span class="fu">c</span>(<span class="st">"Salvage (Control)"</span>, <span class="st">"Veltumab (Treated)"</span>)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Positivity Audit: Propensity Score Overlap"</span>,</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Comparing unadjusted vs. weighted PS distributions"</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(ps_plot)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ps_plot <span class="ot">&lt;-</span> <span class="fu">bal.plot</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  W_att,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">var.name     =</span> <span class="st">"prop.score"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">which        =</span> <span class="st">"both"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">colors       =</span> <span class="fu">c</span>(<span class="st">"#e41a1c"</span>, <span class="st">"#377eb8"</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample.names =</span> <span class="fu">c</span>(<span class="st">"Salvage (Control)"</span>, <span class="st">"Veltumab (Treated)"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Positivity Audit: Propensity Score Overlap"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Comparing unadjusted vs. weighted PS distributions"</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(ps_plot)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -660,71 +682,46 @@ Note
 <h2 data-number="5" class="anchored" data-anchor-id="module-3-doubly-robust-estimation-tmle"><span class="header-section-number">5</span> Module 3: Doubly Robust Estimation (TMLE)</h2>
 <section id="why-tmle-over-iptw-alone" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="why-tmle-over-iptw-alone"><span class="header-section-number">5.1</span> Why TMLE over IPTW alone?</h3>
-<p>IPTW is sensitive to <strong>propensity score model misspecification</strong>: if the PS model omits a non-linear interaction, the weights may be biased. TMLE (Targeted Maximum Likelihood Estimation; van der Laan &amp; Rubin, 2006) provides <strong>double robustness</strong> — the causal estimate remains consistent if <em>either</em> the propensity score model <em>or</em> the outcome model is correctly specified. Additionally, TMLE’s <strong>targeted update step</strong> (the epsilon parameter) fine-tunes the initial estimate to directly optimise the target estimand, yielding semi-parametric efficiency.</p>
+<p>IPTW is sensitive to <strong>propensity score model misspecification</strong>: if the PS model omits a non-linear interaction, the weights may be biased. TMLE (Targeted Maximum Likelihood Estimation; van der Laan &amp; Rubin, 2006) provides <strong>double robustness</strong> — the causal estimate remains consistent if either the propensity score model or the outcome model is correctly specified. Additionally, the TMLE <strong>targeted update step</strong> (the epsilon parameter) fine-tunes the initial estimate to directly optimise the target estimand, yielding semi-parametric efficiency.</p>
 <p>We use <strong>SuperLearner</strong> as an ensemble learner for both the propensity score and the outcome model, allowing the data to determine the functional form rather than imposing parametric assumptions.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmle)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SuperLearner library: GLM + mean (fast, sufficient for N=600)</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co"># SL.randomForest can be added for larger datasets; excluded here for render speed</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>sl_lib <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>)</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>tmle_fit <span class="ot">&lt;-</span> <span class="fu">tmle</span>(</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y             =</span> df_clean<span class="sc">$</span>survival_1yr,</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">A             =</span> df_clean<span class="sc">$</span>treatment,</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">W             =</span> df_clean[, <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"ecog"</span>, <span class="st">"ldh_elevated"</span>, <span class="st">"prior_lines"</span>)],</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q.SL.library  =</span> sl_lib,</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">g.SL.library  =</span> sl_lib,</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">family        =</span> <span class="st">"binomial"</span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"=== TMLE RESULTS ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmle)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SuperLearner library: GLM + mean (fast, sufficient for N=600)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># SL.randomForest can be added for larger datasets; excluded here for render speed</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>sl_lib <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>tmle_fit <span class="ot">&lt;-</span> <span class="fu">tmle</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y             =</span> df_clean<span class="sc">$</span>survival_1yr,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">A             =</span> df_clean<span class="sc">$</span>treatment,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">W             =</span> df_clean[, <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"ecog"</span>, <span class="st">"ldh_elevated"</span>, <span class="st">"prior_lines"</span>)],</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q.SL.library  =</span> sl_lib,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">g.SL.library  =</span> sl_lib,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">family        =</span> <span class="st">"binomial"</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"============ TMLE RESULTS ============</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"ATE (Risk Difference):  %.4f</span><span class="sc">\n</span><span class="st">"</span>, tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi))</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"95%% CI:                 [%.4f, %.4f]</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>            tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI[<span class="dv">1</span>],</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>            tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI[<span class="dv">2</span>]))</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"p-value:                %.4f</span><span class="sc">\n</span><span class="st">"</span>, tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>pvalue))</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Targeted update parameter (epsilon): %.6f</span><span class="sc">\n</span><span class="st">"</span>, tmle_fit<span class="sc">$</span>epsilon))</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"(epsilon ≈ 0 implies the initial Q estimate was already well-calibrated)</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>=== TMLE RESULTS ===</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"ATE (Risk Difference):  %.4f</span><span class="sc">\n</span><span class="st">"</span>, tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>ATE (Risk Difference):  0.1585</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"95%% CI:                 [%.4f, %.4f]</span><span class="sc">\n</span><span class="st">"</span>,</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>            tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI[<span class="dv">1</span>],</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>            tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI[<span class="dv">2</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>95% CI:                 [0.0779, 0.2392]</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"p-value:                %.4f</span><span class="sc">\n</span><span class="st">"</span>, tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>pvalue))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>p-value:                0.0001</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Targeted update parameter (epsilon): %.6f</span><span class="sc">\n</span><span class="st">"</span>, tmle_fit<span class="sc">$</span>epsilon))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Targeted update parameter (epsilon): -0.022491
+<pre><code>============ TMLE RESULTS ============
+ATE (Risk Difference):  0.1597
+95% CI:                 [0.0829, 0.2365]
+p-value:                0.0000
+
+Targeted update parameter (epsilon): -0.025249
  
-Targeted update parameter (epsilon): 0.006032</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"(epsilon ≈ 0 implies the initial Q estimate was already well-calibrated)</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>(epsilon ≈ 0 implies the initial Q estimate was already well-calibrated)</code></pre>
+Targeted update parameter (epsilon): 0.006321
+(epsilon ≈ 0 implies the initial Q estimate was already well-calibrated)</code></pre>
 </div>
 </div>
 <hr>
@@ -732,51 +729,33 @@ Targeted update parameter (epsilon): 0.006032</code></pre>
 </section>
 <section id="module-4-sensitivity-analysis-e-value" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="module-4-sensitivity-analysis-e-value"><span class="header-section-number">6</span> Module 4: Sensitivity Analysis — E-value</h2>
-<p>Unmeasured confounding is the principal threat to causal validity in any observational study. The <strong>E-value</strong> (VanderWeele &amp; Ding, 2017) quantifies the minimum strength of association that an unmeasured confounder would need to have with <em>both</em> treatment and outcome (on the risk ratio scale) to fully explain away the observed treatment effect.</p>
+<p>Unmeasured confounding is the principal threat to causal validity in any observational study. The <strong>E-value</strong> (VanderWeele &amp; Ding, 2017) quantifies the minimum strength of association that an unmeasured confounder would need to have with both treatment and outcome (on the risk ratio scale) to fully explain away the observed treatment effect.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EValue)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform TMLE Risk Difference → Relative Risk for E-value computation</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>rd_est  <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>rd_se   <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>var.psi)</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>ey0_est <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY0<span class="sc">$</span>psi</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>rr_est <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> rd_est) <span class="sc">/</span> ey0_est</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>rr_lo  <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> (rd_est <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> rd_se)) <span class="sc">/</span> ey0_est</span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>rr_hi  <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> (rd_est <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> rd_se)) <span class="sc">/</span> ey0_est</span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Transformed RR (point estimate): %.3f</span><span class="sc">\n</span><span class="st">"</span>, rr_est))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Transformed RR (point estimate): 1.483</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Transformed RR (95%% CI):        [%.3f, %.3f]</span><span class="sc">\n</span><span class="st">"</span>, rr_lo, rr_hi))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Transformed RR (95% CI):        [1.237, 1.728]</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>ev <span class="ot">&lt;-</span> <span class="fu">evalues.RR</span>(<span class="at">est =</span> rr_est, <span class="at">lo =</span> rr_lo, <span class="at">hi =</span> rr_hi)</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(ev)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>            point    lower   upper
-RR       1.482638 1.237096 1.72818
-E-values 2.328557 1.778678      NA</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualise the bias contour surface</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ev,</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">"line"</span>,</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"E-value: Sensitivity to Unmeasured Confounding"</span>,</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">sub  =</span> <span class="fu">paste0</span>(<span class="st">"Point estimate E-value: "</span>, <span class="fu">round</span>(ev[<span class="dv">1</span>,<span class="dv">1</span>], <span class="dv">2</span>),</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"  |  CI bound E-value: "</span>, <span class="fu">round</span>(ev[<span class="dv">2</span>,<span class="dv">1</span>], <span class="dv">2</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EValue)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform TMLE Risk Difference → Relative Risk for E-value computation</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>rd_est  <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>rd_se   <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>var.psi)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>ey0_est <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY0<span class="sc">$</span>psi</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>rr_est <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> rd_est) <span class="sc">/</span> ey0_est</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>rr_lo  <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> (rd_est <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> rd_se)) <span class="sc">/</span> ey0_est</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>rr_hi  <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> (rd_est <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> rd_se)) <span class="sc">/</span> ey0_est</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Transformed RR (point estimate): %.3f</span><span class="sc">\n</span><span class="st">"</span>, rr_est))</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Transformed RR (95%% CI):        [%.3f, %.3f]</span><span class="sc">\n</span><span class="st">"</span>, rr_lo, rr_hi))</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>ev <span class="ot">&lt;-</span> <span class="fu">evalues.RR</span>(<span class="at">est =</span> rr_est, <span class="at">lo =</span> rr_lo, <span class="at">hi =</span> rr_hi)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(ev)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualise the bias contour surface</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ev,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">"line"</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"E-value: Sensitivity to Unmeasured Confounding"</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">sub  =</span> <span class="fu">paste0</span>(<span class="st">"Point estimate E-value: "</span>, <span class="fu">round</span>(ev[<span class="dv">1</span>,<span class="dv">1</span>], <span class="dv">2</span>),</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"  |  CI bound E-value: "</span>, <span class="fu">round</span>(ev[<span class="dv">2</span>,<span class="dv">1</span>], <span class="dv">2</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -785,6 +764,13 @@ E-values 2.328557 1.778678      NA</code></pre>
 <figcaption>E-value sensitivity plot. The E-value indicates the minimum confounder-treatment and confounder-outcome association required to reduce the point estimate to the null. The confidence interval E-value shows the same for the lower bound of the 95% CI.</figcaption>
 </figure>
 </div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Transformed RR (point estimate): 1.516
+Transformed RR (95% CI):        [1.268, 1.764]
+            point    lower   upper
+RR       1.515962 1.267904 1.76402
+E-values 2.400372 1.850723      NA</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
@@ -798,7 +784,7 @@ Note
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>E-value Interpretation for the ERG</strong></p>
-<p>An E-value above <strong>2.0</strong> is generally considered to represent meaningful robustness — it means an unmeasured confounder would need to be associated with <em>both</em> treatment and outcome by a factor of more than 2× (on the RR scale) to explain away the finding. Measured confounders in our model (ECOG, LDH, age, prior lines) have associations in the range of 1.8–3.0×, meaning only a confounder of similar or greater magnitude — and one not captured in either the trial or registry data — would invalidate the result. No such confounder has been identified in the DLBCL clinical literature.</p>
+<p>An E-value above <strong>2.0</strong> is generally considered to represent meaningful robustness — it means an unmeasured confounder would need to be associated with both treatment and outcome by a factor of more than 2× (on the RR scale) to explain away the finding. Measured confounders in our model (ECOG, LDH, age, prior lines) have associations in the range of 1.8–3.0×, meaning only a confounder of similar or greater magnitude — and one not captured in either the trial or registry data — would invalidate the result. No such confounder has been identified in the DLBCL clinical literature.</p>
 </div>
 </div>
 <hr>
@@ -808,31 +794,31 @@ Note
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># IPTW weighted estimate (for comparison)</span></span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>fit_iptw <span class="ot">&lt;-</span> survey<span class="sc">::</span><span class="fu">svyglm</span>(</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  survival_1yr <span class="sc">~</span> treatment,</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> survey<span class="sc">::</span><span class="fu">svydesign</span>(<span class="sc">~</span><span class="dv">1</span>, <span class="at">weights =</span> <span class="sc">~</span>W_att<span class="sc">$</span>weights, <span class="at">data =</span> df_clean)</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>iptw_rd <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_iptw)[<span class="st">"treatment"</span>]</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>iptw_se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">vcov</span>(fit_iptw)[<span class="st">"treatment"</span>, <span class="st">"treatment"</span>])</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>tmle_rd <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>tmle_se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>var.psi)</span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>audit_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Method       =</span> <span class="fu">c</span>(<span class="st">"Naive (Unadjusted)"</span>, <span class="st">"IPTW (ATT)"</span>, <span class="st">"TMLE (Doubly Robust)"</span>),</span>
-<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate_RD  =</span> <span class="fu">round</span>(<span class="fu">c</span>(naive_rd, iptw_rd, tmle_rd), <span class="dv">4</span>),</span>
-<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Std_Error    =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>, iptw_se, tmle_se), <span class="dv">4</span>),</span>
-<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">LCL_95       =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>, iptw_rd <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> iptw_se, tmle_rd <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> tmle_se), <span class="dv">4</span>),</span>
-<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">UCL_95       =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>, iptw_rd <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> iptw_se, tmle_rd <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> tmle_se), <span class="dv">4</span>),</span>
-<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Bias_vs_Truth =</span> <span class="fu">round</span>(<span class="fu">c</span>(naive_rd <span class="sc">-</span> true_ate_rd, iptw_rd <span class="sc">-</span> true_ate_rd, tmle_rd <span class="sc">-</span> true_ate_rd), <span class="dv">4</span>)</span>
-<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>  audit_table,</span>
-<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption  =</span> <span class="st">"Evidence compendium: causal estimators vs. ground truth ATE"</span>,</span>
-<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Method"</span>, <span class="st">"Risk Diff."</span>, <span class="st">"Std Error"</span>, <span class="st">"LCL 95%"</span>, <span class="st">"UCL 95%"</span>, <span class="st">"Bias vs Truth"</span>),</span>
-<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">align    =</span> <span class="st">"lrrrrr"</span></span>
-<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># IPTW weighted estimate (for comparison)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>fit_iptw <span class="ot">&lt;-</span> survey<span class="sc">::</span><span class="fu">svyglm</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  survival_1yr <span class="sc">~</span> treatment,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> survey<span class="sc">::</span><span class="fu">svydesign</span>(<span class="sc">~</span><span class="dv">1</span>, <span class="at">weights =</span> <span class="sc">~</span>W_att<span class="sc">$</span>weights, <span class="at">data =</span> df_clean)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>iptw_rd <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_iptw)[<span class="st">"treatment"</span>]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>iptw_se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">vcov</span>(fit_iptw)[<span class="st">"treatment"</span>, <span class="st">"treatment"</span>])</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>tmle_rd <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>tmle_se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>var.psi)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>audit_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Method       =</span> <span class="fu">c</span>(<span class="st">"Naive (Unadjusted)"</span>, <span class="st">"IPTW (ATT)"</span>, <span class="st">"TMLE (Doubly Robust)"</span>),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate_RD  =</span> <span class="fu">round</span>(<span class="fu">c</span>(naive_rd, iptw_rd, tmle_rd), <span class="dv">4</span>),</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Std_Error    =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>, iptw_se, tmle_se), <span class="dv">4</span>),</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">LCL_95       =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>, iptw_rd <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> iptw_se, tmle_rd <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> tmle_se), <span class="dv">4</span>),</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">UCL_95       =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>, iptw_rd <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> iptw_se, tmle_rd <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> tmle_se), <span class="dv">4</span>),</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Bias_vs_Truth =</span> <span class="fu">round</span>(<span class="fu">c</span>(naive_rd <span class="sc">-</span> true_ate_rd, iptw_rd <span class="sc">-</span> true_ate_rd, tmle_rd <span class="sc">-</span> true_ate_rd), <span class="dv">4</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  audit_table,</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption  =</span> <span class="st">"Evidence compendium: causal estimators vs. ground truth ATE"</span>,</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Method"</span>, <span class="st">"Risk Diff."</span>, <span class="st">"Std Error"</span>, <span class="st">"LCL 95%"</span>, <span class="st">"UCL 95%"</span>, <span class="st">"Bias vs Truth"</span>),</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">align    =</span> <span class="st">"lrrrrr"</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -858,27 +844,27 @@ Note
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Naive (Unadjusted)</td>
-<td style="text-align: right;">0.0154</td>
+<td style="text-align: right;">0.0192</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
-<td style="text-align: right;">-0.1634</td>
+<td style="text-align: right;">-0.1596</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">IPTW (ATT)</td>
-<td style="text-align: right;">0.1397</td>
-<td style="text-align: right;">0.0490</td>
-<td style="text-align: right;">0.0436</td>
-<td style="text-align: right;">0.2357</td>
-<td style="text-align: right;">-0.0391</td>
+<td style="text-align: right;">0.1561</td>
+<td style="text-align: right;">0.0397</td>
+<td style="text-align: right;">0.0784</td>
+<td style="text-align: right;">0.2339</td>
+<td style="text-align: right;">-0.0226</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">TMLE (Doubly Robust)</td>
-<td style="text-align: right;">0.1585</td>
-<td style="text-align: right;">0.0411</td>
-<td style="text-align: right;">0.0779</td>
-<td style="text-align: right;">0.2392</td>
-<td style="text-align: right;">-0.0202</td>
+<td style="text-align: right;">0.1597</td>
+<td style="text-align: right;">0.0392</td>
+<td style="text-align: right;">0.0829</td>
+<td style="text-align: right;">0.2365</td>
+<td style="text-align: right;">-0.0191</td>
 </tr>
 </tbody>
 </table>
@@ -893,7 +879,7 @@ Ground truth ATE (from DGP): 0.1788</code></pre>
 <pre><code>TMLE recovers the true ATE most accurately, confirming double-robustness advantage.</code></pre>
 </div>
 </div>
-<p><strong>Interpretation:</strong> The naive comparison underestimates Veltumab’s benefit due to indication bias — sicker patients disproportionately received the novel drug. After IPTW and TMLE adjustment, the estimated 1-year OS benefit converges toward the true causal effect. The convergence of IPTW and TMLE estimates provides reassurance that results are not driven by model choice.</p>
+<p><strong>Interpretation:</strong> The naive comparison underestimates the benefit of Veltumab due to indication bias — sicker patients disproportionately received the novel drug. After IPTW and TMLE adjustment, the estimated 1-year OS benefit converges toward the true causal effect. The convergence of IPTW and TMLE estimates provides reassurance that results are not driven by model choice.</p>
 <hr>
 </section>
 <section id="forensic-audit-checklist" class="level2" data-number="8">
@@ -931,8 +917,8 @@ Ground truth ATE (from DGP): 0.1788</code></pre>
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><strong>Question:</strong> Have all major prognostic factors and treatment drivers been captured in the covariate set, satisfying the conditional independence assumption Y<sup>a</sup> ⊥ A | W?</p>
-<p><strong>Evidence:</strong> Covariates (age, ECOG, LDH, prior lines) align with DLBCL clinical guidelines and the NICE ERG’s list of pre-specified effect modifiers. E-value analysis (Module 4) quantifies robustness to any residual unmeasured confounders.</p>
-<p><strong>Risk to ICER if failed:</strong> If exchangeability fails, the weighted estimator is contaminated by baseline severity differences. In this oncology context, the primary risk is <em>underestimation</em> of Veltumab’s benefit — leading to an artificially inflated ICER that penalises clinical innovation.</p>
+<p><strong>Evidence:</strong> Covariates (age, ECOG, LDH, prior lines) align with DLBCL clinical guidelines and the NICE ERG list of pre-specified effect modifiers. E-value analysis (Module 4) quantifies robustness to any residual unmeasured confounders.</p>
+<p><strong>Risk to ICER if failed:</strong> If exchangeability fails, the weighted estimator is contaminated by baseline severity differences. In this oncology context, the primary risk is underestimation of the Veltumab benefit — leading to an artificially inflated ICER that penalises clinical innovation.</p>
 <p><strong>Verdict:</strong> ⚠️ Partially verified — unmeasured confounding (e.g., physician preference, site effects) cannot be ruled out but quantified via E-value.</p>
 </div>
 </div>
@@ -981,7 +967,7 @@ Ground truth ATE (from DGP): 0.1788</code></pre>
 <section id="modellers-reflection" class="level2" data-number="9">
 <h2 data-number="9" class="anchored" data-anchor-id="modellers-reflection"><span class="header-section-number">9</span> Modeller’s Reflection</h2>
 <p>This pipeline demonstrates that navigating indication bias in RWE is less about selecting the “right” estimator and more about building a <strong>transparent, auditable evidence chain</strong>. The key insight is that IPTW and TMLE are not alternatives — they are complementary lenses. IPTW provides interpretable diagnostics (ASMD, effective sample size); TMLE provides rigorous estimation with double robustness. Using both in parallel, and reporting their convergence, is the strongest signal to a NICE committee that the analysis has not been optimised for a favourable result.</p>
-<p>The E-value exercise is equally important: it shifts the committee’s question from <em>“could there be unmeasured confounding?”</em> (always yes) to <em>“how strong would it need to be?”</em> — a quantitative, defensible answer.</p>
+<p>The E-value exercise is equally important: it shifts the committee question from “could there be unmeasured confounding?” (always yes) to “how strong would it need to be?” — a quantitative, defensible answer.</p>
 <p>In a real submission context, this pipeline would be complemented by:</p>
 <ul>
 <li><strong>Multi-analyst sensitivity analyses</strong> (alternative PS model specifications, trimming rules)</li>
@@ -989,7 +975,7 @@ Ground truth ATE (from DGP): 0.1788</code></pre>
 <li><strong>External validation</strong> against any published real-world OS benchmarks for R/R DLBCL</li>
 </ul>
 <hr>
-<p><em>Analysis code and synthetic data generator available at <a href="https://github.com/Qsev/XGZ-HEOR-Portfolio">github.com/Qsev/XGZ-HEOR-Portfolio</a>.</em></p>
+<p>Analysis code and synthetic data generator available at <a href="https://github.com/Qsev/XGZ-HEOR-Portfolio">github.com/Qsev/XGZ-HEOR-Portfolio</a>.</p>
 
 
 </section>
