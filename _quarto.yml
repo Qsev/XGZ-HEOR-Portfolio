@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: docs
+  resources:
+    - CV/Xiaoge_Zhang_PhD_Health_Economist_CV.pdf
   render:
     - index.qmd
     - TA975_Mock_Case.qmd
