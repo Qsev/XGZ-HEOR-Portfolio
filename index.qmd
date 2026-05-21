@@ -26,7 +26,7 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 <h3 class="card-title">NICE TA975 (CAR-T) Case Study</h3>
 <h6 class="card-subtitle text-muted mb-2">Full Submission Replication</h6>
 <p class="card-text">A complete end-to-end reconstruction of a CAR-T therapy appraisal (Tisagenlecleucel). Features state-transition modeling, parametric survival fitting, and ICER calculations via Patient Access Schemes (PAS).</p>
-<a href="./TA975_Mock_Case.qmd" class="stretched-link">View Case Study &rarr;</a>
+<a href="./05_TA975_CAR-T_Case/TA975_Mock_Case.qmd" class="stretched-link">View Case Study &rarr;</a>
 :::
 :::
 :::

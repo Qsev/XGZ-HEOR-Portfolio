@@ -5,7 +5,7 @@ project:
     - CV/Xiaoge_Zhang_PhD_Health_Economist_CV.pdf
   render:
     - index.qmd
-    - TA975_Mock_Case.qmd
+    - 05_TA975_CAR-T_Case/TA975_Mock_Case.qmd
     - 00_HTA_LLM_Wiki/README.md
     - 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd
     - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
@@ -29,7 +29,7 @@ website:
         text: "Home"
       - text: "Flagship Audits"
         menu:
-          - href: TA975_Mock_Case.qmd
+          - href: 05_TA975_CAR-T_Case/TA975_Mock_Case.qmd
             text: "NICE TA975 (CAR-T) Case"
           - href: 03_Bayesian_NMA_Reconstruction/MLNMR_Audit_Report.qmd
             text: "MLNMR Audit Report"

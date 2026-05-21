@@ -50,7 +50,23 @@ rsconnect/
 
 # Local drafts and AI-assisted files
 scratch/
-# 04_NMA/
 .DS_Store
 /.quarto/
 **/*.quarto_ipynb
+
+# Quarto render artifacts (source-level, not docs/)
+*_files/
+_site/
+
+# Auto-generated README HTML
+README.html
+README_files/
+
+# AI agent configs (local use only)
+.agents/
+
+# R/Stan auto-generated outputs
+Rplots.pdf
+jags_output.txt
+stan_output.txt
+synthetic_rwd_generator.txt
