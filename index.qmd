@@ -133,11 +133,25 @@ Methodological guidelines and implementation templates for causal inference, con
 ::: {.g-col-12 .g-col-md-4}
 ::: {.card .h-100 .shadow-sm .library-card}
 ::: {.card-header .bg-transparent .border-bottom-0 .pt-4 .pb-0}
-<h5 class="fw-bold"><i class="bi bi-shield-check text-info"></i> Causal Prep</h5>
+<h5 class="fw-bold"><i class="bi bi-shield-check text-info"></i> RWE Methodology</h5>
+:::
+::: {.card-body}
+<p class="text-muted small mb-0">A focused library of methodological frameworks, implementation guides, and causal inference templates for observational studies, aligned with the 2022 NICE RWE Framework.</p>
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-md-8}
+::: {.card .h-100 .shadow-sm .library-card}
+::: {.card-header .bg-transparent .border-bottom-0 .pt-4 .pb-0}
+<h5 class="fw-bold"><i class="bi bi-list-task text-secondary"></i> Technical Guides</h5>
 :::
 ::: {.card-body}
 <div class="list-group list-group-flush">
-  <a href="./02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.qmd" class="list-group-item list-group-item-action border-0 px-0 d-flex justify-content-between align-items-center">NICE Framework & Confounding <i class="bi bi-chevron-right text-muted library-chevron"></i></a>
+  <a href="./02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.qmd" class="list-group-item list-group-item-action border-0 px-0 d-flex justify-content-between align-items-center">NICE RWE Framework & Confounding <i class="bi bi-chevron-right text-muted library-chevron"></i></a>
+  <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center text-muted small">Target Trial Emulation & PS Matching <span class="badge bg-light text-secondary rounded-pill">Coming Soon</span></div>
+  <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center text-muted small">Doubly Robust Estimation (TMLE) <span class="badge bg-light text-secondary rounded-pill">Coming Soon</span></div>
+  <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center text-muted small">Time-to-Event & Immortal Time Bias <span class="badge bg-light text-secondary rounded-pill">Coming Soon</span></div>
 </div>
 :::
 :::
