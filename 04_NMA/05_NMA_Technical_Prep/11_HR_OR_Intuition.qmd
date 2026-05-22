@@ -1,0 +1,285 @@
+---
+title: "HEOR Core Metrics: OR vs HR Intuition Guide"
+description: "Establishing the underlying logic from Probability to Odds to Hazard Velocity in Health Technology Assessment"
+author: "Xiaoge Zhang, PhD"
+date: "today"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true
+    embed-resources: true
+    reference-location: margin
+---
+
+<!-- Audit Point: This guide acts as a foundational methodology card in the Technical Library. It helps bridge academic econometrics and clinical biostatistics with market access strategy. It explains why certain statistical metrics behave as they do and why they are selected for specific HTA appraisal pathways (e.g., logistic regression for binary outcomes vs Cox proportional hazards for time-to-event outcomes). -->
+
+## Introduction
+
+In health technology assessment (HTA) submissions, clinical evidence is summarized using various relative treatment effects. The choice of these metrics is not arbitrary; it dictates how clinical efficacy is translated into survival curves, state occupancy traces, and ultimately cost-effectiveness results (QALYs and ICERs).
+
+Two of the most frequently used—and often misunderstood—relative metrics are:
+
+- **Odds Ratio (OR)**: A static, cross-sectional measure comparing the odds of an event.
+- **Hazard Ratio (HR)**: A dynamic, time-to-event measure comparing the instantaneous rate of event occurrence.
+
+<!-- ### The Analogy: A Photo vs. A Movie
+- **Odds Ratio (OR) is a "Photo at the Finish Line"**: It looks at a single point in time (e.g., Day 28, Month 6) and asks: *Did the event happen or not?* It ignores the pathway, speed, and timing of how patients reached that point.
+- **Hazard Ratio (HR) is a "Movie of the Entire Race"**: It watches the cohort continuously at every micro-second of follow-up and asks: *At this exact moment, what is the velocity at which remaining patients are experiencing the event?*
+-->
+
+This guide provides the mathematical derivations, statistical properties, R implementations, and strategic HTA implications of these two core metrics.
+
+## Survival Functions Derivation: From Hazard to Survival
+
+To understand the Hazard Ratio, we must first understand the relationship between the instantaneous Hazard Rate $h(t)$, Cumulative Hazard $H(t)$, and the Survival Function $S(t)$.
+
+### Mathematical Definitions
+
+Let $T \ge 0$ represent the random variable for time-to-event.^[Denotes survival time, measuring the duration from trial baseline to the event of interest. In parametric survival modeling, this random variable $T$ is assumed to follow distributions like the Weibull, Log-Normal, or Gompertz.]
+
+1. **Survival Function $S(t)$**: The probability of surviving (i.e., not experiencing the event) beyond time $t$:
+   $$S(t) = P(T > t)$$
+2. **Cumulative Distribution Function $F(t)$**: The probability of experiencing the event by time $t$:
+   $$F(t) = P(T \le t) = 1 - S(t)$$
+3. **Probability Density Function $f(t)$**: The rate of event occurrence per unit of time:
+   $$f(t) = \frac{d}{dt}F(t) = \frac{d}{dt}(1 - S(t)) = -S'(t)$$
+4. **Hazard Rate $h(t)$**: The instantaneous failure rate at time $t$, conditional on survival up to $t$:
+   $$h(t) = \lim_{\Delta t \to 0} \frac{P(t \le T < t + \Delta t \mid T \ge t)}{\Delta t} = \frac{f(t)}{S(t)}$$
+
+### Step-by-Step Derivation of $S(t)$
+
+#### Step 1: Express $h(t)$ in terms of $S(t)$ and its derivative {.unnumbered}
+Substitute $f(t) = -S'(t)$ into the definition of $h(t)$:
+$$h(t) = \frac{-S'(t)}{S(t)}$$
+
+#### Step 2: Recognize the derivative of the natural logarithm {.unnumbered}
+By the chain rule:
+$$\frac{d}{dt}\ln(S(t)) = \frac{S'(t)}{S(t)}$$
+Substituting this back into Step 1 yields:
+$$h(t) = -\frac{d}{dt}\ln(S(t))$$
+
+#### Step 3: Integrate both sides {.unnumbered}
+Integrate both sides from $0$ to $t$:
+$$\int_0^t h(u) du = \int_0^t -\frac{d}{du}\ln(S(u)) du$$
+The left side is defined as the **Cumulative Hazard Function $H(t)$**:
+$$H(t) = \int_0^t h(u) du$$
+The right side can be evaluated using the Fundamental Theorem of Calculus:
+$$\int_0^t -\frac{d}{du}\ln(S(u)) du = [-\ln(S(u))]_0^t = -\ln(S(t)) - (-\ln(S(0)))$$
+
+#### Step 4: Apply boundary conditions {.unnumbered}
+At time $t=0$, the probability of survival is $1$, so $S(0) = 1$. Since $\ln(1) = 0$:
+$$H(t) = -\ln(S(t))$$
+
+#### Step 5: Solve for $S(t)$ {.unnumbered}
+Multiply by $-1$ and take the exponential of both sides:
+$$S(t) = e^{-H(t)} = \exp\left(-\int_0^t h(u) du\right)$$
+
+---
+
+## Odds Ratio (OR): The Static Endpoint Snapshot
+
+The Odds Ratio evaluates the relative likelihood of a binary outcome. It is widely used in HTA for endpoints like Complete Response (CR) rates, Adverse Event (AE) rates, or any cross-sectional indicator.
+
+### Mathematical Formulation
+
+1. **Probability ($p$)**: The proportion of times an event occurs ($p \in [0, 1]$). In a time-to-event context, if we define the binary event as experiencing the outcome (e.g., progression or death) by a specific time $t$, this probability $p$ is equivalent to the Cumulative Distribution Function $F(t) = 1 - S(t)$ defined in the previous section.
+2. **Odds**: The ratio of the probability of the event occurring to the probability of it not occurring:
+   $$\text{Odds} = \frac{p}{1 - p}$$
+3. **Odds Ratio (OR)**: The ratio of the odds of the event in the treatment group to the odds of the event in the control group:
+   $$\text{OR} = \frac{\text{Odds}_{\text{T}}}{\text{Odds}_{\text{C}}} = \frac{p_{\text{T}} / (1 - p_{\text{T}})}{p_{\text{C}} / (1 - p_{\text{C}})}$$
+
+### Logit Link and Logistic Regression
+
+In evidence synthesis (such as Bayesian Meta-Analysis), relative treatment effects are modeled on the log-odds scale using the **logit link function**:
+$$\text{logit}(p) = \ln\left(\frac{p}{1 - p}\right) = \beta_0 + \beta_1 X$$
+Under this model:
+$$\ln(\text{OR}) = \text{logit}(p_{\text{T}}) - \text{logit}(p_{\text{C}}) = \beta_1$$
+$$\text{OR} = e^{\beta_1}$$
+
+#### Strategic Rationale in HTA {.unnumbered}
+- **Symmetry**: The log-odds scale maps probabilities from $[0, 1]$ to $(-\infty, +\infty)$, preventing out-of-bounds predictions.
+- **Appraisal Defence**: Under a logistic framework, the OR remains mathematically stable across different study baseline risk levels, unlike the Relative Risk (RR), which is structurally constrained by the baseline rate (e.g., if control $p_{\text{C}} = 0.6$, RR cannot exceed $1.67$, but OR has no such restriction).
+
+### R Implementation: Calculating OR via Logistic Regression
+
+To ground the mathematical definition, we simulate a Phase III randomized controlled trial evaluating a binary landmark endpoint, such as the Complete Response (CR) rate at 24 weeks. The trial consists of `N = 500` patients randomized 1:1, with an assumed true response probability of `40%` in the Control arm (`p_C = 0.40`) and `55%` in the active Treatment arm (`p_T = 0.55`). Below is the R implementation to simulate this cohort, fit the logistic regression model, and calculate the Odds Ratio.
+
+
+```{r logistic-reg}
+#| message: false
+#| warning: false
+library(dplyr)
+library(knitr)
+
+# Generate synthetic binary response data (e.g., Complete Response)
+set.seed(2)
+n_patients <- 500
+data_binary <- data.frame(
+  Treatment = c(rep("Control", n_patients/2), rep("Drug A", n_patients/2))
+) %>%
+  mutate(
+    # Control has ~40% CR rate; Drug A has ~55% CR rate
+    CR_prob = ifelse(Treatment == "Control", 0.40, 0.55),
+    CR_achieved = rbinom(n(), 1, CR_prob)
+  )
+
+# 1. Direct cross-tabulation
+table_cr <- table(data_binary$Treatment, data_binary$CR_achieved)
+colnames(table_cr) <- c("No CR", "CR")
+
+# 2. Fit Logistic Regression
+fit_logistic <- glm(CR_achieved ~ Treatment, data = data_binary, family = binomial)
+
+# 3. Extract log-odds and convert to Odds Ratio
+summary_coef <- summary(fit_logistic)$coefficients
+log_or <- summary_coef["TreatmentDrug A", "Estimate"]
+se_log_or <- summary_coef["TreatmentDrug A", "Std. Error"]
+
+or_est <- exp(log_or)
+or_ci_lower <- exp(log_or - 1.96 * se_log_or)
+or_ci_upper <- exp(log_or + 1.96 * se_log_or)
+
+true_or <- (0.55 / 0.45) / (0.40 / 0.60)
+true_log_or <- log(true_or)
+
+results_df <- data.frame(
+  Parameter = c("Log-Odds (Beta)", "Odds Ratio (OR)"),
+  `True Parameter` = c(round(true_log_or, 4), round(true_or, 3)),
+  Estimate = c(round(log_or, 4), round(or_est, 3)),
+  `Std. Error` = c(round(se_log_or, 4), "-"),
+  `95% CI` = c(
+    sprintf("%.4f to %.4f", log_or - 1.96 * se_log_or, log_or + 1.96 * se_log_or),
+    sprintf("%.3f to %.3f", or_ci_lower, or_ci_upper)
+  ),
+  check.names = FALSE
+)
+
+# 4. Display results as styled tables
+kable(table_cr, format = "html", table.attr = "class='table table-striped table-hover' style='width: 50%; margin-bottom: 20px;'", caption = "Complete Response (CR) Contingency Table")
+
+
+kable(results_df, format = "html", table.attr = "class='table table-striped table-hover' style='width: 70%;'", caption = "Logistic Regression Model Results")
+```
+
+## Hazard Ratio (HR): The Dynamic Instantaneous Velocity
+
+The Hazard Ratio is the standard relative metric for time-to-event outcomes, such as Overall Survival (OS) or Progression-Free Survival (PFS).
+
+The Cox Proportional Hazards (PH) framework is a semi-parametric regression model widely used in survival analysis to relate the survival time of patients to one or more predictor variables. By modeling the hazard rate as a function of covariates without specifying the functional form of the baseline hazard, it offers a flexible and robust way to estimate relative treatment effects.
+
+### The Proportional Hazards (PH) Assumption
+
+Under the Cox Proportional Hazards framework, the hazard for an individual with covariate vector $X$ is:
+$$h(t \mid X) = h_0(t) e^{\beta X}$$
+Where $h_0(t)$ is the baseline hazard function. The Hazard Ratio comparing treatment ($X=1$) to control ($X=0$) is:
+$$\text{HR}(t) = \frac{h(t \mid X=1)}{h(t \mid X=0)} = \frac{h_0(t) e^{\beta}}{h_0(t)} = e^{\beta}$$
+Since the baseline hazard $h_0(t)$ cancels out, the HR is assumed to be **constant over time**.
+
+### Compatibility of Parametric Distributions with PH
+
+In parametric survival analysis, only specific distributions are mathematically compatible with a constant Hazard Ratio:
+
+1. **Strictly PH-Compatible Distributions**:
+   - **Exponential Distribution**: Hazard rate $h(t) = \lambda$ is constant. The ratio is $\lambda_{\text{T}} / \lambda_{\text{C}}$, which is naturally constant.
+   - **Weibull Distribution**: Hazard rate $h(t) = \lambda \alpha t^{\alpha - 1}$. If we assume a shared shape parameter $\alpha$ between arms, the hazard ratio is $\lambda_{\text{T}} / \lambda_{\text{C}}$, which is constant.
+   - **Gompertz Distribution**: Hazard rate $h(t) = a e^{b t}$. If different arms share the growth rate $b$, the HR is $a_{\text{T}} / a_{\text{C}}$, which is constant.
+   - **Restricted Cubic Splines (on Log-Cumulative Hazard Scale / Royston-Parmar Model)**: These flexible parametric models use cubic splines (smooth polynomials joined at user-specified "knots") to model the log-cumulative hazard function. If all spline parameters (representing the shape of the baseline log-cumulative hazard) are shared across treatment arms, and the treatment effect is modeled as a simple additive constant on the log-cumulative hazard scale (shifting only the intercept), the model enforces a constant Hazard Ratio. This allows for highly flexible baseline hazard shapes (e.g., bathtub or peaked shapes) while strictly maintaining the Proportional Hazards assumption.
+
+2. **Non-PH Distributions (Accelerated Failure Time / AFT)**:
+   - **Log-Normal, Log-Logistic, and Generalized Gamma**: These assume that the treatment multiplies survival time (time acceleration/deceleration) rather than scaling the hazard. Under these distributions, the implied HR changes continuously over time, violating the Cox PH assumption.
+
+### R Implementation: Calculating HR via Cox Regression
+
+Here is how to calculate and interpret the Hazard Ratio in R using synthetic survival data.
+
+```{r cox-reg}
+#| message: false
+#| warning: false
+library(survival)
+library(knitr)
+
+# Generate synthetic survival data
+set.seed(18)
+n_patients <- 200
+data_survival <- data.frame(
+  Treatment = c(rep(0, n_patients/2), rep(1, n_patients/2)) # 0: Control, 1: Drug A
+) %>%
+  mutate(
+    # Generate Weibull-distributed survival times
+    # Control: shape = 1.2, scale = 0.04 (median OS ~ 24 months)
+    # Drug A: shape = 1.2, scale = 0.02 (median OS ~ 43 months; HR = 0.5)
+    true_scale = ifelse(Treatment == 0, 0.04, 0.02),
+    u = runif(n()),
+    time = (-log(u) / true_scale)^(1/1.2),
+    # Add random censoring before 60 months
+    censor_time = runif(n(), 10, 80),
+    observed_time = pmin(time, censor_time, 60),
+    event = ifelse(time <= observed_time, 1, 0)
+  )
+
+# Fit Cox Proportional Hazards Model
+fit_cox <- coxph(Surv(observed_time, event) ~ Treatment, data = data_survival)
+
+# Extract and convert coefficients
+summary_cox <- summary(fit_cox)
+log_hr <- summary_cox$coefficients["Treatment", "coef"]
+se_log_hr <- summary_cox$coefficients["Treatment", "se(coef)"]
+
+hr_est <- exp(log_hr)
+hr_ci_lower <- summary_cox$conf.int["Treatment", "lower .95"]
+hr_ci_upper <- summary_cox$conf.int["Treatment", "upper .95"]
+
+# True parameters: HR = 0.5, log(HR) = log(0.5) = -0.6931
+true_hr <- 0.5
+true_log_hr <- log(true_hr)
+
+# Display results as a styled table
+results_cox_df <- data.frame(
+  Parameter = c("Log-Hazard (Beta)", "Hazard Ratio (HR)"),
+  `True Parameter` = c(round(true_log_hr, 4), round(true_hr, 3)),
+  Estimate = c(round(log_hr, 4), round(hr_est, 3)),
+  `Std. Error` = c(round(se_log_hr, 4), "-"),
+  `95% CI` = c(
+    sprintf("%.4f to %.4f", log_hr - 1.96 * se_log_hr, log_hr + 1.96 * se_log_hr),
+    sprintf("%.3f to %.3f", hr_ci_lower, hr_ci_upper)
+  ),
+  check.names = FALSE
+)
+kable(results_cox_df, format = "html", table.attr = "class='table table-striped table-hover' style='width: 70%;'", caption = "Cox Proportional Hazards Model Results")
+```
+
+---
+
+## Methodological Note: Key Differences & HTA Misconceptions
+
+While both Odds Ratios (OR) and Hazard Ratios (HR) express relative treatment effects, they operate on different scales, represent different data structures, and are mathematically distinct.
+
+### Key Conceptual Differences
+
+1. **Static vs. Dynamic**: 
+   - **Odds Ratio (OR)** is a static, cross-sectional measure at a specific landmark time point (e.g., Complete Response rate at 24 weeks). It ignores when events occurred or the velocity of their occurrence during the study.
+   - **Hazard Ratio (HR)** is a dynamic, time-to-event measure that compares the instantaneous rate of event occurrence across the entire follow-up period.
+2. **Mathematical Definition**:
+   - `OR` represents the ratio of the odds of an event occurring (i.e., $p / (1 - p)$).
+   - `HR` represents the ratio of the instantaneous hazard rates (i.e., $h(t \mid X=1) / h(t \mid X=0)$).
+
+### Common HTA Modeling Pitfalls
+
+- **Avoid Direct Equivalency**: A common error in indirect treatment comparisons (ITCs) is treating an OR for a binary landmark survival endpoint (e.g., proportion of patients alive at 1 year) as a constant Hazard Ratio. Because the cumulative event rate changes over time, the relationship between the cumulative event OR and the underlying HR is non-linear and dynamic.
+- **Survivor Bias**: Applying an event-based OR (such as response or relapse rates) directly as a hazard multiplier in partitioned survival models or state transition models without accounting for baseline hazards introduces selection bias.
+- **Effect Magnification**: For common events (e.g., response rates around 50%), the OR is numerically more extreme (further from 1.0) than the Relative Risk (RR) or Hazard Ratio (HR), which can lead to overestimating treatment efficacy if misinterpreted.
+
+## Conclusion & Strategic Considerations
+
+When drafting or auditing HTA submissions, ensure statistical coherence by following these guidelines:
+
+- **Check scale consistency**: Ensure all Weibull or spline parameters derived from trial analysis match the model cycle length (e.g., converting annual scale parameters to monthly).
+- **Verify AFT distributions**: If using Log-Normal or Log-Logistic curves, do not report a single, constant HR in the submission text, as it varies by design.
+- **Avoid OR-to-HR conversions**: Never use a constant conversion multiplier to convert binary ORs into time-to-event HRs.
+- **Expose the ROI**: Clearly demonstrate to the appraisal committee whether the drug's value is driven by "entry" (Odds Ratio of response) or "durability" (Hazard Ratio of progression/relapse).
+
+---
+**Technical Library Node:** `04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.qmd`  
+**Methodological Alignment:** NICE Decision Support Unit (DSU) TSD 19 & 21.

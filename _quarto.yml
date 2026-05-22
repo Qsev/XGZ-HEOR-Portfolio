@@ -21,6 +21,7 @@ project:
     - 04_NMA/05_NMA_Technical_Prep/07_STC.qmd
     - 04_NMA/05_NMA_Technical_Prep/08_ML_NMR.qmd
     - 04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.qmd
+    - 04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.qmd
 
 website:
   title: "HEOR Technical Portfolio"
@@ -62,6 +63,8 @@ website:
             text: "ML-NMR"
           - href: 04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.qmd
             text: "Flexible Survival"
+          - href: 04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.qmd
+            text: "HR vs OR Intuition"
       - text: "Methodology Wiki"
         href: 00_HTA_LLM_Wiki/README.md
     right:
