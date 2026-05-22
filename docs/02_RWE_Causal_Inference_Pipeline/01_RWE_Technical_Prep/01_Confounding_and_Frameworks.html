@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Xiaoge Zhang, PhD">
+<meta name="dcterms.date" content="2026-05-22">
+
+<title>NICE RWE Framework &amp; Confounding by Indication – HEOR Technical Portfolio</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8c38fd85d21bfe44b50360969156fb14.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../custom.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">HEOR Technical Portfolio</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-flagship-audits" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Flagship Audits</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-flagship-audits">    
+        <li>
+    <a class="dropdown-item" href="../../05_TA975_CAR-T_Case/TA975_Mock_Case.html">
+ <span class="dropdown-text">NICE TA975 (CAR-T) Case</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.html">
+ <span class="dropdown-text">ML-NMR: AML Population Alignment</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.html">
+ <span class="dropdown-text">RWE ECA: R/R DLBCL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.html">
+ <span class="dropdown-text">PSM: Survival Extrapolation in RRMM</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-nma-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">NMA Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-nma-library">    
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.html">
+ <span class="dropdown-text">Bayesian Estimation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">
+ <span class="dropdown-text">Standard Bayesian NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.html">
+ <span class="dropdown-text">Network Meta-Regression</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.html">
+ <span class="dropdown-text">Survival NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/04_Component_NMA.html">
+ <span class="dropdown-text">Component NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.html">
+ <span class="dropdown-text">IPD NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/06_MAIC.html">
+ <span class="dropdown-text">MAIC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/07_STC.html">
+ <span class="dropdown-text">STC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/08_ML_NMR.html">
+ <span class="dropdown-text">ML-NMR</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.html">
+ <span class="dropdown-text">Flexible Survival</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.html">
+ <span class="dropdown-text">HR vs OR Intuition</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-rwe-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">RWE Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-rwe-library">    
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.html">
+ <span class="dropdown-text">NICE Framework &amp; Confounding</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../00_HTA_LLM_Wiki/README.html"> 
+<span class="menu-text">Methodology Wiki</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Qsev/XGZ-HEOR-Portfolio" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-confounding-by-indication-problem" id="toc-the-confounding-by-indication-problem" class="nav-link active" data-scroll-target="#the-confounding-by-indication-problem"><span class="header-section-number">1</span> The Confounding by Indication Problem</a></li>
+  <li><a href="#analytical-scenario-oncology-drug-x-vs.-standard-care" id="toc-analytical-scenario-oncology-drug-x-vs.-standard-care" class="nav-link" data-scroll-target="#analytical-scenario-oncology-drug-x-vs.-standard-care"><span class="header-section-number">2</span> Analytical Scenario: Oncology Drug X vs.&nbsp;Standard Care</a>
+  <ul class="collapse">
+  <li><a href="#baseline-cohort-description-table-n-100" id="toc-baseline-cohort-description-table-n-100" class="nav-link" data-scroll-target="#baseline-cohort-description-table-n-100"><span class="header-section-number">2.1</span> Baseline Cohort Description Table (N = 100)</a></li>
+  <li><a href="#the-naive-analysis-the-false-failure" id="toc-the-naive-analysis-the-false-failure" class="nav-link" data-scroll-target="#the-naive-analysis-the-false-failure"><span class="header-section-number">2.2</span> The Naive Analysis (The False Failure)</a></li>
+  </ul></li>
+  <li><a href="#baseline-audit-quantifying-imbalance" id="toc-baseline-audit-quantifying-imbalance" class="nav-link" data-scroll-target="#baseline-audit-quantifying-imbalance"><span class="header-section-number">3</span> Baseline Audit: Quantifying Imbalance</a>
+  <ul class="collapse">
+  <li><a href="#the-mathematical-derivation-of-smd" id="toc-the-mathematical-derivation-of-smd" class="nav-link" data-scroll-target="#the-mathematical-derivation-of-smd"><span class="header-section-number">3.1</span> The Mathematical Derivation of SMD</a></li>
+  <li><a href="#why-p-values-fail-as-balance-metrics" id="toc-why-p-values-fail-as-balance-metrics" class="nav-link" data-scroll-target="#why-p-values-fail-as-balance-metrics"><span class="header-section-number">3.2</span> Why P-Values Fail as Balance Metrics</a></li>
+  </ul></li>
+  <li><a href="#propensity-score-theory-estimation" id="toc-propensity-score-theory-estimation" class="nav-link" data-scroll-target="#propensity-score-theory-estimation"><span class="header-section-number">4</span> Propensity Score Theory &amp; Estimation</a>
+  <ul class="collapse">
+  <li><a href="#from-imbalance-to-causal-adjustment-the-role-of-propensity-scores" id="toc-from-imbalance-to-causal-adjustment-the-role-of-propensity-scores" class="nav-link" data-scroll-target="#from-imbalance-to-causal-adjustment-the-role-of-propensity-scores">From Imbalance to Causal Adjustment: The Role of Propensity Scores</a></li>
+  <li><a href="#the-logistic-propensity-model" id="toc-the-logistic-propensity-model" class="nav-link" data-scroll-target="#the-logistic-propensity-model"><span class="header-section-number">4.1</span> The Logistic Propensity Model</a></li>
+  </ul></li>
+  <li><a href="#propensity-score-matching-the-common-support-constraint" id="toc-propensity-score-matching-the-common-support-constraint" class="nav-link" data-scroll-target="#propensity-score-matching-the-common-support-constraint"><span class="header-section-number">5</span> Propensity Score Matching &amp; The Common Support Constraint</a>
+  <ul class="collapse">
+  <li><a href="#the-mechanics-of-propensity-score-matching-psm" id="toc-the-mechanics-of-propensity-score-matching-psm" class="nav-link" data-scroll-target="#the-mechanics-of-propensity-score-matching-psm">The Mechanics of Propensity Score Matching (PSM)</a></li>
+  <li><a href="#the-positivity-common-support-assumption" id="toc-the-positivity-common-support-assumption" class="nav-link" data-scroll-target="#the-positivity-common-support-assumption"><span class="header-section-number">5.1</span> The Positivity (Common Support) Assumption</a></li>
+  <li><a href="#post-matching-analysis-workflow-estimating-the-treatment-effect" id="toc-post-matching-analysis-workflow-estimating-the-treatment-effect" class="nav-link" data-scroll-target="#post-matching-analysis-workflow-estimating-the-treatment-effect">Post-Matching Analysis Workflow: Estimating the Treatment Effect</a></li>
+  </ul></li>
+  <li><a href="#r-implementation-quantitative-audit-modeling-pipeline" id="toc-r-implementation-quantitative-audit-modeling-pipeline" class="nav-link" data-scroll-target="#r-implementation-quantitative-audit-modeling-pipeline"><span class="header-section-number">6</span> R Implementation: Quantitative Audit &amp; Modeling Pipeline</a>
+  <ul class="collapse">
+  <li><a href="#step-1-initialize-cohort-and-baseline-balance-audit" id="toc-step-1-initialize-cohort-and-baseline-balance-audit" class="nav-link" data-scroll-target="#step-1-initialize-cohort-and-baseline-balance-audit"><span class="header-section-number">6.1</span> Step 1: Initialize Cohort and Baseline Balance Audit</a></li>
+  <li><a href="#step-2-propensity-score-estimation" id="toc-step-2-propensity-score-estimation" class="nav-link" data-scroll-target="#step-2-propensity-score-estimation"><span class="header-section-number">6.2</span> Step 2: Propensity Score Estimation</a></li>
+  <li><a href="#step-3-nearest-neighbor-matching-with-caliper-constraint" id="toc-step-3-nearest-neighbor-matching-with-caliper-constraint" class="nav-link" data-scroll-target="#step-3-nearest-neighbor-matching-with-caliper-constraint"><span class="header-section-number">6.3</span> Step 3: Nearest-Neighbor Matching with Caliper Constraint</a></li>
+  <li><a href="#step-4-post-match-balance-audit-causal-estimation" id="toc-step-4-post-match-balance-audit-causal-estimation" class="nav-link" data-scroll-target="#step-4-post-match-balance-audit-causal-estimation"><span class="header-section-number">6.4</span> Step 4: Post-Match Balance Audit &amp; Causal Estimation</a></li>
+  <li><a href="#step-5-visualize-propensity-score-overlap-common-support-verification" id="toc-step-5-visualize-propensity-score-overlap-common-support-verification" class="nav-link" data-scroll-target="#step-5-visualize-propensity-score-overlap-common-support-verification"><span class="header-section-number">6.5</span> Step 5: Visualize Propensity Score Overlap (Common Support Verification)</a></li>
+  <li><a href="#methodological-interpretation-of-the-r-output" id="toc-methodological-interpretation-of-the-r-output" class="nav-link" data-scroll-target="#methodological-interpretation-of-the-r-output"><span class="header-section-number">6.6</span> Methodological Interpretation of the R Output</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">NICE RWE Framework &amp; Confounding by Indication</h1>
+<p class="subtitle lead">Methodological Foundations &amp; Quantitative Auditing of Observational Data</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xiaoge Zhang, PhD </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 22, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>HTA Context: NICE Real-World Evidence Framework (2022)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The NICE RWE Framework outlines three core principles for generating high-quality RWE:</p>
+<ol type="1">
+<li><strong>Data Suitability</strong>: Ensuring data provenance, quality, and relevance (using tools like DataSAT).</li>
+<li><strong>Study Transparency</strong>: Pre-registering study protocols, publishing analytical code, and outlining patient attrition flow.</li>
+<li><strong>Methodological Rigor</strong>: Utilizing analytical designs that minimize risk of bias (e.g., active comparators, new-user designs) and thoroughly characterizing unmeasured confounding (e.g., via E-value sensitivity analysis).</li>
+</ol>
+</div>
+</div>
+<section id="the-confounding-by-indication-problem" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="the-confounding-by-indication-problem"><span class="header-section-number">1</span> The Confounding by Indication Problem</h2>
+<p>In clinical practice, treatment allocation is not randomized. Physicians prescribe therapies based on clinical need, prognosis, and patient severity. When a new, highly effective, or last-line therapy is introduced, it is systematically reserved for the <strong>sickest, oldest, and most fragile patients</strong>.</p>
+<p>This treatment assignment mechanism creates <strong>Confounding by Indication</strong> (or Indication Bias):</p>
+<ul>
+<li>The treatment group (<span class="math inline">\(D = 1\)</span>) is pre-selected to have a worse prognosis at baseline.</li>
+<li>The comparator group (<span class="math inline">\(D = 0\)</span>) is pre-selected to have a better prognosis.</li>
+<li>Consequently, a naive comparison of raw outcomes will show the new drug underperforming (a “False Failure”), even if it is clinically superior.</li>
+</ul>
+</section>
+<section id="analytical-scenario-oncology-drug-x-vs.-standard-care" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="analytical-scenario-oncology-drug-x-vs.-standard-care"><span class="header-section-number">2</span> Analytical Scenario: Oncology Drug X vs.&nbsp;Standard Care</h2>
+<p>To illustrate, consider a retrospective cohort study evaluating a new high-cost oncology Drug X (<span class="math inline">\(D = 1\)</span>) against the historical Standard of Care (<span class="math inline">\(D = 0\)</span>).</p>
+<ul>
+<li><strong>Confounders (<span class="math inline">\(X\)</span>):</strong>
+<ol type="1">
+<li><strong>Age</strong> (continuous variable; older age increases hazard of death).</li>
+<li><strong>ECOG Performance Status</strong> (categorical score: 0 = fully active, 3 = bedridden; higher score indicates sicker patient).</li>
+</ol></li>
+<li><strong>Outcome (<span class="math inline">\(Y\)</span>):</strong> Survival time (months).</li>
+</ul>
+<section id="baseline-cohort-description-table-n-100" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="baseline-cohort-description-table-n-100"><span class="header-section-number">2.1</span> Baseline Cohort Description Table (N = 100)</h3>
+<p>The cohort of 100 patients is simulated in R using a fixed seed to ensure reproducibility. The following code chunk initializes the baseline demographic and clinical characteristics, along with the survival times:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set seed for reproducibility</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">46</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate confounders</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">65</span>, <span class="at">sd =</span> <span class="dv">8</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>ecog <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">prob =</span> <span class="fl">0.4</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Propensity score model with selection bias</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>logit_ps <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">7.5</span> <span class="sc">+</span> <span class="fl">0.08</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">1.2</span> <span class="sc">*</span> ecog</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ps <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span>logit_ps))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> ps)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Outcome model (Survival time in months)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>survival <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">42</span> <span class="sc">+</span> <span class="fl">5.0</span> <span class="sc">*</span> treatment <span class="sc">-</span> <span class="fl">0.45</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">6.0</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">1.5</span>))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>survival[survival <span class="sc">&lt;</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>cohort <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">patient_id =</span> <span class="dv">1</span><span class="sc">:</span>n,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">age        =</span> age,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">ecog       =</span> ecog,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment  =</span> treatment,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">survival   =</span> survival</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Instead of displaying all 100 individual patient records, the baseline demographic and clinical characteristics of the cohort are summarized below. This table represents the starting raw dataset generated for this causal analysis:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate counts</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n_treated <span class="ot">&lt;-</span> <span class="fu">sum</span>(cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n_control <span class="ot">&lt;-</span> <span class="fu">sum</span>(cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate age stats</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>mean_age_treated <span class="ot">&lt;-</span> <span class="fu">mean</span>(cohort<span class="sc">$</span>age[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>sd_age_treated <span class="ot">&lt;-</span> <span class="fu">sd</span>(cohort<span class="sc">$</span>age[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>mean_age_control <span class="ot">&lt;-</span> <span class="fu">mean</span>(cohort<span class="sc">$</span>age[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>sd_age_control <span class="ot">&lt;-</span> <span class="fu">sd</span>(cohort<span class="sc">$</span>age[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate ECOG stats</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>mean_ecog_treated <span class="ot">&lt;-</span> <span class="fu">mean</span>(cohort<span class="sc">$</span>ecog[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>sd_ecog_treated <span class="ot">&lt;-</span> <span class="fu">sd</span>(cohort<span class="sc">$</span>ecog[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>mean_ecog_control <span class="ot">&lt;-</span> <span class="fu">mean</span>(cohort<span class="sc">$</span>ecog[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>sd_ecog_control <span class="ot">&lt;-</span> <span class="fu">sd</span>(cohort<span class="sc">$</span>ecog[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate survival outcome stats</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>mean_survival_treated <span class="ot">&lt;-</span> <span class="fu">mean</span>(cohort<span class="sc">$</span>survival[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>sd_survival_treated <span class="ot">&lt;-</span> <span class="fu">sd</span>(cohort<span class="sc">$</span>survival[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>mean_survival_control <span class="ot">&lt;-</span> <span class="fu">mean</span>(cohort<span class="sc">$</span>survival[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>sd_survival_control <span class="ot">&lt;-</span> <span class="fu">sd</span>(cohort<span class="sc">$</span>survival[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Create baseline summary table</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>baseline_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(<span class="st">"Sample Size (N)"</span>, <span class="st">"Age (Years), Mean (SD)"</span>, <span class="st">"ECOG Score, Mean (SD)"</span>, <span class="st">"Survival Time (Months), Mean (SD)"</span>),</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">Treated =</span> <span class="fu">c</span>(</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d"</span>, n_treated),</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f)"</span>, mean_age_treated, sd_age_treated),</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f)"</span>, mean_ecog_treated, sd_ecog_treated),</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f)"</span>, mean_survival_treated, sd_survival_treated)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">Control =</span> <span class="fu">c</span>(</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d"</span>, n_control),</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f)"</span>, mean_age_control, sd_age_control),</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f)"</span>, mean_ecog_control, sd_ecog_control),</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f)"</span>, mean_survival_control, sd_survival_control)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(baseline_summary, <span class="at">caption =</span> <span class="st">"Baseline Cohort Description Table (N = 100)"</span>,</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Characteristic / Metric"</span>, <span class="st">"Treated (Drug X)"</span>, <span class="st">"Standard Care (Control)"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Baseline Cohort Description Table (N = 100)</caption>
+<colgroup>
+<col style="width: 45%">
+<col style="width: 22%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Characteristic / Metric</th>
+<th style="text-align: left;">Treated (Drug X)</th>
+<th style="text-align: left;">Standard Care (Control)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Sample Size (N)</td>
+<td style="text-align: left;">42</td>
+<td style="text-align: left;">58</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Age (Years), Mean (SD)</td>
+<td style="text-align: left;">67.00 (8.51)</td>
+<td style="text-align: left;">63.69 (6.82)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ECOG Score, Mean (SD)</td>
+<td style="text-align: left;">1.88 (0.77)</td>
+<td style="text-align: left;">0.88 (0.77)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Survival Time (Months), Mean (SD)</td>
+<td style="text-align: left;">5.95 (4.98)</td>
+<td style="text-align: left;">8.50 (4.85)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="the-naive-analysis-the-false-failure" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="the-naive-analysis-the-false-failure"><span class="header-section-number">2.2</span> The Naive Analysis (The False Failure)</h3>
+<p>Calculating the simple arithmetic mean survival for both groups:</p>
+<p><span class="math display">\[\mu_1 = \text{Mean survival of Drug X group}\]</span> <span class="math display">\[\mu_0 = \text{Mean survival of Standard Care group}\]</span></p>
+<p>In our generated cohort of 100 patients, the naive mean survivals are computed as:</p>
+<ul>
+<li><strong>Treated (Drug X)</strong>: <span class="math inline">\(\mu_1 = 5.95 \text{ Months}\)</span></li>
+<li><strong>Standard Care (Control)</strong>: <span class="math inline">\(\mu_0 = 8.5 \text{ Months}\)</span></li>
+</ul>
+<p><span class="math display">\[\text{Naive Difference} = \mu_1 - \mu_0 = 5.95 - 8.5 = -2.55 \text{ Months}\]</span></p>
+<p>The crude analysis incorrectly concludes that Drug X reduces survival by <strong>2.55 months</strong>. A HTA submission based on this raw comparison would result in immediate rejection.</p>
+</section>
+</section>
+<section id="baseline-audit-quantifying-imbalance" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="baseline-audit-quantifying-imbalance"><span class="header-section-number">3</span> Baseline Audit: Quantifying Imbalance</h2>
+<p>The naive analysis is highly misleading because it assumes the treatment and control cohorts are comparable at baseline. To determine whether a naive comparison is valid, we must measure the distance between the covariate distributions of the two groups.</p>
+<p>This is achieved using the <strong>Standardized Mean Difference (SMD)</strong>. The SMD quantifies the magnitude of difference between two groups on a standardized scale, which directly reflects the degree of overlap between their distributions.</p>
+<p>When the SMD is small, the two groups have substantial overlap and are comparable. However, when the SMD is large (typically exceeding the standard threshold of 0.1), the distributions diverge significantly. A large SMD indicates that the baseline imbalance is severe enough to invalidate any naive comparison, rendering the crude analysis biased and making causal adjustment (e.g., matching or weighting) mandatory.</p>
+<section id="the-mathematical-derivation-of-smd" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="the-mathematical-derivation-of-smd"><span class="header-section-number">3.1</span> The Mathematical Derivation of SMD</h3>
+<p>For a continuous or binary covariate, the SMD is the difference in means scaled by the pooled standard deviation within the groups. The pooled standard deviation <span class="math inline">\(s_{\text{pooled}}\)</span> integrates the within-group variation from both cohorts, preventing treatment-related differences in means from inflating the scale factor. To calculate <span class="math inline">\(s_{\text{pooled}}\)</span>, we evaluate the group-specific sample variances <span class="math inline">\(s_g^2\)</span> (for <span class="math inline">\(g \in \{0, 1\}\)</span>).</p>
+<p><span class="math display">\[SMD = \frac{|\bar{X}_{1} - \bar{X}_{0}|}{s_{\text{pooled}}}, \qquad s_{\text{pooled}} = \sqrt{\frac{s_1^2 + s_0^2}{2}}, \qquad s_g^2 = \frac{\sum_{i \in g} (X_i - \bar{X}_g)^2}{n_g - 1} \]</span></p>
+<p>Each <span class="math inline">\(s_g^2\)</span> represents the unbiased sample variance of the covariate within treatment group <span class="math inline">\(g\)</span>, reflecting the spread of characteristics around the respective group mean <span class="math inline">\(\bar{X}_g\)</span>. Here, <span class="math inline">\(s_1^2\)</span> and <span class="math inline">\(s_0^2\)</span> are the group-specific variances computed for the treated (<span class="math inline">\(g = 1\)</span>) and control (<span class="math inline">\(g = 0\)</span>) groups, respectively. This ensures the baseline variability is evaluated within each group separately before pooling.</p>
+<section id="industry-balance-benchmarks" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="industry-balance-benchmarks">Industry Balance Benchmarks</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">SMD Value</th>
+<th style="text-align: left;">Balance Status</th>
+<th style="text-align: left;">HTA Implications</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">SMD &lt; 0.1</td>
+<td style="text-align: left;">Group Balance Achieved</td>
+<td style="text-align: left;">Highly comparable cohorts; standard threshold accepted by NICE/HTA guidelines.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0.1 <span class="math inline">\(\le\)</span> SMD &lt; 0.2</td>
+<td style="text-align: left;">Marginal Imbalance</td>
+<td style="text-align: left;">Minor baseline discrepancy; potential for residual confounding.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SMD <span class="math inline">\(\ge\)</span> 0.2</td>
+<td style="text-align: left;">Severe Imbalance</td>
+<td style="text-align: left;">Covariates are significantly unbalanced; adjustment via matching, weighting, or regression is mandatory.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="why-p-values-fail-as-balance-metrics" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="why-p-values-fail-as-balance-metrics"><span class="header-section-number">3.2</span> Why P-Values Fail as Balance Metrics</h3>
+<p>A common error in retrospective studies is conducting hypothesis tests (e.g., two-sample <span class="math inline">\(t\)</span>-tests for continuous covariates like Age, or chi-squared tests for categorical covariates like ECOG) on each baseline covariate between the treatment and control groups before adjustment, using the resulting <span class="math inline">\(p\)</span>-value to assess whether the cohorts have sufficient distribution overlap (balance).</p>
+<p>HTA guidelines (NICE, FDA, ISPOR) reject this practice because using <span class="math inline">\(p\)</span>-values to evaluate baseline overlap is conceptually and mathematically incorrect:</p>
+<ol type="1">
+<li><strong>Logical Redundancy (Incorrect Null Hypothesis)</strong>: A hypothesis test evaluates whether the two samples are randomly drawn from a single shared parent population. In observational data, treatment assignment is systematically non-random (due to confounding by indication). Since we already know the cohorts do not come from the same population, testing this null hypothesis is logically redundant.</li>
+<li><strong>Failure to Measure Overlap (Sample Size Dependency)</strong>: A <span class="math inline">\(p\)</span>-value does not measure the magnitude of distribution overlap or similarity between the groups; it is heavily determined by sample size (<span class="math inline">\(N\)</span>). In large electronic health records (<span class="math inline">\(N &gt; 10,000\)</span>), even if the overlap is nearly perfect and the difference is clinically negligible, the <span class="math inline">\(p\)</span>-value will be highly significant (<span class="math inline">\(p &lt; 0.05\)</span>). Conversely, in small cohorts (e.g., <span class="math inline">\(N = 10\)</span>), even if the cohorts have zero overlap, the <span class="math inline">\(p\)</span>-value can easily be non-significant (<span class="math inline">\(p &gt; 0.05\)</span>), failing to detect severe imbalance.</li>
+<li><strong>Lack of Standardized Scale</strong>: Unlike <span class="math inline">\(p\)</span>-values, the Standardized Mean Difference (SMD) is sample-size invariant. It directly measures the distance between distributions in standard deviation units, allowing direct comparison of balance across covariates of different units and scales (e.g., Age in years versus ECOG scores).</li>
+</ol>
+</section>
+</section>
+<section id="propensity-score-theory-estimation" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="propensity-score-theory-estimation"><span class="header-section-number">4</span> Propensity Score Theory &amp; Estimation</h2>
+<section id="from-imbalance-to-causal-adjustment-the-role-of-propensity-scores" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="from-imbalance-to-causal-adjustment-the-role-of-propensity-scores">From Imbalance to Causal Adjustment: The Role of Propensity Scores</h3>
+<p>The baseline audit using SMDs reveals a fundamental challenge: our treatment and control cohorts are highly unbalanced (e.g., older, sicker patients are systematically channeled into the Drug X group). To resolve this sample imbalance, we must reconstruct a balanced clinical scenario where the treatment and control groups have comparable baseline characteristics—mimicking the balance achieved in a randomized controlled trial (RCT).</p>
+<p>To achieve this group comparability, we must adjust for the confounding covariates (Age and ECOG). Why do we need the <strong>Propensity Score</strong> as the tool to achieve this balance, rather than simply matching patients directly on their covariates?</p>
+<ol type="1">
+<li><strong>The Curse of Dimensionality in Multi-Dimensional Balance</strong>: In real-world HEOR studies, we typically control for dozens of baseline confounders (e.g., demographics, comorbidities, clinical markers, and prior therapies). If we attempt to find matches with the exact same combination of all baseline covariates (Exact Matching), the probability of finding a match drops to near zero as the number of covariates increases. This results in the exclusion of most patients, severely reducing sample size and statistical power.</li>
+<li><strong>Propensity Score as a Dimensionality Reduction Tool</strong>: Rosenbaum and Rubin (1983) proved that the propensity score—the conditional probability of receiving treatment given baseline covariates, <span class="math inline">\(e(X) = P(D = 1 \mid X)\)</span>—is a <em>balancing score</em>. Conditionally on the propensity score, the distribution of all baseline covariates is mathematically guaranteed to be independent of treatment assignment.</li>
+</ol>
+<p>By matching or weighting on this single, one-dimensional score, we collapse the high-dimensional covariate imbalance into a single dimension. This ensures that the multi-dimensional covariate distributions are balanced between groups without suffering from the severe sample attrition associated with exact matching.</p>
+</section>
+<section id="the-logistic-propensity-model" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="the-logistic-propensity-model"><span class="header-section-number">4.1</span> The Logistic Propensity Model</h3>
+<p>The propensity score is the conditional probability of receiving treatment given baseline covariates: <span class="math inline">\(e(X) = P(D = 1 \mid X)\)</span>. We estimate this probability using a logistic regression model:</p>
+<p><span class="math display">\[\ln\left(\frac{e(X)}{1 - e(X)}\right) = \beta_0 + \beta_1 \cdot \text{Age} + \beta_2 \cdot \text{ECOG}\]</span></p>
+<p>A patient with a high score (e.g., <span class="math inline">\(e(X) = 0.95\)</span>) has characteristics that make them highly likely to receive the new drug under clinical practice guidelines.</p>
+</section>
+</section>
+<section id="propensity-score-matching-the-common-support-constraint" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="propensity-score-matching-the-common-support-constraint"><span class="header-section-number">5</span> Propensity Score Matching &amp; The Common Support Constraint</h2>
+<section id="the-mechanics-of-propensity-score-matching-psm" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="the-mechanics-of-propensity-score-matching-psm">The Mechanics of Propensity Score Matching (PSM)</h3>
+<p>Once we have estimated a propensity score for every patient, we use these scores to pair treated patients with control patients. The goal is to construct a matched sample where the distribution of propensity scores—and thus the distribution of all baseline covariates—is identical between the groups. Under normal conditions (where the distributions overlap), matching is executed using specific algorithmic parameters:</p>
+<ol type="1">
+<li><strong>Nearest Neighbor (NN) Matching</strong>: The most common algorithm. For each treated patient, the algorithm searches the control pool and selects the patient whose propensity score is closest.</li>
+<li><strong>Caliper Width Constraint</strong>: Simply matching the “nearest” neighbor can result in poor matches if the closest control is still very different. To prevent this, we enforce a <strong>caliper</strong>—a maximum allowable difference between matched propensity scores. A standard industry recommendation (Rosenbaum and Rubin, 1985) is to use a caliper of <strong>0.2 times the standard deviation of the logit of the propensity score</strong>: <span class="math display">\[\text{Caliper} = 0.2 \times \sigma_{\text{logit}(e(X))}\]</span> If a treated patient has no control patient within this caliper distance, they remain unmatched and are excluded from the final cohort.</li>
+<li><strong>Matching Ratios (1:1 vs.&nbsp;1:k)</strong>:
+<ul>
+<li><strong>1:1 Matching</strong>: Each treated patient is matched to exactly one control. This minimizes bias because matches are highly similar, but discards data and reduces statistical power.</li>
+<li><strong>1:k Matching</strong>: Each treated patient is matched to <span class="math inline">\(k\)</span> controls (e.g., 1:2 or 1:3). This increases sample size and statistical power but can introduce bias as less-optimal matches are accepted.</li>
+</ul></li>
+<li><strong>Replacement Options</strong>:
+<ul>
+<li><strong>Without Replacement</strong>: Once a control patient is matched, they are removed from the pool and cannot be matched again. This is order-dependent but ensures independent observations, making downstream variance and survival calculations straightforward.</li>
+<li><strong>With Replacement</strong>: A control patient can be matched to multiple treated patients. This reduces bias (controls are always matched to their closest matches) but increases variance and requires complex weighting in downstream analyses.</li>
+</ul></li>
+</ol>
+</section>
+<section id="the-positivity-common-support-assumption" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="the-positivity-common-support-assumption"><span class="header-section-number">5.1</span> The Positivity (Common Support) Assumption</h3>
+<p>For matching to be methodologically valid, we must satisfy the <strong>Positivity Assumption</strong> (also known as the <strong>Common Support Constraint</strong>). This assumption dictates that every patient in the population must have a non-zero probability of receiving either treatment:</p>
+<p><span class="math display">\[0 &lt; P(D = 1 \mid X) &lt; 1\]</span></p>
+<p>Graphically, this means that the distribution of propensity scores for the treated and control cohorts must share a region of <strong>overlap (common support)</strong>. If there is no overlap for a certain range of propensity scores, it means patients in that range can only receive one treatment but not the other under clinical practice, making comparison impossible.</p>
+<p>When the positivity assumption is violated (i.e., there is a lack of common support), matching fails because we cannot find comparable individuals. In real-world HTA audits, a lack of common support is handled as follows:</p>
+<ul>
+<li><strong>Partial Lack of Overlap</strong>: Resolved by <strong>Trimming</strong> (excluding patients whose propensity scores lie outside the overlap region). <em>HTA Caveat</em>: Trimming changes the target population and limits the generalizability (external validity) of the findings, which must be explicitly declared and justified in HTA submissions.</li>
+<li><strong>Complete Separation (Zero Overlap)</strong>: The treatment effect is <strong>mathematically unestimable</strong> because the covariate distributions of the treated and control cohorts do not overlap at all. In this scenario, researchers must source a more comparable control arm (e.g., from another database), broaden the study eligibility criteria, or pivot to a single-arm evaluation compared against natural history data.</li>
+</ul>
+</section>
+<section id="post-matching-analysis-workflow-estimating-the-treatment-effect" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="post-matching-analysis-workflow-estimating-the-treatment-effect">Post-Matching Analysis Workflow: Estimating the Treatment Effect</h3>
+<p>Once the matching process successfully pairs treated and control patients, the analysis enters the downstream estimation phase. The workflow consists of three mandatory steps to ensure methodological validity:</p>
+<ol type="1">
+<li><strong>Re-Audit Covariate Balance</strong>: We calculate the Standardized Mean Difference (SMD) for all covariates in the matched cohort. If all SMDs are successfully reduced below the 0.1 threshold, the baseline imbalance is resolved, and we can proceed to outcome analysis.</li>
+<li><strong>Estimate the Target Causal Effect (ATT)</strong>: Because we matched control patients to our treated cohort, the target estimand is the <strong>Average Treatment Effect on the Treated (ATT)</strong>. We estimate this by directly comparing the outcomes of the matched groups:
+<ul>
+<li><strong>For continuous outcomes</strong>: The difference in means between the matched treated and matched control groups (e.g., mean survival difference).</li>
+<li><strong>For time-to-event outcomes (HTA standard)</strong>: Plotting matched Kaplan-Meier curves and fitting a Cox Proportional Hazards model on the matched cohort to obtain the Hazard Ratio (HR).</li>
+</ul></li>
+<li><strong>Adjust Statistical Inference for Matching</strong>: Matching introduces statistical dependence between the paired individuals. Therefore, standard errors, p-values, and confidence intervals must be adjusted to account for this clustering (e.g., using robust standard errors clustered on the matched pairs, or stratification in the survival model).</li>
+</ol>
+</section>
+</section>
+<section id="r-implementation-quantitative-audit-modeling-pipeline" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="r-implementation-quantitative-audit-modeling-pipeline"><span class="header-section-number">6</span> R Implementation: Quantitative Audit &amp; Modeling Pipeline</h2>
+<p>The following R code constructs our overlapping observational cohort (N = 100), manually calculates the baseline SMDs to audit covariate imbalance, estimates propensity scores using logistic regression, implements a manual nearest-neighbor matching algorithm with a caliper constraint, and estimates the causal treatment effect.</p>
+<section id="step-1-initialize-cohort-and-baseline-balance-audit" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="step-1-initialize-cohort-and-baseline-balance-audit"><span class="header-section-number">6.1</span> Step 1: Initialize Cohort and Baseline Balance Audit</h3>
+<p>First, we set up the cohort and calculate the Standardized Mean Difference (SMD) for both covariates (age and ecog) to quantify baseline imbalance.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Define Manual SMD Function</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>calculate_smd <span class="ot">&lt;-</span> <span class="cf">function</span>(data, variable_name, treatment_col) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  x1 <span class="ot">&lt;-</span> data[data[[treatment_col]] <span class="sc">==</span> <span class="dv">1</span>, variable_name]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  x0 <span class="ot">&lt;-</span> data[data[[treatment_col]] <span class="sc">==</span> <span class="dv">0</span>, variable_name]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  mean1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(x1); mean0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(x0)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  var1  <span class="ot">&lt;-</span> <span class="fu">var</span>(x1);  var0  <span class="ot">&lt;-</span> <span class="fu">var</span>(x0)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  s_pooled <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((var1 <span class="sc">+</span> var0) <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  smd <span class="ot">&lt;-</span> <span class="fu">abs</span>(mean1 <span class="sc">-</span> mean0) <span class="sc">/</span> s_pooled</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(<span class="at">mean_treated =</span> mean1, <span class="at">mean_control =</span> mean0, <span class="at">smd =</span> smd))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Calculate Baseline SMDs</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>age_audit  <span class="ot">&lt;-</span> <span class="fu">calculate_smd</span>(cohort, <span class="st">"age"</span>, <span class="st">"treatment"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>ecog_audit <span class="ot">&lt;-</span> <span class="fu">calculate_smd</span>(cohort, <span class="st">"ecog"</span>, <span class="st">"treatment"</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>balance_baseline <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">Covariate =</span> <span class="fu">c</span>(<span class="st">"Age"</span>, <span class="st">"ECOG"</span>),</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">Treated_Mean =</span> <span class="fu">c</span>(age_audit[<span class="st">"mean_treated"</span>], ecog_audit[<span class="st">"mean_treated"</span>]),</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">Control_Mean =</span> <span class="fu">c</span>(age_audit[<span class="st">"mean_control"</span>], ecog_audit[<span class="st">"mean_control"</span>]),</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">SMD =</span> <span class="fu">c</span>(age_audit[<span class="st">"smd"</span>], ecog_audit[<span class="st">"smd"</span>])</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Format Output Table</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(balance_baseline, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Baseline Covariate Balance (Before Matching)"</span>, </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Covariate"</span>, <span class="st">"Treated Mean"</span>, <span class="st">"Control Mean"</span>, <span class="st">"SMD"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Baseline Covariate Balance (Before Matching)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Covariate</th>
+<th style="text-align: right;">Treated Mean</th>
+<th style="text-align: right;">Control Mean</th>
+<th style="text-align: right;">SMD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Age</td>
+<td style="text-align: right;">67.000</td>
+<td style="text-align: right;">63.690</td>
+<td style="text-align: right;">0.429</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ECOG</td>
+<td style="text-align: right;">1.881</td>
+<td style="text-align: right;">0.879</td>
+<td style="text-align: right;">1.296</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="step-2-propensity-score-estimation" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="step-2-propensity-score-estimation"><span class="header-section-number">6.2</span> Step 2: Propensity Score Estimation</h3>
+<p>We fit a logistic regression model predicting treatment assignment (D) based on Age and ECOG performance status. The predicted probabilities are our estimated propensity scores.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Fit Propensity Score Model</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>logit_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> cohort, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>cohort<span class="sc">$</span>propensity_score <span class="ot">&lt;-</span> <span class="fu">predict</span>(logit_model, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>cohort<span class="sc">$</span>logit_ps <span class="ot">&lt;-</span> <span class="fu">predict</span>(logit_model, <span class="at">type =</span> <span class="st">"link"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Display first 5 rows for clarity and conciseness</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(cohort[, <span class="fu">c</span>(<span class="st">"patient_id"</span>, <span class="st">"treatment"</span>, <span class="st">"age"</span>, <span class="st">"ecog"</span>, <span class="st">"survival"</span>, <span class="st">"propensity_score"</span>, <span class="st">"logit_ps"</span>)], <span class="dv">5</span>), </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Estimated Propensity Scores and Logits (First 5 Patients Shown)"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Patient ID"</span>, <span class="st">"Treatment (D)"</span>, <span class="st">"Age"</span>, <span class="st">"ECOG"</span>, <span class="st">"Survival Months"</span>, <span class="st">"Propensity Score"</span>, <span class="st">"Logit PS"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Estimated Propensity Scores and Logits (First 5 Patients Shown)</caption>
+<colgroup>
+<col style="width: 14%">
+<col style="width: 18%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 21%">
+<col style="width: 22%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Patient ID</th>
+<th style="text-align: right;">Treatment (D)</th>
+<th style="text-align: right;">Age</th>
+<th style="text-align: right;">ECOG</th>
+<th style="text-align: right;">Survival Months</th>
+<th style="text-align: right;">Propensity Score</th>
+<th style="text-align: right;">Logit PS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">0.048</td>
+<td style="text-align: right;">-2.989</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.687</td>
+<td style="text-align: right;">0.786</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.864</td>
+<td style="text-align: right;">1.852</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.430</td>
+<td style="text-align: right;">-0.280</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.777</td>
+<td style="text-align: right;">1.246</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="step-3-nearest-neighbor-matching-with-caliper-constraint" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="step-3-nearest-neighbor-matching-with-caliper-constraint"><span class="header-section-number">6.3</span> Step 3: Nearest-Neighbor Matching with Caliper Constraint</h3>
+<p>We implement a manual nearest-neighbor matching algorithm. We match treated patients to available controls on the logit of the propensity score, applying a caliper constraint of 0.2 times the standard deviation of logit(e(X)).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Set Caliper Width (0.2 * SD of Logit PS)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sd_logit <span class="ot">&lt;-</span> <span class="fu">sd</span>(cohort<span class="sc">$</span>logit_ps)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>caliper_width <span class="ot">&lt;-</span> <span class="fl">0.2</span> <span class="sc">*</span> sd_logit</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Extract Subsets</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>treated <span class="ot">&lt;-</span> cohort[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>, ]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>controls <span class="ot">&lt;-</span> cohort[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>, ]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort treated by propensity score descending (greedy matching order)</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>treated_sorted <span class="ot">&lt;-</span> treated[<span class="fu">order</span>(<span class="sc">-</span>treated<span class="sc">$</span>logit_ps), ]</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>available_controls <span class="ot">&lt;-</span> controls</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>matched_pairs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(treated_sorted)) {</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  tr <span class="ot">&lt;-</span> treated_sorted[i, ]</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(available_controls) <span class="sc">==</span> <span class="dv">0</span>) <span class="cf">break</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate absolute distances on logit PS scale</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  distances <span class="ot">&lt;-</span> <span class="fu">abs</span>(available_controls<span class="sc">$</span>logit_ps <span class="sc">-</span> tr<span class="sc">$</span>logit_ps)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  best_match_idx <span class="ot">&lt;-</span> <span class="fu">which.min</span>(distances)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  min_dist <span class="ot">&lt;-</span> distances[best_match_idx]</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Enforce caliper constraint</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (min_dist <span class="sc">&lt;=</span> caliper_width) {</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    matched_pairs <span class="ot">&lt;-</span> <span class="fu">rbind</span>(matched_pairs, <span class="fu">data.frame</span>(</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">pair_id =</span> <span class="fu">nrow</span>(matched_pairs) <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">treated_id =</span> tr<span class="sc">$</span>patient_id,</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">control_id =</span> available_controls<span class="sc">$</span>patient_id[best_match_idx],</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">treated_ps =</span> tr<span class="sc">$</span>propensity_score,</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">control_ps =</span> available_controls<span class="sc">$</span>propensity_score[best_match_idx],</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">logit_diff =</span> min_dist</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove matched control from the pool (without replacement)</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    available_controls <span class="ot">&lt;-</span> available_controls[<span class="sc">-</span>best_match_idx, ]</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Display first 5 matched pairs for clarity and conciseness</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(matched_pairs, <span class="dv">5</span>), <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Matched Pairs (Caliper Constraint Applied, First 5 Pairs Shown)"</span>,</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Pair ID"</span>, <span class="st">"Treated Patient ID"</span>, <span class="st">"Control Patient ID"</span>, <span class="st">"Treated PS"</span>, <span class="st">"Control PS"</span>, <span class="st">"Logit PS Diff"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Matched Pairs (Caliper Constraint Applied, First 5 Pairs Shown)</caption>
+<colgroup>
+<col style="width: 9%">
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Pair ID</th>
+<th style="text-align: right;">Treated Patient ID</th>
+<th style="text-align: right;">Control Patient ID</th>
+<th style="text-align: right;">Treated PS</th>
+<th style="text-align: right;">Control PS</th>
+<th style="text-align: right;">Logit PS Diff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">0.886</td>
+<td style="text-align: right;">0.886</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">0.819</td>
+<td style="text-align: right;">0.799</td>
+<td style="text-align: right;">0.131</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">0.777</td>
+<td style="text-align: right;">0.741</td>
+<td style="text-align: right;">0.197</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">93</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">0.753</td>
+<td style="text-align: right;">0.728</td>
+<td style="text-align: right;">0.131</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">0.741</td>
+<td style="text-align: right;">0.728</td>
+<td style="text-align: right;">0.066</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="step-4-post-match-balance-audit-causal-estimation" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="step-4-post-match-balance-audit-causal-estimation"><span class="header-section-number">6.4</span> Step 4: Post-Match Balance Audit &amp; Causal Estimation</h3>
+<p>We compile the matched sample, re-audit the covariate balance, and calculate the causal treatment effect (mean survival difference) on the matched cohort.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Compile Matched Cohort</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>matched_treated_data <span class="ot">&lt;-</span> cohort[cohort<span class="sc">$</span>patient_id <span class="sc">%in%</span> matched_pairs<span class="sc">$</span>treated_id, ]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>matched_control_data <span class="ot">&lt;-</span> cohort[cohort<span class="sc">$</span>patient_id <span class="sc">%in%</span> matched_pairs<span class="sc">$</span>control_id, ]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>matched_cohort <span class="ot">&lt;-</span> <span class="fu">rbind</span>(matched_treated_data, matched_control_data)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Re-Audit Covariate Balance</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>age_matched_audit  <span class="ot">&lt;-</span> <span class="fu">calculate_smd</span>(matched_cohort, <span class="st">"age"</span>, <span class="st">"treatment"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>ecog_matched_audit <span class="ot">&lt;-</span> <span class="fu">calculate_smd</span>(matched_cohort, <span class="st">"ecog"</span>, <span class="st">"treatment"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>balance_matched <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Covariate =</span> <span class="fu">c</span>(<span class="st">"Age"</span>, <span class="st">"ECOG"</span>),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Treated_Mean =</span> <span class="fu">c</span>(age_matched_audit[<span class="st">"mean_treated"</span>], ecog_matched_audit[<span class="st">"mean_treated"</span>]),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Control_Mean =</span> <span class="fu">c</span>(age_matched_audit[<span class="st">"mean_control"</span>], ecog_matched_audit[<span class="st">"mean_control"</span>]),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">SMD =</span> <span class="fu">c</span>(age_matched_audit[<span class="st">"smd"</span>], ecog_matched_audit[<span class="st">"smd"</span>])</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Calculate Naive vs. Matched Survival Differences</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>mean_survival_treated_raw <span class="ot">&lt;-</span> <span class="fu">mean</span>(cohort<span class="sc">$</span>survival[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>mean_survival_control_raw <span class="ot">&lt;-</span> <span class="fu">mean</span>(cohort<span class="sc">$</span>survival[cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>naive_diff <span class="ot">&lt;-</span> mean_survival_treated_raw <span class="sc">-</span> mean_survival_control_raw</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>mean_survival_treated_matched <span class="ot">&lt;-</span> <span class="fu">mean</span>(matched_treated_data<span class="sc">$</span>survival)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>mean_survival_control_matched <span class="ot">&lt;-</span> <span class="fu">mean</span>(matched_control_data<span class="sc">$</span>survival)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>matched_diff <span class="ot">&lt;-</span> mean_survival_treated_matched <span class="sc">-</span> mean_survival_control_matched</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Display Balance Audit Table</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(balance_matched, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Post-Matching Covariate Balance"</span>, </span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Covariate"</span>, <span class="st">"Treated Mean"</span>, <span class="st">"Control Mean"</span>, <span class="st">"SMD"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Post-Matching Covariate Balance</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Covariate</th>
+<th style="text-align: right;">Treated Mean</th>
+<th style="text-align: right;">Control Mean</th>
+<th style="text-align: right;">SMD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Age</td>
+<td style="text-align: right;">66.143</td>
+<td style="text-align: right;">65.619</td>
+<td style="text-align: right;">0.083</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ECOG</td>
+<td style="text-align: right;">1.619</td>
+<td style="text-align: right;">1.571</td>
+<td style="text-align: right;">0.071</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Display Outcome Comparison Table</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>outcome_comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Analysis =</span> <span class="fu">c</span>(<span class="st">"Naive (Crude)"</span>, <span class="st">"Matched (Causal)"</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Treated_Mean =</span> <span class="fu">c</span>(mean_survival_treated_raw, mean_survival_treated_matched),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Control_Mean =</span> <span class="fu">c</span>(mean_survival_control_raw, mean_survival_control_matched),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Survival_Difference =</span> <span class="fu">c</span>(naive_diff, matched_diff)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(outcome_comparison, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Survival Outcomes Comparison (Naive vs. Matched)"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Analysis Type"</span>, <span class="st">"Treated Mean Survival (Months)"</span>, <span class="st">"Control Mean Survival (Months)"</span>, <span class="st">"Survival Difference (Months)"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Survival Outcomes Comparison (Naive vs.&nbsp;Matched)</caption>
+<colgroup>
+<col style="width: 15%">
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Analysis Type</th>
+<th style="text-align: right;">Treated Mean Survival (Months)</th>
+<th style="text-align: right;">Control Mean Survival (Months)</th>
+<th style="text-align: right;">Survival Difference (Months)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Naive (Crude)</td>
+<td style="text-align: right;">5.952</td>
+<td style="text-align: right;">8.500</td>
+<td style="text-align: right;">-2.548</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Matched (Causal)</td>
+<td style="text-align: right;">7.810</td>
+<td style="text-align: right;">4.333</td>
+<td style="text-align: right;">3.476</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="step-5-visualize-propensity-score-overlap-common-support-verification" class="level3" data-number="6.5">
+<h3 data-number="6.5" class="anchored" data-anchor-id="step-5-visualize-propensity-score-overlap-common-support-verification"><span class="header-section-number">6.5</span> Step 5: Visualize Propensity Score Overlap (Common Support Verification)</h3>
+<p>To verify the positivity assumption (common support) and audit the matching process, we visualize the individual estimated propensity scores for each patient as points on parallel treatment tracks (diamonds for treated patients, circles for control patients), drawing connection segments between matched pairs. Patients who fell outside the caliper or lacked overlap are faded out as grey shapes, clearly demonstrating how matching prunes the extremes to restore common support.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Identify matched indicator</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>cohort<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(cohort<span class="sc">$</span>patient_id <span class="sc">%in%</span> <span class="fu">c</span>(matched_pairs<span class="sc">$</span>treated_id, matched_pairs<span class="sc">$</span>control_id), <span class="st">"Matched"</span>, <span class="st">"Unmatched (Discarded)"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Add status indicator combining treatment and matching</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>cohort<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  cohort<span class="sc">$</span>matched <span class="sc">==</span> <span class="st">"Matched"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Matched Treated (Drug X)"</span>, <span class="st">"Matched Control (Standard Care)"</span>),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(cohort<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Unmatched Treated (Discarded)"</span>, <span class="st">"Unmatched Control (Discarded)"</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Create segments data linking matched pairs</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>segments_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> matched_pairs<span class="sc">$</span>treated_ps,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="dv">2</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">xend =</span> matched_pairs<span class="sc">$</span>control_ps,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">yend =</span> <span class="dv">1</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Generate the parallel track point plot</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw segment lines first so they sit behind points</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="at">data =</span> segments_data, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend),</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"#e2e8f0"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plot points for cohort</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> cohort, <span class="fu">aes</span>(<span class="at">x =</span> propensity_score, <span class="at">y =</span> treatment <span class="sc">+</span> <span class="dv">1</span>, </span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>                               <span class="at">color =</span> status, <span class="at">shape =</span> status, <span class="at">alpha =</span> status),</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="dv">0</span>, <span class="at">height =</span> <span class="fl">0.08</span>, <span class="at">seed =</span> <span class="dv">42</span>)) <span class="sc">+</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Control</span><span class="sc">\n</span><span class="st">(Standard Care)"</span>, <span class="st">"Treated</span><span class="sc">\n</span><span class="st">(Drug X)"</span>),</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">2.4</span>)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Matched Treated (Drug X)"</span> <span class="ot">=</span> <span class="st">"#a855f7"</span>,</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Matched Control (Standard Care)"</span> <span class="ot">=</span> <span class="st">"#3b82f6"</span>,</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Unmatched Treated (Discarded)"</span> <span class="ot">=</span> <span class="st">"#94a3b8"</span>,</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Unmatched Control (Discarded)"</span> <span class="ot">=</span> <span class="st">"#94a3b8"</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Patient Status"</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Matched Treated (Drug X)"</span> <span class="ot">=</span> <span class="dv">18</span>,        <span class="co"># Diamond for Treated</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Matched Control (Standard Care)"</span> <span class="ot">=</span> <span class="dv">19</span>,  <span class="co"># Circle for Control</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Unmatched Treated (Discarded)"</span> <span class="ot">=</span> <span class="dv">18</span>,    <span class="co"># Diamond for Treated</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Unmatched Control (Discarded)"</span> <span class="ot">=</span> <span class="dv">19</span>     <span class="co"># Circle for Control</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Patient Status"</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_alpha_manual</span>(</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Matched Treated (Drug X)"</span> <span class="ot">=</span> <span class="fl">0.9</span>,</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Matched Control (Standard Care)"</span> <span class="ot">=</span> <span class="fl">0.9</span>,</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Unmatched Treated (Discarded)"</span> <span class="ot">=</span> <span class="fl">0.4</span>,</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Unmatched Control (Discarded)"</span> <span class="ot">=</span> <span class="fl">0.4</span></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Patient Status"</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Propensity Score Overlap &amp; Matching Audit"</span>,</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Estimated Propensity Score e(X)"</span>,</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Treatment Group"</span></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">11</span>) <span class="sc">+</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">13</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#f8fafc"</span>, <span class="at">color =</span> <span class="cn">NA</span>),</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">"#e2e8f0"</span>),</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">"#e2e8f0"</span>),</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">11</span>)</span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01_Confounding_and_Frameworks_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Attrition Audit: Patients Discarded (Unmatched due to Caliper/Support Violations)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>During the matching process, individuals who could not be paired within the caliper boundary were discarded to ensure comparability:</p>
+<ul>
+<li><strong>Treated Group (Drug X)</strong>: <strong>21</strong> patients discarded (out of 42 total treated patients).</li>
+<li><strong>Control Group (Standard Care)</strong>: <strong>37</strong> patients discarded (out of 58 total control patients).</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Methodological Note: Sample Size vs.&nbsp;Effective Sample Size (ESS)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In causal inference audits, it is important to distinguish how “effective sample size” applies to matching versus weighting:</p>
+<ol type="1">
+<li><strong>In Propensity Score Matching (PSM)</strong> (this analysis): Because matching here is 1:1 and unweighted (matched patients have weight = 1, unmatched have weight = 0), the effective sample size is simply the count of matched individuals (here, 42). There is no variance inflation from unequal weights.</li>
+<li><strong>In Propensity Score Weighting (IPTW)</strong> (introduced in later modules): Weights vary continuously, which inflates the variance of the treatment effect estimator. To audit this variance inflation, we calculate the <strong>Effective Sample Size (ESS)</strong> using the Kish formula: <code>ESS = (sum(w_i))^2 / sum(w_i^2)</code>. A low ESS relative to the actual sample size indicates extreme weights and unstable estimates, a key audit check in NICE submissions.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="methodological-interpretation-of-the-r-output" class="level3" data-number="6.6">
+<h3 data-number="6.6" class="anchored" data-anchor-id="methodological-interpretation-of-the-r-output"><span class="header-section-number">6.6</span> Methodological Interpretation of the R Output</h3>
+<p>The analysis reveals the following critical causal inference dynamics:</p>
+<ol type="1">
+<li><strong>Baseline Imbalance</strong>: Before adjustment, the treated group was significantly older and sicker. The treated mean age was 67 compared to 63.69 for the control group (baseline Age SMD = 0.429, far exceeding the 0.1 threshold). Similarly, the mean ECOG score for the treated group was 1.88 compared to 0.88 for controls (baseline ECOG SMD = 1.296). This baseline disparity represents severe <strong>Confounding by Indication</strong>.</li>
+<li><strong>The Naive False Failure</strong>: Due to this confounding, the crude outcome comparison shows that patients on Standard Care lived longer than those on Drug X (Naive Difference = -2.55 months), falsely suggesting that Drug X is inferior.</li>
+<li><strong>Propensity Score Dimensionality Reduction</strong>: The logistic regression model maps these baseline confounders into a one-dimensional probability score. Sicker, older patients receive higher propensity scores, reflecting their higher probability of treatment under real-world clinical practice.</li>
+<li><strong>Caliper Pruning &amp; Common Support Restoration</strong>:
+<ul>
+<li>Out of the original 42 treated patients, 21 were successfully matched to 21 control patients.</li>
+<li>21 treated patients and 37 control patients fell outside the caliper boundary (0.315 on the logit scale) or lacked comparable propensity score overlap and were pruned from the cohort.</li>
+<li>Specifically, the sicker, older patients in the treated group (with extremely high propensity scores) and the younger, healthier patients in the control group (with extremely low propensity scores) could not be matched and were excluded, restoring common support.</li>
+</ul></li>
+<li><strong>Baseline Covariate Balance Resolution</strong>: In the matched sub-cohort, the SMD for Age falls to 0.083 and for ECOG falls to 0.071. Both SMDs are now below the standard threshold of 0.1, indicating that the matched cohorts are highly comparable.</li>
+<li><strong>Causal Truth Revealed (True Success)</strong>: Comparing survival on the matched cohort reveals that Drug X increases survival by <strong>3.48 months</strong> (Matched Difference = +3.48 months). By comparing only comparable patients, we have eliminated the negative selection bias, revealing that the drug is highly effective.</li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,537 @@
+---
+title: "NICE RWE Framework & Confounding by Indication"
+subtitle: "Methodological Foundations & Quantitative Auditing of Observational Data"
+author: "Xiaoge Zhang, PhD"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "R Code"
+    number-sections: true
+---
+
+::: {.callout-note}
+## HTA Context: NICE Real-World Evidence Framework (2022)
+
+The NICE RWE Framework outlines three core principles for generating high-quality RWE:
+
+1. **Data Suitability**: Ensuring data provenance, quality, and relevance (using tools like DataSAT).
+2. **Study Transparency**: Pre-registering study protocols, publishing analytical code, and outlining patient attrition flow.
+3. **Methodological Rigor**: Utilizing analytical designs that minimize risk of bias (e.g., active comparators, new-user designs) and thoroughly characterizing unmeasured confounding (e.g., via E-value sensitivity analysis).
+:::
+
+
+
+## The Confounding by Indication Problem
+
+In clinical practice, treatment allocation is not randomized. Physicians prescribe therapies based on clinical need, prognosis, and patient severity. When a new, highly effective, or last-line therapy is introduced, it is systematically reserved for the **sickest, oldest, and most fragile patients**.
+
+This treatment assignment mechanism creates **Confounding by Indication** (or Indication Bias):
+
+* The treatment group ($D = 1$) is pre-selected to have a worse prognosis at baseline.
+* The comparator group ($D = 0$) is pre-selected to have a better prognosis.
+* Consequently, a naive comparison of raw outcomes will show the new drug underperforming (a "False Failure"), even if it is clinically superior.
+
+
+
+## Analytical Scenario: Oncology Drug X vs. Standard Care
+
+To illustrate, consider a retrospective cohort study evaluating a new high-cost oncology Drug X ($D = 1$) against the historical Standard of Care ($D = 0$). 
+
+* **Confounders ($X$):**
+  1. **Age** (continuous variable; older age increases hazard of death).
+  2. **ECOG Performance Status** (categorical score: 0 = fully active, 3 = bedridden; higher score indicates sicker patient).
+* **Outcome ($Y$):** Survival time (months).
+
+### Baseline Cohort Description Table (N = 100)
+
+The cohort of 100 patients is simulated in R using a fixed seed to ensure reproducibility. The following code chunk initializes the baseline demographic and clinical characteristics, along with the survival times:
+
+```{r}
+#| label: setup-cohort
+#| echo: true
+#| warning: false
+#| message: false
+
+# Set seed for reproducibility
+set.seed(46)
+n <- 100
+
+# Generate confounders
+age <- round(rnorm(n, mean = 65, sd = 8))
+ecog <- rbinom(n, size = 3, prob = 0.4)
+
+# Propensity score model with selection bias
+logit_ps <- -7.5 + 0.08 * age + 1.2 * ecog
+ps <- 1 / (1 + exp(-logit_ps))
+treatment <- rbinom(n, size = 1, prob = ps)
+
+# Outcome model (Survival time in months)
+survival <- round(42 + 5.0 * treatment - 0.45 * age - 6.0 * ecog + rnorm(n, mean = 0, sd = 1.5))
+survival[survival < 1] <- 1
+
+cohort <- data.frame(
+  patient_id = 1:n,
+  age        = age,
+  ecog       = ecog,
+  treatment  = treatment,
+  survival   = survival
+)
+```
+
+Instead of displaying all 100 individual patient records, the baseline demographic and clinical characteristics of the cohort are summarized below. This table represents the starting raw dataset generated for this causal analysis:
+
+```{r}
+#| label: baseline-desc
+#| echo: true
+#| warning: false
+#| message: false
+
+# Calculate counts
+n_treated <- sum(cohort$treatment == 1)
+n_control <- sum(cohort$treatment == 0)
+
+# Calculate age stats
+mean_age_treated <- mean(cohort$age[cohort$treatment == 1])
+sd_age_treated <- sd(cohort$age[cohort$treatment == 1])
+mean_age_control <- mean(cohort$age[cohort$treatment == 0])
+sd_age_control <- sd(cohort$age[cohort$treatment == 0])
+
+# Calculate ECOG stats
+mean_ecog_treated <- mean(cohort$ecog[cohort$treatment == 1])
+sd_ecog_treated <- sd(cohort$ecog[cohort$treatment == 1])
+mean_ecog_control <- mean(cohort$ecog[cohort$treatment == 0])
+sd_ecog_control <- sd(cohort$ecog[cohort$treatment == 0])
+
+# Calculate survival outcome stats
+mean_survival_treated <- mean(cohort$survival[cohort$treatment == 1])
+sd_survival_treated <- sd(cohort$survival[cohort$treatment == 1])
+mean_survival_control <- mean(cohort$survival[cohort$treatment == 0])
+sd_survival_control <- sd(cohort$survival[cohort$treatment == 0])
+
+# Create baseline summary table
+baseline_summary <- data.frame(
+  Metric = c("Sample Size (N)", "Age (Years), Mean (SD)", "ECOG Score, Mean (SD)", "Survival Time (Months), Mean (SD)"),
+  Treated = c(
+    sprintf("%d", n_treated),
+    sprintf("%.2f (%.2f)", mean_age_treated, sd_age_treated),
+    sprintf("%.2f (%.2f)", mean_ecog_treated, sd_ecog_treated),
+    sprintf("%.2f (%.2f)", mean_survival_treated, sd_survival_treated)
+  ),
+  Control = c(
+    sprintf("%d", n_control),
+    sprintf("%.2f (%.2f)", mean_age_control, sd_age_control),
+    sprintf("%.2f (%.2f)", mean_ecog_control, sd_ecog_control),
+    sprintf("%.2f (%.2f)", mean_survival_control, sd_survival_control)
+  ),
+  stringsAsFactors = FALSE
+)
+
+library(knitr)
+kable(baseline_summary, caption = "Baseline Cohort Description Table (N = 100)",
+      col.names = c("Characteristic / Metric", "Treated (Drug X)", "Standard Care (Control)"))
+```
+
+### The Naive Analysis (The False Failure)
+
+Calculating the simple arithmetic mean survival for both groups:
+
+$$\mu_1 = \text{Mean survival of Drug X group}$$
+$$\mu_0 = \text{Mean survival of Standard Care group}$$
+
+In our generated cohort of 100 patients, the naive mean survivals are computed as:
+
+* **Treated (Drug X)**: $\mu_1 = `r round(mean(cohort$survival[cohort$treatment == 1]), 2)` \text{ Months}$
+* **Standard Care (Control)**: $\mu_0 = `r round(mean(cohort$survival[cohort$treatment == 0]), 2)` \text{ Months}$
+
+$$\text{Naive Difference} = \mu_1 - \mu_0 = `r round(mean(cohort$survival[cohort$treatment == 1]), 2)` - `r round(mean(cohort$survival[cohort$treatment == 0]), 2)` = `r round(mean(cohort$survival[cohort$treatment == 1]) - mean(cohort$survival[cohort$treatment == 0]), 2)` \text{ Months}$$
+
+The crude analysis incorrectly concludes that Drug X reduces survival by **`r abs(round(mean(cohort$survival[cohort$treatment == 1]) - mean(cohort$survival[cohort$treatment == 0]), 2))` months**. A HTA submission based on this raw comparison would result in immediate rejection.
+
+
+
+
+## Baseline Audit: Quantifying Imbalance
+
+The naive analysis is highly misleading because it assumes the treatment and control cohorts are comparable at baseline. To determine whether a naive comparison is valid, we must measure the distance between the covariate distributions of the two groups. 
+
+This is achieved using the **Standardized Mean Difference (SMD)**. The SMD quantifies the magnitude of difference between two groups on a standardized scale, which directly reflects the degree of overlap between their distributions. 
+
+When the SMD is small, the two groups have substantial overlap and are comparable. However, when the SMD is large (typically exceeding the standard threshold of 0.1), the distributions diverge significantly. A large SMD indicates that the baseline imbalance is severe enough to invalidate any naive comparison, rendering the crude analysis biased and making causal adjustment (e.g., matching or weighting) mandatory.
+
+### The Mathematical Derivation of SMD
+
+For a continuous or binary covariate, the SMD is the difference in means scaled by the pooled standard deviation within the groups. The pooled standard deviation $s_{\text{pooled}}$ integrates the within-group variation from both cohorts, preventing treatment-related differences in means from inflating the scale factor. To calculate $s_{\text{pooled}}$, we evaluate the group-specific sample variances $s_g^2$ (for $g \in \{0, 1\}$). 
+
+$$SMD = \frac{|\bar{X}_{1} - \bar{X}_{0}|}{s_{\text{pooled}}}, \qquad s_{\text{pooled}} = \sqrt{\frac{s_1^2 + s_0^2}{2}}, \qquad s_g^2 = \frac{\sum_{i \in g} (X_i - \bar{X}_g)^2}{n_g - 1} $$
+
+Each $s_g^2$ represents the unbiased sample variance of the covariate within treatment group $g$, reflecting the spread of characteristics around the respective group mean $\bar{X}_g$. Here, $s_1^2$ and $s_0^2$ are the group-specific variances computed for the treated ($g = 1$) and control ($g = 0$) groups, respectively. This ensures the baseline variability is evaluated within each group separately before pooling.
+
+#### Industry Balance Benchmarks {.unnumbered}
+
+| SMD Value | Balance Status | HTA Implications|
+|:---|:---|:---|
+| SMD < 0.1 | Group Balance Achieved | Highly comparable cohorts; standard threshold accepted by NICE/HTA guidelines. |
+| 0.1 $\le$ SMD < 0.2 | Marginal Imbalance | Minor baseline discrepancy; potential for residual confounding. |
+| SMD $\ge$ 0.2 | Severe Imbalance | Covariates are significantly unbalanced; adjustment via matching, weighting, or regression is mandatory. |
+
+### Why P-Values Fail as Balance Metrics
+
+A common error in retrospective studies is conducting hypothesis tests (e.g., two-sample $t$-tests for continuous covariates like Age, or chi-squared tests for categorical covariates like ECOG) on each baseline covariate between the treatment and control groups before adjustment, using the resulting $p$-value to assess whether the cohorts have sufficient distribution overlap (balance). 
+
+HTA guidelines (NICE, FDA, ISPOR) reject this practice because using $p$-values to evaluate baseline overlap is conceptually and mathematically incorrect:
+
+1. **Logical Redundancy (Incorrect Null Hypothesis)**: A hypothesis test evaluates whether the two samples are randomly drawn from a single shared parent population. In observational data, treatment assignment is systematically non-random (due to confounding by indication). Since we already know the cohorts do not come from the same population, testing this null hypothesis is logically redundant.
+2. **Failure to Measure Overlap (Sample Size Dependency)**: A $p$-value does not measure the magnitude of distribution overlap or similarity between the groups; it is heavily determined by sample size ($N$). In large electronic health records ($N > 10,000$), even if the overlap is nearly perfect and the difference is clinically negligible, the $p$-value will be highly significant ($p < 0.05$). Conversely, in small cohorts (e.g., $N = 10$), even if the cohorts have zero overlap, the $p$-value can easily be non-significant ($p > 0.05$), failing to detect severe imbalance.
+3. **Lack of Standardized Scale**: Unlike $p$-values, the Standardized Mean Difference (SMD) is sample-size invariant. It directly measures the distance between distributions in standard deviation units, allowing direct comparison of balance across covariates of different units and scales (e.g., Age in years versus ECOG scores).
+
+
+
+## Propensity Score Theory & Estimation
+
+### From Imbalance to Causal Adjustment: The Role of Propensity Scores {.unnumbered}
+
+The baseline audit using SMDs reveals a fundamental challenge: our treatment and control cohorts are highly unbalanced (e.g., older, sicker patients are systematically channeled into the Drug X group). To resolve this sample imbalance, we must reconstruct a balanced clinical scenario where the treatment and control groups have comparable baseline characteristics—mimicking the balance achieved in a randomized controlled trial (RCT). 
+
+To achieve this group comparability, we must adjust for the confounding covariates (Age and ECOG). Why do we need the **Propensity Score** as the tool to achieve this balance, rather than simply matching patients directly on their covariates?
+
+1. **The Curse of Dimensionality in Multi-Dimensional Balance**: In real-world HEOR studies, we typically control for dozens of baseline confounders (e.g., demographics, comorbidities, clinical markers, and prior therapies). If we attempt to find matches with the exact same combination of all baseline covariates (Exact Matching), the probability of finding a match drops to near zero as the number of covariates increases. This results in the exclusion of most patients, severely reducing sample size and statistical power.
+2. **Propensity Score as a Dimensionality Reduction Tool**: Rosenbaum and Rubin (1983) proved that the propensity score—the conditional probability of receiving treatment given baseline covariates, $e(X) = P(D = 1 \mid X)$—is a *balancing score*. Conditionally on the propensity score, the distribution of all baseline covariates is mathematically guaranteed to be independent of treatment assignment. 
+
+By matching or weighting on this single, one-dimensional score, we collapse the high-dimensional covariate imbalance into a single dimension. This ensures that the multi-dimensional covariate distributions are balanced between groups without suffering from the severe sample attrition associated with exact matching.
+
+### The Logistic Propensity Model
+
+The propensity score is the conditional probability of receiving treatment given baseline covariates: $e(X) = P(D = 1 \mid X)$. We estimate this probability using a logistic regression model:
+
+$$\ln\left(\frac{e(X)}{1 - e(X)}\right) = \beta_0 + \beta_1 \cdot \text{Age} + \beta_2 \cdot \text{ECOG}$$
+
+A patient with a high score (e.g., $e(X) = 0.95$) has characteristics that make them highly likely to receive the new drug under clinical practice guidelines.
+
+
+
+## Propensity Score Matching & The Common Support Constraint
+
+### The Mechanics of Propensity Score Matching (PSM) {.unnumbered}
+
+Once we have estimated a propensity score for every patient, we use these scores to pair treated patients with control patients. The goal is to construct a matched sample where the distribution of propensity scores—and thus the distribution of all baseline covariates—is identical between the groups. Under normal conditions (where the distributions overlap), matching is executed using specific algorithmic parameters:
+
+1. **Nearest Neighbor (NN) Matching**: The most common algorithm. For each treated patient, the algorithm searches the control pool and selects the patient whose propensity score is closest.
+2. **Caliper Width Constraint**: Simply matching the "nearest" neighbor can result in poor matches if the closest control is still very different. To prevent this, we enforce a **caliper**—a maximum allowable difference between matched propensity scores. A standard industry recommendation (Rosenbaum and Rubin, 1985) is to use a caliper of **0.2 times the standard deviation of the logit of the propensity score**:
+   $$\text{Caliper} = 0.2 \times \sigma_{\text{logit}(e(X))}$$
+   If a treated patient has no control patient within this caliper distance, they remain unmatched and are excluded from the final cohort.
+3. **Matching Ratios (1:1 vs. 1:k)**: 
+   * **1:1 Matching**: Each treated patient is matched to exactly one control. This minimizes bias because matches are highly similar, but discards data and reduces statistical power.
+   * **1:k Matching**: Each treated patient is matched to $k$ controls (e.g., 1:2 or 1:3). This increases sample size and statistical power but can introduce bias as less-optimal matches are accepted.
+4. **Replacement Options**:
+   * **Without Replacement**: Once a control patient is matched, they are removed from the pool and cannot be matched again. This is order-dependent but ensures independent observations, making downstream variance and survival calculations straightforward.
+   * **With Replacement**: A control patient can be matched to multiple treated patients. This reduces bias (controls are always matched to their closest matches) but increases variance and requires complex weighting in downstream analyses.
+
+### The Positivity (Common Support) Assumption
+
+For matching to be methodologically valid, we must satisfy the **Positivity Assumption** (also known as the **Common Support Constraint**). This assumption dictates that every patient in the population must have a non-zero probability of receiving either treatment:
+
+$$0 < P(D = 1 \mid X) < 1$$
+
+Graphically, this means that the distribution of propensity scores for the treated and control cohorts must share a region of **overlap (common support)**. If there is no overlap for a certain range of propensity scores, it means patients in that range can only receive one treatment but not the other under clinical practice, making comparison impossible.
+
+
+When the positivity assumption is violated (i.e., there is a lack of common support), matching fails because we cannot find comparable individuals. In real-world HTA audits, a lack of common support is handled as follows:
+
+* **Partial Lack of Overlap**: Resolved by **Trimming** (excluding patients whose propensity scores lie outside the overlap region). *HTA Caveat*: Trimming changes the target population and limits the generalizability (external validity) of the findings, which must be explicitly declared and justified in HTA submissions.
+* **Complete Separation (Zero Overlap)**: The treatment effect is **mathematically unestimable** because the covariate distributions of the treated and control cohorts do not overlap at all. In this scenario, researchers must source a more comparable control arm (e.g., from another database), broaden the study eligibility criteria, or pivot to a single-arm evaluation compared against natural history data.
+
+
+
+### Post-Matching Analysis Workflow: Estimating the Treatment Effect {.unnumbered}
+
+Once the matching process successfully pairs treated and control patients, the analysis enters the downstream estimation phase. The workflow consists of three mandatory steps to ensure methodological validity:
+
+1. **Re-Audit Covariate Balance**: We calculate the Standardized Mean Difference (SMD) for all covariates in the matched cohort. If all SMDs are successfully reduced below the 0.1 threshold, the baseline imbalance is resolved, and we can proceed to outcome analysis.
+2. **Estimate the Target Causal Effect (ATT)**: Because we matched control patients to our treated cohort, the target estimand is the **Average Treatment Effect on the Treated (ATT)**. We estimate this by directly comparing the outcomes of the matched groups:
+   * **For continuous outcomes**: The difference in means between the matched treated and matched control groups (e.g., mean survival difference).
+   * **For time-to-event outcomes (HTA standard)**: Plotting matched Kaplan-Meier curves and fitting a Cox Proportional Hazards model on the matched cohort to obtain the Hazard Ratio (HR).
+3. **Adjust Statistical Inference for Matching**: Matching introduces statistical dependence between the paired individuals. Therefore, standard errors, p-values, and confidence intervals must be adjusted to account for this clustering (e.g., using robust standard errors clustered on the matched pairs, or stratification in the survival model).
+
+
+## R Implementation: Quantitative Audit & Modeling Pipeline
+
+The following R code constructs our overlapping observational cohort (N = 100), manually calculates the baseline SMDs to audit covariate imbalance, estimates propensity scores using logistic regression, implements a manual nearest-neighbor matching algorithm with a caliper constraint, and estimates the causal treatment effect.
+
+### Step 1: Initialize Cohort and Baseline Balance Audit
+
+First, we set up the cohort and calculate the Standardized Mean Difference (SMD) for both covariates (age and ecog) to quantify baseline imbalance.
+
+```{r}
+#| warning: false
+#| message: false
+
+# 1. Define Manual SMD Function
+calculate_smd <- function(data, variable_name, treatment_col) {
+  x1 <- data[data[[treatment_col]] == 1, variable_name]
+  x0 <- data[data[[treatment_col]] == 0, variable_name]
+  
+  mean1 <- mean(x1); mean0 <- mean(x0)
+  var1  <- var(x1);  var0  <- var(x0)
+  
+  s_pooled <- sqrt((var1 + var0) / 2)
+  smd <- abs(mean1 - mean0) / s_pooled
+  return(c(mean_treated = mean1, mean_control = mean0, smd = smd))
+}
+
+# 2. Calculate Baseline SMDs
+age_audit  <- calculate_smd(cohort, "age", "treatment")
+ecog_audit <- calculate_smd(cohort, "ecog", "treatment")
+
+balance_baseline <- data.frame(
+  Covariate = c("Age", "ECOG"),
+  Treated_Mean = c(age_audit["mean_treated"], ecog_audit["mean_treated"]),
+  Control_Mean = c(age_audit["mean_control"], ecog_audit["mean_control"]),
+  SMD = c(age_audit["smd"], ecog_audit["smd"])
+)
+
+# Format Output Table
+library(knitr)
+kable(balance_baseline, digits = 3, caption = "Baseline Covariate Balance (Before Matching)", 
+      col.names = c("Covariate", "Treated Mean", "Control Mean", "SMD"))
+```
+
+### Step 2: Propensity Score Estimation
+
+We fit a logistic regression model predicting treatment assignment (D) based on Age and ECOG performance status. The predicted probabilities are our estimated propensity scores.
+
+```{r}
+# 1. Fit Propensity Score Model
+logit_model <- glm(treatment ~ age + ecog, data = cohort, family = binomial(link = "logit"))
+cohort$propensity_score <- predict(logit_model, type = "response")
+cohort$logit_ps <- predict(logit_model, type = "link")
+
+# Display first 5 rows for clarity and conciseness
+kable(head(cohort[, c("patient_id", "treatment", "age", "ecog", "survival", "propensity_score", "logit_ps")], 5), 
+      digits = 3, caption = "Estimated Propensity Scores and Logits (First 5 Patients Shown)",
+      col.names = c("Patient ID", "Treatment (D)", "Age", "ECOG", "Survival Months", "Propensity Score", "Logit PS"))
+```
+
+### Step 3: Nearest-Neighbor Matching with Caliper Constraint
+
+We implement a manual nearest-neighbor matching algorithm. We match treated patients to available controls on the logit of the propensity score, applying a caliper constraint of 0.2 times the standard deviation of logit(e(X)).
+
+```{r}
+# 1. Set Caliper Width (0.2 * SD of Logit PS)
+sd_logit <- sd(cohort$logit_ps)
+caliper_width <- 0.2 * sd_logit
+
+# 2. Extract Subsets
+treated <- cohort[cohort$treatment == 1, ]
+controls <- cohort[cohort$treatment == 0, ]
+
+# Sort treated by propensity score descending (greedy matching order)
+treated_sorted <- treated[order(-treated$logit_ps), ]
+available_controls <- controls
+
+matched_pairs <- data.frame()
+
+for (i in 1:nrow(treated_sorted)) {
+  tr <- treated_sorted[i, ]
+  if (nrow(available_controls) == 0) break
+  
+  # Calculate absolute distances on logit PS scale
+  distances <- abs(available_controls$logit_ps - tr$logit_ps)
+  best_match_idx <- which.min(distances)
+  min_dist <- distances[best_match_idx]
+  
+  # Enforce caliper constraint
+  if (min_dist <= caliper_width) {
+    matched_pairs <- rbind(matched_pairs, data.frame(
+      pair_id = nrow(matched_pairs) + 1,
+      treated_id = tr$patient_id,
+      control_id = available_controls$patient_id[best_match_idx],
+      treated_ps = tr$propensity_score,
+      control_ps = available_controls$propensity_score[best_match_idx],
+      logit_diff = min_dist
+    ))
+    # Remove matched control from the pool (without replacement)
+    available_controls <- available_controls[-best_match_idx, ]
+  }
+}
+
+# Display first 5 matched pairs for clarity and conciseness
+kable(head(matched_pairs, 5), digits = 3, caption = "Matched Pairs (Caliper Constraint Applied, First 5 Pairs Shown)",
+      col.names = c("Pair ID", "Treated Patient ID", "Control Patient ID", "Treated PS", "Control PS", "Logit PS Diff"))
+```
+
+### Step 4: Post-Match Balance Audit & Causal Estimation
+
+We compile the matched sample, re-audit the covariate balance, and calculate the causal treatment effect (mean survival difference) on the matched cohort.
+
+```{r}
+# 1. Compile Matched Cohort
+matched_treated_data <- cohort[cohort$patient_id %in% matched_pairs$treated_id, ]
+matched_control_data <- cohort[cohort$patient_id %in% matched_pairs$control_id, ]
+matched_cohort <- rbind(matched_treated_data, matched_control_data)
+
+# 2. Re-Audit Covariate Balance
+age_matched_audit  <- calculate_smd(matched_cohort, "age", "treatment")
+ecog_matched_audit <- calculate_smd(matched_cohort, "ecog", "treatment")
+
+balance_matched <- data.frame(
+  Covariate = c("Age", "ECOG"),
+  Treated_Mean = c(age_matched_audit["mean_treated"], ecog_matched_audit["mean_treated"]),
+  Control_Mean = c(age_matched_audit["mean_control"], ecog_matched_audit["mean_control"]),
+  SMD = c(age_matched_audit["smd"], ecog_matched_audit["smd"])
+)
+
+# 3. Calculate Naive vs. Matched Survival Differences
+mean_survival_treated_raw <- mean(cohort$survival[cohort$treatment == 1])
+mean_survival_control_raw <- mean(cohort$survival[cohort$treatment == 0])
+naive_diff <- mean_survival_treated_raw - mean_survival_control_raw
+
+mean_survival_treated_matched <- mean(matched_treated_data$survival)
+mean_survival_control_matched <- mean(matched_control_data$survival)
+matched_diff <- mean_survival_treated_matched - mean_survival_control_matched
+
+# Display Balance Audit Table
+kable(balance_matched, digits = 3, caption = "Post-Matching Covariate Balance", 
+      col.names = c("Covariate", "Treated Mean", "Control Mean", "SMD"))
+
+# Display Outcome Comparison Table
+outcome_comparison <- data.frame(
+  Analysis = c("Naive (Crude)", "Matched (Causal)"),
+  Treated_Mean = c(mean_survival_treated_raw, mean_survival_treated_matched),
+  Control_Mean = c(mean_survival_control_raw, mean_survival_control_matched),
+  Survival_Difference = c(naive_diff, matched_diff)
+)
+
+kable(outcome_comparison, digits = 3, caption = "Survival Outcomes Comparison (Naive vs. Matched)",
+      col.names = c("Analysis Type", "Treated Mean Survival (Months)", "Control Mean Survival (Months)", "Survival Difference (Months)"))
+```
+
+### Step 5: Visualize Propensity Score Overlap (Common Support Verification)
+
+To verify the positivity assumption (common support) and audit the matching process, we visualize the individual estimated propensity scores for each patient as points on parallel treatment tracks (diamonds for treated patients, circles for control patients), drawing connection segments between matched pairs. Patients who fell outside the caliper or lacked overlap are faded out as grey shapes, clearly demonstrating how matching prunes the extremes to restore common support.
+
+```{r}
+#| warning: false
+#| message: false
+#| fig-width: 9
+#| fig-height: 4.5
+#| fig-align: center
+
+library(ggplot2)
+
+# 1. Identify matched indicator
+cohort$matched <- ifelse(cohort$patient_id %in% c(matched_pairs$treated_id, matched_pairs$control_id), "Matched", "Unmatched (Discarded)")
+
+# 2. Add status indicator combining treatment and matching
+cohort$status <- ifelse(
+  cohort$matched == "Matched",
+  ifelse(cohort$treatment == 1, "Matched Treated (Drug X)", "Matched Control (Standard Care)"),
+  ifelse(cohort$treatment == 1, "Unmatched Treated (Discarded)", "Unmatched Control (Discarded)")
+)
+
+# 3. Create segments data linking matched pairs
+segments_data <- data.frame(
+  x = matched_pairs$treated_ps,
+  y = 2,
+  xend = matched_pairs$control_ps,
+  yend = 1
+)
+
+# 4. Generate the parallel track point plot
+ggplot() +
+  # Draw segment lines first so they sit behind points
+  geom_segment(data = segments_data, aes(x = x, y = y, xend = xend, yend = yend),
+               color = "#e2e8f0", linewidth = 0.5, alpha = 0.8) +
+  # Plot points for cohort
+  geom_point(data = cohort, aes(x = propensity_score, y = treatment + 1, 
+                               color = status, shape = status, alpha = status),
+             size = 3.5, position = position_jitter(width = 0, height = 0.08, seed = 42)) +
+  scale_y_continuous(
+    breaks = c(1, 2),
+    labels = c("Control\n(Standard Care)", "Treated\n(Drug X)"),
+    limits = c(0.6, 2.4)
+  ) +
+  scale_color_manual(
+    values = c(
+      "Matched Treated (Drug X)" = "#a855f7",
+      "Matched Control (Standard Care)" = "#3b82f6",
+      "Unmatched Treated (Discarded)" = "#94a3b8",
+      "Unmatched Control (Discarded)" = "#94a3b8"
+    ),
+    name = "Patient Status"
+  ) +
+  scale_shape_manual(
+    values = c(
+      "Matched Treated (Drug X)" = 18,        # Diamond for Treated
+      "Matched Control (Standard Care)" = 19,  # Circle for Control
+      "Unmatched Treated (Discarded)" = 18,    # Diamond for Treated
+      "Unmatched Control (Discarded)" = 19     # Circle for Control
+    ),
+    name = "Patient Status"
+  ) +
+  scale_alpha_manual(
+    values = c(
+      "Matched Treated (Drug X)" = 0.9,
+      "Matched Control (Standard Care)" = 0.9,
+      "Unmatched Treated (Discarded)" = 0.4,
+      "Unmatched Control (Discarded)" = 0.4
+    ),
+    name = "Patient Status"
+  ) +
+  labs(
+    title = "Propensity Score Overlap & Matching Audit",
+    x = "Estimated Propensity Score e(X)",
+    y = "Treatment Group"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
+    panel.background = element_rect(fill = "#f8fafc", color = NA),
+    panel.grid.major.x = element_line(color = "#e2e8f0"),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_line(color = "#e2e8f0"),
+    axis.text.y = element_text(face = "bold", size = 11)
+  )
+```
+
+::: {.callout-note}
+## Attrition Audit: Patients Discarded (Unmatched due to Caliper/Support Violations)
+
+During the matching process, individuals who could not be paired within the caliper boundary were discarded to ensure comparability:
+
+* **Treated Group (Drug X)**: **`r sum(cohort$treatment == 1 & cohort$matched != "Matched")`** patients discarded (out of `r sum(cohort$treatment == 1)` total treated patients).
+* **Control Group (Standard Care)**: **`r sum(cohort$treatment == 0 & cohort$matched != "Matched")`** patients discarded (out of `r sum(cohort$treatment == 0)` total control patients).
+:::
+
+::: {.callout-tip collapse="true"}
+## Methodological Note: Sample Size vs. Effective Sample Size (ESS)
+
+In causal inference audits, it is important to distinguish how "effective sample size" applies to matching versus weighting:
+
+1. **In Propensity Score Matching (PSM)** (this analysis): Because matching here is 1:1 and unweighted (matched patients have weight = 1, unmatched have weight = 0), the effective sample size is simply the count of matched individuals (here, 42). There is no variance inflation from unequal weights.
+2. **In Propensity Score Weighting (IPTW)** (introduced in later modules): Weights vary continuously, which inflates the variance of the treatment effect estimator. To audit this variance inflation, we calculate the **Effective Sample Size (ESS)** using the Kish formula: `ESS = (sum(w_i))^2 / sum(w_i^2)`. A low ESS relative to the actual sample size indicates extreme weights and unstable estimates, a key audit check in NICE submissions.
+:::
+
+
+### Methodological Interpretation of the R Output
+
+The analysis reveals the following critical causal inference dynamics:
+
+1. **Baseline Imbalance**: Before adjustment, the treated group was significantly older and sicker. The treated mean age was `r round(mean(cohort$age[cohort$treatment == 1]), 2)` compared to `r round(mean(cohort$age[cohort$treatment == 0]), 2)` for the control group (baseline Age SMD = `r round(calculate_smd(cohort, "age", "treatment")["smd"], 3)`, far exceeding the 0.1 threshold). Similarly, the mean ECOG score for the treated group was `r round(mean(cohort$ecog[cohort$treatment == 1]), 2)` compared to `r round(mean(cohort$ecog[cohort$treatment == 0]), 2)` for controls (baseline ECOG SMD = `r round(calculate_smd(cohort, "ecog", "treatment")["smd"], 3)`). This baseline disparity represents severe **Confounding by Indication**.
+2. **The Naive False Failure**: Due to this confounding, the crude outcome comparison shows that patients on Standard Care lived longer than those on Drug X (Naive Difference = `r round(mean(cohort$survival[cohort$treatment == 1]) - mean(cohort$survival[cohort$treatment == 0]), 2)` months), falsely suggesting that Drug X is inferior.
+3. **Propensity Score Dimensionality Reduction**: The logistic regression model maps these baseline confounders into a one-dimensional probability score. Sicker, older patients receive higher propensity scores, reflecting their higher probability of treatment under real-world clinical practice.
+4. **Caliper Pruning & Common Support Restoration**:
+   * Out of the original `r sum(cohort$treatment == 1)` treated patients, `r nrow(matched_pairs)` were successfully matched to `r nrow(matched_pairs)` control patients.
+   * `r sum(cohort$treatment == 1) - nrow(matched_pairs)` treated patients and `r sum(cohort$treatment == 0) - nrow(matched_pairs)` control patients fell outside the caliper boundary (`r round(caliper_width, 3)` on the logit scale) or lacked comparable propensity score overlap and were pruned from the cohort.
+   * Specifically, the sicker, older patients in the treated group (with extremely high propensity scores) and the younger, healthier patients in the control group (with extremely low propensity scores) could not be matched and were excluded, restoring common support.
+5. **Baseline Covariate Balance Resolution**: In the matched sub-cohort, the SMD for Age falls to `r round(calculate_smd(matched_cohort, "age", "treatment")["smd"], 3)` and for ECOG falls to `r round(calculate_smd(matched_cohort, "ecog", "treatment")["smd"], 3)`. Both SMDs are now below the standard threshold of 0.1, indicating that the matched cohorts are highly comparable.
+6. **Causal Truth Revealed (True Success)**: Comparing survival on the matched cohort reveals that Drug X increases survival by **`r round(mean(matched_treated_data$survival) - mean(matched_control_data$survival), 2)` months** (Matched Difference = +`r round(mean(matched_treated_data$survival) - mean(matched_control_data$survival), 2)` months). By comparing only comparable patients, we have eliminated the negative selection bias, revealing that the drug is highly effective.
+
+
+
+
+
+

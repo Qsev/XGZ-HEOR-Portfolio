@@ -1,7 +1,7 @@
 ---
 title: "NICE TA975 (Tisagenlecleucel) HEOR Mock Case"
-author: "Xiaoge Zhang"
-date: "`r Sys.Date()`"
+author: "Xiaoge Zhang, PhD"
+date: today
 format: 
   html:
     toc: true

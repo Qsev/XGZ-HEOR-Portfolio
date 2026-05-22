@@ -22,6 +22,7 @@ project:
     - 04_NMA/05_NMA_Technical_Prep/08_ML_NMR.qmd
     - 04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.qmd
     - 04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.qmd
+    - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.qmd
 
 website:
   title: "HEOR Technical Portfolio"
@@ -41,7 +42,7 @@ website:
             text: "RWE ECA: R/R DLBCL"
           - href: 01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.qmd
             text: "PSM: Survival Extrapolation in RRMM"
-      - text: "Technical Library"
+      - text: "NMA Library"
         menu:
           - href: 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
             text: "Bayesian Estimation"
@@ -65,6 +66,10 @@ website:
             text: "Flexible Survival"
           - href: 04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.qmd
             text: "HR vs OR Intuition"
+      - text: "RWE Library"
+        menu:
+          - href: 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.qmd
+            text: "NICE Framework & Confounding"
       - text: "Methodology Wiki"
         href: 00_HTA_LLM_Wiki/README.md
     right:
@@ -83,3 +88,4 @@ format:
     toc-depth: 3
     code-fold: true
     number-sections: true
+    code-annotations: below

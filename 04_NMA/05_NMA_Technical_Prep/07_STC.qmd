@@ -1,11 +1,10 @@
 ---
 title: "Simulated Treatment Comparison (STC)"
-author: "Xiaoge Zhang"
-date: "06/05/2026"
+author: "Xiaoge Zhang, PhD"
+date: today
 engine: knitr
 format: 
   html:
-    theme: cosmo
     toc: true
     toc-depth: 3
     code-fold: true

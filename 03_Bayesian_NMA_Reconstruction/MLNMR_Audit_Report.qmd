@@ -1,8 +1,8 @@
 ---
 title: "Technical Audit Report: Multilevel Network Meta-Regression (ML-NMR)"
 subtitle: "Evidence Synthesis and Population Alignment for HTA Appraisals"
-author: "Xiaoge Zhang, PhD (York)"
-date: last-modified
+author: "Xiaoge Zhang, PhD"
+date: today
 format:
   html:
     toc: true

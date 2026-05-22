@@ -1,16 +1,15 @@
 ---
 title: "Component Network Meta-Analysis (CNMA)"
-author: "Xiaoge Zhang"
-date: "06/05/2026"
+author: "Xiaoge Zhang, PhD"
+date: today
 engine: knitr
 format: 
   html:
-    theme: cosmo
     toc: true
     toc-depth: 3
     code-fold: true
     code-summary: "View the code"
-    number-sections: True
+    number-sections: true
 ---
 
 *Disentangling the Effects of Combination Therapies*

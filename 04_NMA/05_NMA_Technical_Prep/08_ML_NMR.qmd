@@ -1,8 +1,8 @@
 ---
 title: "Multilevel Network Meta-Regression (ML-NMR)"
 description: "Resolving Ecological Bias in Population-Adjusted Indirect Comparisons"
-author: "Xiaoge Zhang"
-date: "today"
+author: "Xiaoge Zhang, PhD"
+date: today
 format:
   html:
     toc: true

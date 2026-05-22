@@ -1,16 +1,15 @@
 ---
 title: "Survival NMA & Other Data Types"
-author: "Xiaoge Zhang"
-date: "06/05/2026"
+author: "Xiaoge Zhang, PhD"
+date: today
 engine: knitr
 format: 
   html:
-    theme: cosmo
     toc: true
     toc-depth: 3
     code-fold: true
     code-summary: "View the code"
-    number-sections: True
+    number-sections: true
 ---
 
 *Extending NMA to Continuous, Count, and Time-to-Event (Survival) Data*

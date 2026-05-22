@@ -1,8 +1,8 @@
 ---
 title: "The Core of Bayesian Estimation"
 description: "An Intuitive and Mathematical Deep Dive into Bayes' Theorem and MCMC"
-author: "Xiaoge Zhang"
-date: "today"
+author: "Xiaoge Zhang, PhD"
+date: today
 format:
   html:
     toc: true

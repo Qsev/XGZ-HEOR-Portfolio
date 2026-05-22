@@ -1,8 +1,8 @@
 ---
 title: "Flexible Survival Analysis and Extrapolation"
 description: "Fitting Standard and Flexible Parametric Models for Economic Evaluation"
-author: "Xiaoge Zhang"
-date: "today"
+author: "Xiaoge Zhang, PhD"
+date: today
 format:
   html:
     toc: true

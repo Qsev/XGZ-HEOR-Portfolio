@@ -2,7 +2,7 @@
 title: "HEOR Core Metrics: OR vs HR Intuition Guide"
 description: "Establishing the underlying logic from Probability to Odds to Hazard Velocity in Health Technology Assessment"
 author: "Xiaoge Zhang, PhD"
-date: "today"
+date: today
 format:
   html:
     toc: true

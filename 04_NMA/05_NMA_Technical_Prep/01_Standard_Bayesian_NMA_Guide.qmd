@@ -1,15 +1,14 @@
 ---
 title: "Standard Bayesian Network Meta-Analysis (NMA)"
-author: "Xiaoge Zhang"
-date: 06/05/2026
+author: "Xiaoge Zhang, PhD"
+date: today
 format: 
   html:
-    theme: cosmo          # 使用现代、干净的主题（可选 flatly, lumen 等）
-    toc: true             # 自动生成右侧目录（Table of Contents）
-    toc-depth: 3          # 目录层级深度
-    code-fold: true       # 默认折叠代码块，读者点击可以展开（非常适合作品集）
-    code-summary: "View the code" # 折叠代码块的提示文字
-    number-sections: true # 自动为标题编号
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "View the code"
+    number-sections: true
 ---
 
 *Mastering Evidence Synthesis through a Minimal Mock Case*
