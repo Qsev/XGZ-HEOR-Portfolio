@@ -501,7 +501,7 @@
     "href": "index.html#the-technical-library",
     "title": "Xiaoge Zhang, PhD",
     "section": "📚 The Technical Library",
-    "text": "📚 The Technical Library\n\nEvidence Synthesis & NMA Knowledge Base\nA comprehensive suite of technical guidelines and code templates for diverse Network Meta-Analysis challenges.\n\n\n\n\n\n Fundamentals\n\n\n\n\nBayesian Estimation Basics  HR vs OR Intuition  Standard Bayesian NMA \n\n\n\n\n\n\n\n\n Population Adjust\n\n\n\n\nMAIC Framework  STC Methodology  ML-NMR Framework \n\n\n\n\n\n\n\n\n Advanced Synthesis\n\n\n\n\nSurvival NMA  Network Meta-Regression  Component NMA  IPD NMA"
+    "text": "📚 The Technical Library\n\nNMA & Evidence Synthesis Library\nA comprehensive suite of technical guidelines and code templates for diverse Network Meta-Analysis challenges.\n\n\n\n\n\n Fundamentals\n\n\n\n\nBayesian Estimation Basics  HR vs OR Intuition  Standard Bayesian NMA \n\n\n\n\n\n\n\n\n Population Adjust\n\n\n\n\nMAIC Framework  STC Methodology  ML-NMR Framework \n\n\n\n\n\n\n\n\n Advanced Synthesis\n\n\n\n\nSurvival NMA  Network Meta-Regression  Component NMA  IPD NMA \n\n\n\n\n\n\n\nReal-World Evidence & Causal Inference Library\nMethodological guidelines and implementation templates for causal inference, confounding adjustment, and external control arms.\n\n\n\n\n\n Causal Prep\n\n\n\n\nNICE Framework & Confounding"
   },
   {
     "objectID": "index.html#tech-stack-methodologies",
