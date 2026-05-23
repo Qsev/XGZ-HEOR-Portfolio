@@ -128,12 +128,14 @@ knitr::kable(desc_tbl, caption = "Baseline Characteristics & Raw Outcomes of the
 We estimate the conditional expectation of the outcome $Y$ given treatment $D$ and baseline covariates $W$:
 $$Q_0(D, W) = E[Y \mid D, W]$$
 
-We fit a logistic regression model for $Y$ and generate two counterfactual predicted values for each individual $i$:
+We fit a logistic regression model[^glm_link] for $Y$ and generate two counterfactual predicted values for each individual $i$:
 
 - The predicted outcome under treatment: $Q_0(1, W_i)$
 - The predicted outcome under control: $Q_0(0, W_i)$
 
 To prevent boundary logit explosions, the initial outcome predictions are bounded to $[0.005, 0.995]$ (corresponding to the default `alpha = 0.995` threshold).
+
+[^glm_link]: Specifying `family = binomial` in R's `glm()` function defaults to a logistic regression model (Logit link function) to model binary outcome probabilities.
 
 ```{r}
 # Fit the initial outcome regression model (Q0)
