@@ -42,9 +42,15 @@ TMLE operates by taking an initial estimate of the outcome regression and "targe
 
 The mathematical implementation follows five steps. To illustrate the mechanics transparently, we will run the manual calculations in R alongside each step using a simulated cohort ($N=500$) with baseline confounding.
 
-### Cohort Simulation Setup
+### Cohort Simulation Setup & Baseline Characteristics
 
-First, we set up the simulation environment and generate a baseline cohort where elderly and sicker patients (with higher ECOG performance status) are preferentially assigned to treatment (confounding by indication).
+The simulated cohort represents an observational registry of 500 patients:
+
+- **Baseline Confounders**: Age (normally distributed around 65) and ECOG performance status (binary indicator where 1 denotes poor status, with 40% prevalence).
+- **Confounding by Indication**: Older and sicker patients are preferentially prescribed the active treatment (probability of treatment increases with both age and poor ECOG status).
+- **Survival Outcome**: 1-year survival probability is driven by both confounders (older age and poor ECOG status lower survival) and treatment (which increases survival by a true risk difference of +15.5%).
+
+The baseline characteristics table below highlights the treatment assignment bias: older, sicker patients are heavily concentrated in the treated group, which will mask the true efficacy in naive unadjusted analyses.
 
 ```{r}
 #| message: false
@@ -84,6 +90,35 @@ df <- data.frame(age, ecog, treatment, survival_1yr)
 naive_treated <- mean(df$survival_1yr[df$treatment == 1])
 naive_control <- mean(df$survival_1yr[df$treatment == 0])
 naive_ate <- naive_treated - naive_control
+
+# Construct baseline descriptive statistics
+get_stats <- function(sub_df) {
+  n_sub <- nrow(sub_df)
+  mean_age <- mean(sub_df$age)
+  sd_age <- sd(sub_df$age)
+  n_ecog <- sum(sub_df$ecog == 1)
+  pct_ecog <- (n_ecog / n_sub) * 100
+  n_surv <- sum(sub_df$survival_1yr == 1)
+  pct_surv <- (n_surv / n_sub) * 100
+  
+  c(
+    sprintf("%d", n_sub),
+    sprintf("%.2f (%.2f)", mean_age, sd_age),
+    sprintf("%d (%.1f%%)", n_ecog, pct_ecog),
+    sprintf("%d (%.1f%%)", n_surv, pct_surv)
+  )
+}
+
+desc_tbl <- data.frame(
+  Characteristic = c("Sample Size (N)", "Age, Mean (SD)", "ECOG Status: Poor (1), N (%)", "Observed 1-Year Survival, N (%)"),
+  "Control (D = 0)" = get_stats(df[df$treatment == 0, ]),
+  "Treated (D = 1)" = get_stats(df[df$treatment == 1, ]),
+  "Total Cohort" = get_stats(df),
+  check.names = FALSE,
+  stringsAsFactors = FALSE
+)
+
+knitr::kable(desc_tbl, caption = "Baseline Characteristics & Raw Outcomes of the Simulated Cohort", align = "lrrr")
 ```
 
 ---

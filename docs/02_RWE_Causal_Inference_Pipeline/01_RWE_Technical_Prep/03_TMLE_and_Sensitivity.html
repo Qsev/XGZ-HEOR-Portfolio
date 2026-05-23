@@ -288,7 +288,7 @@ window.Quarto = {
   </ul></li>
   <li><a href="#the-5-step-tmle-algorithm-with-integrated-r-code" id="toc-the-5-step-tmle-algorithm-with-integrated-r-code" class="nav-link" data-scroll-target="#the-5-step-tmle-algorithm-with-integrated-r-code"><span class="header-section-number">2</span> The 5-Step TMLE Algorithm with Integrated R Code</a>
   <ul class="collapse">
-  <li><a href="#cohort-simulation-setup" id="toc-cohort-simulation-setup" class="nav-link" data-scroll-target="#cohort-simulation-setup"><span class="header-section-number">2.1</span> Cohort Simulation Setup</a></li>
+  <li><a href="#cohort-simulation-setup-baseline-characteristics" id="toc-cohort-simulation-setup-baseline-characteristics" class="nav-link" data-scroll-target="#cohort-simulation-setup-baseline-characteristics"><span class="header-section-number">2.1</span> Cohort Simulation Setup &amp; Baseline Characteristics</a></li>
   <li><a href="#step-1-initial-estimation-of-the-outcome-regression-q_0" id="toc-step-1-initial-estimation-of-the-outcome-regression-q_0" class="nav-link" data-scroll-target="#step-1-initial-estimation-of-the-outcome-regression-q_0"><span class="header-section-number">2.2</span> Step 1: Initial Estimation of the Outcome Regression (<span class="math inline">\(Q_0\)</span>)</a></li>
   <li><a href="#step-2-estimation-of-the-propensity-score-g_0" id="toc-step-2-estimation-of-the-propensity-score-g_0" class="nav-link" data-scroll-target="#step-2-estimation-of-the-propensity-score-g_0"><span class="header-section-number">2.3</span> Step 2: Estimation of the Propensity Score (<span class="math inline">\(g_0\)</span>)</a></li>
   <li><a href="#step-3-computation-of-the-clever-covariate-h" id="toc-step-3-computation-of-the-clever-covariate-h" class="nav-link" data-scroll-target="#step-3-computation-of-the-clever-covariate-h"><span class="header-section-number">2.4</span> Step 3: Computation of the Clever Covariate (<span class="math inline">\(H\)</span>)</a></li>
@@ -369,9 +369,15 @@ window.Quarto = {
 <h2 data-number="2" class="anchored" data-anchor-id="the-5-step-tmle-algorithm-with-integrated-r-code"><span class="header-section-number">2</span> The 5-Step TMLE Algorithm with Integrated R Code</h2>
 <p>TMLE operates by taking an initial estimate of the outcome regression and “targeting” it using the treatment assignment model to directly optimize the parameter of interest (e.g., the Average Treatment Effect, ATE).</p>
 <p>The mathematical implementation follows five steps. To illustrate the mechanics transparently, we will run the manual calculations in R alongside each step using a simulated cohort (<span class="math inline">\(N=500\)</span>) with baseline confounding.</p>
-<section id="cohort-simulation-setup" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="cohort-simulation-setup"><span class="header-section-number">2.1</span> Cohort Simulation Setup</h3>
-<p>First, we set up the simulation environment and generate a baseline cohort where elderly and sicker patients (with higher ECOG performance status) are preferentially assigned to treatment (confounding by indication).</p>
+<section id="cohort-simulation-setup-baseline-characteristics" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="cohort-simulation-setup-baseline-characteristics"><span class="header-section-number">2.1</span> Cohort Simulation Setup &amp; Baseline Characteristics</h3>
+<p>The simulated cohort represents an observational registry of 500 patients:</p>
+<ul>
+<li><strong>Baseline Confounders</strong>: Age (normally distributed around 65) and ECOG performance status (binary indicator where 1 denotes poor status, with 40% prevalence).</li>
+<li><strong>Confounding by Indication</strong>: Older and sicker patients are preferentially prescribed the active treatment (probability of treatment increases with both age and poor ECOG status).</li>
+<li><strong>Survival Outcome</strong>: 1-year survival probability is driven by both confounders (older age and poor ECOG status lower survival) and treatment (which increases survival by a true risk difference of +15.5%).</li>
+</ul>
+<p>The baseline characteristics table below highlights the treatment assignment bias: older, sicker patients are heavily concentrated in the treated group, which will mask the true efficacy in naive unadjusted analyses.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
@@ -408,8 +414,82 @@ window.Quarto = {
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Naive (Unadjusted) Estimate</span></span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>naive_treated <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>naive_control <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>naive_ate <span class="ot">&lt;-</span> naive_treated <span class="sc">-</span> naive_control</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>naive_ate <span class="ot">&lt;-</span> naive_treated <span class="sc">-</span> naive_control</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Construct baseline descriptive statistics</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>get_stats <span class="ot">&lt;-</span> <span class="cf">function</span>(sub_df) {</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  n_sub <span class="ot">&lt;-</span> <span class="fu">nrow</span>(sub_df)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  mean_age <span class="ot">&lt;-</span> <span class="fu">mean</span>(sub_df<span class="sc">$</span>age)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  sd_age <span class="ot">&lt;-</span> <span class="fu">sd</span>(sub_df<span class="sc">$</span>age)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  n_ecog <span class="ot">&lt;-</span> <span class="fu">sum</span>(sub_df<span class="sc">$</span>ecog <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  pct_ecog <span class="ot">&lt;-</span> (n_ecog <span class="sc">/</span> n_sub) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  n_surv <span class="ot">&lt;-</span> <span class="fu">sum</span>(sub_df<span class="sc">$</span>survival_1yr <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  pct_surv <span class="ot">&lt;-</span> (n_surv <span class="sc">/</span> n_sub) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d"</span>, n_sub),</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f)"</span>, mean_age, sd_age),</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d (%.1f%%)"</span>, n_ecog, pct_ecog),</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d (%.1f%%)"</span>, n_surv, pct_surv)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>desc_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">Characteristic =</span> <span class="fu">c</span>(<span class="st">"Sample Size (N)"</span>, <span class="st">"Age, Mean (SD)"</span>, <span class="st">"ECOG Status: Poor (1), N (%)"</span>, <span class="st">"Observed 1-Year Survival, N (%)"</span>),</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Control (D = 0)"</span> <span class="ot">=</span> <span class="fu">get_stats</span>(df[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>, ]),</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Treated (D = 1)"</span> <span class="ot">=</span> <span class="fu">get_stats</span>(df[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>, ]),</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Total Cohort"</span> <span class="ot">=</span> <span class="fu">get_stats</span>(df),</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(desc_tbl, <span class="at">caption =</span> <span class="st">"Baseline Characteristics &amp; Raw Outcomes of the Simulated Cohort"</span>, <span class="at">align =</span> <span class="st">"lrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Baseline Characteristics &amp; Raw Outcomes of the Simulated Cohort</caption>
+<colgroup>
+<col style="width: 41%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Characteristic</th>
+<th style="text-align: right;">Control (D = 0)</th>
+<th style="text-align: right;">Treated (D = 1)</th>
+<th style="text-align: right;">Total Cohort</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Sample Size (N)</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">416</td>
+<td style="text-align: right;">500</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Age, Mean (SD)</td>
+<td style="text-align: right;">62.47 (10.45)</td>
+<td style="text-align: right;">65.97 (10.10)</td>
+<td style="text-align: right;">65.38 (10.24)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ECOG Status: Poor (1), N (%)</td>
+<td style="text-align: right;">18 (21.4%)</td>
+<td style="text-align: right;">177 (42.5%)</td>
+<td style="text-align: right;">195 (39.0%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Observed 1-Year Survival, N (%)</td>
+<td style="text-align: right;">25 (29.8%)</td>
+<td style="text-align: right;">163 (39.2%)</td>
+<td style="text-align: right;">188 (37.6%)</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <hr>
 </section>
