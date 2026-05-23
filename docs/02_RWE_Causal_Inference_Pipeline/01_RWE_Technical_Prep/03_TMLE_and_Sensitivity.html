@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Xiaoge Zhang, PhD">
+<meta name="dcterms.date" content="2026-05-23">
+
+<title>Targeted Maximum Likelihood Estimation &amp; Sensitivity Analysis – HEOR Technical Portfolio</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8c38fd85d21bfe44b50360969156fb14.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../custom.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">HEOR Technical Portfolio</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-flagship-audits" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Flagship Audits</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-flagship-audits">    
+        <li>
+    <a class="dropdown-item" href="../../05_TA975_CAR-T_Case/TA975_Mock_Case.html">
+ <span class="dropdown-text">NICE TA975 (CAR-T) Case</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.html">
+ <span class="dropdown-text">ML-NMR: AML Population Alignment</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.html">
+ <span class="dropdown-text">RWE ECA: R/R DLBCL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.html">
+ <span class="dropdown-text">PSM: Survival Extrapolation in RRMM</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-nma-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">NMA Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-nma-library">    
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.html">
+ <span class="dropdown-text">Bayesian Estimation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">
+ <span class="dropdown-text">Standard Bayesian NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.html">
+ <span class="dropdown-text">Network Meta-Regression</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.html">
+ <span class="dropdown-text">Survival NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/04_Component_NMA.html">
+ <span class="dropdown-text">Component NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.html">
+ <span class="dropdown-text">IPD NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/06_MAIC.html">
+ <span class="dropdown-text">MAIC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/07_STC.html">
+ <span class="dropdown-text">STC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/08_ML_NMR.html">
+ <span class="dropdown-text">ML-NMR</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.html">
+ <span class="dropdown-text">Flexible Survival</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.html">
+ <span class="dropdown-text">HR vs OR Intuition</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-rwe-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">RWE Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-rwe-library">    
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.html">
+ <span class="dropdown-text">NICE Framework &amp; Confounding</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.html">
+ <span class="dropdown-text">PSM, IPTW &amp; AIPW</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/03_TMLE_and_Sensitivity.html">
+ <span class="dropdown-text">TMLE &amp; Sensitivity Analysis</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../00_HTA_LLM_Wiki/README.html"> 
+<span class="menu-text">Methodology Wiki</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Qsev/XGZ-HEOR-Portfolio" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction-the-limits-of-single-robustness-aipw" id="toc-introduction-the-limits-of-single-robustness-aipw" class="nav-link active" data-scroll-target="#introduction-the-limits-of-single-robustness-aipw"><span class="header-section-number">1</span> Introduction: The Limits of Single Robustness &amp; AIPW</a>
+  <ul class="collapse">
+  <li><a href="#doubly-robust-estimators" id="toc-doubly-robust-estimators" class="nav-link" data-scroll-target="#doubly-robust-estimators"><span class="header-section-number">1.1</span> Doubly Robust Estimators</a></li>
+  <li><a href="#why-tmle-over-aipw" id="toc-why-tmle-over-aipw" class="nav-link" data-scroll-target="#why-tmle-over-aipw"><span class="header-section-number">1.2</span> Why TMLE Over AIPW?</a></li>
+  </ul></li>
+  <li><a href="#the-5-step-tmle-algorithm" id="toc-the-5-step-tmle-algorithm" class="nav-link" data-scroll-target="#the-5-step-tmle-algorithm"><span class="header-section-number">2</span> The 5-Step TMLE Algorithm</a>
+  <ul class="collapse">
+  <li><a href="#step-1-initial-estimation-of-the-outcome-regression-q_0" id="toc-step-1-initial-estimation-of-the-outcome-regression-q_0" class="nav-link" data-scroll-target="#step-1-initial-estimation-of-the-outcome-regression-q_0"><span class="header-section-number">2.1</span> Step 1: Initial Estimation of the Outcome Regression (<span class="math inline">\(Q_0\)</span>)</a></li>
+  <li><a href="#step-2-estimation-of-the-propensity-score-g_0" id="toc-step-2-estimation-of-the-propensity-score-g_0" class="nav-link" data-scroll-target="#step-2-estimation-of-the-propensity-score-g_0"><span class="header-section-number">2.2</span> Step 2: Estimation of the Propensity Score (<span class="math inline">\(g_0\)</span>)</a></li>
+  <li><a href="#step-3-computation-of-the-clever-covariate-h" id="toc-step-3-computation-of-the-clever-covariate-h" class="nav-link" data-scroll-target="#step-3-computation-of-the-clever-covariate-h"><span class="header-section-number">2.3</span> Step 3: Computation of the Clever Covariate (<span class="math inline">\(H\)</span>)</a></li>
+  <li><a href="#step-4-the-fluctuation-update-step" id="toc-step-4-the-fluctuation-update-step" class="nav-link" data-scroll-target="#step-4-the-fluctuation-update-step"><span class="header-section-number">2.4</span> Step 4: The Fluctuation (Update) Step</a></li>
+  <li><a href="#step-5-parameter-estimation-via-substitution" id="toc-step-5-parameter-estimation-via-substitution" class="nav-link" data-scroll-target="#step-5-parameter-estimation-via-substitution"><span class="header-section-number">2.5</span> Step 5: Parameter Estimation via Substitution</a></li>
+  </ul></li>
+  <li><a href="#sensitivity-analysis-the-e-value" id="toc-sensitivity-analysis-the-e-value" class="nav-link" data-scroll-target="#sensitivity-analysis-the-e-value"><span class="header-section-number">3</span> Sensitivity Analysis: The E-Value</a>
+  <ul class="collapse">
+  <li><a href="#the-e-value-formulation" id="toc-the-e-value-formulation" class="nav-link" data-scroll-target="#the-e-value-formulation"><span class="header-section-number">3.1</span> The E-Value Formulation</a></li>
+  <li><a href="#interpretation-in-hta-appraisals" id="toc-interpretation-in-hta-appraisals" class="nav-link" data-scroll-target="#interpretation-in-hta-appraisals"><span class="header-section-number">3.2</span> Interpretation in HTA Appraisals</a></li>
+  </ul></li>
+  <li><a href="#r-implementation-pipeline" id="toc-r-implementation-pipeline" class="nav-link" data-scroll-target="#r-implementation-pipeline"><span class="header-section-number">4</span> R Implementation Pipeline</a>
+  <ul class="collapse">
+  <li><a href="#doubly-robust-estimation-via-tmle" id="toc-doubly-robust-estimation-via-tmle" class="nav-link" data-scroll-target="#doubly-robust-estimation-via-tmle"><span class="header-section-number">4.1</span> Doubly Robust Estimation via TMLE</a></li>
+  <li><a href="#sensitivity-analysis-e-value-calculation" id="toc-sensitivity-analysis-e-value-calculation" class="nav-link" data-scroll-target="#sensitivity-analysis-e-value-calculation"><span class="header-section-number">4.2</span> Sensitivity Analysis: E-Value Calculation</a></li>
+  <li><a href="#e-value-contour-visualization" id="toc-e-value-contour-visualization" class="nav-link" data-scroll-target="#e-value-contour-visualization"><span class="header-section-number">4.3</span> E-Value Contour Visualization</a></li>
+  </ul></li>
+  <li><a href="#causal-evidence-reconciliation" id="toc-causal-evidence-reconciliation" class="nav-link" data-scroll-target="#causal-evidence-reconciliation"><span class="header-section-number">5</span> Causal Evidence Reconciliation</a></li>
+  <li><a href="#eag-defense-strategy" id="toc-eag-defense-strategy" class="nav-link" data-scroll-target="#eag-defense-strategy"><span class="header-section-number">6</span> EAG Defense Strategy</a>
+  <ul class="collapse">
+  <li><a href="#justifying-tmle-over-parametric-regression" id="toc-justifying-tmle-over-parametric-regression" class="nav-link" data-scroll-target="#justifying-tmle-over-parametric-regression"><span class="header-section-number">6.1</span> Justifying TMLE Over Parametric Regression</a></li>
+  <li><a href="#auditing-sensitivity-via-e-value" id="toc-auditing-sensitivity-via-e-value" class="nav-link" data-scroll-target="#auditing-sensitivity-via-e-value"><span class="header-section-number">6.2</span> Auditing Sensitivity via E-Value</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Targeted Maximum Likelihood Estimation &amp; Sensitivity Analysis</h1>
+<p class="subtitle lead">Doubly Robust Causal Inference &amp; Unmeasured Confounding Audits</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xiaoge Zhang, PhD </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 23, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Advanced Causal Inference for External Control Arms and Observational Real-World Evidence</em></p>
+<section id="introduction-the-limits-of-single-robustness-aipw" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction-the-limits-of-single-robustness-aipw"><span class="header-section-number">1</span> Introduction: The Limits of Single Robustness &amp; AIPW</h2>
+<p>In health technology assessment (HTA), observational real-world data (RWD) is frequently used to construct External Control Arms (ECAs) when randomized controlled trials (RCTs) are unfeasible. Standard propensity score adjustments, such as Propensity Score Matching (PSM) and Inverse Probability Treatment Weighting (IPTW), rely entirely on the correct specification of the treatment assignment model: <span class="math display">\[g(X) = P(D = 1 \mid X)\]</span></p>
+<p>If the propensity score model omits crucial confounders or misspecifies their functional forms (e.g., ignoring non-linearities or interactions), these single-robust estimators yield biased estimates of the treatment effect.</p>
+<section id="doubly-robust-estimators" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="doubly-robust-estimators"><span class="header-section-number">1.1</span> Doubly Robust Estimators</h3>
+<p>To address this, doubly robust estimators combine the treatment model with an outcome regression model: <span class="math display">\[m(D, X) = E[Y \mid D, X]\]</span></p>
+<p>This ensures that the treatment effect estimate is unbiased if <em>either</em> the treatment model <em>or</em> the outcome model is correctly specified.</p>
+</section>
+<section id="why-tmle-over-aipw" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="why-tmle-over-aipw"><span class="header-section-number">1.2</span> Why TMLE Over AIPW?</h3>
+<p>While Augmented Inverse Probability Weighting (AIPW) is also doubly robust, <strong>Targeted Maximum Likelihood Estimation (TMLE)</strong>—developed by Mark van der Laan and colleagues—is preferred in HTA and regulatory submissions for several reasons:</p>
+<ul>
+<li><strong>Substitution Estimator (Respecting Bounds)</strong>: AIPW is an influence function-based estimator. Because it adds a weighted residual correction, it can yield predicted counterfactual values that lie outside the physical bounds of the outcome space. For example, in binary or time-to-event outcomes, AIPW can predict survival probabilities that are greater than <span class="math inline">\(1\)</span> or less than <span class="math inline">\(0\)</span>. TMLE is a <em>substitution estimator</em>, which mathematically guarantees that the estimated probabilities respect the natural bounds of the parameter space (i.e., restricting survival estimates strictly within <span class="math inline">\([0, 1]\)</span>).</li>
+<li><strong>Semiparametric Efficiency</strong>: TMLE is asymptotically efficient, meaning it achieves the lowest possible variance (the semiparametric efficiency bound) among all regular estimators when both models are correctly specified.</li>
+<li><strong>Ensemble Integration</strong>: TMLE natively integrates machine learning ensembles (like <code>SuperLearner</code>) to model both the outcome and treatment mechanisms, minimizing the risk of model misspecification bias.</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="the-5-step-tmle-algorithm" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-5-step-tmle-algorithm"><span class="header-section-number">2</span> The 5-Step TMLE Algorithm</h2>
+<p>TMLE operates by taking an initial estimate of the outcome regression and “targeting” it using the treatment assignment model to directly optimize the parameter of interest (e.g., the Average Treatment Effect, ATE).</p>
+<p>The mathematical implementation follows five steps:</p>
+<section id="step-1-initial-estimation-of-the-outcome-regression-q_0" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="step-1-initial-estimation-of-the-outcome-regression-q_0"><span class="header-section-number">2.1</span> Step 1: Initial Estimation of the Outcome Regression (<span class="math inline">\(Q_0\)</span>)</h3>
+<p>We estimate the conditional expectation of the outcome <span class="math inline">\(Y\)</span> given treatment <span class="math inline">\(D\)</span> and baseline covariates <span class="math inline">\(W\)</span>: <span class="math display">\[Q_0(D, W) = E[Y \mid D, W]\]</span></p>
+<p>This model is fitted using a machine learning library or parametric regression. We then generate two predicted values for each individual <span class="math inline">\(i\)</span>:</p>
+<ul>
+<li>The predicted outcome under treatment: <span class="math inline">\(Q_0(1, W_i)\)</span></li>
+<li>The predicted outcome under control: <span class="math inline">\(Q_0(0, W_i)\)</span></li>
+</ul>
+</section>
+<section id="step-2-estimation-of-the-propensity-score-g_0" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="step-2-estimation-of-the-propensity-score-g_0"><span class="header-section-number">2.2</span> Step 2: Estimation of the Propensity Score (<span class="math inline">\(g_0\)</span>)</h3>
+<p>We estimate the probability of treatment assignment given covariates: <span class="math display">\[g(W) = P(D = 1 \mid W)\]</span></p>
+<p>For each individual <span class="math inline">\(i\)</span>, we compute their estimated propensity score <span class="math inline">\(g(W_i)\)</span>.</p>
+</section>
+<section id="step-3-computation-of-the-clever-covariate-h" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="step-3-computation-of-the-clever-covariate-h"><span class="header-section-number">2.3</span> Step 3: Computation of the Clever Covariate (<span class="math inline">\(H\)</span>)</h3>
+<p>We construct a secondary covariate, known as the <strong>Clever Covariate</strong> <span class="math inline">\(H(D, W)\)</span>, which represents the inverse probability weight adjusted for the treatment actually received: <span class="math display">\[H(D, W) = \frac{D}{g(W)} - \frac{1 - D}{1 - g(W)}\]</span></p>
+<p>For each individual <span class="math inline">\(i\)</span>, we evaluate two values of the Clever Covariate:</p>
+<ul>
+<li>The covariate value under treatment (<span class="math inline">\(D_i = 1\)</span>): <span class="math inline">\(H(1, W_i) = \frac{1}{g(W_i)}\)</span></li>
+<li>The covariate value under control (<span class="math inline">\(D_i = 0\)</span>): <span class="math inline">\(H(0, W_i) = -\frac{1}{1 - g(W_i)}\)</span></li>
+</ul>
+</section>
+<section id="step-4-the-fluctuation-update-step" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="step-4-the-fluctuation-update-step"><span class="header-section-number">2.4</span> Step 4: The Fluctuation (Update) Step</h3>
+<p>We update the initial outcome prediction <span class="math inline">\(Q_0\)</span> by fitting a logistic regression of the observed outcome <span class="math inline">\(Y\)</span> on the Clever Covariate <span class="math inline">\(H(D, W)\)</span>, using the logit of the initial prediction <span class="math inline">\(Q_0(D, W)\)</span> as a fixed offset: <span class="math display">\[\text{logit}\big(Q_1(D, W)\right) = \text{logit}\big(Q_0(D, W)\right) + \epsilon \cdot H(D, W)\]</span></p>
+<p>Here, the coefficient <span class="math inline">\(\epsilon\)</span> (the fluctuation parameter) is estimated via Maximum Likelihood.</p>
+<p>If the initial outcome regression <span class="math inline">\(Q_0\)</span> is already perfectly calibrated, the residual error <span class="math inline">\((Y - Q_0)\)</span> will be orthogonal to the weights, and the estimated coefficient <span class="math inline">\(\epsilon\)</span> will be close to <span class="math inline">\(0\)</span>. If <span class="math inline">\(Q_0\)</span> is biased, <span class="math inline">\(\epsilon\)</span> will deviate from <span class="math inline">\(0\)</span>, shifting the predictions to remove the bias.</p>
+<p>We then update the counterfactual predictions for all individuals:</p>
+<ul>
+<li>Updated survival under treatment: <span class="math inline">\(Q_1(1, W_i) = \text{logit}^{-1}\left( \text{logit}(Q_0(1, W_i)) + \epsilon \cdot H(1, W_i) \right)\)</span></li>
+<li>Updated survival under control: <span class="math inline">\(Q_1(0, W_i) = \text{logit}^{-1}\left( \text{logit}(Q_0(0, W_i)) + \epsilon \cdot H(0, W_i) \right)\)</span></li>
+</ul>
+</section>
+<section id="step-5-parameter-estimation-via-substitution" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="step-5-parameter-estimation-via-substitution"><span class="header-section-number">2.5</span> Step 5: Parameter Estimation via Substitution</h3>
+<p>Finally, we calculate the doubly robust ATE by averaging the updated counterfactual predictions across the sample: <span class="math display">\[\hat{ATE}_{TMLE} = \frac{1}{n} \sum_{i=1}^n \left[ Q_1(1, W_i) - Q_1(0, W_i) \right]\]</span></p>
+<p>Because the update step satisfies the efficient score equation, standard errors and confidence intervals are computed asymptotically using the variance of the influence function.</p>
+<hr>
+</section>
+</section>
+<section id="sensitivity-analysis-the-e-value" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="sensitivity-analysis-the-e-value"><span class="header-section-number">3</span> Sensitivity Analysis: The E-Value</h2>
+<p>A critical assumption in causal inference is <strong>Exchangeability (Unconfoundedness)</strong>—the assumption that all confounders (<span class="math inline">\(W\)</span>) that simultaneously drive treatment assignment and clinical outcomes have been measured and adjusted for: <span class="math display">\[Y^{(1)}, Y^{(0)} \perp D \mid W\]</span></p>
+<p>In real-world observational registries, this assumption is unverifiable and frequently threatened by <strong>Unmeasured Confounding</strong> (e.g., unrecorded tumor biomarkers, sub-clinical frailty, or physician subjective preferences).</p>
+<section id="the-e-value-formulation" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="the-e-value-formulation"><span class="header-section-number">3.1</span> The E-Value Formulation</h3>
+<p>The <strong>E-Value</strong> (VanderWeele and Ding, 2017) quantifies the minimum strength of association that an unmeasured confounder (<span class="math inline">\(U\)</span>) would need to have with both the treatment (<span class="math inline">\(D\)</span>) and the outcome (<span class="math inline">\(Y\)</span>), on the Risk Ratio (RR) scale, to fully explain away an observed treatment effect.</p>
+<p>For a point estimate representing a Relative Risk (<span class="math inline">\(RR_{obs} &gt; 1\)</span>), the E-value is calculated as: <span class="math display">\[E = RR_{obs} + \sqrt{RR_{obs} (RR_{obs} - 1)}\]</span></p>
+<p>If the observed treatment effect is protective (<span class="math inline">\(RR_{obs} &lt; 1\)</span>), we first invert the estimate (<span class="math inline">\(1/RR_{obs}\)</span>) before applying the formula.</p>
+</section>
+<section id="interpretation-in-hta-appraisals" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="interpretation-in-hta-appraisals"><span class="header-section-number">3.2</span> Interpretation in HTA Appraisals</h3>
+<p>The E-value provides an intuitive benchmark for HTA committees:</p>
+<ul>
+<li>If the E-value is small (e.g., <span class="math inline">\(E = 1.2\)</span>), a weak unmeasured confounder that increases both the probability of treatment and the probability of survival by only 1.2-fold could nullify the treatment effect. The evidence is highly sensitive to hidden bias.</li>
+<li>If the E-value is large (e.g., <span class="math inline">\(E = 2.8\)</span>), a hidden confounder would need to have a strong 2.8-fold association with both treatment and outcome to explain away the effect. If known, measured confounders (like ECOG score) only have associations of 1.5-fold to 2.0-fold, it is highly unlikely that an unmeasured factor of such extreme magnitude exists, establishing the robustness of the causal claim.</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="r-implementation-pipeline" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="r-implementation-pipeline"><span class="header-section-number">4</span> R Implementation Pipeline</h2>
+<p>This pipeline simulates a cohort (<span class="math inline">\(N=500\)</span>) with baseline confounding, fits the ATE using TMLE with ensemble learners, and conducts an E-value sensitivity analysis.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(WeightIt)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmle)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EValue)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Simulate Confounders</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">65</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ecog <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.4</span>) <span class="co"># 1 = Poor performance status</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Simulate Treatment Assignment (Confounding by Indication)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Elderly and sicker patients are more likely to receive the treatment (D = 1)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ps_true <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">1.2</span> <span class="sc">*</span> ecog)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_true)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Simulate Survival Outcome (1-Year Survival)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># True Treatment Effect (Risk Difference) = +15.5% (coefficient = 0.8 in log-odds scale)</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>y_prob_1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">1.0</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> <span class="dv">1</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>y_prob_0 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">1.0</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> <span class="dv">0</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>true_ate <span class="ot">&lt;-</span> <span class="fu">mean</span>(y_prob_1) <span class="sc">-</span> <span class="fu">mean</span>(y_prob_0)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>survival_1yr <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(treatment <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">rbinom</span>(n, <span class="dv">1</span>, y_prob_1),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">rbinom</span>(n, <span class="dv">1</span>, y_prob_0))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(age, ecog, treatment, survival_1yr)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Naive (Unadjusted) Estimate</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>naive_treated <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>naive_control <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>naive_ate <span class="ot">&lt;-</span> naive_treated <span class="sc">-</span> naive_control</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="doubly-robust-estimation-via-tmle" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="doubly-robust-estimation-via-tmle"><span class="header-section-number">4.1</span> Doubly Robust Estimation via TMLE</h3>
+<p>We estimate the treatment effect using the <code>tmle</code> package. We specify <code>SuperLearner</code> ensemble models (with GLM and Mean libraries) to predict both the treatment assignment and outcome regressions.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit TMLE and suppress package-level output</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sl_lib <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tmle_fit <span class="ot">&lt;-</span> <span class="fu">suppressMessages</span>(<span class="fu">tmle</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y             =</span> df<span class="sc">$</span>survival_1yr,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">A             =</span> df<span class="sc">$</span>treatment,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">W             =</span> df[, <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"ecog"</span>)],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q.SL.library  =</span> sl_lib,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">g.SL.library  =</span> sl_lib,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">family        =</span> <span class="st">"binomial"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract results</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>tmle_est <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>tmle_se  <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>var.psi)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>tmle_ci  <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>tmle_pval <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>pvalue</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>epsilon  <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>epsilon</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Format TMLE parameter table</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>tmle_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">c</span>(<span class="st">"Risk under Control (EY0)"</span>, <span class="st">"Risk under Exposure (EY1)"</span>, <span class="st">"Risk Difference (ATE)"</span>),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate =</span> <span class="fu">c</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY0<span class="sc">$</span>psi, tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY1<span class="sc">$</span>psi, tmle_est),</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Std. Error"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sqrt</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY0<span class="sc">$</span>var.psi), <span class="fu">sqrt</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY1<span class="sc">$</span>var.psi), tmle_se),</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">c</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY0<span class="sc">$</span>CI[<span class="dv">1</span>], tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY1<span class="sc">$</span>CI[<span class="dv">1</span>], tmle_ci[<span class="dv">1</span>]),</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">c</span>(tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY0<span class="sc">$</span>CI[<span class="dv">2</span>], tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY1<span class="sc">$</span>CI[<span class="dv">2</span>], tmle_ci[<span class="dv">2</span>]),</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="st">"p-value"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, tmle_pval),</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Round values for display</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>tmle_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(tmle_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">5</span>], <span class="dv">4</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>tmle_tbl[<span class="dv">3</span>, <span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="fu">format.pval</span>(tmle_pval, <span class="at">eps =</span> <span class="fl">0.001</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(tmle_tbl, <span class="at">caption =</span> <span class="st">"Targeted Maximum Likelihood Estimation (TMLE) Results"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Targeted Maximum Likelihood Estimation (TMLE) Results</caption>
+<colgroup>
+<col style="width: 37%">
+<col style="width: 12%">
+<col style="width: 15%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Std. Error</th>
+<th style="text-align: right;">95% LCL</th>
+<th style="text-align: right;">95% UCL</th>
+<th style="text-align: right;">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Risk under Control (EY0)</td>
+<td style="text-align: right;">0.2295</td>
+<td style="text-align: right;">0.0419</td>
+<td style="text-align: right;">0.1475</td>
+<td style="text-align: right;">0.3116</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Risk under Exposure (EY1)</td>
+<td style="text-align: right;">0.4006</td>
+<td style="text-align: right;">0.0241</td>
+<td style="text-align: right;">0.3533</td>
+<td style="text-align: right;">0.4479</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Risk Difference (ATE)</td>
+<td style="text-align: right;">0.1710</td>
+<td style="text-align: right;">0.0477</td>
+<td style="text-align: right;">0.0775</td>
+<td style="text-align: right;">0.2646</td>
+<td style="text-align: right;">&lt;0.001</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Interpretation of the Fluctuation Parameter
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The estimated fluctuation parameter <span class="math inline">\(\epsilon\)</span> is <strong>-0.037252, 0.008208</strong>. This value represents the degree of covariate adjustment applied during the targeting step. A non-zero <span class="math inline">\(\epsilon\)</span> indicates that the initial outcome predictions were shifted to successfully correct for treatment selection bias.</p>
+</div>
+</div>
+</section>
+<section id="sensitivity-analysis-e-value-calculation" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="sensitivity-analysis-e-value-calculation"><span class="header-section-number">4.2</span> Sensitivity Analysis: E-Value Calculation</h3>
+<p>To evaluate sensitivity to unmeasured confounding, we transform the Risk Difference obtained from TMLE to the Relative Risk (RR) scale and calculate the corresponding E-value.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Transform Risk Difference to Relative Risk</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ey0_est <span class="ot">&lt;-</span> tmle_fit<span class="sc">$</span>estimates<span class="sc">$</span>EY0<span class="sc">$</span>psi</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>rr_est  <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> tmle_est) <span class="sc">/</span> ey0_est</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>rr_lo   <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> tmle_ci[<span class="dv">1</span>]) <span class="sc">/</span> ey0_est</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>rr_hi   <span class="ot">&lt;-</span> (ey0_est <span class="sc">+</span> tmle_ci[<span class="dv">2</span>]) <span class="sc">/</span> ey0_est</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Compute E-value</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ev <span class="ot">&lt;-</span> <span class="fu">evalues.RR</span>(<span class="at">est =</span> rr_est, <span class="at">lo =</span> rr_lo, <span class="at">hi =</span> rr_hi)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ev_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(ev)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Format E-value table</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>ev_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Metric / Parameter"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Relative Risk of Treatment (RR)"</span>, <span class="st">"E-value (Treatment Effect Bound)"</span>),</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Point Estimate"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_df[<span class="st">"RR"</span>, <span class="st">"point"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_df[<span class="st">"E-values"</span>, <span class="st">"point"</span>])),</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Lower Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_df[<span class="st">"RR"</span>, <span class="st">"lower"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_df[<span class="st">"E-values"</span>, <span class="st">"lower"</span>])),</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Upper Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_df[<span class="st">"RR"</span>, <span class="st">"upper"</span>]), <span class="st">"N/A"</span>),</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ev_tbl, <span class="at">caption =</span> <span class="st">"E-Value Analysis for Unmeasured Confounding Sensitivity"</span>, <span class="at">align =</span> <span class="st">"lrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>E-Value Analysis for Unmeasured Confounding Sensitivity</caption>
+<colgroup>
+<col style="width: 38%">
+<col style="width: 17%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Metric / Parameter</th>
+<th style="text-align: right;">Point Estimate</th>
+<th style="text-align: right;">95% CI Lower Bound</th>
+<th style="text-align: right;">95% CI Upper Bound</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Relative Risk of Treatment (RR)</td>
+<td style="text-align: right;">1.745</td>
+<td style="text-align: right;">1.338</td>
+<td style="text-align: right;">2.153</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">E-value (Treatment Effect Bound)</td>
+<td style="text-align: right;">2.886</td>
+<td style="text-align: right;">2.010</td>
+<td style="text-align: right;">N/A</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The point estimate E-value of <strong>2.89</strong> indicates that an unmeasured confounder would need to have a Relative Risk association of at least <strong>2.89</strong>-fold with both treatment assignment and survival to fully explain away the observed causal survival benefit.</p>
+</section>
+<section id="e-value-contour-visualization" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="e-value-contour-visualization"><span class="header-section-number">4.3</span> E-Value Contour Visualization</h3>
+<p>The contour curve illustrates the required strength of association between the unmeasured confounder and the treatment (x-axis) and outcome (y-axis) to reduce the observed effect to the null.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ev, <span class="at">type =</span> <span class="st">"line"</span>, </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"E-value Contour: Sensitivity to Unmeasured Confounding"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in plot.xy(xy, type, ...): plot type 'line' will be truncated to first
+character</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="03_TMLE_and_Sensitivity_files/figure-html/evalue-plot-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="causal-evidence-reconciliation" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="causal-evidence-reconciliation"><span class="header-section-number">5</span> Causal Evidence Reconciliation</h2>
+<p>We reconcile the point estimates and standard errors across our observational causal pipeline compared to the simulated population ground truth.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit IPTW for comparison (from Page 2 workflow)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">weightit</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">"ps"</span>, <span class="at">estimand =</span> <span class="st">"ATE"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>fit_iptw <span class="ot">&lt;-</span> <span class="fu">lm_weightit</span>(survival_1yr <span class="sc">~</span> treatment, <span class="at">data =</span> df, <span class="at">weightit =</span> W)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>iptw_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_iptw)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>iptw_est <span class="ot">&lt;-</span> iptw_summary<span class="sc">$</span>coefficients[<span class="st">"treatment"</span>, <span class="st">"Estimate"</span>]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>iptw_se  <span class="ot">&lt;-</span> iptw_summary<span class="sc">$</span>coefficients[<span class="st">"treatment"</span>, <span class="st">"Std. Error"</span>]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine into reconciliation matrix</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimator =</span> <span class="fu">c</span>(<span class="st">"Ground Truth (Omniscient)"</span>, <span class="st">"Naive (Unadjusted)"</span>, <span class="st">"IPTW (Weighting Only)"</span>, <span class="st">"TMLE (Doubly Robust)"</span>),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ATE Point Estimate"</span> <span class="ot">=</span> <span class="fu">c</span>(true_ate, naive_ate, iptw_est, tmle_est),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Standard Error"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, iptw_se, tmle_se),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, iptw_est <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> iptw_se, tmle_ci[<span class="dv">1</span>]),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, iptw_est <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> iptw_se, tmle_ci[<span class="dv">2</span>]),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Bias vs. Truth"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.0000</span>, naive_ate <span class="sc">-</span> true_ate, iptw_est <span class="sc">-</span> true_ate, tmle_est <span class="sc">-</span> true_ate),</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Format values for display</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], <span class="dv">4</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[<span class="fu">is.na</span>(reconciliation_tbl)] <span class="ot">&lt;-</span> <span class="st">"N/A"</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(reconciliation_tbl, <span class="at">caption =</span> <span class="st">"Causal Evidence Reconciliation Across Estimators"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Causal Evidence Reconciliation Across Estimators</caption>
+<colgroup>
+<col style="width: 28%">
+<col style="width: 20%">
+<col style="width: 16%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Estimator</th>
+<th style="text-align: right;">ATE Point Estimate</th>
+<th style="text-align: right;">Standard Error</th>
+<th style="text-align: right;">95% LCL</th>
+<th style="text-align: right;">95% UCL</th>
+<th style="text-align: right;">Bias vs.&nbsp;Truth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Ground Truth (Omniscient)</td>
+<td style="text-align: right;">0.1550</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Naive (Unadjusted)</td>
+<td style="text-align: right;">0.0942</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">-0.0608</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">IPTW (Weighting Only)</td>
+<td style="text-align: right;">0.1678</td>
+<td style="text-align: right;">0.0476</td>
+<td style="text-align: right;">0.0746</td>
+<td style="text-align: right;">0.261</td>
+<td style="text-align: right;">0.0128</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TMLE (Doubly Robust)</td>
+<td style="text-align: right;">0.1710</td>
+<td style="text-align: right;">0.0477</td>
+<td style="text-align: right;">0.0775</td>
+<td style="text-align: right;">0.2646</td>
+<td style="text-align: right;">0.0161</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr>
+</section>
+<section id="eag-defense-strategy" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="eag-defense-strategy"><span class="header-section-number">6</span> EAG Defense Strategy</h2>
+<p>When defending causal estimates derived via TMLE and E-value sensitivity analysis during EAG reviews, modellers should leverage the following arguments:</p>
+<section id="justifying-tmle-over-parametric-regression" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="justifying-tmle-over-parametric-regression"><span class="header-section-number">6.1</span> Justifying TMLE Over Parametric Regression</h3>
+<blockquote class="blockquote">
+<p>“Rather than relying on arbitrary functional forms that assume linear log-odds relations for confounding covariates, we implemented TMLE coupled with the SuperLearner ensemble. This allows the data to non-parametrically determine the correct functional relations, minimizing model misspecification bias.</p>
+<p>Furthermore, TMLE is a substitution estimator, meaning that unlike influence function-based estimators (like AIPW) which can yield survival predictions outside the valid <span class="math inline">\([0, 1]\)</span> interval, TMLE is mathematically restricted to remain within the physical bounds of probability space. This ensures clinical plausibility in all extrapolated subgroups.”</p>
+</blockquote>
+</section>
+<section id="auditing-sensitivity-via-e-value" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="auditing-sensitivity-via-e-value"><span class="header-section-number">6.2</span> Auditing Sensitivity via E-Value</h3>
+<blockquote class="blockquote">
+<p>“The E-value of 2.89 demonstrates that our causal treatment effect is robust against unmeasured confounding. To invalidate this survival difference, an unmeasured baseline covariate would need to increase both the likelihood of treatment and the likelihood of survival by at least 2.89-fold.</p>
+<p>In our adjusted models, the strongest measured clinical confounders (such as poor ECOG performance status) only display hazard associations of approximately 1.8-fold. It is highly implausible that a missing, unmeasured confounder of greater magnitude exists that is completely uncorrelated with the clinical indicators adjusted for in this analysis.”</p>
+</blockquote>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
