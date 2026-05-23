@@ -311,7 +311,7 @@ window.Quarto = {
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -365,7 +365,7 @@ window.Quarto = {
 </ul>
 </section>
 </section>
-<section id="the-5-step-tmle-algorithm-with-integrated-r-code" class="level2" data-number="2">
+<section id="the-5-step-tmle-algorithm-with-integrated-r-code" class="level2 page-columns page-full" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="the-5-step-tmle-algorithm-with-integrated-r-code"><span class="header-section-number">2</span> The 5-Step TMLE Algorithm with Integrated R Code</h2>
 <p>TMLE operates by taking an initial estimate of the outcome regression and “targeting” it using the treatment assignment model to directly optimize the parameter of interest (e.g., the Average Treatment Effect, ATE).</p>
 <p>The mathematical implementation follows five steps. To illustrate the mechanics transparently, we will run the manual calculations in R alongside each step using a simulated cohort (<span class="math inline">\(N=500\)</span>) with baseline confounding.</p>
@@ -493,11 +493,14 @@ window.Quarto = {
 </div>
 <hr>
 </section>
-<section id="step-1-initial-estimation-of-the-outcome-regression-q_0" class="level3" data-number="2.2">
+<section id="step-1-initial-estimation-of-the-outcome-regression-q_0" class="level3 page-columns page-full" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="step-1-initial-estimation-of-the-outcome-regression-q_0"><span class="header-section-number">2.2</span> Step 1: Initial Estimation of the Outcome Regression (<span class="math inline">\(Q_0\)</span>)</h3>
 <p>We estimate the conditional expectation of the outcome <span class="math inline">\(Y\)</span> given treatment <span class="math inline">\(D\)</span> and baseline covariates <span class="math inline">\(W\)</span>: <span class="math display">\[Q_0(D, W) = E[Y \mid D, W]\]</span></p>
-<p>We fit a logistic regression model<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> for <span class="math inline">\(Y\)</span> and generate two counterfactual predicted values for each individual <span class="math inline">\(i\)</span>:</p>
-<ul>
+<p>We fit a logistic regression model for <span class="math inline">\(Y\)</span> and generate two counterfactual predicted values for each individual <span class="math inline">\(i\)</span>:</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>Note: Specifying <code>family = binomial</code> in R’s <code>glm()</code> function defaults to a logistic regression model (Logit Model) to model binary outcome probabilities.</p>
+</div></div><ul>
 <li>The predicted outcome under treatment: <span class="math inline">\(Q_0(1, W_i)\)</span></li>
 <li>The predicted outcome under control: <span class="math inline">\(Q_0(0, W_i)\)</span></li>
 </ul>
@@ -1185,13 +1188,7 @@ character</code></pre>
 </section>
 </section>
 
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Specifying <code>family = binomial</code> in R’s <code>glm()</code> function defaults to a logistic regression model (Logit link function) to model binary outcome probabilities.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
