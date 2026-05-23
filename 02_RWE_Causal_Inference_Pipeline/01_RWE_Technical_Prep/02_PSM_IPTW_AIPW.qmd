@@ -389,6 +389,22 @@ iptw_summary <- summary(fit_iptw)
 iptw_est <- iptw_summary$coefficients["treatment", "Estimate"]
 iptw_se <- iptw_summary$coefficients["treatment", "Std. Error"]
 
+# Extract and format IPTW regression results for display
+iptw_coefs <- iptw_summary$coefficients
+iptw_cis <- confint(fit_iptw)
+
+iptw_tbl <- data.frame(
+  Parameter = c("Intercept (Control Survival)", "Treatment Effect (ATE)"),
+  Estimate = round(iptw_coefs[, "Estimate"], 4),
+  "Std. Error" = round(iptw_coefs[, "Std. Error"], 4),
+  "z value" = round(iptw_coefs[, "z value"], 2),
+  "p-value" = format.pval(iptw_coefs[, "Pr(>|z|)"], eps = 0.001, digits = 3),
+  "95% LCL" = round(iptw_cis[, 1], 4),
+  "95% UCL" = round(iptw_cis[, 2], 4),
+  check.names = FALSE,
+  row.names = NULL
+)
+
 # 2. AIPW Estimation
 sl_lib_aipw <- c("SL.glm", "SL.mean")
 
@@ -420,7 +436,10 @@ aipw_tbl <- data.frame(
   check.names = FALSE
 )
 
+# Output both tables
+knitr::kable(iptw_tbl, caption = "Weighted Linear Regression Estimates via IPTW (Robust Standard Errors)", align = "lrrrrrr")
 knitr::kable(aipw_tbl, caption = "Doubly Robust Estimates via Augmented Inverse Probability Weighting (AIPW)", align = "lrrrrr")
+
 ```
 
 ### Evidence Synthesis Comparison
