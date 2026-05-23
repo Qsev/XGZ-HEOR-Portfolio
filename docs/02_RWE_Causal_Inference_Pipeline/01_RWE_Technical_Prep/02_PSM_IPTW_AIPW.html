@@ -291,25 +291,24 @@ window.Quarto = {
   <li><a href="#the-weighting-mechanism" id="toc-the-weighting-mechanism" class="nav-link" data-scroll-target="#the-weighting-mechanism"><span class="header-section-number">3.1</span> The Weighting Mechanism</a></li>
   <li><a href="#weighted-least-squares-wls-algebra" id="toc-weighted-least-squares-wls-algebra" class="nav-link" data-scroll-target="#weighted-least-squares-wls-algebra"><span class="header-section-number">3.2</span> Weighted Least Squares (WLS) Algebra</a></li>
   <li><a href="#effective-sample-size-ess" id="toc-effective-sample-size-ess" class="nav-link" data-scroll-target="#effective-sample-size-ess"><span class="header-section-number">3.3</span> Effective Sample Size (ESS)</a></li>
+  <li><a href="#the-belt-and-suspenders-philosophy" id="toc-the-belt-and-suspenders-philosophy" class="nav-link" data-scroll-target="#the-belt-and-suspenders-philosophy"><span class="header-section-number">3.4</span> The “Belt and Suspenders” Philosophy</a></li>
+  <li><a href="#structural-anatomy-of-the-estimator" id="toc-structural-anatomy-of-the-estimator" class="nav-link" data-scroll-target="#structural-anatomy-of-the-estimator"><span class="header-section-number">3.5</span> Structural Anatomy of the Estimator</a></li>
+  <li><a href="#step-by-step-proof-of-double-robustness" id="toc-step-by-step-proof-of-double-robustness" class="nav-link" data-scroll-target="#step-by-step-proof-of-double-robustness"><span class="header-section-number">3.6</span> Step-by-Step Proof of Double Robustness</a></li>
+  <li><a href="#comparison-why-aipw-is-preferred-in-hta" id="toc-comparison-why-aipw-is-preferred-in-hta" class="nav-link" data-scroll-target="#comparison-why-aipw-is-preferred-in-hta"><span class="header-section-number">3.7</span> Comparison: Why AIPW is Preferred in HTA</a></li>
   </ul></li>
-  <li><a href="#augmented-inverse-probability-weighting-aipw" id="toc-augmented-inverse-probability-weighting-aipw" class="nav-link" data-scroll-target="#augmented-inverse-probability-weighting-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</a>
+  <li><a href="#r-implementation-pipeline" id="toc-r-implementation-pipeline" class="nav-link" data-scroll-target="#r-implementation-pipeline"><span class="header-section-number">4</span> R Implementation Pipeline</a>
   <ul class="collapse">
-  <li><a href="#the-belt-and-suspenders-philosophy" id="toc-the-belt-and-suspenders-philosophy" class="nav-link" data-scroll-target="#the-belt-and-suspenders-philosophy"><span class="header-section-number">4.1</span> The “Belt and Suspenders” Philosophy</a></li>
-  <li><a href="#algebraic-proof-of-double-robustness" id="toc-algebraic-proof-of-double-robustness" class="nav-link" data-scroll-target="#algebraic-proof-of-double-robustness"><span class="header-section-number">4.2</span> Algebraic Proof of Double Robustness</a></li>
+  <li><a href="#baseline-diagnostics-original-data" id="toc-baseline-diagnostics-original-data" class="nav-link" data-scroll-target="#baseline-diagnostics-original-data"><span class="header-section-number">4.1</span> Baseline Diagnostics (Original Data)</a></li>
+  <li><a href="#iptw-balancing-diagnostics" id="toc-iptw-balancing-diagnostics" class="nav-link" data-scroll-target="#iptw-balancing-diagnostics"><span class="header-section-number">4.2</span> IPTW Balancing &amp; Diagnostics</a></li>
+  <li><a href="#covariate-balance-audit-love-plot" id="toc-covariate-balance-audit-love-plot" class="nav-link" data-scroll-target="#covariate-balance-audit-love-plot"><span class="header-section-number">4.3</span> Covariate Balance Audit (Love Plot)</a></li>
+  <li><a href="#treatment-effect-estimation-iptw-aipw" id="toc-treatment-effect-estimation-iptw-aipw" class="nav-link" data-scroll-target="#treatment-effect-estimation-iptw-aipw"><span class="header-section-number">4.4</span> Treatment Effect Estimation (IPTW &amp; AIPW)</a></li>
+  <li><a href="#evidence-synthesis-comparison" id="toc-evidence-synthesis-comparison" class="nav-link" data-scroll-target="#evidence-synthesis-comparison"><span class="header-section-number">4.5</span> Evidence Synthesis Comparison</a></li>
   </ul></li>
-  <li><a href="#r-implementation-pipeline" id="toc-r-implementation-pipeline" class="nav-link" data-scroll-target="#r-implementation-pipeline"><span class="header-section-number">5</span> R Implementation Pipeline</a>
+  <li><a href="#advanced-hta-considerations-eag-defense" id="toc-advanced-hta-considerations-eag-defense" class="nav-link" data-scroll-target="#advanced-hta-considerations-eag-defense"><span class="header-section-number">5</span> Advanced HTA Considerations &amp; EAG Defense</a>
   <ul class="collapse">
-  <li><a href="#baseline-diagnostics-original-data" id="toc-baseline-diagnostics-original-data" class="nav-link" data-scroll-target="#baseline-diagnostics-original-data"><span class="header-section-number">5.1</span> Baseline Diagnostics (Original Data)</a></li>
-  <li><a href="#iptw-balancing-diagnostics" id="toc-iptw-balancing-diagnostics" class="nav-link" data-scroll-target="#iptw-balancing-diagnostics"><span class="header-section-number">5.2</span> IPTW Balancing &amp; Diagnostics</a></li>
-  <li><a href="#covariate-balance-audit-love-plot" id="toc-covariate-balance-audit-love-plot" class="nav-link" data-scroll-target="#covariate-balance-audit-love-plot"><span class="header-section-number">5.3</span> Covariate Balance Audit (Love Plot)</a></li>
-  <li><a href="#treatment-effect-estimation-iptw-aipw" id="toc-treatment-effect-estimation-iptw-aipw" class="nav-link" data-scroll-target="#treatment-effect-estimation-iptw-aipw"><span class="header-section-number">5.4</span> Treatment Effect Estimation (IPTW &amp; AIPW)</a></li>
-  <li><a href="#evidence-synthesis-comparison" id="toc-evidence-synthesis-comparison" class="nav-link" data-scroll-target="#evidence-synthesis-comparison"><span class="header-section-number">5.5</span> Evidence Synthesis Comparison</a></li>
-  </ul></li>
-  <li><a href="#advanced-hta-considerations-eag-defense" id="toc-advanced-hta-considerations-eag-defense" class="nav-link" data-scroll-target="#advanced-hta-considerations-eag-defense"><span class="header-section-number">6</span> Advanced HTA Considerations &amp; EAG Defense</a>
-  <ul class="collapse">
-  <li><a href="#boundary-explosions-ps-to-0-or-1" id="toc-boundary-explosions-ps-to-0-or-1" class="nav-link" data-scroll-target="#boundary-explosions-ps-to-0-or-1"><span class="header-section-number">6.1</span> Boundary Explosions (<span class="math inline">\(PS \to 0\)</span> or <span class="math inline">\(1\)</span>)</a></li>
-  <li><a href="#ess-collapse-defense-strategy" id="toc-ess-collapse-defense-strategy" class="nav-link" data-scroll-target="#ess-collapse-defense-strategy"><span class="header-section-number">6.2</span> ESS Collapse Defense Strategy</a></li>
-  <li><a href="#methodological-trade-offs" id="toc-methodological-trade-offs" class="nav-link" data-scroll-target="#methodological-trade-offs"><span class="header-section-number">6.3</span> Methodological Trade-offs</a></li>
+  <li><a href="#boundary-explosions-ps-to-0-or-1" id="toc-boundary-explosions-ps-to-0-or-1" class="nav-link" data-scroll-target="#boundary-explosions-ps-to-0-or-1"><span class="header-section-number">5.1</span> Boundary Explosions (<span class="math inline">\(PS \to 0\)</span> or <span class="math inline">\(1\)</span>)</a></li>
+  <li><a href="#ess-collapse-defense-strategy" id="toc-ess-collapse-defense-strategy" class="nav-link" data-scroll-target="#ess-collapse-defense-strategy"><span class="header-section-number">5.2</span> ESS Collapse Defense Strategy</a></li>
+  <li><a href="#methodological-trade-offs" id="toc-methodological-trade-offs" class="nav-link" data-scroll-target="#methodological-trade-offs"><span class="header-section-number">5.3</span> Methodological Trade-offs</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -356,7 +355,7 @@ window.Quarto = {
 <p>For instance, in oncology appraisals, a newly launched therapy is often reserved for patients who have failed multiple lines of prior therapy or have a poor performance status. If we directly compare the survival outcomes of patients receiving the new therapy against those on standard of care (SOC), the naive treatment effect will be severely biased downward. The new drug’s efficacy is masked by the fact that its recipient group had a much worse prognosis at baseline.</p>
 <section id="the-dimension-reduction-problem" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="the-dimension-reduction-problem"><span class="header-section-number">1.1</span> The Dimension Reduction Problem</h3>
-<p>To estimate a causal effect, we must control for the baseline covariates <span class="math inline">\(X\)</span>. If we attempt to match patients on multiple characteristics simultaneously (e.g., matching a treated patient with a control patient who has the exact same age, gender, biomarkers, and comorbidities), we quickly encounter the <strong>Curse of Dimensionality</strong>. As the number of covariates increases, the probability of finding an exact match in a finite sample approaches zero.</p>
+<p>To estimate a causal effect, we must control for the baseline covariates <span class="math inline">\(X\)</span>. If we attempt to match patients on multiple characteristics simultaneously (e.g., matching a treated patient with a control patient who has the exact same age, gender, biomarkers, and comorbidities), we quickly encounter the Curse of Dimensionality. As the number of covariates increases, the probability of finding an exact match in a finite sample approaches zero.</p>
 <p><strong>Propensity Score Methods</strong> solve this problem by collapsing the high-dimensional covariate space <span class="math inline">\(X\)</span> into a one-dimensional summary metric: the <strong>Propensity Score (PS)</strong>.</p>
 <hr>
 </section>
@@ -365,7 +364,7 @@ window.Quarto = {
 <h2 data-number="2" class="anchored" data-anchor-id="propensity-score-matching-psm"><span class="header-section-number">2</span> Propensity Score Matching (PSM)</h2>
 <section id="core-logic-the-s-curve" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="core-logic-the-s-curve"><span class="header-section-number">2.1</span> Core Logic &amp; The S-Curve</h3>
-<p>The Propensity Score <span class="math inline">\(e(X)\)</span> is defined as the conditional probability of receiving treatment given a vector of observed baseline covariates: <span class="math display">\[e(X) = P(D = 1 \mid X)\]</span></p>
+<p>The Propensity Score <span class="math inline">\(e(X)\)</span> is defined as the conditional probability of receiving treatment given a vector of observed baseline covariates <span class="math inline">\(X\)</span>: <span class="math display">\[e(X) = P(D = 1 \mid X)\]</span></p>
 <p>Because probability is bounded between 0 (never treated) and 1 (always treated), a standard linear model (<span class="math inline">\(D = \beta X + \epsilon\)</span>) is inappropriate as it can predict values outside this range. We therefore model the propensity score using a <strong>Logistic Regression (Logit)</strong> model: <span class="math display">\[P(D=1 \mid X) = \frac{1}{1 + e^{-z}}\]</span> where <span class="math inline">\(z\)</span> is the linear combination of the confounders: <span class="math display">\[z = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k\]</span></p>
 <p>Taking the natural logarithm of the odds (the Logit transformation) yields a linear representation: <span class="math display">\[\ln\left(\frac{P(D=1 \mid X)}{1 - P(D=1 \mid X)}\right) = \beta_0 + \beta_1 X_1 + \dots + \beta_k X_k\]</span></p>
 <p>By matching treated and control patients who have the same (or very similar) propensity scores, we neutralize the baseline covariates. Within a matched block, the distribution of covariates <span class="math inline">\(X\)</span> is balanced between the treated and control groups, effectively simulating a <strong>Pseudo-Randomized Controlled Trial (Pseudo-RCT)</strong>.</p>
@@ -401,29 +400,115 @@ window.Quarto = {
 <h3 data-number="3.3" class="anchored" data-anchor-id="effective-sample-size-ess"><span class="header-section-number">3.3</span> Effective Sample Size (ESS)</h3>
 <p>Because weighting inflates the influence of certain individuals, the statistical precision of the weighted sample is lower than the nominal sample size. We quantify this information loss using Kish’s <strong>Effective Sample Size (ESS)</strong>: <span class="math display">\[ESS = \frac{\left(\sum_{i=1}^n W_i\right)^2}{\sum_{i=1}^n W_i^2}\]</span></p>
 <p>If all weights are uniform (<span class="math inline">\(W_i=1\)</span>), the ESS equals the actual sample size <span class="math inline">\(N\)</span>. If a few patients have extremely large weights, the denominator increases, and the ESS collapses, signaling that the treatment effect estimate is dominated by a tiny fraction of the population.</p>
+<p>—## Augmented Inverse Probability Weighting (AIPW)</p>
+<p><strong>Augmented IPTW (AIPW)</strong> is a <strong>Doubly Robust (DR)</strong> estimator that resolves the primary vulnerability of both standard regression models and propensity score weighting. It achieves this by combining an <strong>outcome regression (OR)</strong> model with a <strong>treatment assignment (propensity score)</strong> model.</p>
+</section>
+<section id="the-belt-and-suspenders-philosophy" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="the-belt-and-suspenders-philosophy"><span class="header-section-number">3.4</span> The “Belt and Suspenders” Philosophy</h3>
+<p>To construct the AIPW estimator, we fit two distinct models: 1. <strong>The Treatment Model (Propensity Score)</strong>: <span class="math display">\[g(X) = P(D = 1 \mid X)\]</span> 2. <strong>The Outcome Model</strong>: <span class="math display">\[m_d(X) = E[Y \mid D=d, X] \quad \text{for } d \in \{0, 1\}\]</span></p>
+<p>The AIPW estimator for the counterfactual mean under treatment (<span class="math inline">\(d = 1\)</span>) is: <span class="math display">\[\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n \left[ m_1(X_i) + \frac{D_i (Y_i - m_1(X_i))}{g(X_i)} \right]\]</span></p>
+<p>Similarly, the counterfactual mean under control (<span class="math inline">\(d = 0\)</span>) is: <span class="math display">\[\hat{Y}_{AIPW}^{(0)} = \frac{1}{n} \sum_{i=1}^n \left[ m_0(X_i) + \frac{(1 - D_i) (Y_i - m_0(X_i))}{1 - g(X_i)} \right]\]</span></p>
+<p>The doubly robust Average Treatment Effect (ATE) estimator is the difference: <span class="math display">\[\hat{ATE}_{AIPW} = \hat{Y}_{AIPW}^{(1)} - \hat{Y}_{AIPW}^{(0)}\]</span></p>
 <hr>
 </section>
-</section>
-<section id="augmented-inverse-probability-weighting-aipw" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="augmented-inverse-probability-weighting-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</h2>
-<p><strong>Augmented IPTW (AIPW)</strong> is a <strong>Doubly Robust (DR)</strong> estimator that combines the propensity score model with an outcome regression model.</p>
-<section id="the-belt-and-suspenders-philosophy" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="the-belt-and-suspenders-philosophy"><span class="header-section-number">4.1</span> The “Belt and Suspenders” Philosophy</h3>
-<p>AIPW requires two separate models: 1. <strong>The Treatment Model (Propensity Score)</strong>: <span class="math inline">\(g(X) = P(D=1 \mid X)\)</span> 2. <strong>The Outcome Model</strong>: <span class="math inline">\(m_d(X) = E[Y \mid D=d, X]\)</span> for <span class="math inline">\(d \in \{0, 1\}\)</span></p>
-<p>The AIPW estimator for the counterfactual mean under treatment (<span class="math inline">\(d=1\)</span>) is: <span class="math display">\[\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n \left[ m_1(X_i) + \frac{D_i (Y_i - m_1(X_i))}{g(X_i)} \right]\]</span> Similarly, the counterfactual mean under control (<span class="math inline">\(d=0\)</span>) is: <span class="math display">\[\hat{Y}_{AIPW}^{(0)} = \frac{1}{n} \sum_{i=1}^n \left[ m_0(X_i) + \frac{(1 - D_i) (Y_i - m_0(X_i))}{1 - g(X_i)} \right]\]</span></p>
-</section>
-<section id="algebraic-proof-of-double-robustness" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="algebraic-proof-of-double-robustness"><span class="header-section-number">4.2</span> Algebraic Proof of Double Robustness</h3>
-<p>The bias of the AIPW estimator is proportional to the product of the errors in both models: <span class="math display">\[\text{Bias} \propto \left(g(X) - \hat{g}(X)\right) \times \left(m_d(X) - \hat{m}_d(X)\right)\]</span></p>
+<section id="structural-anatomy-of-the-estimator" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="structural-anatomy-of-the-estimator"><span class="header-section-number">3.5</span> Structural Anatomy of the Estimator</h3>
+<p>Let’s dissect the mathematical structure of <span class="math inline">\(\hat{Y}_{AIPW}^{(1)}\)</span> to understand its components:</p>
+<p><span class="math display">\[\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n \Big[ \underbrace{m_1(X_i)}_{\text{Component A}} + \underbrace{\frac{D_i (Y_i - m_1(X_i))}{g(X_i)}}_{\text{Component B}} \Big]\]</span></p>
 <ul>
-<li><p><strong>Case 1: Propensity model <span class="math inline">\(\hat{g}(X)\)</span> is correct, but outcome model <span class="math inline">\(\hat{m}_1(X)\)</span> is wrong.</strong> Since the propensity score is correct, the expectation of the augmentation term simplifies: <span class="math display">\[E\left[ \frac{D_i (Y_i - \hat{m}_1(X_i))}{g(X_i)} \right] = E\left[ \frac{e(X_i) (Y_i - \hat{m}_1(X_i))}{e(X_i)} \right] = E[Y_i \mid D_i=1] - E[\hat{m}_1(X_i)]\]</span> Adding this to the first term <span class="math inline">\(E[\hat{m}_1(X_i)]\)</span> cancels out the incorrect outcome predictions, leaving the unbiased causal estimate.</p></li>
-<li><p><strong>Case 2: Outcome model <span class="math inline">\(\hat{m}_1(X)\)</span> is correct, but propensity model <span class="math inline">\(\hat{g}(X)\)</span> is wrong.</strong> If the outcome model is correct, <span class="math inline">\(\hat{m}_1(X_i) = Y_i\)</span>. The residual <span class="math inline">\((Y_i - \hat{m}_1(X_i))\)</span> becomes zero, making the second term vanish completely: <span class="math display">\[\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n Y_i\]</span> The incorrect propensity weights are canceled out, leaving the unbiased outcome prediction.</p></li>
+<li><strong>Component A: Base Prediction (G-Computation)</strong> This represents the outcome predicted by the outcome model for patient <span class="math inline">\(i\)</span> under the treatment condition, based on their baseline covariates. If the outcome model is correct, the average of this term across the entire sample is an unbiased estimate of the counterfactual mean.</li>
+<li><strong>Component B: Weighted Residual Correction (Bias Adjuster)</strong> This term scales the <em>residual error</em> <span class="math inline">\((Y_i - m_1(X_i))\)</span> of the outcome model for treated patients using the inverse of the propensity score.
+<ul>
+<li>If the outcome model is incorrect, this residual is non-zero. The term captures this systematic prediction bias and adds it back to Component A, correcting the estimate.</li>
+<li>If the propensity score model is correct, the expectation of this correction term exactly offsets any bias in the outcome model.</li>
+<li>Additionally, this component acts as a <em>control variate</em> (a variance reduction technique). By centering the outcome <span class="math inline">\(Y_i\)</span> around its conditional mean <span class="math inline">\(m_1(X_i)\)</span>, we minimize the variance inflation caused by extreme weights in standard IPTW.</li>
+</ul></li>
 </ul>
 <hr>
 </section>
+<section id="step-by-step-proof-of-double-robustness" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="step-by-step-proof-of-double-robustness"><span class="header-section-number">3.6</span> Step-by-Step Proof of Double Robustness</h3>
+<p>AIPW is doubly robust because it yields an unbiased estimate if <strong>either</strong> the propensity score model <span class="math inline">\(g(X)\)</span> <strong>or</strong> the outcome regression model <span class="math inline">\(m_1(X)\)</span> is correctly specified.</p>
+<p>We prove this using the <strong>Law of Iterated Expectations (LIE)</strong>: <span class="math display">\[E[Z] = E_X \big[ E[Z \mid X] \big]\]</span></p>
+<section id="assumptions-required" class="level4" data-number="3.6.1">
+<h4 data-number="3.6.1" class="anchored" data-anchor-id="assumptions-required"><span class="header-section-number">3.6.1</span> Assumptions Required:</h4>
+<ol type="1">
+<li><strong>Consistency</strong>: <span class="math inline">\(Y_i = D_i Y_i^{(1)} + (1 - D_i) Y_i^{(0)}\)</span>. For treated patients (<span class="math inline">\(D_i = 1\)</span>), the observed outcome is the potential outcome under treatment: <span class="math inline">\(Y_i = Y_i^{(1)}\)</span>.</li>
+<li><strong>Conditional Independence (Unconfoundedness)</strong>: Causal potential outcomes are independent of treatment assignment given baseline covariates: <span class="math inline">\(Y^{(1)}, Y^{(0)} \perp D \mid X\)</span>.</li>
+</ol>
+<p>Let <span class="math inline">\(\hat{g}(X)\)</span> and <span class="math inline">\(\hat{m}_1(X)\)</span> be our estimated models. The expectation of the AIPW estimator under treatment is: <span class="math display">\[E\left[ \hat{Y}_{AIPW}^{(1)} \right] = E_X \left[ E\left[ \hat{m}_1(X_i) + \frac{D_i (Y_i - \hat{m}_1(X_i))}{\hat{g}(X_i)} \;\middle|\; X_i \right] \right]\]</span></p>
+<hr>
 </section>
-<section id="r-implementation-pipeline" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="r-implementation-pipeline"><span class="header-section-number">5</span> R Implementation Pipeline</h2>
+<section id="case-1-propensity-model-is-correct-hatgx-gx-outcome-model-is-misspecified-hatm_1x-neq-m_1x" class="level4" data-number="3.6.2">
+<h4 data-number="3.6.2" class="anchored" data-anchor-id="case-1-propensity-model-is-correct-hatgx-gx-outcome-model-is-misspecified-hatm_1x-neq-m_1x"><span class="header-section-number">3.6.2</span> Case 1: Propensity Model is Correct (<span class="math inline">\(\hat{g}(X) = g(X)\)</span>), Outcome Model is Misspecified (<span class="math inline">\(\hat{m}_1(X) \neq m_1(X)\)</span>)</h4>
+<p>If the propensity score model is correct, we have <span class="math inline">\(E[D_i \mid X_i] = \hat{g}(X_i) = g(X_i)\)</span>.</p>
+<p>Let’s evaluate the conditional expectation of the estimator’s terms given <span class="math inline">\(X_i\)</span>: <span class="math display">\[E\left[ \hat{m}_1(X_i) + \frac{D_i (Y_i - \hat{m}_1(X_i))}{\hat{g}(X_i)} \;\middle|\; X_i \right] = \hat{m}_1(X_i) + \frac{E\left[ D_i (Y_i - \hat{m}_1(X_i)) \mid X_i \right]}{g(X_i)}\]</span></p>
+<p>Using consistency (<span class="math inline">\(D_i Y_i = D_i Y_i^{(1)}\)</span>) and conditioning: <span class="math display">\[E\left[ D_i (Y_i - \hat{m}_1(X_i)) \mid X_i \right] = E\left[ D_i Y_i^{(1)} - D_i \hat{m}_1(X_i) \mid X_i \right]\]</span></p>
+<p>By the Conditional Independence assumption (<span class="math inline">\(Y^{(1)} \perp D \mid X\)</span>): <span class="math display">\[E\left[ D_i Y_i^{(1)} \mid X_i \right] = E\left[ D_i \mid X_i \right] \cdot E\left[ Y_i^{(1)} \mid X_i \right] = g(X_i) E\left[ Y_i^{(1)} \mid X_i \right]\]</span></p>
+<p>Similarly, since <span class="math inline">\(\hat{m}_1(X_i)\)</span> is a deterministic function of <span class="math inline">\(X_i\)</span>: <span class="math display">\[E\left[ D_i \hat{m}_1(X_i) \mid X_i \right] = E\left[ D_i \mid X_i \right] \cdot \hat{m}_1(X_i) = g(X_i) \hat{m}_1(X_i)\]</span></p>
+<p>Substitute these expectations back into the numerator: <span class="math display">\[E\left[ D_i (Y_i - \hat{m}_1(X_i)) \mid X_i \right] = g(X_i) E\left[ Y_i^{(1)} \mid X_i \right] - g(X_i) \hat{m}_1(X_i) = g(X_i) \left( E\left[ Y_i^{(1)} \mid X_i \right] - \hat{m}_1(X_i) \right)\]</span></p>
+<p>Now substitute this back into the estimator: <span class="math display">\[\hat{m}_1(X_i) + \frac{g(X_i) \left( E\left[ Y_i^{(1)} \mid X_i \right] - \hat{m}_1(X_i) \right)}{g(X_i)} = \hat{m}_1(X_i) + E\left[ Y_i^{(1)} \mid X_i \right] - \hat{m}_1(X_i) = E\left[ Y_i^{(1)} \mid X_i \right]\]</span></p>
+<p>Taking the outer expectation over the covariate distribution <span class="math inline">\(X\)</span>: <span class="math display">\[E\left[ \hat{Y}_{AIPW}^{(1)} \right] = E_X \Big[ E\left[ Y_i^{(1)} \mid X_i \right] \Big] = E\left[ Y_i^{(1)} \right]\]</span></p>
+<p><strong>Result</strong>: The estimate is unbiased. The incorrect predictions of the outcome model (<span class="math inline">\(\hat{m}_1(X_i)\)</span>) are algebraically canceled out by the weighted residual term.</p>
+<hr>
+</section>
+<section id="case-2-outcome-model-is-correct-hatm_1x-m_1x-propensity-model-is-misspecified-hatgx-neq-gx" class="level4" data-number="3.6.3">
+<h4 data-number="3.6.3" class="anchored" data-anchor-id="case-2-outcome-model-is-correct-hatm_1x-m_1x-propensity-model-is-misspecified-hatgx-neq-gx"><span class="header-section-number">3.6.3</span> Case 2: Outcome Model is Correct (<span class="math inline">\(\hat{m}_1(X) = m_1(X)\)</span>), Propensity Model is Misspecified (<span class="math inline">\(\hat{g}(X) \neq g(X)\)</span>)</h4>
+<p>If the outcome model is correctly specified, we have <span class="math inline">\(\hat{m}_1(X_i) = m_1(X_i) = E\left[ Y_i^{(1)} \mid X_i \right]\)</span>.</p>
+<p>Let’s evaluate the conditional expectation of the residual correction term numerator given <span class="math inline">\(X_i\)</span>: <span class="math display">\[E\left[ D_i (Y_i - \hat{m}_1(X_i)) \mid X_i \right] = E\left[ D_i (Y_i^{(1)} - E\left[ Y_i^{(1)} \mid X_i \right]) \mid X_i \right]\]</span></p>
+<p>Conditioning further on treatment assignment <span class="math inline">\(D_i\)</span> using the Law of Iterated Expectations: <span class="math display">\[E\left[ D_i (Y_i^{(1)} - E\left[ Y_i^{(1)} \mid X_i \right]) \mid X_i \right] = E_{D \mid X} \left[ E\left[ D_i (Y_i^{(1)} - E\left[ Y_i^{(1)} \mid X_i \right]) \;\middle|\; X_i, D_i \right] \right]\]</span></p>
+<p>Since <span class="math inline">\(D_i\)</span> is binary, this expectation only has a non-zero value when <span class="math inline">\(D_i = 1\)</span>: <span class="math display">\[P(D_i = 1 \mid X_i) \cdot E\left[ 1 \cdot (Y_i^{(1)} - E\left[ Y_i^{(1)} \mid X_i \right]) \;\middle|\; X_i, D_i = 1 \right]\]</span></p>
+<p>By the Conditional Independence assumption (<span class="math inline">\(Y^{(1)} \perp D \mid X\)</span>): <span class="math display">\[E\left[ Y_i^{(1)} - E\left[ Y_i^{(1)} \mid X_i \right] \;\middle|\; X_i, D_i = 1 \right] = E\left[ Y_i^{(1)} \mid X_i \right] - E\left[ Y_i^{(1)} \mid X_i \right] = 0\]</span></p>
+<p>Since the conditional expectation of the numerator is <span class="math inline">\(0\)</span>: <span class="math display">\[E\left[ \frac{D_i (Y_i - \hat{m}_1(X_i))}{\hat{g}(X_i)} \;\middle|\; X_i \right] = 0\]</span></p>
+<p>Therefore, the expectation of the estimator simplifies to: <span class="math display">\[E\left[ \hat{Y}_{AIPW}^{(1)} \mid X_i \right] = E\left[ \hat{m}_1(X_i) \mid X_i \right] = E\left[ Y_i^{(1)} \mid X_i \right]\]</span></p>
+<p>Taking the outer expectation over the covariate distribution <span class="math inline">\(X\)</span>: <span class="math display">\[E\left[ \hat{Y}_{AIPW}^{(1)} \right] = E_X \Big[ E\left[ Y_i^{(1)} \mid X_i \right] \Big] = E\left[ Y_i^{(1)} \right]\]</span></p>
+<p><strong>Result</strong>: The estimate is unbiased. Since the outcome model is correct, the expected residual error is <span class="math inline">\(0\)</span>. The incorrect propensity weights (<span class="math inline">\(\hat{g}(X_i)\)</span>) are multiplied by zero and fail to introduce any bias.</p>
+<hr>
+</section>
+</section>
+<section id="comparison-why-aipw-is-preferred-in-hta" class="level3" data-number="3.7">
+<h3 data-number="3.7" class="anchored" data-anchor-id="comparison-why-aipw-is-preferred-in-hta"><span class="header-section-number">3.7</span> Comparison: Why AIPW is Preferred in HTA</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Standard IPTW</th>
+<th style="text-align: left;">AIPW (Augmented IPTW)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Estimator Type</strong></td>
+<td style="text-align: left;">Single-robust (Propensity score only)</td>
+<td style="text-align: left;"><strong>Doubly-robust (Propensity score + Outcome regression)</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Model Misspecification</strong></td>
+<td style="text-align: left;">Severe bias if PS model is wrong</td>
+<td style="text-align: left;"><strong>Unbiased if either model is correct</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Variance (Efficiency)</strong></td>
+<td style="text-align: left;">High variance due to extreme weights</td>
+<td style="text-align: left;"><strong>Low variance (uses outcome predictions as control variates)</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>HTA / EAG Acceptance</strong></td>
+<td style="text-align: left;">Moderately accepted; heavily criticized for extreme weights</td>
+<td style="text-align: left;"><strong>Highly preferred; provides minimum variance bounds (semiparametric efficiency)</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="r-implementation-pipeline" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="r-implementation-pipeline"><span class="header-section-number">4</span> R Implementation Pipeline</h2>
 <p>This pipeline simulates a real-world dataset (<span class="math inline">\(N=500\)</span>) with a severe confounding by indication trap: high-risk, elderly patients with poor performance status (ECOG=1) are preferentially prescribed the new therapy (Drug X), masking its true survival benefit.</p>
 <div class="cell">
 <details class="code-fold">
@@ -459,8 +544,8 @@ window.Quarto = {
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>naive_ate <span class="ot">&lt;-</span> naive_treated <span class="sc">-</span> naive_control</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<section id="baseline-diagnostics-original-data" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="baseline-diagnostics-original-data"><span class="header-section-number">5.1</span> Baseline Diagnostics (Original Data)</h3>
+<section id="baseline-diagnostics-original-data" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="baseline-diagnostics-original-data"><span class="header-section-number">4.1</span> Baseline Diagnostics (Original Data)</h3>
 <p>Without adjustment, patients receiving Drug X are significantly older and have worse ECOG scores, creating a naive survival comparison that underestimates the treatment effect:</p>
 <div class="cell">
 <details class="code-fold">
@@ -558,8 +643,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="iptw-balancing-diagnostics" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="iptw-balancing-diagnostics"><span class="header-section-number">5.2</span> IPTW Balancing &amp; Diagnostics</h3>
+<section id="iptw-balancing-diagnostics" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="iptw-balancing-diagnostics"><span class="header-section-number">4.2</span> IPTW Balancing &amp; Diagnostics</h3>
 <p>We apply <code>WeightIt</code> to calculate propensity weights and evaluate baseline balance.</p>
 <div class="cell">
 <details class="code-fold">
@@ -617,8 +702,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="covariate-balance-audit-love-plot" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="covariate-balance-audit-love-plot"><span class="header-section-number">5.3</span> Covariate Balance Audit (Love Plot)</h3>
+<section id="covariate-balance-audit-love-plot" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="covariate-balance-audit-love-plot"><span class="header-section-number">4.3</span> Covariate Balance Audit (Love Plot)</h3>
 <p>A standardized mean difference (SMD) below <span class="math inline">\(0.1\)</span> indicates that the baseline confounding has been successfully balanced between groups.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -640,8 +725,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="treatment-effect-estimation-iptw-aipw" class="level3" data-number="5.4">
-<h3 data-number="5.4" class="anchored" data-anchor-id="treatment-effect-estimation-iptw-aipw"><span class="header-section-number">5.4</span> Treatment Effect Estimation (IPTW &amp; AIPW)</h3>
+<section id="treatment-effect-estimation-iptw-aipw" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="treatment-effect-estimation-iptw-aipw"><span class="header-section-number">4.4</span> Treatment Effect Estimation (IPTW &amp; AIPW)</h3>
 <p>We fit a weighted regression model using <code>lm_weightit</code> to calculate the IPTW estimate with robust standard errors, followed by doubly robust estimation via <code>AIPW</code>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -761,8 +846,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="evidence-synthesis-comparison" class="level3" data-number="5.5">
-<h3 data-number="5.5" class="anchored" data-anchor-id="evidence-synthesis-comparison"><span class="header-section-number">5.5</span> Evidence Synthesis Comparison</h3>
+<section id="evidence-synthesis-comparison" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="evidence-synthesis-comparison"><span class="header-section-number">4.5</span> Evidence Synthesis Comparison</h3>
 <p>The unadjusted naive estimate is biased downward, while the adjusted IPTW and doubly robust AIPW estimates successfully recover the true treatment effect.</p>
 <table class="caption-top table">
 <colgroup>
@@ -803,10 +888,10 @@ window.Quarto = {
 <hr>
 </section>
 </section>
-<section id="advanced-hta-considerations-eag-defense" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="advanced-hta-considerations-eag-defense"><span class="header-section-number">6</span> Advanced HTA Considerations &amp; EAG Defense</h2>
-<section id="boundary-explosions-ps-to-0-or-1" class="level3" data-number="6.1">
-<h3 data-number="6.1" class="anchored" data-anchor-id="boundary-explosions-ps-to-0-or-1"><span class="header-section-number">6.1</span> Boundary Explosions (<span class="math inline">\(PS \to 0\)</span> or <span class="math inline">\(1\)</span>)</h3>
+<section id="advanced-hta-considerations-eag-defense" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="advanced-hta-considerations-eag-defense"><span class="header-section-number">5</span> Advanced HTA Considerations &amp; EAG Defense</h2>
+<section id="boundary-explosions-ps-to-0-or-1" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="boundary-explosions-ps-to-0-or-1"><span class="header-section-number">5.1</span> Boundary Explosions (<span class="math inline">\(PS \to 0\)</span> or <span class="math inline">\(1\)</span>)</h3>
 <p>In observational datasets, physician prescribing preferences can result in near-deterministic treatment assignments for certain patient subgroups. This leads to propensity scores that approach <span class="math inline">\(0\)</span> or <span class="math inline">\(1\)</span>.</p>
 <ul>
 <li><strong>The Hazard</strong>: For a treated patient with <span class="math inline">\(PS = 0.01\)</span>, the weight is <span class="math inline">\(W = 100\)</span>. This single outlier’s outcome is multiplied a hundredfold in the pseudo-population, destabilizing the clinical outcome model.</li>
@@ -817,16 +902,16 @@ window.Quarto = {
 </ol></li>
 </ul>
 </section>
-<section id="ess-collapse-defense-strategy" class="level3" data-number="6.2">
-<h3 data-number="6.2" class="anchored" data-anchor-id="ess-collapse-defense-strategy"><span class="header-section-number">6.2</span> ESS Collapse Defense Strategy</h3>
+<section id="ess-collapse-defense-strategy" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="ess-collapse-defense-strategy"><span class="header-section-number">5.2</span> ESS Collapse Defense Strategy</h3>
 <p>When defending a weighted analysis against EAG critiques regarding a low Effective Sample Size, modellers should present the following defense arguments:</p>
 <blockquote class="blockquote">
 <p>“The reduction in Effective Sample Size (ESS) is the mathematically necessary cost of removing baseline confounding (bias) from the observational sample. The Love Plot confirms that the standardized mean differences (SMDs) for all critical confounders are brought below the HTA-standard 0.1 threshold, restoring balance.</p>
 <p>Accepting a lower ESS is a deliberate and defensible trade-off: it sacrifices statistical precision (widening the confidence intervals) in order to secure accuracy (eliminating selection bias). This is superior to a matched analysis (PSM) that would drop patients entirely and restrict the clinical representativeness of the appraisal.”</p>
 </blockquote>
 </section>
-<section id="methodological-trade-offs" class="level3" data-number="6.3">
-<h3 data-number="6.3" class="anchored" data-anchor-id="methodological-trade-offs"><span class="header-section-number">6.3</span> Methodological Trade-offs</h3>
+<section id="methodological-trade-offs" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="methodological-trade-offs"><span class="header-section-number">5.3</span> Methodological Trade-offs</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 25%">
