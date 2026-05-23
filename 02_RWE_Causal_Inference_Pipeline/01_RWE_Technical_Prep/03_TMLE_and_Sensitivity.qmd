@@ -62,6 +62,7 @@ library(survey)
 library(tmle)
 library(SuperLearner)
 library(EValue)
+library(AIPW)
 
 set.seed(2026)
 n <- 500
@@ -416,14 +417,30 @@ iptw_summary <- summary(fit_iptw)
 iptw_est <- iptw_summary$coefficients["treatment", "Estimate"]
 iptw_se  <- iptw_summary$coefficients["treatment", "Std. Error"]
 
+# Fit AIPW for comparison (from Page 2 workflow)
+sl_lib_aipw <- c("SL.glm", "SL.mean")
+aipw_obj <- AIPW$new(
+  Y = df$survival_1yr,
+  A = df$treatment,
+  W = df[, c("age", "ecog")],
+  Q.SL.library = sl_lib_aipw,
+  g.SL.library = sl_lib_aipw
+)
+suppressMessages(aipw_obj$fit())
+invisible(capture.output(aipw_obj$summary()))
+aipw_res <- aipw_obj$result
+aipw_est <- aipw_res["Risk Difference", "Estimate"]
+aipw_se  <- aipw_res["Risk Difference", "SE"]
+aipw_ci  <- c(aipw_res["Risk Difference", "95% LCL"], aipw_res["Risk Difference", "95% UCL"])
+
 # Combine into reconciliation matrix
 reconciliation_tbl <- data.frame(
-  Estimator = c("Ground Truth (Omniscient)", "Naive (Unadjusted)", "IPTW (Weighting Only)", "TMLE (Doubly Robust)"),
-  "ATE Point Estimate" = c(true_ate, naive_ate, iptw_est, tmle_est),
-  "Standard Error" = c(NA, NA, iptw_se, tmle_se),
-  "95% LCL" = c(NA, NA, iptw_est - 1.96 * iptw_se, tmle_ci[1]),
-  "95% UCL" = c(NA, NA, iptw_est + 1.96 * iptw_se, tmle_ci[2]),
-  "Bias vs. Truth" = c(0.0000, naive_ate - true_ate, iptw_est - true_ate, tmle_est - true_ate),
+  Estimator = c("Ground Truth (Omniscient)", "Naive (Unadjusted)", "IPTW (Weighting Only)", "AIPW (Doubly Robust)", "TMLE (Doubly Robust)"),
+  "ATE Point Estimate" = c(true_ate, naive_ate, iptw_est, aipw_est, tmle_est),
+  "Standard Error" = c(NA, NA, iptw_se, aipw_se, tmle_se),
+  "95% LCL" = c(NA, NA, iptw_est - 1.96 * iptw_se, aipw_ci[1], tmle_ci[1]),
+  "95% UCL" = c(NA, NA, iptw_est + 1.96 * iptw_se, aipw_ci[2], tmle_ci[2]),
+  "Bias vs. Truth" = c(0.0000, naive_ate - true_ate, iptw_est - true_ate, aipw_est - true_ate, tmle_est - true_ate),
   check.names = FALSE
 )
 
