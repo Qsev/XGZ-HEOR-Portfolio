@@ -151,7 +151,9 @@ Q0_1_raw <- predict(fit_Q, newdata = data.frame(treatment = 1, age, ecog), type 
 Q0_0 <- pmin(pmax(Q0_0_raw, 0.005), 0.995)
 Q0_1 <- pmin(pmax(Q0_1_raw, 0.005), 0.995)
 
-# Observed treatment predictions
+# Factual prediction under actual observed treatment (no counterfactual component).
+# Because we only observe outcome Y under the actual treatment A, we must use Q0_A as the baseline offset
+# to calculate residuals and fit the fluctuation parameter (epsilon) in Step 4.
 Q0_A <- ifelse(treatment == 1, Q0_1, Q0_0)
 
 # Format summary table
