@@ -526,13 +526,7 @@ In observational datasets, physician prescribing preferences can result in near-
      This scales down extreme weights globally.
   2. **Weight Trimming**: If weights remain extreme after stabilization, we apply asymmetric trimming (e.g., trimming the top and bottom 1% of the weight distribution). While trimming introduces a small amount of bias by changing the target population, it significantly reduces variance and stabilizes survival extrapolations, which is generally accepted by NICE EAGs.
 
-### ESS Collapse Defense Strategy
 
-When defending a weighted analysis against EAG critiques regarding a low Effective Sample Size, modellers should present the following defense arguments:
-
-> "The reduction in Effective Sample Size (ESS) is the mathematically necessary cost of removing baseline confounding (bias) from the observational sample. The Love Plot confirms that the standardized mean differences (SMDs) for all critical confounders are brought below the HTA-standard 0.1 threshold, restoring balance. 
-> 
-> Accepting a lower ESS is a deliberate and defensible trade-off: it sacrifices statistical precision (widening the confidence intervals) in order to secure accuracy (eliminating selection bias). This is superior to a matched analysis (PSM) that would drop patients entirely and restrict the clinical representativeness of the appraisal."
 
 ### Methodological Trade-offs
 
