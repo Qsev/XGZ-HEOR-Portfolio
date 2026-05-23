@@ -10,6 +10,7 @@ format:
     code-fold: true
     code-summary: "R Code"
     number-sections: true
+    reference-location: margin
 ---
 
 *Advanced Causal Inference for External Control Arms and Observational Real-World Evidence*
@@ -128,11 +129,7 @@ knitr::kable(desc_tbl, caption = "Baseline Characteristics & Raw Outcomes of the
 We estimate the conditional expectation of the outcome $Y$ given treatment $D$ and baseline covariates $W$:
 $$Q_0(D, W) = E[Y \mid D, W]$$
 
-We fit a logistic regression model for $Y$ and generate two counterfactual predicted values for each individual $i$:
-
-::: {.column-margin}
-Note: Specifying `family = binomial` in R's `glm()` function defaults to a logistic regression model (Logit Model) to model binary outcome probabilities.
-:::
+We fit a logistic regression model^[Specifying `family = binomial` in R's `glm()` function defaults to a logistic regression model (Logit Model) to model binary outcome probabilities.] for $Y$ and generate two counterfactual predicted values for each individual $i$:
 
 - The predicted outcome under treatment: $Q_0(1, W_i)$
 - The predicted outcome under control: $Q_0(0, W_i)$
@@ -173,14 +170,7 @@ knitr::kable(q0_summary, digits = 4, caption = "Summary of Initial Outcome Regre
 We estimate the probability of treatment assignment given covariates:
 $$g(W) = P(D = 1 \mid W)$$
 
-We fit a logistic regression model for treatment assignment to predict propensity scores, and apply a dynamic lower bound threshold to guarantee that inverse weights do not blow up.
-
-::: {.column-margin}
-If not specified, the `tmle` package adaptively calculates the propensity score lower bound based on the sample size:
-$$\text{gbound\_lower} = \frac{5}{\sqrt{n} \cdot \ln(n)}$$
-
-For $N=500$, the lower bound is approximately `0.03598`. This bound is applied independently to the propensity scores of the treated ($g(W)$) and control ($1 - g(W)$) groups.
-:::
+We fit a logistic regression model for treatment assignment to predict propensity scores, and apply a dynamic lower bound threshold^[If not specified, the `tmle` package adaptively calculates the propensity score lower bound based on the sample size: $$\text{gbound\_lower} = \frac{5}{\sqrt{n} \cdot \ln(n)}$$ For $N=500$, the lower bound is approximately `0.03598`. This bound is applied independently to the propensity scores of the treated ($g(W)$) and control ($1 - g(W)$) groups.] to guarantee that inverse weights do not blow up.
 
 
 ```{r}
