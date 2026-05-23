@@ -86,19 +86,35 @@ $$ESS = \frac{\left(\sum_{i=1}^n W_i\right)^2}{\sum_{i=1}^n W_i^2}$$
 
 If all weights are uniform ($W_i=1$), the ESS equals the actual sample size $N$. If a few patients have extremely large weights, the denominator increases, and the ESS collapses, signaling that the treatment effect estimate is dominated by a tiny fraction of the population.
 
----## Augmented Inverse Probability Weighting (AIPW)
+---
+
+## Augmented Inverse Probability Weighting (AIPW)
 
 **Augmented IPTW (AIPW)** is a **Doubly Robust (DR)** estimator that resolves the primary vulnerability of both standard regression models and propensity score weighting. It achieves this by combining an **outcome regression (OR)** model with a **treatment assignment (propensity score)** model.
 
 ### The "Belt and Suspenders" Philosophy
 
-To construct the AIPW estimator, we fit two distinct models:
-1. **The Treatment Model (Propensity Score)**:
-   $$g(X) = P(D = 1 \mid X)$$
-2. **The Outcome Model**:
-   $$m_d(X) = E[Y \mid D=d, X] \quad \text{for } d \in \{0, 1\}$$
+To construct the AIPW estimator, we fit two distinct models on the observed data:
 
-The AIPW estimator for the counterfactual mean under treatment ($d = 1$) is:
+1. **The Treatment Model (Propensity Score Model, $g(X)$)**:
+   Predicts the probability of receiving treatment ($D$) given baseline covariates ($X$). Concretely, using a logistic model:
+   $$g(X) = P(D = 1 \mid X) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 \cdot \text{Age} + \beta_2 \cdot \text{ECOG})}}$$
+   
+2. **The Outcome Model ($m_d(X)$)**:
+   Predicts the clinical outcome ($Y$) given the treatment assignment ($D$) and baseline covariates ($X$).
+   
+   - **What is the Outcome $Y$?** In our simulated oncology scenario, $Y$ is the **1-year survival indicator**—a binary clinical endpoint ($Y_i = 1$ if patient $i$ is alive at 1 year, and $Y_i = 0$ if deceased).
+   - **Concretely, what does the Outcome Model look like?** Because $Y$ is binary, we model the conditional expectation $E[Y \mid D, X] = P(Y = 1 \mid D, X)$ using a logistic regression model:
+     $$E[Y \mid D, X] = \frac{1}{1 + e^{-(\alpha_0 + \alpha_1 D + \alpha_2 \cdot \text{Age} + \alpha_3 \cdot \text{ECOG})}}$$
+     where $\alpha_1$ is the conditional log-odds ratio associated with treatment, and $\alpha_2, \alpha_3$ adjust for baseline confounding.
+     
+   - **How are the counterfactual predictions generated?** Once the outcome model is fitted and its coefficients $\hat{\alpha}$ are estimated, we generate two predicted values for *every* patient $i$ in the sample by plugging in the treatment indicator ($d = 1$ and $d = 0$) while keeping their baseline covariates ($X_i$) unchanged:
+     - **Predicted survival under treatment ($d = 1$)**:
+       $$m_1(X_i) = \hat{P}(Y_i^{(1)} = 1 \mid X_i) = \frac{1}{1 + e^{-(\hat{\alpha}_0 + \hat{\alpha}_1 \cdot 1 + \hat{\alpha}_2 \cdot \text{Age}_i + \hat{\alpha}_3 \cdot \text{ECOG}_i)}}$$
+     - **Predicted survival under control ($d = 0$)**:
+       $$m_0(X_i) = \hat{P}(Y_i^{(0)} = 1 \mid X_i) = \frac{1}{1 + e^{-(\hat{\alpha}_0 + \hat{\alpha}_1 \cdot 0 + \hat{\alpha}_2 \cdot \text{Age}_i + \hat{\alpha}_3 \cdot \text{ECOG}_i)}}$$
+
+The AIPW estimator aggregates these predictions alongside the propensity score weights. The counterfactual mean under treatment ($d = 1$) is:
 $$\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n \left[ m_1(X_i) + \frac{D_i (Y_i - m_1(X_i))}{g(X_i)} \right]$$
 
 Similarly, the counterfactual mean under control ($d = 0$) is:
@@ -106,6 +122,7 @@ $$\hat{Y}_{AIPW}^{(0)} = \frac{1}{n} \sum_{i=1}^n \left[ m_0(X_i) + \frac{(1 - D
 
 The doubly robust Average Treatment Effect (ATE) estimator is the difference:
 $$\hat{ATE}_{AIPW} = \hat{Y}_{AIPW}^{(1)} - \hat{Y}_{AIPW}^{(0)}$$
+
 
 ---
 
