@@ -77,9 +77,49 @@ $$\sum_{i=1}^n W_i (Y_i - \hat{Y}_i)^2$$
 
 In matrix notation, the normal equation for the regression coefficients is modified from the standard OLS $(X'X)^{-1}X'Y$ to:
 $$\hat{\beta}_{WLS} = (X'WX)^{-1}X'WY$$
-where $W$ is a diagonal matrix containing the IPTW weights $W_i$. The weight acts as a volume knob; patients with higher weights pull the regression line closer to their observed data points.
+
+### Statistical Inference & Robust Standard Errors
+
+A common misconception in observational studies is that the standard error of the weighted treatment effect can be computed by treating the weighted groups as two independent samples (e.g., using the simple addition of independent normal variances: $SE = \sqrt{Var(\bar{Y}_1) + Var(\bar{Y}_0)}$). In HTA practice, this naive approach is strictly rejected for three reasons:
+
+1. **Non-Independence**: The treated and control groups are not independent samples drawn from separate populations. They are subgroups of the same observational cohort, meaning their baseline covariates and potential outcomes share a joint distribution.
+2. **Variance Inflation**: Weighting introduces unequal weights ($W_i \neq 1$), which violates the homoscedasticity assumption of standard OLS. Failing to adjust for this leads to severely underestimated standard errors and inflated Type I error rates.
+3. **Estimation Uncertainty of Propensity Scores**: The propensity scores $e(X)$ are not true population parameters; they are *estimated* from the data. This estimation process introduces auxiliary uncertainty that must propagate into the final treatment effect variance.
+
+#### M-Estimation & The Sandwich Variance Estimator
+
+To obtain asymptotically correct standard errors, modern causal inference relies on the **M-Estimation (Empirical Sandwich Covariance)** framework. We stack the estimating equations for the treatment assignment model (propensity score) and the outcome regression model together as a joint system:
+
+$$\sum_{i=1}^n \Psi_i(\theta) = 0$$
+
+where $\theta = [\beta, \alpha]^T$ is the combined parameter vector containing the propensity model coefficients $\beta$ (logistic regression) and the outcome model coefficients $\alpha$ (WLS regression).
+
+The stacked estimating equations $\Psi_i(\theta)$ for individual $i$ are:
+$$\Psi_i(\theta) = \begin{bmatrix}
+X_i \left( D_i - \text{logit}^{-1}(X_i \beta) \right) \\
+W_i(\beta) \cdot Z_i \left( Y_i - Z_i \alpha \right)
+\end{bmatrix}$$
+
+where $Z_i = [1, D_i]^T$ is the covariate vector of the outcome model, and $W_i(\beta) = \frac{D_i}{\text{logit}^{-1}(X_i \beta)} + \frac{1 - D_i}{1 - \text{logit}^{-1}(X_i \beta)}$ are the estimated weights.
+
+By Taylor expansion of the joint estimating equations, the asymptotic variance-covariance matrix of $\hat{\theta}$ is given by the **Sandwich Formula**:
+
+$$V(\hat{\theta}) = A(\hat{\theta})^{-1} B(\hat{\theta}) A(\hat{\theta})^{-T}$$
+
+- **The "Bread" Matrix $A(\hat{\theta})$**: The expected Jacobian matrix of the estimating equations:
+  $$A(\hat{\theta}) = - \frac{1}{n} \sum_{i=1}^n \frac{\partial \Psi_i(\theta)}{\partial \theta}$$
+  The off-diagonal blocks of $A(\hat{\theta})$ capture the dependence of the outcome estimating equations on the propensity score parameters $\beta$. This explicitly accounts for the uncertainty introduced by estimating the weights.
+- **The "Meat" Matrix $B(\hat{\theta})$**: The empirical variance of the estimating equations:
+  $$B(\hat{\theta}) = \frac{1}{n} \sum_{i=1}^n \Psi_i(\theta) \Psi_i(\theta)^T$$
+  which allows for heteroscedasticity and clustering.
+
+Once the robust variance of the treatment effect coefficient $\hat{\alpha}_1$ (the ATE estimate) is extracted from the diagonal of $V(\hat{\theta})$ as $SE_{\text{robust}}$, the 95% Confidence Interval is constructed using the standard Wald formulation:
+$$CI_{95\%} = \hat{\alpha}_1 \pm 1.96 \cdot SE_{\text{robust}}$$
+
+This is the exact methodology executed by `lm_weightit` under the hood, ensuring that the confidence intervals presented in the portfolio are methodologically rigorous and defensible.
 
 ### Effective Sample Size (ESS)
+
 
 Because weighting inflates the influence of certain individuals, the statistical precision of the weighted sample is lower than the nominal sample size. We quantify this information loss using Kish's **Effective Sample Size (ESS)**:
 $$ESS = \frac{\left(\sum_{i=1}^n W_i\right)^2}{\sum_{i=1}^n W_i^2}$$

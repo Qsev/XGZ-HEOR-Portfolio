@@ -290,7 +290,8 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#the-weighting-mechanism" id="toc-the-weighting-mechanism" class="nav-link" data-scroll-target="#the-weighting-mechanism"><span class="header-section-number">3.1</span> The Weighting Mechanism</a></li>
   <li><a href="#weighted-least-squares-wls-algebra" id="toc-weighted-least-squares-wls-algebra" class="nav-link" data-scroll-target="#weighted-least-squares-wls-algebra"><span class="header-section-number">3.2</span> Weighted Least Squares (WLS) Algebra</a></li>
-  <li><a href="#effective-sample-size-ess" id="toc-effective-sample-size-ess" class="nav-link" data-scroll-target="#effective-sample-size-ess"><span class="header-section-number">3.3</span> Effective Sample Size (ESS)</a></li>
+  <li><a href="#statistical-inference-robust-standard-errors" id="toc-statistical-inference-robust-standard-errors" class="nav-link" data-scroll-target="#statistical-inference-robust-standard-errors"><span class="header-section-number">3.3</span> Statistical Inference &amp; Robust Standard Errors</a></li>
+  <li><a href="#effective-sample-size-ess" id="toc-effective-sample-size-ess" class="nav-link" data-scroll-target="#effective-sample-size-ess"><span class="header-section-number">3.4</span> Effective Sample Size (ESS)</a></li>
   </ul></li>
   <li><a href="#augmented-inverse-probability-weighting-aipw" id="toc-augmented-inverse-probability-weighting-aipw" class="nav-link" data-scroll-target="#augmented-inverse-probability-weighting-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</a>
   <ul class="collapse">
@@ -397,10 +398,38 @@ window.Quarto = {
 <section id="weighted-least-squares-wls-algebra" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="weighted-least-squares-wls-algebra"><span class="header-section-number">3.2</span> Weighted Least Squares (WLS) Algebra</h3>
 <p>In practice, the treatment effect is estimated using <strong>Weighted Least Squares (WLS)</strong>. The objective is to minimize the weighted sum of squared residuals: <span class="math display">\[\sum_{i=1}^n W_i (Y_i - \hat{Y}_i)^2\]</span></p>
-<p>In matrix notation, the normal equation for the regression coefficients is modified from the standard OLS <span class="math inline">\((X'X)^{-1}X'Y\)</span> to: <span class="math display">\[\hat{\beta}_{WLS} = (X'WX)^{-1}X'WY\]</span> where <span class="math inline">\(W\)</span> is a diagonal matrix containing the IPTW weights <span class="math inline">\(W_i\)</span>. The weight acts as a volume knob; patients with higher weights pull the regression line closer to their observed data points.</p>
+<p>In matrix notation, the normal equation for the regression coefficients is modified from the standard OLS <span class="math inline">\((X'X)^{-1}X'Y\)</span> to: <span class="math display">\[\hat{\beta}_{WLS} = (X'WX)^{-1}X'WY\]</span></p>
 </section>
-<section id="effective-sample-size-ess" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="effective-sample-size-ess"><span class="header-section-number">3.3</span> Effective Sample Size (ESS)</h3>
+<section id="statistical-inference-robust-standard-errors" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="statistical-inference-robust-standard-errors"><span class="header-section-number">3.3</span> Statistical Inference &amp; Robust Standard Errors</h3>
+<p>A common misconception in observational studies is that the standard error of the weighted treatment effect can be computed by treating the weighted groups as two independent samples (e.g., using the simple addition of independent normal variances: <span class="math inline">\(SE = \sqrt{Var(\bar{Y}_1) + Var(\bar{Y}_0)}\)</span>). In HTA practice, this naive approach is strictly rejected for three reasons:</p>
+<ol type="1">
+<li><strong>Non-Independence</strong>: The treated and control groups are not independent samples drawn from separate populations. They are subgroups of the same observational cohort, meaning their baseline covariates and potential outcomes share a joint distribution.</li>
+<li><strong>Variance Inflation</strong>: Weighting introduces unequal weights (<span class="math inline">\(W_i \neq 1\)</span>), which violates the homoscedasticity assumption of standard OLS. Failing to adjust for this leads to severely underestimated standard errors and inflated Type I error rates.</li>
+<li><strong>Estimation Uncertainty of Propensity Scores</strong>: The propensity scores <span class="math inline">\(e(X)\)</span> are not true population parameters; they are <em>estimated</em> from the data. This estimation process introduces auxiliary uncertainty that must propagate into the final treatment effect variance.</li>
+</ol>
+<section id="m-estimation-the-sandwich-variance-estimator" class="level4" data-number="3.3.1">
+<h4 data-number="3.3.1" class="anchored" data-anchor-id="m-estimation-the-sandwich-variance-estimator"><span class="header-section-number">3.3.1</span> M-Estimation &amp; The Sandwich Variance Estimator</h4>
+<p>To obtain asymptotically correct standard errors, modern causal inference relies on the <strong>M-Estimation (Empirical Sandwich Covariance)</strong> framework. We stack the estimating equations for the treatment assignment model (propensity score) and the outcome regression model together as a joint system:</p>
+<p><span class="math display">\[\sum_{i=1}^n \Psi_i(\theta) = 0\]</span></p>
+<p>where <span class="math inline">\(\theta = [\beta, \alpha]^T\)</span> is the combined parameter vector containing the propensity model coefficients <span class="math inline">\(\beta\)</span> (logistic regression) and the outcome model coefficients <span class="math inline">\(\alpha\)</span> (WLS regression).</p>
+<p>The stacked estimating equations <span class="math inline">\(\Psi_i(\theta)\)</span> for individual <span class="math inline">\(i\)</span> are: <span class="math display">\[\Psi_i(\theta) = \begin{bmatrix}
+X_i \left( D_i - \text{logit}^{-1}(X_i \beta) \right) \\
+W_i(\beta) \cdot Z_i \left( Y_i - Z_i \alpha \right)
+\end{bmatrix}\]</span></p>
+<p>where <span class="math inline">\(Z_i = [1, D_i]^T\)</span> is the covariate vector of the outcome model, and <span class="math inline">\(W_i(\beta) = \frac{D_i}{\text{logit}^{-1}(X_i \beta)} + \frac{1 - D_i}{1 - \text{logit}^{-1}(X_i \beta)}\)</span> are the estimated weights.</p>
+<p>By Taylor expansion of the joint estimating equations, the asymptotic variance-covariance matrix of <span class="math inline">\(\hat{\theta}\)</span> is given by the <strong>Sandwich Formula</strong>:</p>
+<p><span class="math display">\[V(\hat{\theta}) = A(\hat{\theta})^{-1} B(\hat{\theta}) A(\hat{\theta})^{-T}\]</span></p>
+<ul>
+<li><strong>The “Bread” Matrix <span class="math inline">\(A(\hat{\theta})\)</span></strong>: The expected Jacobian matrix of the estimating equations: <span class="math display">\[A(\hat{\theta}) = - \frac{1}{n} \sum_{i=1}^n \frac{\partial \Psi_i(\theta)}{\partial \theta}\]</span> The off-diagonal blocks of <span class="math inline">\(A(\hat{\theta})\)</span> capture the dependence of the outcome estimating equations on the propensity score parameters <span class="math inline">\(\beta\)</span>. This explicitly accounts for the uncertainty introduced by estimating the weights.</li>
+<li><strong>The “Meat” Matrix <span class="math inline">\(B(\hat{\theta})\)</span></strong>: The empirical variance of the estimating equations: <span class="math display">\[B(\hat{\theta}) = \frac{1}{n} \sum_{i=1}^n \Psi_i(\theta) \Psi_i(\theta)^T\]</span> which allows for heteroscedasticity and clustering.</li>
+</ul>
+<p>Once the robust variance of the treatment effect coefficient <span class="math inline">\(\hat{\alpha}_1\)</span> (the ATE estimate) is extracted from the diagonal of <span class="math inline">\(V(\hat{\theta})\)</span> as <span class="math inline">\(SE_{\text{robust}}\)</span>, the 95% Confidence Interval is constructed using the standard Wald formulation: <span class="math display">\[CI_{95\%} = \hat{\alpha}_1 \pm 1.96 \cdot SE_{\text{robust}}\]</span></p>
+<p>This is the exact methodology executed by <code>lm_weightit</code> under the hood, ensuring that the confidence intervals presented in the portfolio are methodologically rigorous and defensible.</p>
+</section>
+</section>
+<section id="effective-sample-size-ess" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="effective-sample-size-ess"><span class="header-section-number">3.4</span> Effective Sample Size (ESS)</h3>
 <p>Because weighting inflates the influence of certain individuals, the statistical precision of the weighted sample is lower than the nominal sample size. We quantify this information loss using Kish’s <strong>Effective Sample Size (ESS)</strong>: <span class="math display">\[ESS = \frac{\left(\sum_{i=1}^n W_i\right)^2}{\sum_{i=1}^n W_i^2}\]</span></p>
 <p>If all weights are uniform (<span class="math inline">\(W_i=1\)</span>), the ESS equals the actual sample size <span class="math inline">\(N\)</span>. If a few patients have extremely large weights, the denominator increases, and the ESS collapses, signaling that the treatment effect estimate is dominated by a tiny fraction of the population.</p>
 <hr>
