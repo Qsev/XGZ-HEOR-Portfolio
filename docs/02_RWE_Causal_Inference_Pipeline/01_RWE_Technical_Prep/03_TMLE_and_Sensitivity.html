@@ -993,7 +993,15 @@ window.Quarto = {
 </section>
 <section id="how-is-it-calculated" class="level4" data-number="3.1.2">
 <h4 data-number="3.1.2" class="anchored" data-anchor-id="how-is-it-calculated"><span class="header-section-number">3.1.2</span> How is it Calculated?</h4>
-<p>For an observed Relative Risk (<span class="math inline">\(RR\)</span>) greater than <span class="math inline">\(1\)</span> (indicating a risk-increasing treatment effect, or when we invert a protective effect <span class="math inline">\(RR &lt; 1\)</span> to <span class="math inline">\(1/RR\)</span>): <span class="math display">\[\text{E-value} = RR + \sqrt{RR \cdot (RR - 1)}\]</span></p>
+<section id="calculating-the-relative-risk-from-tmle-estimates" class="level5" data-number="3.1.2.1">
+<h5 data-number="3.1.2.1" class="anchored" data-anchor-id="calculating-the-relative-risk-from-tmle-estimates"><span class="header-section-number">3.1.2.1</span> 1. Calculating the Relative Risk from TMLE Estimates</h5>
+<p>TMLE outputs the Average Treatment Effect (ATE) on the <strong>Risk Difference (RD)</strong> scale: <span class="math display">\[ATE = EY_1 - EY_0\]</span> where <span class="math inline">\(EY_1\)</span> is the expected survival rate under treatment, and <span class="math inline">\(EY_0\)</span> is the expected survival rate under control.</p>
+<p>To calculate the Relative Risk (<span class="math inline">\(RR\)</span>) required for E-value computation: <span class="math display">\[RR = \frac{EY_1}{EY_0} = \frac{EY_0 + ATE}{EY_0}\]</span></p>
+<p>The lower and upper bounds of the 95% confidence interval for the Relative Risk (<span class="math inline">\(RR_{lower}\)</span> and <span class="math inline">\(RR_{upper}\)</span>) are calculated similarly by substituting the lower and upper confidence limits of the ATE: <span class="math display">\[RR_{lower} = \frac{EY_0 + ATE_{lower}}{EY_0}, \quad RR_{upper} = \frac{EY_0 + ATE_{upper}}{EY_0}\]</span></p>
+</section>
+<section id="the-e-value-formula" class="level5" data-number="3.1.2.2">
+<h5 data-number="3.1.2.2" class="anchored" data-anchor-id="the-e-value-formula"><span class="header-section-number">3.1.2.2</span> 2. The E-value Formula</h5>
+<p>For an observed Relative Risk (<span class="math inline">\(RR\)</span>) greater than <span class="math inline">\(1\)</span> (for protective effects like survival where we invert <span class="math inline">\(RR &lt; 1\)</span> to <span class="math inline">\(1/RR\)</span>): <span class="math display">\[\text{E-value} = RR + \sqrt{RR \cdot (RR - 1)}\]</span></p>
 <p>To evaluate the statistical robustness of the effect, we also compute the E-value for the <strong>lower bound</strong> of the 95% confidence interval (<span class="math inline">\(RR_{lower}\)</span>): <span class="math display">\[\text{E-value}_{\text{lower}} = RR_{\text{lower}} + \sqrt{RR_{\text{lower}} \cdot (RR_{\text{lower}} - 1)}\]</span></p>
 <p>If <span class="math inline">\(RR_{\text{lower}} \le 1\)</span>, the E-value for the confidence interval limit is defined as <span class="math inline">\(1\)</span> (meaning that unmeasured confounding of any strength could explain away the statistical significance, as the interval already includes the null).</p>
 <p>To evaluate sensitivity to unmeasured confounding, we transform the Risk Difference obtained from TMLE to the Relative Risk (RR) scale and calculate the corresponding E-value.</p>
@@ -1055,6 +1063,7 @@ window.Quarto = {
 </table>
 </div>
 </div>
+</section>
 </section>
 <section id="how-to-interpret-the-e-value" class="level4" data-number="3.1.3">
 <h4 data-number="3.1.3" class="anchored" data-anchor-id="how-to-interpret-the-e-value"><span class="header-section-number">3.1.3</span> How to Interpret the E-value?</h4>

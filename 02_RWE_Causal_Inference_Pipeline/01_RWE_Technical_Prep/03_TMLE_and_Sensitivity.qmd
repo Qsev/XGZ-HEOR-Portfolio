@@ -373,7 +373,19 @@ To completely explain away the treatment's effect, this hidden confounder must h
 
 #### How is it Calculated?
 
-For an observed Relative Risk ($RR$) greater than $1$ (indicating a risk-increasing treatment effect, or when we invert a protective effect $RR < 1$ to $1/RR$):
+##### 1. Calculating the Relative Risk from TMLE Estimates
+TMLE outputs the Average Treatment Effect (ATE) on the **Risk Difference (RD)** scale:
+$$ATE = EY_1 - EY_0$$
+where $EY_1$ is the expected survival rate under treatment, and $EY_0$ is the expected survival rate under control.
+
+To calculate the Relative Risk ($RR$) required for E-value computation:
+$$RR = \frac{EY_1}{EY_0} = \frac{EY_0 + ATE}{EY_0}$$
+
+The lower and upper bounds of the 95% confidence interval for the Relative Risk ($RR_{lower}$ and $RR_{upper}$) are calculated similarly by substituting the lower and upper confidence limits of the ATE:
+$$RR_{lower} = \frac{EY_0 + ATE_{lower}}{EY_0}, \quad RR_{upper} = \frac{EY_0 + ATE_{upper}}{EY_0}$$
+
+##### 2. The E-value Formula
+For an observed Relative Risk ($RR$) greater than $1$ (for protective effects like survival where we invert $RR < 1$ to $1/RR$):
 $$\text{E-value} = RR + \sqrt{RR \cdot (RR - 1)}$$
 
 To evaluate the statistical robustness of the effect, we also compute the E-value for the **lower bound** of the 95% confidence interval ($RR_{lower}$):
