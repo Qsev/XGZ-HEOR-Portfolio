@@ -164,9 +164,51 @@ naive_ate <- naive_treated - naive_control
 Without adjustment, patients receiving Drug X are significantly older and have worse ECOG scores, creating a naive survival comparison that underestimates the treatment effect:
 
 ```{r}
-cat("Treated Group Mean Age: ", round(mean(df$age[df$treatment == 1]), 2), "\n")
-cat("Control Group Mean Age: ", round(mean(df$age[df$treatment == 0]), 2), "\n")
-cat("Naive Survival Difference (ATE): ", round(naive_ate, 4), "\n")
+# Create baseline characteristics table
+n_trt <- sum(df$treatment == 1)
+n_ctl <- sum(df$treatment == 0)
+
+mean_age_trt <- mean(df$age[df$treatment == 1])
+sd_age_trt <- sd(df$age[df$treatment == 1])
+mean_age_ctl <- mean(df$age[df$treatment == 0])
+sd_age_ctl <- sd(df$age[df$treatment == 0])
+
+ecog1_trt <- sum(df$ecog[df$treatment == 1] == 1)
+ecog1_ctl <- sum(df$ecog[df$treatment == 0] == 1)
+
+surv_trt <- sum(df$survival_1yr[df$treatment == 1] == 1)
+surv_ctl <- sum(df$survival_1yr[df$treatment == 0] == 1)
+
+baseline_tbl <- data.frame(
+  "Baseline Characteristic" = c(
+    "Sample Size, N (%)", 
+    "Age (years), Mean (SD)", 
+    "ECOG Performance Status = 1, N (%)", 
+    "1-Year Survival Rate, N (%)"
+  ),
+  "Treated (Drug X)" = c(
+    sprintf("%d (100%%)", n_trt),
+    sprintf("%.1f (%.1f)", mean_age_trt, sd_age_trt),
+    sprintf("%d (%.1f%%)", ecog1_trt, 100 * ecog1_trt / n_trt),
+    sprintf("%d (%.1f%%)", surv_trt, 100 * surv_trt / n_trt)
+  ),
+  "Control (Standard of Care)" = c(
+    sprintf("%d (100%%)", n_ctl),
+    sprintf("%.1f (%.1f)", mean_age_ctl, sd_age_ctl),
+    sprintf("%d (%.1f%%)", ecog1_ctl, 100 * ecog1_ctl / n_ctl),
+    sprintf("%d (%.1f%%)", surv_ctl, 100 * surv_ctl / n_ctl)
+  ),
+  "Difference" = c(
+    "",
+    sprintf("%+.2f", mean_age_trt - mean_age_ctl),
+    sprintf("%+.1f%%", 100 * (ecog1_trt / n_trt - ecog1_ctl / n_ctl)),
+    sprintf("%+.1f%%", 100 * (surv_trt / n_trt - surv_ctl / n_ctl))
+  ),
+  check.names = FALSE,
+  stringsAsFactors = FALSE
+)
+
+knitr::kable(baseline_tbl, caption = "Baseline Covariates and Naive Survival Outcomes (Unadjusted)", align = "lrrr")
 ```
 
 ### IPTW Balancing & Diagnostics
@@ -182,8 +224,15 @@ W <- weightit(treatment ~ age + ecog,
 
 # Extract Effective Sample Size (ESS)
 ess_summary <- summary(W)
-cat("Effective Sample Size (Control Group): ", round(ess_summary$effective.sample.size["Weighted", "Control"], 2), "\n")
-cat("Effective Sample Size (Treated Group): ", round(ess_summary$effective.sample.size["Weighted", "Treated"], 2), "\n")
+ess_df <- as.data.frame(ess_summary$effective.sample.size)
+ess_table <- data.frame(
+  "Sample Group" = row.names(ess_df),
+  "Control Group (Standard of Care)" = round(ess_df$Control, 2),
+  "Treated Group (Drug X)" = round(ess_df$Treated, 2),
+  "Total Sample Size" = round(ess_df$Control + ess_df$Treated, 2),
+  check.names = FALSE
+)
+knitr::kable(ess_table, caption = "Effective Sample Size (ESS) Comparison", align = "lrrr")
 ```
 
 ### Covariate Balance Audit (Love Plot)
@@ -228,12 +277,27 @@ aipw_obj <- AIPW$new(
   g.SL.library = sl_lib_aipw
 )
 
-# Run double robust estimation
-aipw_obj$fit()
-aipw_obj$summary()
+# Run double robust estimation and suppress console output
+invisible(capture.output(aipw_obj$fit()))
+invisible(capture.output(aipw_obj$summary()))
+
+# Extract and format AIPW results
 aipw_res <- as.data.frame(aipw_obj$result)
 aipw_est <- aipw_res["Risk Difference", "Estimate"]
 aipw_se <- aipw_res["Risk Difference", "SE"]
+
+# Create a clean data frame for AIPW outputs
+aipw_tbl <- data.frame(
+  Parameter = row.names(aipw_res),
+  Estimate = round(aipw_res$Estimate, 4),
+  "Std. Error" = round(aipw_res$SE, 4),
+  "95% LCL" = round(aipw_res$`95% LCL`, 4),
+  "95% UCL" = round(aipw_res$`95% UCL`, 4),
+  "Sample Size (N)" = as.integer(aipw_res$N),
+  check.names = FALSE
+)
+
+knitr::kable(aipw_tbl, caption = "Doubly Robust Estimates via Augmented Inverse Probability Weighting (AIPW)", align = "lrrrrr")
 ```
 
 ### Evidence Synthesis Comparison

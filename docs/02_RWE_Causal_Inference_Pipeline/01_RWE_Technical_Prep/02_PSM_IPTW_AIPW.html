@@ -465,24 +465,96 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Treated Group Mean Age: "</span>, <span class="fu">round</span>(<span class="fu">mean</span>(df<span class="sc">$</span>age[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>]), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create baseline characteristics table</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n_trt <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n_ctl <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>mean_age_trt <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>age[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>sd_age_trt <span class="ot">&lt;-</span> <span class="fu">sd</span>(df<span class="sc">$</span>age[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>mean_age_ctl <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>age[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>sd_age_ctl <span class="ot">&lt;-</span> <span class="fu">sd</span>(df<span class="sc">$</span>age[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ecog1_trt <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>ecog[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>] <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>ecog1_ctl <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>ecog[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>] <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>surv_trt <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>] <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>surv_ctl <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>] <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>baseline_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Baseline Characteristic"</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Sample Size, N (%)"</span>, </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Age (years), Mean (SD)"</span>, </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ECOG Performance Status = 1, N (%)"</span>, </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1-Year Survival Rate, N (%)"</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Treated (Drug X)"</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d (100%%)"</span>, n_trt),</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f (%.1f)"</span>, mean_age_trt, sd_age_trt),</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d (%.1f%%)"</span>, ecog1_trt, <span class="dv">100</span> <span class="sc">*</span> ecog1_trt <span class="sc">/</span> n_trt),</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d (%.1f%%)"</span>, surv_trt, <span class="dv">100</span> <span class="sc">*</span> surv_trt <span class="sc">/</span> n_trt)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Control (Standard of Care)"</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d (100%%)"</span>, n_ctl),</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f (%.1f)"</span>, mean_age_ctl, sd_age_ctl),</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d (%.1f%%)"</span>, ecog1_ctl, <span class="dv">100</span> <span class="sc">*</span> ecog1_ctl <span class="sc">/</span> n_ctl),</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%d (%.1f%%)"</span>, surv_ctl, <span class="dv">100</span> <span class="sc">*</span> surv_ctl <span class="sc">/</span> n_ctl)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Difference"</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">""</span>,</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%+.2f"</span>, mean_age_trt <span class="sc">-</span> mean_age_ctl),</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%+.1f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> (ecog1_trt <span class="sc">/</span> n_trt <span class="sc">-</span> ecog1_ctl <span class="sc">/</span> n_ctl)),</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%+.1f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> (surv_trt <span class="sc">/</span> n_trt <span class="sc">-</span> surv_ctl <span class="sc">/</span> n_ctl))</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(baseline_tbl, <span class="at">caption =</span> <span class="st">"Baseline Covariates and Naive Survival Outcomes (Unadjusted)"</span>, <span class="at">align =</span> <span class="st">"lrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Treated Group Mean Age:  65.97 </code></pre>
-</div>
-<details class="code-fold">
-<summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Control Group Mean Age: "</span>, <span class="fu">round</span>(<span class="fu">mean</span>(df<span class="sc">$</span>age[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>]), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Control Group Mean Age:  62.47 </code></pre>
-</div>
-<details class="code-fold">
-<summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Naive Survival Difference (ATE): "</span>, <span class="fu">round</span>(naive_ate, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Naive Survival Difference (ATE):  0.118 </code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Baseline Covariates and Naive Survival Outcomes (Unadjusted)</caption>
+<colgroup>
+<col style="width: 38%">
+<col style="width: 18%">
+<col style="width: 30%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Baseline Characteristic</th>
+<th style="text-align: right;">Treated (Drug X)</th>
+<th style="text-align: right;">Control (Standard of Care)</th>
+<th style="text-align: right;">Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Sample Size, N (%)</td>
+<td style="text-align: right;">416 (100%)</td>
+<td style="text-align: right;">84 (100%)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Age (years), Mean (SD)</td>
+<td style="text-align: right;">66.0 (10.1)</td>
+<td style="text-align: right;">62.5 (10.5)</td>
+<td style="text-align: right;">+3.49</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ECOG Performance Status = 1, N (%)</td>
+<td style="text-align: right;">177 (42.5%)</td>
+<td style="text-align: right;">18 (21.4%)</td>
+<td style="text-align: right;">+21.1%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1-Year Survival Rate, N (%)</td>
+<td style="text-align: right;">163 (39.2%)</td>
+<td style="text-align: right;">23 (27.4%)</td>
+<td style="text-align: right;">+11.8%</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </section>
@@ -492,25 +564,56 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate weights</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">weightit</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> ecog,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> df,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">"ps"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">estimand =</span> <span class="st">"ATE"</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract Effective Sample Size (ESS)</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ess_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(W)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Effective Sample Size (Control Group): "</span>, <span class="fu">round</span>(ess_summary<span class="sc">$</span>effective.sample.size[<span class="st">"Weighted"</span>, <span class="st">"Control"</span>], <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate weights</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">weightit</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> ecog,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> df,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">"ps"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">estimand =</span> <span class="st">"ATE"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract Effective Sample Size (ESS)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ess_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(W)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ess_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(ess_summary<span class="sc">$</span>effective.sample.size)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ess_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Sample Group"</span> <span class="ot">=</span> <span class="fu">row.names</span>(ess_df),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Control Group (Standard of Care)"</span> <span class="ot">=</span> <span class="fu">round</span>(ess_df<span class="sc">$</span>Control, <span class="dv">2</span>),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Treated Group (Drug X)"</span> <span class="ot">=</span> <span class="fu">round</span>(ess_df<span class="sc">$</span>Treated, <span class="dv">2</span>),</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Total Sample Size"</span> <span class="ot">=</span> <span class="fu">round</span>(ess_df<span class="sc">$</span>Control <span class="sc">+</span> ess_df<span class="sc">$</span>Treated, <span class="dv">2</span>),</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ess_table, <span class="at">caption =</span> <span class="st">"Effective Sample Size (ESS) Comparison"</span>, <span class="at">align =</span> <span class="st">"lrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Effective Sample Size (Control Group):  69.45 </code></pre>
-</div>
-<details class="code-fold">
-<summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Effective Sample Size (Treated Group): "</span>, <span class="fu">round</span>(ess_summary<span class="sc">$</span>effective.sample.size[<span class="st">"Weighted"</span>, <span class="st">"Treated"</span>], <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Effective Sample Size (Treated Group):  412.18 </code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Effective Sample Size (ESS) Comparison</caption>
+<colgroup>
+<col style="width: 14%">
+<col style="width: 37%">
+<col style="width: 26%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Sample Group</th>
+<th style="text-align: right;">Control Group (Standard of Care)</th>
+<th style="text-align: right;">Treated Group (Drug X)</th>
+<th style="text-align: right;">Total Sample Size</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Unweighted</td>
+<td style="text-align: right;">84.00</td>
+<td style="text-align: right;">416.00</td>
+<td style="text-align: right;">500.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Weighted</td>
+<td style="text-align: right;">69.45</td>
+<td style="text-align: right;">412.18</td>
+<td style="text-align: right;">481.63</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </section>
@@ -520,13 +623,13 @@ window.Quarto = {
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">love.plot</span>(W,</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>),</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">binary =</span> <span class="st">"std"</span>,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">abs =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">shapes =</span> <span class="fu">c</span>(<span class="st">"circle filled"</span>, <span class="st">"triangle filled"</span>),</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"#e53e3e"</span>, <span class="st">"#3182ce"</span>),</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">sample.names =</span> <span class="fu">c</span>(<span class="st">"Original"</span>, <span class="st">"Weighted"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">love.plot</span>(W,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">binary =</span> <span class="st">"std"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">abs =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">shapes =</span> <span class="fu">c</span>(<span class="st">"circle filled"</span>, <span class="st">"triangle filled"</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"#e53e3e"</span>, <span class="st">"#3182ce"</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">sample.names =</span> <span class="fu">c</span>(<span class="st">"Original"</span>, <span class="st">"Weighted"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -543,50 +646,119 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. IPTW Weighted Linear Regression</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>fit_iptw <span class="ot">&lt;-</span> <span class="fu">lm_weightit</span>(survival_1yr <span class="sc">~</span> treatment,</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">weightit =</span> W)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>iptw_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_iptw)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>iptw_est <span class="ot">&lt;-</span> iptw_summary<span class="sc">$</span>coefficients[<span class="st">"treatment"</span>, <span class="st">"Estimate"</span>]</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>iptw_se <span class="ot">&lt;-</span> iptw_summary<span class="sc">$</span>coefficients[<span class="st">"treatment"</span>, <span class="st">"Std. Error"</span>]</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. AIPW Estimation</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>sl_lib_aipw <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>)</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>aipw_obj <span class="ot">&lt;-</span> AIPW<span class="sc">$</span><span class="fu">new</span>(</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> df<span class="sc">$</span>survival_1yr,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">A =</span> df<span class="sc">$</span>treatment,</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">W =</span> df[, <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"ecog"</span>)],</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q.SL.library =</span> sl_lib_aipw,</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">g.SL.library =</span> sl_lib_aipw</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Run double robust estimation</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>aipw_obj<span class="sc">$</span><span class="fu">fit</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. IPTW Weighted Linear Regression</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>fit_iptw <span class="ot">&lt;-</span> <span class="fu">lm_weightit</span>(survival_1yr <span class="sc">~</span> treatment,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">weightit =</span> W)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>iptw_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_iptw)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>iptw_est <span class="ot">&lt;-</span> iptw_summary<span class="sc">$</span>coefficients[<span class="st">"treatment"</span>, <span class="st">"Estimate"</span>]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>iptw_se <span class="ot">&lt;-</span> iptw_summary<span class="sc">$</span>coefficients[<span class="st">"treatment"</span>, <span class="st">"Std. Error"</span>]</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. AIPW Estimation</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>sl_lib_aipw <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>aipw_obj <span class="ot">&lt;-</span> AIPW<span class="sc">$</span><span class="fu">new</span>(</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> df<span class="sc">$</span>survival_1yr,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">A =</span> df<span class="sc">$</span>treatment,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">W =</span> df[, <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"ecog"</span>)],</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q.SL.library =</span> sl_lib_aipw,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">g.SL.library =</span> sl_lib_aipw</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Run double robust estimation and suppress console output</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">capture.output</span>(aipw_obj<span class="sc">$</span><span class="fu">fit</span>()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Done!</code></pre>
 </div>
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>aipw_obj<span class="sc">$</span><span class="fu">summary</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">capture.output</span>(aipw_obj<span class="sc">$</span><span class="fu">summary</span>()))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and format AIPW results</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>aipw_res <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(aipw_obj<span class="sc">$</span>result)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>aipw_est <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"Estimate"</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>aipw_se <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"SE"</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a clean data frame for AIPW outputs</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>aipw_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">row.names</span>(aipw_res),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate =</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span>Estimate, <span class="dv">4</span>),</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Std. Error"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span>SE, <span class="dv">4</span>),</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span><span class="st">`</span><span class="at">95% LCL</span><span class="st">`</span>, <span class="dv">4</span>),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span><span class="st">`</span><span class="at">95% UCL</span><span class="st">`</span>, <span class="dv">4</span>),</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Sample Size (N)"</span> <span class="ot">=</span> <span class="fu">as.integer</span>(aipw_res<span class="sc">$</span>N),</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(aipw_tbl, <span class="at">caption =</span> <span class="st">"Doubly Robust Estimates via Augmented Inverse Probability Weighting (AIPW)"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>                 Estimate     SE 95% LCL 95% UCL   N
-Risk of Exposure    0.400 0.0242  0.3526   0.447 416
-Risk of Control     0.229 0.0487  0.1340   0.325  84
-Risk Difference     0.171 0.0541  0.0644   0.277 500
-Risk Ratio          1.743 0.2195  1.1337   2.681 500
-Odds Ratio          2.239 0.2914  1.2645   3.963 500</code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Doubly Robust Estimates via Augmented Inverse Probability Weighting (AIPW)</caption>
+<colgroup>
+<col style="width: 24%">
+<col style="width: 13%">
+<col style="width: 15%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Std. Error</th>
+<th style="text-align: right;">95% LCL</th>
+<th style="text-align: right;">95% UCL</th>
+<th style="text-align: right;">Sample Size (N)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Risk of Exposure</td>
+<td style="text-align: right;">0.3999</td>
+<td style="text-align: right;">0.0242</td>
+<td style="text-align: right;">0.3526</td>
+<td style="text-align: right;">0.4473</td>
+<td style="text-align: right;">416</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Risk of Control</td>
+<td style="text-align: right;">0.2294</td>
+<td style="text-align: right;">0.0487</td>
+<td style="text-align: right;">0.1340</td>
+<td style="text-align: right;">0.3248</td>
+<td style="text-align: right;">84</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Risk Difference</td>
+<td style="text-align: right;">0.1705</td>
+<td style="text-align: right;">0.0541</td>
+<td style="text-align: right;">0.0644</td>
+<td style="text-align: right;">0.2766</td>
+<td style="text-align: right;">500</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Risk Ratio</td>
+<td style="text-align: right;">1.7433</td>
+<td style="text-align: right;">0.2195</td>
+<td style="text-align: right;">1.1337</td>
+<td style="text-align: right;">2.6807</td>
+<td style="text-align: right;">500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Odds Ratio</td>
+<td style="text-align: right;">2.2387</td>
+<td style="text-align: right;">0.2914</td>
+<td style="text-align: right;">1.2645</td>
+<td style="text-align: right;">3.9635</td>
+<td style="text-align: right;">500</td>
+</tr>
+</tbody>
+</table>
 </div>
-<details class="code-fold">
-<summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>aipw_res <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(aipw_obj<span class="sc">$</span>result)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>aipw_est <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"Estimate"</span>]</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>aipw_se <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"SE"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 </div>
 </section>
 <section id="evidence-synthesis-comparison" class="level3" data-number="5.5">
