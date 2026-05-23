@@ -366,12 +366,10 @@ The estimated fluctuation parameters under the production fit are $\epsilon_0 = 
 
 In observational real-world evidence (RWD) studies, a major source of skepticism from HTA agencies (like NICE) is **unmeasured confounding** (selection bias due to variables not captured in the database). The **E-value**, developed by VanderWeele and Ding (2017), is a quantitative sensitivity metric that evaluates how robust an observed causal association is to unmeasured confounding. 
 
-Specifically, the E-value is defined as the minimum strength of association on the risk ratio scale that an unmeasured confounder ($U$) must have with both:
+In simple terms, the E-value answers this question: 
+*"How strong would an unmeasured confounder (like a hidden genetic mutation) need to be to completely explain away the observed survival benefit of our treatment?"*
 
-1. The treatment assignment ($D$)
-2. The clinical outcome ($Y$)
-
-to fully explain away the observed treatment-outcome association, adjusting for the measured covariates ($W$).
+To completely explain away the treatment's effect, this hidden confounder must have a strong "double-association": it must be highly associated with whether a patient receives the treatment, **and** it must be highly associated with whether the patient survives. The E-value is the minimum value of this double-association. If no such strong confounder exists in reality, we can conclude that the observed survival benefit is truly caused by the treatment.
 
 #### How is it Calculated?
 
