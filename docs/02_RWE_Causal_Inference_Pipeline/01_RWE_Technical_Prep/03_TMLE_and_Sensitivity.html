@@ -353,10 +353,10 @@ window.Quarto = {
 <section id="introduction-the-limits-of-single-robustness-aipw" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="introduction-the-limits-of-single-robustness-aipw"><span class="header-section-number">1</span> Introduction: The Limits of Single Robustness &amp; AIPW</h2>
 <p>In health technology assessment (HTA), observational real-world data (RWD) is frequently used to construct External Control Arms (ECAs) when randomized controlled trials (RCTs) are unfeasible. Standard propensity score adjustments, such as Propensity Score Matching (PSM) and Inverse Probability Treatment Weighting (IPTW), rely entirely on the correct specification of the treatment assignment model: <span class="math display">\[g(X) = P(D = 1 \mid X)\]</span></p>
-<p>If the propensity score model omits crucial confounders or misspecifies their functional forms (e.g., ignoring non-linearities or interactions), these single-robust estimators yield biased estimates of the treatment effect.</p>
+<p>If the propensity score model <strong>omits crucial confounders</strong> or <strong>misspecifies their functional forms (e.g., ignoring non-linearities or interactions)</strong>, these single-robust estimators yield biased estimates of the treatment effect.</p>
 <section id="doubly-robust-estimators" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="doubly-robust-estimators"><span class="header-section-number">1.1</span> Doubly Robust Estimators</h3>
-<p>To address this, doubly robust estimators combine the treatment model with an outcome regression model: <span class="math display">\[m(D, X) = E[Y \mid D, X]\]</span></p>
+<p>To address this, doubly robust estimators combine the treatment model with an outcome regression model. For a detailed algebraic proof of the double robustness property, see the <a href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.html#augmented-inverse-probability-weighting-aipw">AIPW section in Page 2</a>: <span class="math display">\[m(D, X) = E[Y \mid D, W]\]</span></p>
 <p>This ensures that the treatment effect estimate is unbiased if <em>either</em> the treatment model <em>or</em> the outcome model is correctly specified.</p>
 </section>
 <section id="why-tmle-over-aipw" class="level3" data-number="1.2">

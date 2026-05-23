@@ -19,12 +19,12 @@ format:
 In health technology assessment (HTA), observational real-world data (RWD) is frequently used to construct External Control Arms (ECAs) when randomized controlled trials (RCTs) are unfeasible. Standard propensity score adjustments, such as Propensity Score Matching (PSM) and Inverse Probability Treatment Weighting (IPTW), rely entirely on the correct specification of the treatment assignment model:
 $$g(X) = P(D = 1 \mid X)$$
 
-If the propensity score model omits crucial confounders or misspecifies their functional forms (e.g., ignoring non-linearities or interactions), these single-robust estimators yield biased estimates of the treatment effect.
+If the propensity score model **omits crucial confounders** or **misspecifies their functional forms (e.g., ignoring non-linearities or interactions)**, these single-robust estimators yield biased estimates of the treatment effect.
 
 ### Doubly Robust Estimators
 
-To address this, doubly robust estimators combine the treatment model with an outcome regression model:
-$$m(D, X) = E[Y \mid D, X]$$
+To address this, doubly robust estimators combine the treatment model with an outcome regression model. For a detailed algebraic proof of the double robustness property, see the [AIPW section in Page 2](./02_PSM_IPTW_AIPW.qmd#augmented-inverse-probability-weighting-aipw):
+$$m(D, X) = E[Y \mid D, W]$$
 
 This ensures that the treatment effect estimate is unbiased if *either* the treatment model *or* the outcome model is correctly specified.
 
