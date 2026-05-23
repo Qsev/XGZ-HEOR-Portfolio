@@ -74,7 +74,7 @@ For each individual $i$, we evaluate two values of the Clever Covariate:
 ### Step 4: The Fluctuation (Update) Step
 
 We update the initial outcome prediction $Q_0$ by fitting a logistic regression of the observed outcome $Y$ on the Clever Covariate $H(D, W)$, using the logit of the initial prediction $Q_0(D, W)$ as a fixed offset:
-$$\text{logit}\big(Q_1(D, W)\right) = \text{logit}\big(Q_0(D, W)\right) + \epsilon \cdot H(D, W)$$
+$$\text{logit}\left(Q_1(D, W)\right) = \text{logit}\left(Q_0(D, W)\right) + \epsilon \cdot H(D, W)$$
 
 Here, the coefficient $\epsilon$ (the fluctuation parameter) is estimated via Maximum Likelihood. 
 
