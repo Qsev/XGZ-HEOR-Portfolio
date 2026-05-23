@@ -299,7 +299,6 @@ window.Quarto = {
   <li><a href="#production-r-implementation-pipeline-package-level-fit-plots" id="toc-production-r-implementation-pipeline-package-level-fit-plots" class="nav-link" data-scroll-target="#production-r-implementation-pipeline-package-level-fit-plots"><span class="header-section-number">3</span> Production R Implementation Pipeline (Package-level Fit &amp; Plots)</a>
   <ul class="collapse">
   <li><a href="#sensitivity-analysis-e-value-calculation" id="toc-sensitivity-analysis-e-value-calculation" class="nav-link" data-scroll-target="#sensitivity-analysis-e-value-calculation"><span class="header-section-number">3.1</span> Sensitivity Analysis: E-Value Calculation</a></li>
-  <li><a href="#e-value-contour-visualization" id="toc-e-value-contour-visualization" class="nav-link" data-scroll-target="#e-value-contour-visualization"><span class="header-section-number">3.2</span> E-Value Contour Visualization</a></li>
   </ul></li>
   <li><a href="#causal-evidence-reconciliation" id="toc-causal-evidence-reconciliation" class="nav-link" data-scroll-target="#causal-evidence-reconciliation"><span class="header-section-number">4</span> Causal Evidence Reconciliation</a></li>
   </ul>
@@ -986,6 +985,17 @@ window.Quarto = {
 </div>
 <section id="sensitivity-analysis-e-value-calculation" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="sensitivity-analysis-e-value-calculation"><span class="header-section-number">3.1</span> Sensitivity Analysis: E-Value Calculation</h3>
+<section id="what-is-the-e-value" class="level4" data-number="3.1.1">
+<h4 data-number="3.1.1" class="anchored" data-anchor-id="what-is-the-e-value"><span class="header-section-number">3.1.1</span> What is the E-value?</h4>
+<p>In observational real-world evidence (RWD) studies, a major source of skepticism from HTA agencies (like NICE) is <strong>unmeasured confounding</strong> (selection bias due to variables not captured in the database). The <strong>E-value</strong>, developed by VanderWeele and Ding (2017), is a quantitative sensitivity metric that evaluates how robust an observed causal association is to unmeasured confounding.</p>
+<p>Specifically, the E-value is defined as the minimum strength of association on the risk ratio scale that an unmeasured confounder (<span class="math inline">\(U\)</span>) must have with both: 1. The treatment assignment (<span class="math inline">\(D\)</span>) 2. The clinical outcome (<span class="math inline">\(Y\)</span>)</p>
+<p>to fully explain away the observed treatment-outcome association, adjusting for the measured covariates (<span class="math inline">\(W\)</span>).</p>
+</section>
+<section id="how-is-it-calculated" class="level4" data-number="3.1.2">
+<h4 data-number="3.1.2" class="anchored" data-anchor-id="how-is-it-calculated"><span class="header-section-number">3.1.2</span> How is it Calculated?</h4>
+<p>For an observed Relative Risk (<span class="math inline">\(RR\)</span>) greater than <span class="math inline">\(1\)</span> (indicating a risk-increasing treatment effect, or when we invert a protective effect <span class="math inline">\(RR &lt; 1\)</span> to <span class="math inline">\(1/RR\)</span>): <span class="math display">\[\text{E-value} = RR + \sqrt{RR \cdot (RR - 1)}\]</span></p>
+<p>To evaluate the statistical robustness of the effect, we also compute the E-value for the <strong>lower bound</strong> of the 95% confidence interval (<span class="math inline">\(RR_{lower}\)</span>): <span class="math display">\[\text{E-value}_{\text{lower}} = RR_{\text{lower}} + \sqrt{RR_{\text{lower}} \cdot (RR_{\text{lower}} - 1)}\]</span></p>
+<p>If <span class="math inline">\(RR_{\text{lower}} \le 1\)</span>, the E-value for the confidence interval limit is defined as <span class="math inline">\(1\)</span> (meaning that unmeasured confounding of any strength could explain away the statistical significance, as the interval already includes the null).</p>
 <p>To evaluate sensitivity to unmeasured confounding, we transform the Risk Difference obtained from TMLE to the Relative Risk (RR) scale and calculate the corresponding E-value.</p>
 <div class="cell">
 <details class="code-fold">
@@ -1045,11 +1055,20 @@ window.Quarto = {
 </table>
 </div>
 </div>
-<p>The point estimate E-value of <strong>2.87</strong> indicates that an unmeasured confounder would need to have a Relative Risk association of at least <strong>2.87</strong>-fold with both treatment assignment and survival to fully explain away the observed causal survival benefit.</p>
 </section>
-<section id="e-value-contour-visualization" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="e-value-contour-visualization"><span class="header-section-number">3.2</span> E-Value Contour Visualization</h3>
-<p>The contour curve illustrates the required strength of association between the unmeasured confounder and the treatment (x-axis) and outcome (y-axis) to reduce the observed effect to the null.</p>
+<section id="how-to-interpret-the-e-value" class="level4" data-number="3.1.3">
+<h4 data-number="3.1.3" class="anchored" data-anchor-id="how-to-interpret-the-e-value"><span class="header-section-number">3.1.3</span> How to Interpret the E-value?</h4>
+<p>For this analysis, our target outcome (1-year survival rate) represents a protective/positive effect of treatment, which we evaluate by converting the TMLE risk difference to a Relative Risk scale (<span class="math inline">\(RR = 1.740\)</span>). The resulting E-value analysis is summarized in the table below.</p>
+<p>To interpret these results:</p>
+<ol type="1">
+<li><p><strong>Point Estimate E-value (2.87)</strong>: To completely explain away the observed point estimate of the treatment effect (<span class="math inline">\(RR = 1.740\)</span>), an unmeasured confounder (or group of confounders) would need to increase the probability of both treatment assignment and 1-year survival by at least <strong>2.87-fold</strong> (after adjusting for the measured covariates age and ECOG status). If the association is weaker than this threshold, the observed treatment effect cannot be fully explained away.</p></li>
+<li><p><strong>95% Confidence Interval Lower Bound E-value (2)</strong>: To explain away the <em>statistical significance</em> of the treatment effect (i.e.&nbsp;to push the lower limit of the 95% confidence interval to <span class="math inline">\(RR = 1.0\)</span>), an unmeasured confounder would need an association of at least <strong>2-fold</strong> with both treatment and survival.</p></li>
+<li><p><strong>Comparison with Measured Confounders</strong>: To assess clinical plausibility, we compare the E-value against the strengths of our measured confounders. In our adjusted model, poor performance status (ECOG = 1) is the strongest clinical confounder, displaying a risk association of approximately 1.8-fold. Because the unmeasured confounder would need to have an association of at least <strong>2.87-fold</strong> (nearly twice as strong as our strongest measured clinical predictor) and be completely uncorrelated with age and ECOG to nullify the effect, the presence of such an unmeasured confounder is highly implausible.</p></li>
+</ol>
+</section>
+<section id="e-value-contour-visualization" class="level4" data-number="3.1.4">
+<h4 data-number="3.1.4" class="anchored" data-anchor-id="e-value-contour-visualization"><span class="header-section-number">3.1.4</span> E-Value Contour Visualization</h4>
+<p>The contour plot displays the relationship between the two key confounding parameters: - <strong><span class="math inline">\(RR_{UD}\)</span> (x-axis)</strong>: The strength of association between the unmeasured confounder and treatment assignment. - <strong><span class="math inline">\(RR_{UY}\)</span> (y-axis)</strong>: The strength of association between the unmeasured confounder and the outcome.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>R Code</summary>
@@ -1068,7 +1087,19 @@ character</code></pre>
 </div>
 </div>
 </div>
+<section id="understanding-the-contour-curve" class="level5" data-number="3.1.4.1">
+<h5 data-number="3.1.4.1" class="anchored" data-anchor-id="understanding-the-contour-curve"><span class="header-section-number">3.1.4.1</span> Understanding the Contour Curve</h5>
+<ul>
+<li><strong>The Solid Curve (Point Estimate Boundary)</strong>: The solid black line represents the E-value boundary. Any point <span class="math inline">\((RR_{UD}, RR_{UY})\)</span> on this line defines a combination of confounder-treatment and confounder-outcome associations that is <em>just strong enough</em> to reduce the observed Relative Risk (<span class="math inline">\(RR = 1.740\)</span>) to the null (<span class="math inline">\(1.0\)</span>).</li>
+<li><strong>The Diagonal Intersection</strong>: The E-value itself (value of <strong>2.87</strong>) corresponds to the point on the curve where the two associations are assumed to be equal: <span class="math inline">\(RR_{UD} = RR_{UY} = 2.87\)</span>.</li>
+<li><strong>The Non-diagonal Trade-off</strong>: The curve illustrates that the associations do not have to be equal. If an unmeasured confounder has a weaker relationship with treatment (e.g.&nbsp;<span class="math inline">\(RR_{UD} = 2.0\)</span>), it would need to have a much stronger relationship with the outcome (e.g.&nbsp;<span class="math inline">\(RR_{UY} \approx 6.0\)</span>) to explain away the effect.</li>
+<li><strong>Below/Left of the Curve</strong>: This represents the region where unmeasured confounding is <strong>insufficient</strong> to explain away the observed effect. If the true confounding associations lie in this region, the treatment effect remains causal and significant.</li>
+<li><strong>Above/Right of the Curve</strong>: This represents the region where unmeasured confounding is strong enough to explain away the observed effect.</li>
+<li><strong>The Dashed Curve (Confidence Interval Boundary)</strong>: Shows the boundary required to explain away the 95% confidence interval lower limit (<span class="math inline">\(RR_{lower} = 1.334\)</span>), corresponding to the lower limit E-value of <strong>2</strong>.</li>
+</ul>
 <hr>
+</section>
+</section>
 </section>
 </section>
 <section id="causal-evidence-reconciliation" class="level2" data-number="4">

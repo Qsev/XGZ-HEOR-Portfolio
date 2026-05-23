@@ -362,6 +362,26 @@ The estimated fluctuation parameters under the production fit are $\epsilon_0 = 
 
 ### Sensitivity Analysis: E-Value Calculation
 
+#### What is the E-value?
+
+In observational real-world evidence (RWD) studies, a major source of skepticism from HTA agencies (like NICE) is **unmeasured confounding** (selection bias due to variables not captured in the database). The **E-value**, developed by VanderWeele and Ding (2017), is a quantitative sensitivity metric that evaluates how robust an observed causal association is to unmeasured confounding. 
+
+Specifically, the E-value is defined as the minimum strength of association on the risk ratio scale that an unmeasured confounder ($U$) must have with both:
+1. The treatment assignment ($D$)
+2. The clinical outcome ($Y$)
+
+to fully explain away the observed treatment-outcome association, adjusting for the measured covariates ($W$).
+
+#### How is it Calculated?
+
+For an observed Relative Risk ($RR$) greater than $1$ (indicating a risk-increasing treatment effect, or when we invert a protective effect $RR < 1$ to $1/RR$):
+$$\text{E-value} = RR + \sqrt{RR \cdot (RR - 1)}$$
+
+To evaluate the statistical robustness of the effect, we also compute the E-value for the **lower bound** of the 95% confidence interval ($RR_{lower}$):
+$$\text{E-value}_{\text{lower}} = RR_{\text{lower}} + \sqrt{RR_{\text{lower}} \cdot (RR_{\text{lower}} - 1)}$$
+
+If $RR_{\text{lower}} \le 1$, the E-value for the confidence interval limit is defined as $1$ (meaning that unmeasured confounding of any strength could explain away the statistical significance, as the interval already includes the null).
+
 To evaluate sensitivity to unmeasured confounding, we transform the Risk Difference obtained from TMLE to the Relative Risk (RR) scale and calculate the corresponding E-value.
 
 ```{r}
@@ -387,11 +407,26 @@ ev_tbl <- data.frame(
 knitr::kable(ev_tbl, caption = "E-Value Analysis for Unmeasured Confounding Sensitivity", align = "lrrr")
 ```
 
-The point estimate E-value of **`r round(ev_df["E-values", "point"], 2)`** indicates that an unmeasured confounder would need to have a Relative Risk association of at least **`r round(ev_df["E-values", "point"], 2)`**-fold with both treatment assignment and survival to fully explain away the observed causal survival benefit.
+#### How to Interpret the E-value?
 
-### E-Value Contour Visualization
+For this analysis, our target outcome (1-year survival rate) represents a protective/positive effect of treatment, which we evaluate by converting the TMLE risk difference to a Relative Risk scale ($RR = 1.740$). The resulting E-value analysis is summarized in the table below.
 
-The contour curve illustrates the required strength of association between the unmeasured confounder and the treatment (x-axis) and outcome (y-axis) to reduce the observed effect to the null.
+To interpret these results:
+
+1. **Point Estimate E-value (`r round(ev_df["E-values", "point"], 2)`)**:
+   To completely explain away the observed point estimate of the treatment effect ($RR = 1.740$), an unmeasured confounder (or group of confounders) would need to increase the probability of both treatment assignment and 1-year survival by at least **`r round(ev_df["E-values", "point"], 2)`-fold** (after adjusting for the measured covariates age and ECOG status). If the association is weaker than this threshold, the observed treatment effect cannot be fully explained away.
+
+2. **95% Confidence Interval Lower Bound E-value (`r round(ev_df["E-values", "lower"], 2)`)**:
+   To explain away the *statistical significance* of the treatment effect (i.e. to push the lower limit of the 95% confidence interval to $RR = 1.0$), an unmeasured confounder would need an association of at least **`r round(ev_df["E-values", "lower"], 2)`-fold** with both treatment and survival. 
+
+3. **Comparison with Measured Confounders**:
+   To assess clinical plausibility, we compare the E-value against the strengths of our measured confounders. In our adjusted model, poor performance status (ECOG = 1) is the strongest clinical confounder, displaying a risk association of approximately 1.8-fold. Because the unmeasured confounder would need to have an association of at least **2.87-fold** (nearly twice as strong as our strongest measured clinical predictor) and be completely uncorrelated with age and ECOG to nullify the effect, the presence of such an unmeasured confounder is highly implausible.
+
+#### E-Value Contour Visualization
+
+The contour plot displays the relationship between the two key confounding parameters:
+- **$RR_{UD}$ (x-axis)**: The strength of association between the unmeasured confounder and treatment assignment.
+- **$RR_{UY}$ (y-axis)**: The strength of association between the unmeasured confounder and the outcome.
 
 ```{r}
 #| label: evalue-plot
@@ -402,6 +437,15 @@ The contour curve illustrates the required strength of association between the u
 plot(ev, type = "line", 
      main = "E-value Contour: Sensitivity to Unmeasured Confounding")
 ```
+
+##### Understanding the Contour Curve
+
+- **The Solid Curve (Point Estimate Boundary)**: The solid black line represents the E-value boundary. Any point $(RR_{UD}, RR_{UY})$ on this line defines a combination of confounder-treatment and confounder-outcome associations that is *just strong enough* to reduce the observed Relative Risk ($RR = 1.740$) to the null ($1.0$).
+- **The Diagonal Intersection**: The E-value itself (value of **`r round(ev_df["E-values", "point"], 2)`**) corresponds to the point on the curve where the two associations are assumed to be equal: $RR_{UD} = RR_{UY} = 2.87$.
+- **The Non-diagonal Trade-off**: The curve illustrates that the associations do not have to be equal. If an unmeasured confounder has a weaker relationship with treatment (e.g. $RR_{UD} = 2.0$), it would need to have a much stronger relationship with the outcome (e.g. $RR_{UY} \approx 6.0$) to explain away the effect.
+- **Below/Left of the Curve**: This represents the region where unmeasured confounding is **insufficient** to explain away the observed effect. If the true confounding associations lie in this region, the treatment effect remains causal and significant.
+- **Above/Right of the Curve**: This represents the region where unmeasured confounding is strong enough to explain away the observed effect.
+- **The Dashed Curve (Confidence Interval Boundary)**: Shows the boundary required to explain away the 95% confidence interval lower limit ($RR_{lower} = 1.334$), corresponding to the lower limit E-value of **`r round(ev_df["E-values", "lower"], 2)`**.
 
 ---
 
