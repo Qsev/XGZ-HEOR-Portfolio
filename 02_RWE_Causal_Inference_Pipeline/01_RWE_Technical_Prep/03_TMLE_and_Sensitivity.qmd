@@ -32,96 +32,19 @@ This ensures that the treatment effect estimate is unbiased if *either* the trea
 
 While Augmented Inverse Probability Weighting (AIPW) is also doubly robust, **Targeted Maximum Likelihood Estimation (TMLE)**—developed by Mark van der Laan and colleagues—is preferred in HTA and regulatory submissions for several reasons:
 
-- **Substitution Estimator (Respecting Bounds)**: AIPW is an influence function-based estimator. Because it adds a weighted residual correction, it can yield predicted counterfactual values that lie outside the physical bounds of the outcome space. For example, in binary or time-to-event outcomes, AIPW can predict survival probabilities that are greater than $1$ or less than $0$. TMLE is a *substitution estimator*, which mathematically guarantees that the estimated probabilities respect the natural bounds of the parameter space (i.e., restricting survival estimates strictly within $[0, 1]$).
-- **Semiparametric Efficiency**: TMLE is asymptotically efficient, meaning it achieves the lowest possible variance (the semiparametric efficiency bound) among all regular estimators when both models are correctly specified.
-- **Ensemble Integration**: TMLE natively integrates machine learning ensembles (like `SuperLearner`) to model both the outcome and treatment mechanisms, minimizing the risk of model misspecification bias.
+- **Substitution Estimator (Respecting Bounds)**: AIPW is an influence function-based estimator. Because it adds a weighted residual correction, it can yield predicted counterfactual values that lie outside the physical bounds of the outcome space. For example, in binary or time-to-event outcomes, **AIPW can predict survival probabilities that are greater than $1$ or less than $0$.** TMLE is a *substitution estimator*, which mathematically guarantees that the estimated probabilities respect the natural bounds of the parameter space (i.e., restricting survival estimates strictly within $[0, 1]$).
+- **Semiparametric Efficiency**: TMLE is asymptotically **efficient**, meaning it achieves the lowest possible variance (the semiparametric efficiency bound) among all regular estimators when both models are correctly specified.
+- **Ensemble Integration**: TMLE natively integrates machine learning ensembles (like `SuperLearner`) to model **both** the outcome and treatment mechanisms, **minimizing the risk of model misspecification bias**.
 
----
-
-## The 5-Step TMLE Algorithm
+## The 5-Step TMLE Algorithm with Integrated R Code
 
 TMLE operates by taking an initial estimate of the outcome regression and "targeting" it using the treatment assignment model to directly optimize the parameter of interest (e.g., the Average Treatment Effect, ATE).
 
-The mathematical implementation follows five steps:
+The mathematical implementation follows five steps. To illustrate the mechanics transparently, we will run the manual calculations in R alongside each step using a simulated cohort ($N=500$) with baseline confounding.
 
-### Step 1: Initial Estimation of the Outcome Regression ($Q_0$)
+### Cohort Simulation Setup
 
-We estimate the conditional expectation of the outcome $Y$ given treatment $D$ and baseline covariates $W$:
-$$Q_0(D, W) = E[Y \mid D, W]$$
-
-This model is fitted using a machine learning library or parametric regression. We then generate two predicted values for each individual $i$:
-
-- The predicted outcome under treatment: $Q_0(1, W_i)$
-- The predicted outcome under control: $Q_0(0, W_i)$
-
-### Step 2: Estimation of the Propensity Score ($g_0$)
-
-We estimate the probability of treatment assignment given covariates:
-$$g(W) = P(D = 1 \mid W)$$
-
-For each individual $i$, we compute their estimated propensity score $g(W_i)$.
-
-### Step 3: Computation of the Clever Covariate ($H$)
-
-We construct a secondary covariate, known as the **Clever Covariate** $H(D, W)$, which represents the inverse probability weight adjusted for the treatment actually received:
-$$H(D, W) = \frac{D}{g(W)} - \frac{1 - D}{1 - g(W)}$$
-
-For each individual $i$, we evaluate two values of the Clever Covariate:
-
-- The covariate value under treatment ($D_i = 1$): $H(1, W_i) = \frac{1}{g(W_i)}$
-- The covariate value under control ($D_i = 0$): $H(0, W_i) = -\frac{1}{1 - g(W_i)}$
-
-### Step 4: The Fluctuation (Update) Step
-
-We update the initial outcome prediction $Q_0$ by fitting a logistic regression of the observed outcome $Y$ on the Clever Covariate $H(D, W)$, using the logit of the initial prediction $Q_0(D, W)$ as a fixed offset:
-$$\text{logit}\left(Q_1(D, W)\right) = \text{logit}\left(Q_0(D, W)\right) + \epsilon \cdot H(D, W)$$
-
-Here, the coefficient $\epsilon$ (the fluctuation parameter) is estimated via Maximum Likelihood. 
-
-If the initial outcome regression $Q_0$ is already perfectly calibrated, the residual error $(Y - Q_0)$ will be orthogonal to the weights, and the estimated coefficient $\epsilon$ will be close to $0$. If $Q_0$ is biased, $\epsilon$ will deviate from $0$, shifting the predictions to remove the bias.
-
-We then update the counterfactual predictions for all individuals:
-
-- Updated survival under treatment: $Q_1(1, W_i) = \text{logit}^{-1}\left( \text{logit}(Q_0(1, W_i)) + \epsilon \cdot H(1, W_i) \right)$
-- Updated survival under control: $Q_1(0, W_i) = \text{logit}^{-1}\left( \text{logit}(Q_0(0, W_i)) + \epsilon \cdot H(0, W_i) \right)$
-
-### Step 5: Parameter Estimation via Substitution
-
-Finally, we calculate the doubly robust ATE by averaging the updated counterfactual predictions across the sample:
-$$\hat{ATE}_{TMLE} = \frac{1}{n} \sum_{i=1}^n \left[ Q_1(1, W_i) - Q_1(0, W_i) \right]$$
-
-Because the update step satisfies the efficient score equation, standard errors and confidence intervals are computed asymptotically using the variance of the influence function.
-
----
-
-## Sensitivity Analysis: The E-Value
-
-A critical assumption in causal inference is **Exchangeability (Unconfoundedness)**—the assumption that all confounders ($W$) that simultaneously drive treatment assignment and clinical outcomes have been measured and adjusted for:
-$$Y^{(1)}, Y^{(0)} \perp D \mid W$$
-
-In real-world observational registries, this assumption is unverifiable and frequently threatened by **Unmeasured Confounding** (e.g., unrecorded tumor biomarkers, sub-clinical frailty, or physician subjective preferences).
-
-### The E-Value Formulation
-
-The **E-Value** (VanderWeele and Ding, 2017) quantifies the minimum strength of association that an unmeasured confounder ($U$) would need to have with both the treatment ($D$) and the outcome ($Y$), on the Risk Ratio (RR) scale, to fully explain away an observed treatment effect.
-
-For a point estimate representing a Relative Risk ($RR_{obs} > 1$), the E-value is calculated as:
-$$E = RR_{obs} + \sqrt{RR_{obs} (RR_{obs} - 1)}$$
-
-If the observed treatment effect is protective ($RR_{obs} < 1$), we first invert the estimate ($1/RR_{obs}$) before applying the formula.
-
-### Interpretation in HTA Appraisals
-
-The E-value provides an intuitive benchmark for HTA committees:
-
-- If the E-value is small (e.g., $E = 1.2$), a weak unmeasured confounder that increases both the probability of treatment and the probability of survival by only 1.2-fold could nullify the treatment effect. The evidence is highly sensitive to hidden bias.
-- If the E-value is large (e.g., $E = 2.8$), a hidden confounder would need to have a strong 2.8-fold association with both treatment and outcome to explain away the effect. If known, measured confounders (like ECOG score) only have associations of 1.5-fold to 2.0-fold, it is highly unlikely that an unmeasured factor of such extreme magnitude exists, establishing the robustness of the causal claim.
-
----
-
-## R Implementation Pipeline
-
-This pipeline simulates a cohort ($N=500$) with baseline confounding, fits the ATE using TMLE with ensemble learners, and conducts an E-value sensitivity analysis.
+First, we set up the simulation environment and generate a baseline cohort where elderly and sicker patients (with higher ECOG performance status) are preferentially assigned to treatment (confounding by indication).
 
 ```{r}
 #| message: false
@@ -163,12 +86,202 @@ naive_control <- mean(df$survival_1yr[df$treatment == 0])
 naive_ate <- naive_treated - naive_control
 ```
 
-### Doubly Robust Estimation via TMLE
+---
 
-We estimate the treatment effect using the `tmle` package. We specify `SuperLearner` ensemble models (with GLM and Mean libraries) to predict both the treatment assignment and outcome regressions.
+### Step 1: Initial Estimation of the Outcome Regression ($Q_0$)
+
+We estimate the conditional expectation of the outcome $Y$ given treatment $D$ and baseline covariates $W$:
+$$Q_0(D, W) = E[Y \mid D, W]$$
+
+We fit a logistic regression model for $Y$ and generate two counterfactual predicted values for each individual $i$:
+
+- The predicted outcome under treatment: $Q_0(1, W_i)$
+- The predicted outcome under control: $Q_0(0, W_i)$
+
+To prevent boundary logit explosions, the initial outcome predictions are bounded to $[0.005, 0.995]$ (corresponding to the default `alpha = 0.995` threshold).
 
 ```{r}
-# Fit TMLE and suppress package-level output
+# Fit the initial outcome regression model (Q0)
+fit_Q <- glm(survival_1yr ~ treatment + age + ecog, family = binomial, data = df)
+
+# Predict counterfactual outcomes under treatment and control
+Q0_0_raw <- predict(fit_Q, newdata = data.frame(treatment = 0, age, ecog), type = "response")
+Q0_1_raw <- predict(fit_Q, newdata = data.frame(treatment = 1, age, ecog), type = "response")
+
+# Bound predictions to [0.005, 0.995]
+Q0_0 <- pmin(pmax(Q0_0_raw, 0.005), 0.995)
+Q0_1 <- pmin(pmax(Q0_1_raw, 0.005), 0.995)
+
+# Observed treatment predictions
+Q0_A <- ifelse(treatment == 1, Q0_1, Q0_0)
+
+# Format summary table
+q0_summary <- data.frame(
+  Metric = c("Mean Prediction", "Minimum Prediction", "Maximum Prediction"),
+  "Control (Q0_0)" = c(mean(Q0_0), min(Q0_0), max(Q0_0)),
+  "Treatment (Q0_1)" = c(mean(Q0_1), min(Q0_1), max(Q0_1)),
+  check.names = FALSE
+)
+knitr::kable(q0_summary, digits = 4, caption = "Summary of Initial Outcome Regression Predictions (Q0)", align = "lrr")
+```
+
+---
+
+### Step 2: Estimation of the Propensity Score ($g_0$)
+
+We estimate the probability of treatment assignment given covariates:
+$$g(W) = P(D = 1 \mid W)$$
+
+If not specified, the `tmle` package adaptively calculates the propensity score lower bound based on the sample size:
+$$\text{gbound\_lower} = \frac{5}{\sqrt{n} \cdot \ln(n)}$$
+
+For $N=500$, the lower bound is approximately `0.03598`. We fit a logistic regression for treatment and apply this bound independently to $g(W)$ (treated) and $1 - g(W)$ (control) to guarantee that inverse weights do not blow up.
+
+```{r}
+# Fit propensity score model
+fit_g <- glm(treatment ~ age + ecog, family = binomial, data = df)
+g1W_raw <- predict(fit_g, type = "response")
+
+# Calculate dynamic lower bound: 5 / (sqrt(n) * log(n))
+gbound_lower <- 5 / (sqrt(n) * log(n))
+
+# Apply bounding independently for g1W and g0W
+g1W <- pmax(g1W_raw, gbound_lower)
+g0W <- pmax(1 - g1W_raw, gbound_lower)
+
+# Format summary table
+g_summary <- data.frame(
+  Metric = c("Lower Bound Value", "Mean Propensity Score", "Minimum Propensity Score"),
+  "g1W (Treated)" = c(gbound_lower, mean(g1W), min(g1W)),
+  "g0W (Control)" = c(gbound_lower, mean(g0W), min(g0W)),
+  check.names = FALSE
+)
+knitr::kable(g_summary, digits = 4, caption = "Summary of Bounded Propensity Scores", align = "lrr")
+```
+
+---
+
+### Step 3: Computation of the Clever Covariate ($H$)
+
+We construct the **Clever Covariates** $H_1(W)$ and $H_0(W)$ representing the inverse probability weights adjusted for treatment received:
+
+- For treated: $H_1(W) = \frac{D}{g(W)}$
+- For controls: $H_0(W) = \frac{1 - D}{1 - g(W)}$
+
+```{r}
+# Calculate clever covariates
+H1W <- treatment / g1W
+H0W <- (1 - treatment) / g0W
+
+# Display first few rows
+h_tbl <- data.frame(
+  Patient = 1:5,
+  Treatment = treatment[1:5],
+  "g1W (Treated)" = g1W[1:5],
+  "g0W (Control)" = g0W[1:5],
+  "H0W (Clever Control)" = H0W[1:5],
+  "H1W (Clever Treated)" = H1W[1:5],
+  check.names = FALSE
+)
+knitr::kable(h_tbl, digits = 4, caption = "Clever Covariates (First 5 Patients)", align = "lrrrrr")
+```
+
+---
+
+### Step 4: The Fluctuation (Update) Step
+
+We update the initial outcome prediction $Q_0$ by fitting a logistic regression of the observed outcome $Y$ on the Clever Covariates $H_0(W)$ and $H_1(W)$ without an intercept, using the logit of the initial prediction $Q_0(D, W)$ as a fixed offset:
+$$\text{logit}\left(Q_1(D, W)\right) = \text{logit}\left(Q_0(D, W)\right) + \epsilon_0 \cdot H_0(W) + \epsilon_1 \cdot H_1(W)$$
+
+Fitting this regression via Maximum Likelihood estimates the fluctuation parameters $\epsilon_0$ and $\epsilon_1$, which represent the residual bias correction. We then update the counterfactual predictions and bound them.
+
+```{r}
+# Fit fluctuation regression (offset-only model)
+fit_eps <- glm(survival_1yr ~ -1 + H0W + H1W, offset = qlogis(Q0_A), family = binomial)
+eps <- coef(fit_eps)
+
+# Update counterfactual predictions
+Q1_0 <- plogis(qlogis(Q0_0) + eps["H0W"] / g0W)
+Q1_1 <- plogis(qlogis(Q0_1) + eps["H1W"] / g1W)
+
+# Bound final updated predictions to [0.005, 0.995]
+Q1_0 <- pmin(pmax(Q1_0, 0.005), 0.995)
+Q1_1 <- pmin(pmax(Q1_1, 0.005), 0.995)
+
+# Format epsilon table
+eps_tbl <- data.frame(
+  Parameter = c("epsilon_0 (Control, H0W)", "epsilon_1 (Treatment, H1W)"),
+  Estimate = c(eps["H0W"], eps["H1W"]),
+  "Std. Error" = summary(fit_eps)$coefficients[, "Std. Error"],
+  "z-value" = summary(fit_eps)$coefficients[, "z value"],
+  "p-value" = summary(fit_eps)$coefficients[, "Pr(>|z|)"],
+  check.names = FALSE
+)
+knitr::kable(eps_tbl, digits = 6, caption = "Estimated Fluctuation Coefficients (Epsilons)", align = "lrrrr")
+```
+
+---
+
+### Step 5: Parameter Estimation via Substitution
+
+Finally, we calculate the doubly robust ATE by averaging the updated counterfactual predictions across the sample:
+$$\hat{ATE}_{TMLE} = \frac{1}{n} \sum_{i=1}^n \left[ Q_1(1, W_i) - Q_1(0, W_i) \right]$$
+
+```{r}
+# Calculate manual ATE
+ate_manual <- mean(Q1_1 - Q1_0)
+```
+
+The manual step-by-step TMLE yields a Risk Difference (ATE) of **`r sprintf("%.6f", ate_manual)`**.
+
+---
+
+### Verification: Comparing Manual TMLE with the Package Output
+
+To confirm the accuracy of our step-by-step manual implementation, we fit the ATE using the `tmle` package, turning off cross-validation (`cvQinit = FALSE`) to align the initial outcome estimation.
+
+```{r}
+# Fit Package TMLE (without cross-validation for direct verification)
+tmle_fit_verify <- tmle(
+  Y             = df$survival_1yr,
+  A             = df$treatment,
+  W             = df[, c("age", "ecog")],
+  Q.SL.library  = "SL.glm",
+  g.SL.library  = "SL.glm",
+  cvQinit       = FALSE,
+  family        = "binomial"
+)
+
+# Format verification comparison table
+comparison_tbl <- data.frame(
+  Parameter = c("Epsilon_0 (Control Coefficient)", "Epsilon_1 (Treatment Coefficient)", "ATE Point Estimate"),
+  "Manual Step-by-Step" = c(eps["H0W"], eps["H1W"], ate_manual),
+  "tmle Package Output" = c(tmle_fit_verify$epsilon["H0W"], tmle_fit_verify$epsilon["H1W"], tmle_fit_verify$estimates$ATE$psi),
+  "Absolute Difference" = c(
+    abs(eps["H0W"] - tmle_fit_verify$epsilon["H0W"]),
+    abs(eps["H1W"] - tmle_fit_verify$epsilon["H1W"]),
+    abs(ate_manual - tmle_fit_verify$estimates$ATE$psi)
+  ),
+  check.names = FALSE
+)
+knitr::kable(comparison_tbl, digits = 8, caption = "Validation of Manual TMLE Against tmle Package", align = "lrrr")
+```
+
+As demonstrated, the manual step-by-step implementation matches the `tmle` package output exactly to machine precision (absolute difference $\approx 0$), validating the underlying mechanics of the TMLE algorithm.
+
+---
+
+## Production R Implementation Pipeline (Package-level Fit & Plots)
+
+While the manual walkthrough utilizes simple parametric models to illustrate the underlying mechanics, HTA submissions require production-grade models using machine learning ensembles and cross-validation to minimize misspecification bias.
+
+Here, we fit the final ATE using the `tmle` package with cross-validation (`cvQinit = TRUE`) and SuperLearner ensembles containing GLM and Mean libraries.
+
+```{r}
+#| message: false
+#| warning: false
+
+# Fit production-grade TMLE and suppress package-level output
 sl_lib <- c("SL.glm", "SL.mean")
 
 tmle_fit <- suppressMessages(tmle(
@@ -202,12 +315,12 @@ tmle_tbl <- data.frame(
 tmle_tbl[, 2:5] <- round(tmle_tbl[, 2:5], 4)
 tmle_tbl[3, 6] <- format.pval(tmle_pval, eps = 0.001, digits = 3)
 
-knitr::kable(tmle_tbl, caption = "Targeted Maximum Likelihood Estimation (TMLE) Results", align = "lrrrrr")
+knitr::kable(tmle_tbl, caption = "Production TMLE Results with SuperLearner & Cross-Validation", align = "lrrrrr")
 ```
 
 ::: {.callout-note}
-## Interpretation of the Fluctuation Parameter
-The estimated fluctuation parameter $\epsilon$ is **`r round(epsilon, 6)`**. This value represents the degree of covariate adjustment applied during the targeting step. A non-zero $\epsilon$ indicates that the initial outcome predictions were shifted to successfully correct for treatment selection bias.
+## Interpretation of the Fluctuation Parameters
+The estimated fluctuation parameters under the production fit are $\epsilon_0 = $ **`r round(epsilon[1], 6)`** (Control) and $\epsilon_1 = $ **`r round(epsilon[2], 6)`** (Treated). These non-zero coefficients represent the targeted adjustments applied during the fluctuation step to remove residual treatment selection bias.
 :::
 
 ### Sensitivity Analysis: E-Value Calculation
