@@ -173,10 +173,15 @@ knitr::kable(q0_summary, digits = 4, caption = "Summary of Initial Outcome Regre
 We estimate the probability of treatment assignment given covariates:
 $$g(W) = P(D = 1 \mid W)$$
 
+We fit a logistic regression model for treatment assignment to predict propensity scores, and apply a dynamic lower bound threshold to guarantee that inverse weights do not blow up.
+
+::: {.column-margin}
 If not specified, the `tmle` package adaptively calculates the propensity score lower bound based on the sample size:
 $$\text{gbound\_lower} = \frac{5}{\sqrt{n} \cdot \ln(n)}$$
 
-For $N=500$, the lower bound is approximately `0.03598`. We fit a logistic regression for treatment and apply this bound independently to $g(W)$ (treated) and $1 - g(W)$ (control) to guarantee that inverse weights do not blow up.
+For $N=500$, the lower bound is approximately `0.03598`. This bound is applied independently to the propensity scores of the treated ($g(W)$) and control ($1 - g(W)$) groups.
+:::
+
 
 ```{r}
 # Fit propensity score model

@@ -565,12 +565,15 @@ window.Quarto = {
 </div>
 <hr>
 </section>
-<section id="step-2-estimation-of-the-propensity-score-g_0" class="level3" data-number="2.3">
+<section id="step-2-estimation-of-the-propensity-score-g_0" class="level3 page-columns page-full" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="step-2-estimation-of-the-propensity-score-g_0"><span class="header-section-number">2.3</span> Step 2: Estimation of the Propensity Score (<span class="math inline">\(g_0\)</span>)</h3>
 <p>We estimate the probability of treatment assignment given covariates: <span class="math display">\[g(W) = P(D = 1 \mid W)\]</span></p>
+<p>We fit a logistic regression model for treatment assignment to predict propensity scores, and apply a dynamic lower bound threshold to guarantee that inverse weights do not blow up.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
 <p>If not specified, the <code>tmle</code> package adaptively calculates the propensity score lower bound based on the sample size: <span class="math display">\[\text{gbound\_lower} = \frac{5}{\sqrt{n} \cdot \ln(n)}\]</span></p>
-<p>For <span class="math inline">\(N=500\)</span>, the lower bound is approximately <code>0.03598</code>. We fit a logistic regression for treatment and apply this bound independently to <span class="math inline">\(g(W)\)</span> (treated) and <span class="math inline">\(1 - g(W)\)</span> (control) to guarantee that inverse weights do not blow up.</p>
-<div class="cell">
+<p>For <span class="math inline">\(N=500\)</span>, the lower bound is approximately <code>0.03598</code>. This bound is applied independently to the propensity scores of the treated (<span class="math inline">\(g(W)\)</span>) and control (<span class="math inline">\(1 - g(W)\)</span>) groups.</p>
+</div></div><div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit propensity score model</span></span>
