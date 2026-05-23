@@ -448,6 +448,18 @@ window.Quarto = {
 <section id="step-by-step-proof-of-double-robustness" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="step-by-step-proof-of-double-robustness"><span class="header-section-number">4.3</span> Step-by-Step Proof of Double Robustness</h3>
 <p>AIPW is doubly robust because it yields an unbiased estimate if <strong>either</strong> the propensity score model <span class="math inline">\(g(X)\)</span> <strong>or</strong> the outcome regression model <span class="math inline">\(m_1(X)\)</span> is correctly specified.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Step-by-Step Mathematical Proof of Double Robustness
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <p>We prove this using the <strong>Law of Iterated Expectations (LIE)</strong>: <span class="math display">\[E[Z] = E_X \big[ E[Z \mid X] \big]\]</span></p>
 <section id="assumptions-required" class="level4" data-number="4.3.1">
 <h4 data-number="4.3.1" class="anchored" data-anchor-id="assumptions-required"><span class="header-section-number">4.3.1</span> Assumptions Required:</h4>
@@ -482,8 +494,11 @@ window.Quarto = {
 <p>Therefore, the expectation of the estimator simplifies to: <span class="math display">\[E\left[ \hat{Y}_{AIPW}^{(1)} \mid X_i \right] = E\left[ \hat{m}_1(X_i) \mid X_i \right] = E\left[ Y_i^{(1)} \mid X_i \right]\]</span></p>
 <p>Taking the outer expectation over the covariate distribution <span class="math inline">\(X\)</span>: <span class="math display">\[E\left[ \hat{Y}_{AIPW}^{(1)} \right] = E_X \Big[ E\left[ Y_i^{(1)} \mid X_i \right] \Big] = E\left[ Y_i^{(1)} \right]\]</span></p>
 <p><strong>Result</strong>: The estimate is unbiased. Since the outcome model is correct, the expected residual error is <span class="math inline">\(0\)</span>. The incorrect propensity weights (<span class="math inline">\(\hat{g}(X_i)\)</span>) are multiplied by zero and fail to introduce any bias.</p>
-<hr>
 </section>
+</div>
+</div>
+</div>
+<hr>
 </section>
 <section id="comparison-why-aipw-is-preferred-in-hta" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="comparison-why-aipw-is-preferred-in-hta"><span class="header-section-number">4.4</span> Comparison: Why AIPW is Preferred in HTA</h3>

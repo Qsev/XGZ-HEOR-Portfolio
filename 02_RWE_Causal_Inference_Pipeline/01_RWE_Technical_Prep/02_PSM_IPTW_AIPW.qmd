@@ -146,6 +146,9 @@ $$\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n \Big[ \underbrace{m_1(X_i)}_{\
 
 AIPW is doubly robust because it yields an unbiased estimate if **either** the propensity score model $g(X)$ **or** the outcome regression model $m_1(X)$ is correctly specified.
 
+::: {.callout-note collapse="true"}
+## Step-by-Step Mathematical Proof of Double Robustness
+
 We prove this using the **Law of Iterated Expectations (LIE)**:
 $$E[Z] = E_X \big[ E[Z \mid X] \big]$$
 
@@ -213,6 +216,7 @@ Taking the outer expectation over the covariate distribution $X$:
 $$E\left[ \hat{Y}_{AIPW}^{(1)} \right] = E_X \Big[ E\left[ Y_i^{(1)} \mid X_i \right] \Big] = E\left[ Y_i^{(1)} \right]$$
 
 **Result**: The estimate is unbiased. Since the outcome model is correct, the expected residual error is $0$. The incorrect propensity weights ($\hat{g}(X_i)$) are multiplied by zero and fail to introduce any bias.
+:::
 
 ---
 
