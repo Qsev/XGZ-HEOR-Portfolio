@@ -566,17 +566,33 @@ window.Quarto = {
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_true)</span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Simulate Survival Outcome (1-Year Survival)</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># True Treatment Effect (Risk Difference) = +15%</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>y_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">1.0</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> treatment)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>survival_1yr <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, y_prob)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(age, ecog, treatment, survival_1yr)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Naive (Unadjusted) Estimate</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>naive_treated <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>naive_control <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>naive_ate <span class="ot">&lt;-</span> naive_treated <span class="sc">-</span> naive_control</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># The treatment coefficient is +0.8 on the log-odds (logit) scale.</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Across the covariate distribution, this corresponds to a true marginal Risk Difference (ATE) of +15.5%.</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>y_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">1.0</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> treatment)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>survival_1yr <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, y_prob)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(age, ecog, treatment, survival_1yr)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Naive (Unadjusted) Estimate</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>naive_treated <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>naive_control <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>naive_ate <span class="ot">&lt;-</span> naive_treated <span class="sc">-</span> naive_control</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Methodological Note: Log-Odds vs.&nbsp;Risk Difference (ATE)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In observational binary outcome simulations (like 1-year survival), the treatment effect is defined on the <strong>log-odds ratio</strong> scale (<code>+0.8</code> in the regression formula) rather than as a direct additive percentage. Because the logit function is non-linear, a log-odds coefficient of <code>0.8</code> does not translate to a constant risk difference for all patients.</p>
+<p>To determine the true marginal <strong>Risk Difference (ATE)</strong> for the population, we calculate the difference in expected probabilities under treatment and control states for each individual, and then average them over the baseline covariate distribution: <span class="math display">\[ATE = \frac{1}{n}\sum_{i=1}^n \left[ \text{logit}^{-1}(1 - 0.03 \cdot \text{Age}_i - 1.0 \cdot \text{ECOG}_i + 0.8) - \text{logit}^{-1}(1 - 0.03 \cdot \text{Age}_i - 1.0 \cdot \text{ECOG}_i) \right]\]</span></p>
+<p>For this simulated cohort, the true population ATE is exactly <strong>+15.5%</strong>.</p>
+</div>
 </div>
 <section id="baseline-diagnostics-original-data" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="baseline-diagnostics-original-data"><span class="header-section-number">5.1</span> Baseline Diagnostics (Original Data)</h3>

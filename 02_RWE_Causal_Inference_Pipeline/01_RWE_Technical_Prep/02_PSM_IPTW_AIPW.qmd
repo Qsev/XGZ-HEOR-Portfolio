@@ -258,7 +258,8 @@ ps_true <- plogis(-2 + 0.05 * age + 1.2 * ecog)
 treatment <- rbinom(n, 1, ps_true)
 
 # 3. Simulate Survival Outcome (1-Year Survival)
-# True Treatment Effect (Risk Difference) = +15%
+# The treatment coefficient is +0.8 on the log-odds (logit) scale.
+# Across the covariate distribution, this corresponds to a true marginal Risk Difference (ATE) of +15.5%.
 y_prob <- plogis(1 - 0.03 * age - 1.0 * ecog + 0.8 * treatment)
 survival_1yr <- rbinom(n, 1, y_prob)
 
@@ -270,9 +271,20 @@ naive_control <- mean(df$survival_1yr[df$treatment == 0])
 naive_ate <- naive_treated - naive_control
 ```
 
+::: {.callout-note}
+## Methodological Note: Log-Odds vs. Risk Difference (ATE)
+In observational binary outcome simulations (like 1-year survival), the treatment effect is defined on the **log-odds ratio** scale (`+0.8` in the regression formula) rather than as a direct additive percentage. Because the logit function is non-linear, a log-odds coefficient of `0.8` does not translate to a constant risk difference for all patients. 
+
+To determine the true marginal **Risk Difference (ATE)** for the population, we calculate the difference in expected probabilities under treatment and control states for each individual, and then average them over the baseline covariate distribution:
+$$ATE = \frac{1}{n}\sum_{i=1}^n \left[ \text{logit}^{-1}(1 - 0.03 \cdot \text{Age}_i - 1.0 \cdot \text{ECOG}_i + 0.8) - \text{logit}^{-1}(1 - 0.03 \cdot \text{Age}_i - 1.0 \cdot \text{ECOG}_i) \right]$$
+
+For this simulated cohort, the true population ATE is exactly **+15.5%**.
+:::
+
 ### Baseline Diagnostics (Original Data)
 
 Without adjustment, patients receiving Drug X are significantly older and have worse ECOG scores, creating a naive survival comparison that underestimates the treatment effect:
+
 
 ```{r}
 # Create baseline characteristics table
