@@ -1,0 +1,280 @@
+---
+title: "Propensity Score Methods: PSM, IPTW, and AIPW"
+subtitle: "Methodological Foundations & Advanced HTA Practice"
+author: "Xiaoge Zhang, PhD"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "R Code"
+    number-sections: true
+---
+
+*Bridging the Gap Between Observational Real-World Data and Causal Claims in HTA*
+
+## Introduction: The Confounding Challenge & Self-Selection Bias
+
+In observational studies, treatment assignment ($D$) is rarely random. Clinicians frequently prescribe therapies based on patient characteristics ($X$), such as baseline disease severity or age, which are also directly linked to the clinical outcome ($Y$). This non-random assignment leads to **Selection Bias (Confounding by Indication)**.
+
+For instance, in oncology appraisals, a newly launched therapy is often reserved for patients who have failed multiple lines of prior therapy or have a poor performance status. If we directly compare the survival outcomes of patients receiving the new therapy against those on standard of care (SOC), the naive treatment effect will be severely biased downward. The new drug's efficacy is masked by the fact that its recipient group had a much worse prognosis at baseline.
+
+### The Dimension Reduction Problem
+
+To estimate a causal effect, we must control for the baseline covariates $X$. If we attempt to match patients on multiple characteristics simultaneously (e.g., matching a treated patient with a control patient who has the exact same age, gender, biomarkers, and comorbidities), we quickly encounter the **Curse of Dimensionality**. As the number of covariates increases, the probability of finding an exact match in a finite sample approaches zero.
+
+**Propensity Score Methods** solve this problem by collapsing the high-dimensional covariate space $X$ into a one-dimensional summary metric: the **Propensity Score (PS)**. 
+
+---
+
+## Propensity Score Matching (PSM)
+
+### Core Logic & The S-Curve
+
+The Propensity Score $e(X)$ is defined as the conditional probability of receiving treatment given a vector of observed baseline covariates:
+$$e(X) = P(D = 1 \mid X)$$
+
+Because probability is bounded between 0 (never treated) and 1 (always treated), a standard linear model ($D = \beta X + \epsilon$) is inappropriate as it can predict values outside this range. We therefore model the propensity score using a **Logistic Regression (Logit)** model:
+$$P(D=1 \mid X) = \frac{1}{1 + e^{-z}}$$
+where $z$ is the linear combination of the confounders:
+$$z = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k$$
+
+Taking the natural logarithm of the odds (the Logit transformation) yields a linear representation:
+$$\ln\left(\frac{P(D=1 \mid X)}{1 - P(D=1 \mid X)}\right) = \beta_0 + \beta_1 X_1 + \dots + \beta_k X_k$$
+
+By matching treated and control patients who have the same (or very similar) propensity scores, we neutralize the baseline covariates. Within a matched block, the distribution of covariates $X$ is balanced between the treated and control groups, effectively simulating a **Pseudo-Randomized Controlled Trial (Pseudo-RCT)**.
+
+### Matching Constraints & ATT Estimation
+
+1. **Caliper Width**: When matching, we do not require exact propensity score matches. Instead, we specify a tolerance zone or **caliper** (typically $0.2$ times the standard deviation of the logit of the propensity score). If a treated patient's propensity score is $0.65$, we only match them with a control patient whose score falls within the caliper range.
+2. **Common Support**: Propensity score matching is only valid within the region of **Common Support**—the overlap in propensity score distributions between the treated and control groups. Patients lying outside this overlap (e.g., treated patients with extremely high propensity scores who have no comparable controls) must be discarded.
+3. **ATT Estimation**: By starting with the treated patients and searching for control twins, PSM estimates the **Average Treatment Effect on the Treated (ATT)** by default:
+$$ATT = E[Y^{(1)} - Y^{(0)} \mid D=1]$$
+In HTA appraisals, the ATT is highly relevant because payers want to know the therapeutic benefit specifically for the patient population that clinicians would target in real-world practice.
+
+---
+
+## Inverse Probability Treatment Weighting (IPTW)
+
+While PSM discards unmatched patients, **Inverse Probability Treatment Weighting (IPTW)** retains the entire sample. It balances the groups by assigning each patient a weight ($W$) inversely proportional to the probability of receiving the treatment they actually received.
+
+### The Weighting Mechanism
+
+The Horvitz-Thompson weights for estimating the **Average Treatment Effect (ATE)** across the entire population are defined as:
+$$W_i = \frac{D_i}{e(X_i)} + \frac{1 - D_i}{1 - e(X_i)}$$
+
+- **Treated Patients ($D_i = 1$)**: Weighted by $1/e(X_i)$. A treated patient with a low probability of treatment (rare) represents a larger, unobserved segment of similar patients and is weighted up.
+- **Control Patients ($D_i = 0$)**: Weighted by $1/(1-e(X_i))$.
+
+This weighting process creates a **Weighted Pseudo-Population** where the baseline covariate distributions in both groups are identical, allowing us to estimate the ATE:
+$$ATE = E[Y^{(1)} - Y^{(0)}]$$
+
+### Weighted Least Squares (WLS) Algebra
+
+In practice, the treatment effect is estimated using **Weighted Least Squares (WLS)**. The objective is to minimize the weighted sum of squared residuals:
+$$\sum_{i=1}^n W_i (Y_i - \hat{Y}_i)^2$$
+
+In matrix notation, the normal equation for the regression coefficients is modified from the standard OLS $(X'X)^{-1}X'Y$ to:
+$$\hat{\beta}_{WLS} = (X'WX)^{-1}X'WY$$
+where $W$ is a diagonal matrix containing the IPTW weights $W_i$. The weight acts as a volume knob; patients with higher weights pull the regression line closer to their observed data points.
+
+### Effective Sample Size (ESS)
+
+Because weighting inflates the influence of certain individuals, the statistical precision of the weighted sample is lower than the nominal sample size. We quantify this information loss using Kish's **Effective Sample Size (ESS)**:
+$$ESS = \frac{\left(\sum_{i=1}^n W_i\right)^2}{\sum_{i=1}^n W_i^2}$$
+
+If all weights are uniform ($W_i=1$), the ESS equals the actual sample size $N$. If a few patients have extremely large weights, the denominator increases, and the ESS collapses, signaling that the treatment effect estimate is dominated by a tiny fraction of the population.
+
+---
+
+## Augmented Inverse Probability Weighting (AIPW)
+
+**Augmented IPTW (AIPW)** is a **Doubly Robust (DR)** estimator that combines the propensity score model with an outcome regression model.
+
+### The "Belt and Suspenders" Philosophy
+
+AIPW requires two separate models:
+1. **The Treatment Model (Propensity Score)**: $g(X) = P(D=1 \mid X)$
+2. **The Outcome Model**: $m_d(X) = E[Y \mid D=d, X]$ for $d \in \{0, 1\}$
+
+The AIPW estimator for the counterfactual mean under treatment ($d=1$) is:
+$$\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n \left[ m_1(X_i) + \frac{D_i (Y_i - m_1(X_i))}{g(X_i)} \right]$$
+Similarly, the counterfactual mean under control ($d=0$) is:
+$$\hat{Y}_{AIPW}^{(0)} = \frac{1}{n} \sum_{i=1}^n \left[ m_0(X_i) + \frac{(1 - D_i) (Y_i - m_0(X_i))}{1 - g(X_i)} \right]$$
+
+### Algebraic Proof of Double Robustness
+
+The bias of the AIPW estimator is proportional to the product of the errors in both models:
+$$\text{Bias} \propto \left(g(X) - \hat{g}(X)\right) \times \left(m_d(X) - \hat{m}_d(X)\right)$$
+
+- **Case 1: Propensity model $\hat{g}(X)$ is correct, but outcome model $\hat{m}_1(X)$ is wrong.**
+  Since the propensity score is correct, the expectation of the augmentation term simplifies:
+  $$E\left[ \frac{D_i (Y_i - \hat{m}_1(X_i))}{g(X_i)} \right] = E\left[ \frac{e(X_i) (Y_i - \hat{m}_1(X_i))}{e(X_i)} \right] = E[Y_i \mid D_i=1] - E[\hat{m}_1(X_i)]$$
+  Adding this to the first term $E[\hat{m}_1(X_i)]$ cancels out the incorrect outcome predictions, leaving the unbiased causal estimate.
+  
+- **Case 2: Outcome model $\hat{m}_1(X)$ is correct, but propensity model $\hat{g}(X)$ is wrong.**
+  If the outcome model is correct, $\hat{m}_1(X_i) = Y_i$. The residual $(Y_i - \hat{m}_1(X_i))$ becomes zero, making the second term vanish completely:
+  $$\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n Y_i$$
+  The incorrect propensity weights are canceled out, leaving the unbiased outcome prediction.
+
+---
+
+## R Implementation Pipeline
+
+This pipeline simulates a real-world dataset ($N=500$) with a severe confounding by indication trap: high-risk, elderly patients with poor performance status (ECOG=1) are preferentially prescribed the new therapy (Drug X), masking its true survival benefit.
+
+```{r}
+#| message: false
+#| warning: false
+
+library(WeightIt)
+library(cobalt)
+library(survey)
+library(AIPW)
+library(SuperLearner)
+
+set.seed(2026)
+n <- 500
+
+# 1. Simulate Confounders
+age <- rnorm(n, mean = 65, sd = 10)
+ecog <- rbinom(n, 1, 0.4) # 1 = Poor performance status
+
+# 2. Simulate Treatment Assignment (Confounding by Indication)
+# Elderly and severe patients are more likely to receive Drug X (treatment = 1)
+ps_true <- plogis(-2 + 0.05 * age + 1.2 * ecog)
+treatment <- rbinom(n, 1, ps_true)
+
+# 3. Simulate Survival Outcome (1-Year Survival)
+# True Treatment Effect (Risk Difference) = +15%
+y_prob <- plogis(1 - 0.03 * age - 1.0 * ecog + 0.8 * treatment)
+survival_1yr <- rbinom(n, 1, y_prob)
+
+df <- data.frame(age, ecog, treatment, survival_1yr)
+
+# Calculate Naive (Unadjusted) Estimate
+naive_treated <- mean(df$survival_1yr[df$treatment == 1])
+naive_control <- mean(df$survival_1yr[df$treatment == 0])
+naive_ate <- naive_treated - naive_control
+```
+
+### Baseline Diagnostics (Original Data)
+
+Without adjustment, patients receiving Drug X are significantly older and have worse ECOG scores, creating a naive survival comparison that underestimates the treatment effect:
+
+```{r}
+cat("Treated Group Mean Age: ", round(mean(df$age[df$treatment == 1]), 2), "\n")
+cat("Control Group Mean Age: ", round(mean(df$age[df$treatment == 0]), 2), "\n")
+cat("Naive Survival Difference (ATE): ", round(naive_ate, 4), "\n")
+```
+
+### IPTW Balancing & Diagnostics
+
+We apply `WeightIt` to calculate propensity weights and evaluate baseline balance.
+
+```{r}
+# Estimate weights
+W <- weightit(treatment ~ age + ecog,
+              data = df,
+              method = "ps",
+              estimand = "ATE")
+
+# Extract Effective Sample Size (ESS)
+ess_summary <- summary(W)
+cat("Effective Sample Size (Control Group): ", round(ess_summary$effective.sample.size["Weighted", "Control"], 2), "\n")
+cat("Effective Sample Size (Treated Group): ", round(ess_summary$effective.sample.size["Weighted", "Treated"], 2), "\n")
+```
+
+### Covariate Balance Audit (Love Plot)
+
+A standardized mean difference (SMD) below $0.1$ indicates that the baseline confounding has been successfully balanced between groups.
+
+```{r}
+#| label: love-plot
+#| fig-align: center
+
+love.plot(W,
+          thresholds = c(m = 0.1),
+          binary = "std",
+          abs = TRUE,
+          shapes = c("circle filled", "triangle filled"),
+          colors = c("#e53e3e", "#3182ce"),
+          sample.names = c("Original", "Weighted"))
+```
+
+### Treatment Effect Estimation (IPTW & AIPW)
+
+We fit a weighted regression model using `lm_weightit` to calculate the IPTW estimate with robust standard errors, followed by doubly robust estimation via `AIPW`.
+
+```{r}
+# 1. IPTW Weighted Linear Regression
+fit_iptw <- lm_weightit(survival_1yr ~ treatment,
+                        data = df,
+                        weightit = W)
+
+iptw_summary <- summary(fit_iptw)
+iptw_est <- iptw_summary$coefficients["treatment", "Estimate"]
+iptw_se <- iptw_summary$coefficients["treatment", "Std. Error"]
+
+# 2. AIPW Estimation
+sl_lib_aipw <- c("SL.glm", "SL.mean")
+
+aipw_obj <- AIPW$new(
+  Y = df$survival_1yr,
+  A = df$treatment,
+  W = df[, c("age", "ecog")],
+  Q.SL.library = sl_lib_aipw,
+  g.SL.library = sl_lib_aipw
+)
+
+# Run double robust estimation
+aipw_obj$fit()
+aipw_obj$summary()
+aipw_res <- as.data.frame(aipw_obj$result)
+aipw_est <- aipw_res["Risk Difference", "Estimate"]
+aipw_se <- aipw_res["Risk Difference", "SE"]
+```
+
+### Evidence Synthesis Comparison
+
+The unadjusted naive estimate is biased downward, while the adjusted IPTW and doubly robust AIPW estimates successfully recover the true treatment effect.
+
+| Estimator | ATE Estimate | Standard Error | Audit Status |
+|:---|:---:|:---:|:---|
+| **Naive (Unadjusted)** | `r round(naive_ate, 4)` | N/A | Biased due to selection |
+| **IPTW (Weighting Only)** | `r round(iptw_est, 4)` | `r round(iptw_se, 4)` | Confounding adjusted |
+| **AIPW (Doubly Robust)** | `r round(aipw_est, 4)` | `r round(aipw_se, 4)` | Double robust / minimum variance |
+
+---
+
+## Advanced HTA Considerations & EAG Defense
+
+### Boundary Explosions ($PS \to 0$ or $1$)
+
+In observational datasets, physician prescribing preferences can result in near-deterministic treatment assignments for certain patient subgroups. This leads to propensity scores that approach $0$ or $1$.
+
+- **The Hazard**: For a treated patient with $PS = 0.01$, the weight is $W = 100$. This single outlier's outcome is multiplied a hundredfold in the pseudo-population, destabilizing the clinical outcome model.
+- **The Defense**:
+  1. **Stabilized Weights**: We scale the weights by the marginal probability of treatment $P(D)$ in the sample:
+     $$W_{stabilized} = D \cdot \frac{P(D=1)}{PS} + (1 - D) \cdot \frac{P(D=0)}{1 - PS}$$
+     This scales down extreme weights globally.
+  2. **Weight Trimming**: If weights remain extreme after stabilization, we apply asymmetric trimming (e.g., trimming the top and bottom 1% of the weight distribution). While trimming introduces a small amount of bias by changing the target population, it significantly reduces variance and stabilizes survival extrapolations, which is generally accepted by NICE EAGs.
+
+### ESS Collapse Defense Strategy
+
+When defending a weighted analysis against EAG critiques regarding a low Effective Sample Size, modellers should present the following defense arguments:
+
+> "The reduction in Effective Sample Size (ESS) is the mathematically necessary cost of removing baseline confounding (bias) from the observational sample. The Love Plot confirms that the standardized mean differences (SMDs) for all critical confounders are brought below the HTA-standard 0.1 threshold, restoring balance. 
+> 
+> Accepting a lower ESS is a deliberate and defensible trade-off: it sacrifices statistical precision (widening the confidence intervals) in order to secure accuracy (eliminating selection bias). This is superior to a matched analysis (PSM) that would drop patients entirely and restrict the clinical representativeness of the appraisal."
+
+### Methodological Trade-offs
+
+| Characteristic | Propensity Score Matching (PSM) | Inverse Probability Weighting (IPTW) | Augmented IPTW (AIPW) |
+|:---|:---|:---|:---|
+| **Sample Retention** | Discards unmatched patients (sample loss) | Retains entire sample via weighting | Retains entire sample via weighting |
+| **Causal Parameter** | ATT (Effect on the Treated) | ATE (Effect on the Population) | ATE (Effect on the Population) |
+| **Sensitivity to Model Misspecification** | High (Relies entirely on PS model correctness) | High (Relies entirely on PS model correctness) | **Low (Doubly Robust: unbiased if either PS or outcome model is correct)** |
+| **Efficiency (Variance)** | Lower (due to sample size reduction) | Higher (uses all data, but can be skewed by extreme weights) | **Maximum (residual correction minimizes variance)** |
+| **Destabilization Risk** | Low (extreme patients excluded naturally) | High (due to extreme weights from poor overlap) | Moderate (stabilized by outcome model residuals) |

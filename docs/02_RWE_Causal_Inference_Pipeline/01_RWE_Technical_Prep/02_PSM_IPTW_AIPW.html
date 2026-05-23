@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Xiaoge Zhang, PhD">
+<meta name="dcterms.date" content="2026-05-23">
+
+<title>Propensity Score Methods: PSM, IPTW, and AIPW – HEOR Technical Portfolio</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8c38fd85d21bfe44b50360969156fb14.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../custom.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">HEOR Technical Portfolio</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-flagship-audits" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Flagship Audits</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-flagship-audits">    
+        <li>
+    <a class="dropdown-item" href="../../05_TA975_CAR-T_Case/TA975_Mock_Case.html">
+ <span class="dropdown-text">NICE TA975 (CAR-T) Case</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.html">
+ <span class="dropdown-text">ML-NMR: AML Population Alignment</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.html">
+ <span class="dropdown-text">RWE ECA: R/R DLBCL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.html">
+ <span class="dropdown-text">PSM: Survival Extrapolation in RRMM</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-nma-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">NMA Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-nma-library">    
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.html">
+ <span class="dropdown-text">Bayesian Estimation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">
+ <span class="dropdown-text">Standard Bayesian NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.html">
+ <span class="dropdown-text">Network Meta-Regression</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.html">
+ <span class="dropdown-text">Survival NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/04_Component_NMA.html">
+ <span class="dropdown-text">Component NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.html">
+ <span class="dropdown-text">IPD NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/06_MAIC.html">
+ <span class="dropdown-text">MAIC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/07_STC.html">
+ <span class="dropdown-text">STC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/08_ML_NMR.html">
+ <span class="dropdown-text">ML-NMR</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.html">
+ <span class="dropdown-text">Flexible Survival</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.html">
+ <span class="dropdown-text">HR vs OR Intuition</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-rwe-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">RWE Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-rwe-library">    
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.html">
+ <span class="dropdown-text">NICE Framework &amp; Confounding</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.html">
+ <span class="dropdown-text">PSM, IPTW &amp; AIPW</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../00_HTA_LLM_Wiki/README.html"> 
+<span class="menu-text">Methodology Wiki</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Qsev/XGZ-HEOR-Portfolio" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction-the-confounding-challenge-self-selection-bias" id="toc-introduction-the-confounding-challenge-self-selection-bias" class="nav-link active" data-scroll-target="#introduction-the-confounding-challenge-self-selection-bias"><span class="header-section-number">1</span> Introduction: The Confounding Challenge &amp; Self-Selection Bias</a>
+  <ul class="collapse">
+  <li><a href="#the-dimension-reduction-problem" id="toc-the-dimension-reduction-problem" class="nav-link" data-scroll-target="#the-dimension-reduction-problem"><span class="header-section-number">1.1</span> The Dimension Reduction Problem</a></li>
+  </ul></li>
+  <li><a href="#propensity-score-matching-psm" id="toc-propensity-score-matching-psm" class="nav-link" data-scroll-target="#propensity-score-matching-psm"><span class="header-section-number">2</span> Propensity Score Matching (PSM)</a>
+  <ul class="collapse">
+  <li><a href="#core-logic-the-s-curve" id="toc-core-logic-the-s-curve" class="nav-link" data-scroll-target="#core-logic-the-s-curve"><span class="header-section-number">2.1</span> Core Logic &amp; The S-Curve</a></li>
+  <li><a href="#matching-constraints-att-estimation" id="toc-matching-constraints-att-estimation" class="nav-link" data-scroll-target="#matching-constraints-att-estimation"><span class="header-section-number">2.2</span> Matching Constraints &amp; ATT Estimation</a></li>
+  </ul></li>
+  <li><a href="#inverse-probability-treatment-weighting-iptw" id="toc-inverse-probability-treatment-weighting-iptw" class="nav-link" data-scroll-target="#inverse-probability-treatment-weighting-iptw"><span class="header-section-number">3</span> Inverse Probability Treatment Weighting (IPTW)</a>
+  <ul class="collapse">
+  <li><a href="#the-weighting-mechanism" id="toc-the-weighting-mechanism" class="nav-link" data-scroll-target="#the-weighting-mechanism"><span class="header-section-number">3.1</span> The Weighting Mechanism</a></li>
+  <li><a href="#weighted-least-squares-wls-algebra" id="toc-weighted-least-squares-wls-algebra" class="nav-link" data-scroll-target="#weighted-least-squares-wls-algebra"><span class="header-section-number">3.2</span> Weighted Least Squares (WLS) Algebra</a></li>
+  <li><a href="#effective-sample-size-ess" id="toc-effective-sample-size-ess" class="nav-link" data-scroll-target="#effective-sample-size-ess"><span class="header-section-number">3.3</span> Effective Sample Size (ESS)</a></li>
+  </ul></li>
+  <li><a href="#augmented-inverse-probability-weighting-aipw" id="toc-augmented-inverse-probability-weighting-aipw" class="nav-link" data-scroll-target="#augmented-inverse-probability-weighting-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</a>
+  <ul class="collapse">
+  <li><a href="#the-belt-and-suspenders-philosophy" id="toc-the-belt-and-suspenders-philosophy" class="nav-link" data-scroll-target="#the-belt-and-suspenders-philosophy"><span class="header-section-number">4.1</span> The “Belt and Suspenders” Philosophy</a></li>
+  <li><a href="#algebraic-proof-of-double-robustness" id="toc-algebraic-proof-of-double-robustness" class="nav-link" data-scroll-target="#algebraic-proof-of-double-robustness"><span class="header-section-number">4.2</span> Algebraic Proof of Double Robustness</a></li>
+  </ul></li>
+  <li><a href="#r-implementation-pipeline" id="toc-r-implementation-pipeline" class="nav-link" data-scroll-target="#r-implementation-pipeline"><span class="header-section-number">5</span> R Implementation Pipeline</a>
+  <ul class="collapse">
+  <li><a href="#baseline-diagnostics-original-data" id="toc-baseline-diagnostics-original-data" class="nav-link" data-scroll-target="#baseline-diagnostics-original-data"><span class="header-section-number">5.1</span> Baseline Diagnostics (Original Data)</a></li>
+  <li><a href="#iptw-balancing-diagnostics" id="toc-iptw-balancing-diagnostics" class="nav-link" data-scroll-target="#iptw-balancing-diagnostics"><span class="header-section-number">5.2</span> IPTW Balancing &amp; Diagnostics</a></li>
+  <li><a href="#covariate-balance-audit-love-plot" id="toc-covariate-balance-audit-love-plot" class="nav-link" data-scroll-target="#covariate-balance-audit-love-plot"><span class="header-section-number">5.3</span> Covariate Balance Audit (Love Plot)</a></li>
+  <li><a href="#treatment-effect-estimation-iptw-aipw" id="toc-treatment-effect-estimation-iptw-aipw" class="nav-link" data-scroll-target="#treatment-effect-estimation-iptw-aipw"><span class="header-section-number">5.4</span> Treatment Effect Estimation (IPTW &amp; AIPW)</a></li>
+  <li><a href="#evidence-synthesis-comparison" id="toc-evidence-synthesis-comparison" class="nav-link" data-scroll-target="#evidence-synthesis-comparison"><span class="header-section-number">5.5</span> Evidence Synthesis Comparison</a></li>
+  </ul></li>
+  <li><a href="#advanced-hta-considerations-eag-defense" id="toc-advanced-hta-considerations-eag-defense" class="nav-link" data-scroll-target="#advanced-hta-considerations-eag-defense"><span class="header-section-number">6</span> Advanced HTA Considerations &amp; EAG Defense</a>
+  <ul class="collapse">
+  <li><a href="#boundary-explosions-ps-to-0-or-1" id="toc-boundary-explosions-ps-to-0-or-1" class="nav-link" data-scroll-target="#boundary-explosions-ps-to-0-or-1"><span class="header-section-number">6.1</span> Boundary Explosions (<span class="math inline">\(PS \to 0\)</span> or <span class="math inline">\(1\)</span>)</a></li>
+  <li><a href="#ess-collapse-defense-strategy" id="toc-ess-collapse-defense-strategy" class="nav-link" data-scroll-target="#ess-collapse-defense-strategy"><span class="header-section-number">6.2</span> ESS Collapse Defense Strategy</a></li>
+  <li><a href="#methodological-trade-offs" id="toc-methodological-trade-offs" class="nav-link" data-scroll-target="#methodological-trade-offs"><span class="header-section-number">6.3</span> Methodological Trade-offs</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Propensity Score Methods: PSM, IPTW, and AIPW</h1>
+<p class="subtitle lead">Methodological Foundations &amp; Advanced HTA Practice</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xiaoge Zhang, PhD </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 23, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Bridging the Gap Between Observational Real-World Data and Causal Claims in HTA</em></p>
+<section id="introduction-the-confounding-challenge-self-selection-bias" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction-the-confounding-challenge-self-selection-bias"><span class="header-section-number">1</span> Introduction: The Confounding Challenge &amp; Self-Selection Bias</h2>
+<p>In observational studies, treatment assignment (<span class="math inline">\(D\)</span>) is rarely random. Clinicians frequently prescribe therapies based on patient characteristics (<span class="math inline">\(X\)</span>), such as baseline disease severity or age, which are also directly linked to the clinical outcome (<span class="math inline">\(Y\)</span>). This non-random assignment leads to <strong>Selection Bias (Confounding by Indication)</strong>.</p>
+<p>For instance, in oncology appraisals, a newly launched therapy is often reserved for patients who have failed multiple lines of prior therapy or have a poor performance status. If we directly compare the survival outcomes of patients receiving the new therapy against those on standard of care (SOC), the naive treatment effect will be severely biased downward. The new drug’s efficacy is masked by the fact that its recipient group had a much worse prognosis at baseline.</p>
+<section id="the-dimension-reduction-problem" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="the-dimension-reduction-problem"><span class="header-section-number">1.1</span> The Dimension Reduction Problem</h3>
+<p>To estimate a causal effect, we must control for the baseline covariates <span class="math inline">\(X\)</span>. If we attempt to match patients on multiple characteristics simultaneously (e.g., matching a treated patient with a control patient who has the exact same age, gender, biomarkers, and comorbidities), we quickly encounter the <strong>Curse of Dimensionality</strong>. As the number of covariates increases, the probability of finding an exact match in a finite sample approaches zero.</p>
+<p><strong>Propensity Score Methods</strong> solve this problem by collapsing the high-dimensional covariate space <span class="math inline">\(X\)</span> into a one-dimensional summary metric: the <strong>Propensity Score (PS)</strong>.</p>
+<hr>
+</section>
+</section>
+<section id="propensity-score-matching-psm" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="propensity-score-matching-psm"><span class="header-section-number">2</span> Propensity Score Matching (PSM)</h2>
+<section id="core-logic-the-s-curve" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="core-logic-the-s-curve"><span class="header-section-number">2.1</span> Core Logic &amp; The S-Curve</h3>
+<p>The Propensity Score <span class="math inline">\(e(X)\)</span> is defined as the conditional probability of receiving treatment given a vector of observed baseline covariates: <span class="math display">\[e(X) = P(D = 1 \mid X)\]</span></p>
+<p>Because probability is bounded between 0 (never treated) and 1 (always treated), a standard linear model (<span class="math inline">\(D = \beta X + \epsilon\)</span>) is inappropriate as it can predict values outside this range. We therefore model the propensity score using a <strong>Logistic Regression (Logit)</strong> model: <span class="math display">\[P(D=1 \mid X) = \frac{1}{1 + e^{-z}}\]</span> where <span class="math inline">\(z\)</span> is the linear combination of the confounders: <span class="math display">\[z = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k\]</span></p>
+<p>Taking the natural logarithm of the odds (the Logit transformation) yields a linear representation: <span class="math display">\[\ln\left(\frac{P(D=1 \mid X)}{1 - P(D=1 \mid X)}\right) = \beta_0 + \beta_1 X_1 + \dots + \beta_k X_k\]</span></p>
+<p>By matching treated and control patients who have the same (or very similar) propensity scores, we neutralize the baseline covariates. Within a matched block, the distribution of covariates <span class="math inline">\(X\)</span> is balanced between the treated and control groups, effectively simulating a <strong>Pseudo-Randomized Controlled Trial (Pseudo-RCT)</strong>.</p>
+</section>
+<section id="matching-constraints-att-estimation" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="matching-constraints-att-estimation"><span class="header-section-number">2.2</span> Matching Constraints &amp; ATT Estimation</h3>
+<ol type="1">
+<li><strong>Caliper Width</strong>: When matching, we do not require exact propensity score matches. Instead, we specify a tolerance zone or <strong>caliper</strong> (typically <span class="math inline">\(0.2\)</span> times the standard deviation of the logit of the propensity score). If a treated patient’s propensity score is <span class="math inline">\(0.65\)</span>, we only match them with a control patient whose score falls within the caliper range.</li>
+<li><strong>Common Support</strong>: Propensity score matching is only valid within the region of <strong>Common Support</strong>—the overlap in propensity score distributions between the treated and control groups. Patients lying outside this overlap (e.g., treated patients with extremely high propensity scores who have no comparable controls) must be discarded.</li>
+<li><strong>ATT Estimation</strong>: By starting with the treated patients and searching for control twins, PSM estimates the <strong>Average Treatment Effect on the Treated (ATT)</strong> by default: <span class="math display">\[ATT = E[Y^{(1)} - Y^{(0)} \mid D=1]\]</span> In HTA appraisals, the ATT is highly relevant because payers want to know the therapeutic benefit specifically for the patient population that clinicians would target in real-world practice.</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="inverse-probability-treatment-weighting-iptw" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="inverse-probability-treatment-weighting-iptw"><span class="header-section-number">3</span> Inverse Probability Treatment Weighting (IPTW)</h2>
+<p>While PSM discards unmatched patients, <strong>Inverse Probability Treatment Weighting (IPTW)</strong> retains the entire sample. It balances the groups by assigning each patient a weight (<span class="math inline">\(W\)</span>) inversely proportional to the probability of receiving the treatment they actually received.</p>
+<section id="the-weighting-mechanism" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="the-weighting-mechanism"><span class="header-section-number">3.1</span> The Weighting Mechanism</h3>
+<p>The Horvitz-Thompson weights for estimating the <strong>Average Treatment Effect (ATE)</strong> across the entire population are defined as: <span class="math display">\[W_i = \frac{D_i}{e(X_i)} + \frac{1 - D_i}{1 - e(X_i)}\]</span></p>
+<ul>
+<li><strong>Treated Patients (<span class="math inline">\(D_i = 1\)</span>)</strong>: Weighted by <span class="math inline">\(1/e(X_i)\)</span>. A treated patient with a low probability of treatment (rare) represents a larger, unobserved segment of similar patients and is weighted up.</li>
+<li><strong>Control Patients (<span class="math inline">\(D_i = 0\)</span>)</strong>: Weighted by <span class="math inline">\(1/(1-e(X_i))\)</span>.</li>
+</ul>
+<p>This weighting process creates a <strong>Weighted Pseudo-Population</strong> where the baseline covariate distributions in both groups are identical, allowing us to estimate the ATE: <span class="math display">\[ATE = E[Y^{(1)} - Y^{(0)}]\]</span></p>
+</section>
+<section id="weighted-least-squares-wls-algebra" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="weighted-least-squares-wls-algebra"><span class="header-section-number">3.2</span> Weighted Least Squares (WLS) Algebra</h3>
+<p>In practice, the treatment effect is estimated using <strong>Weighted Least Squares (WLS)</strong>. The objective is to minimize the weighted sum of squared residuals: <span class="math display">\[\sum_{i=1}^n W_i (Y_i - \hat{Y}_i)^2\]</span></p>
+<p>In matrix notation, the normal equation for the regression coefficients is modified from the standard OLS <span class="math inline">\((X'X)^{-1}X'Y\)</span> to: <span class="math display">\[\hat{\beta}_{WLS} = (X'WX)^{-1}X'WY\]</span> where <span class="math inline">\(W\)</span> is a diagonal matrix containing the IPTW weights <span class="math inline">\(W_i\)</span>. The weight acts as a volume knob; patients with higher weights pull the regression line closer to their observed data points.</p>
+</section>
+<section id="effective-sample-size-ess" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="effective-sample-size-ess"><span class="header-section-number">3.3</span> Effective Sample Size (ESS)</h3>
+<p>Because weighting inflates the influence of certain individuals, the statistical precision of the weighted sample is lower than the nominal sample size. We quantify this information loss using Kish’s <strong>Effective Sample Size (ESS)</strong>: <span class="math display">\[ESS = \frac{\left(\sum_{i=1}^n W_i\right)^2}{\sum_{i=1}^n W_i^2}\]</span></p>
+<p>If all weights are uniform (<span class="math inline">\(W_i=1\)</span>), the ESS equals the actual sample size <span class="math inline">\(N\)</span>. If a few patients have extremely large weights, the denominator increases, and the ESS collapses, signaling that the treatment effect estimate is dominated by a tiny fraction of the population.</p>
+<hr>
+</section>
+</section>
+<section id="augmented-inverse-probability-weighting-aipw" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="augmented-inverse-probability-weighting-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</h2>
+<p><strong>Augmented IPTW (AIPW)</strong> is a <strong>Doubly Robust (DR)</strong> estimator that combines the propensity score model with an outcome regression model.</p>
+<section id="the-belt-and-suspenders-philosophy" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="the-belt-and-suspenders-philosophy"><span class="header-section-number">4.1</span> The “Belt and Suspenders” Philosophy</h3>
+<p>AIPW requires two separate models: 1. <strong>The Treatment Model (Propensity Score)</strong>: <span class="math inline">\(g(X) = P(D=1 \mid X)\)</span> 2. <strong>The Outcome Model</strong>: <span class="math inline">\(m_d(X) = E[Y \mid D=d, X]\)</span> for <span class="math inline">\(d \in \{0, 1\}\)</span></p>
+<p>The AIPW estimator for the counterfactual mean under treatment (<span class="math inline">\(d=1\)</span>) is: <span class="math display">\[\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n \left[ m_1(X_i) + \frac{D_i (Y_i - m_1(X_i))}{g(X_i)} \right]\]</span> Similarly, the counterfactual mean under control (<span class="math inline">\(d=0\)</span>) is: <span class="math display">\[\hat{Y}_{AIPW}^{(0)} = \frac{1}{n} \sum_{i=1}^n \left[ m_0(X_i) + \frac{(1 - D_i) (Y_i - m_0(X_i))}{1 - g(X_i)} \right]\]</span></p>
+</section>
+<section id="algebraic-proof-of-double-robustness" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="algebraic-proof-of-double-robustness"><span class="header-section-number">4.2</span> Algebraic Proof of Double Robustness</h3>
+<p>The bias of the AIPW estimator is proportional to the product of the errors in both models: <span class="math display">\[\text{Bias} \propto \left(g(X) - \hat{g}(X)\right) \times \left(m_d(X) - \hat{m}_d(X)\right)\]</span></p>
+<ul>
+<li><p><strong>Case 1: Propensity model <span class="math inline">\(\hat{g}(X)\)</span> is correct, but outcome model <span class="math inline">\(\hat{m}_1(X)\)</span> is wrong.</strong> Since the propensity score is correct, the expectation of the augmentation term simplifies: <span class="math display">\[E\left[ \frac{D_i (Y_i - \hat{m}_1(X_i))}{g(X_i)} \right] = E\left[ \frac{e(X_i) (Y_i - \hat{m}_1(X_i))}{e(X_i)} \right] = E[Y_i \mid D_i=1] - E[\hat{m}_1(X_i)]\]</span> Adding this to the first term <span class="math inline">\(E[\hat{m}_1(X_i)]\)</span> cancels out the incorrect outcome predictions, leaving the unbiased causal estimate.</p></li>
+<li><p><strong>Case 2: Outcome model <span class="math inline">\(\hat{m}_1(X)\)</span> is correct, but propensity model <span class="math inline">\(\hat{g}(X)\)</span> is wrong.</strong> If the outcome model is correct, <span class="math inline">\(\hat{m}_1(X_i) = Y_i\)</span>. The residual <span class="math inline">\((Y_i - \hat{m}_1(X_i))\)</span> becomes zero, making the second term vanish completely: <span class="math display">\[\hat{Y}_{AIPW}^{(1)} = \frac{1}{n} \sum_{i=1}^n Y_i\]</span> The incorrect propensity weights are canceled out, leaving the unbiased outcome prediction.</p></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="r-implementation-pipeline" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="r-implementation-pipeline"><span class="header-section-number">5</span> R Implementation Pipeline</h2>
+<p>This pipeline simulates a real-world dataset (<span class="math inline">\(N=500\)</span>) with a severe confounding by indication trap: high-risk, elderly patients with poor performance status (ECOG=1) are preferentially prescribed the new therapy (Drug X), masking its true survival benefit.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(WeightIt)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cobalt)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AIPW)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Simulate Confounders</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">65</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ecog <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.4</span>) <span class="co"># 1 = Poor performance status</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Simulate Treatment Assignment (Confounding by Indication)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Elderly and severe patients are more likely to receive Drug X (treatment = 1)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ps_true <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">1.2</span> <span class="sc">*</span> ecog)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_true)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Simulate Survival Outcome (1-Year Survival)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># True Treatment Effect (Risk Difference) = +15%</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>y_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">1.0</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> treatment)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>survival_1yr <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, y_prob)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(age, ecog, treatment, survival_1yr)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Naive (Unadjusted) Estimate</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>naive_treated <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>naive_control <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>survival_1yr[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>naive_ate <span class="ot">&lt;-</span> naive_treated <span class="sc">-</span> naive_control</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="baseline-diagnostics-original-data" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="baseline-diagnostics-original-data"><span class="header-section-number">5.1</span> Baseline Diagnostics (Original Data)</h3>
+<p>Without adjustment, patients receiving Drug X are significantly older and have worse ECOG scores, creating a naive survival comparison that underestimates the treatment effect:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Treated Group Mean Age: "</span>, <span class="fu">round</span>(<span class="fu">mean</span>(df<span class="sc">$</span>age[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>]), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Treated Group Mean Age:  65.97 </code></pre>
+</div>
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Control Group Mean Age: "</span>, <span class="fu">round</span>(<span class="fu">mean</span>(df<span class="sc">$</span>age[df<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>]), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Control Group Mean Age:  62.47 </code></pre>
+</div>
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Naive Survival Difference (ATE): "</span>, <span class="fu">round</span>(naive_ate, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Naive Survival Difference (ATE):  0.118 </code></pre>
+</div>
+</div>
+</section>
+<section id="iptw-balancing-diagnostics" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="iptw-balancing-diagnostics"><span class="header-section-number">5.2</span> IPTW Balancing &amp; Diagnostics</h3>
+<p>We apply <code>WeightIt</code> to calculate propensity weights and evaluate baseline balance.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate weights</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">weightit</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> ecog,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> df,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">"ps"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">estimand =</span> <span class="st">"ATE"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract Effective Sample Size (ESS)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ess_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(W)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Effective Sample Size (Control Group): "</span>, <span class="fu">round</span>(ess_summary<span class="sc">$</span>effective.sample.size[<span class="st">"Weighted"</span>, <span class="st">"Control"</span>], <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Effective Sample Size (Control Group):  69.45 </code></pre>
+</div>
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Effective Sample Size (Treated Group): "</span>, <span class="fu">round</span>(ess_summary<span class="sc">$</span>effective.sample.size[<span class="st">"Weighted"</span>, <span class="st">"Treated"</span>], <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Effective Sample Size (Treated Group):  412.18 </code></pre>
+</div>
+</div>
+</section>
+<section id="covariate-balance-audit-love-plot" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="covariate-balance-audit-love-plot"><span class="header-section-number">5.3</span> Covariate Balance Audit (Love Plot)</h3>
+<p>A standardized mean difference (SMD) below <span class="math inline">\(0.1\)</span> indicates that the baseline confounding has been successfully balanced between groups.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">love.plot</span>(W,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">binary =</span> <span class="st">"std"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">abs =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">shapes =</span> <span class="fu">c</span>(<span class="st">"circle filled"</span>, <span class="st">"triangle filled"</span>),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"#e53e3e"</span>, <span class="st">"#3182ce"</span>),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">sample.names =</span> <span class="fu">c</span>(<span class="st">"Original"</span>, <span class="st">"Weighted"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="02_PSM_IPTW_AIPW_files/figure-html/love-plot-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="treatment-effect-estimation-iptw-aipw" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="treatment-effect-estimation-iptw-aipw"><span class="header-section-number">5.4</span> Treatment Effect Estimation (IPTW &amp; AIPW)</h3>
+<p>We fit a weighted regression model using <code>lm_weightit</code> to calculate the IPTW estimate with robust standard errors, followed by doubly robust estimation via <code>AIPW</code>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. IPTW Weighted Linear Regression</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>fit_iptw <span class="ot">&lt;-</span> <span class="fu">lm_weightit</span>(survival_1yr <span class="sc">~</span> treatment,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">weightit =</span> W)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>iptw_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_iptw)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>iptw_est <span class="ot">&lt;-</span> iptw_summary<span class="sc">$</span>coefficients[<span class="st">"treatment"</span>, <span class="st">"Estimate"</span>]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>iptw_se <span class="ot">&lt;-</span> iptw_summary<span class="sc">$</span>coefficients[<span class="st">"treatment"</span>, <span class="st">"Std. Error"</span>]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. AIPW Estimation</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>sl_lib_aipw <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>aipw_obj <span class="ot">&lt;-</span> AIPW<span class="sc">$</span><span class="fu">new</span>(</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> df<span class="sc">$</span>survival_1yr,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">A =</span> df<span class="sc">$</span>treatment,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">W =</span> df[, <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"ecog"</span>)],</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q.SL.library =</span> sl_lib_aipw,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">g.SL.library =</span> sl_lib_aipw</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Run double robust estimation</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>aipw_obj<span class="sc">$</span><span class="fu">fit</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Done!</code></pre>
+</div>
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>aipw_obj<span class="sc">$</span><span class="fu">summary</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 Estimate     SE 95% LCL 95% UCL   N
+Risk of Exposure    0.400 0.0242  0.3526   0.447 416
+Risk of Control     0.229 0.0487  0.1340   0.325  84
+Risk Difference     0.171 0.0541  0.0644   0.277 500
+Risk Ratio          1.743 0.2195  1.1337   2.681 500
+Odds Ratio          2.239 0.2914  1.2645   3.963 500</code></pre>
+</div>
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>aipw_res <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(aipw_obj<span class="sc">$</span>result)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>aipw_est <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"Estimate"</span>]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>aipw_se <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"SE"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="evidence-synthesis-comparison" class="level3" data-number="5.5">
+<h3 data-number="5.5" class="anchored" data-anchor-id="evidence-synthesis-comparison"><span class="header-section-number">5.5</span> Evidence Synthesis Comparison</h3>
+<p>The unadjusted naive estimate is biased downward, while the adjusted IPTW and doubly robust AIPW estimates successfully recover the true treatment effect.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 27%">
+<col style="width: 27%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Estimator</th>
+<th style="text-align: center;">ATE Estimate</th>
+<th style="text-align: center;">Standard Error</th>
+<th style="text-align: left;">Audit Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Naive (Unadjusted)</strong></td>
+<td style="text-align: center;">0.118</td>
+<td style="text-align: center;">N/A</td>
+<td style="text-align: left;">Biased due to selection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>IPTW (Weighting Only)</strong></td>
+<td style="text-align: center;">0.1606</td>
+<td style="text-align: center;">0.0534</td>
+<td style="text-align: left;">Confounding adjusted</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>AIPW (Doubly Robust)</strong></td>
+<td style="text-align: center;">0.1705</td>
+<td style="text-align: center;">0.0541</td>
+<td style="text-align: left;">Double robust / minimum variance</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="advanced-hta-considerations-eag-defense" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="advanced-hta-considerations-eag-defense"><span class="header-section-number">6</span> Advanced HTA Considerations &amp; EAG Defense</h2>
+<section id="boundary-explosions-ps-to-0-or-1" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="boundary-explosions-ps-to-0-or-1"><span class="header-section-number">6.1</span> Boundary Explosions (<span class="math inline">\(PS \to 0\)</span> or <span class="math inline">\(1\)</span>)</h3>
+<p>In observational datasets, physician prescribing preferences can result in near-deterministic treatment assignments for certain patient subgroups. This leads to propensity scores that approach <span class="math inline">\(0\)</span> or <span class="math inline">\(1\)</span>.</p>
+<ul>
+<li><strong>The Hazard</strong>: For a treated patient with <span class="math inline">\(PS = 0.01\)</span>, the weight is <span class="math inline">\(W = 100\)</span>. This single outlier’s outcome is multiplied a hundredfold in the pseudo-population, destabilizing the clinical outcome model.</li>
+<li><strong>The Defense</strong>:
+<ol type="1">
+<li><strong>Stabilized Weights</strong>: We scale the weights by the marginal probability of treatment <span class="math inline">\(P(D)\)</span> in the sample: <span class="math display">\[W_{stabilized} = D \cdot \frac{P(D=1)}{PS} + (1 - D) \cdot \frac{P(D=0)}{1 - PS}\]</span> This scales down extreme weights globally.</li>
+<li><strong>Weight Trimming</strong>: If weights remain extreme after stabilization, we apply asymmetric trimming (e.g., trimming the top and bottom 1% of the weight distribution). While trimming introduces a small amount of bias by changing the target population, it significantly reduces variance and stabilizes survival extrapolations, which is generally accepted by NICE EAGs.</li>
+</ol></li>
+</ul>
+</section>
+<section id="ess-collapse-defense-strategy" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="ess-collapse-defense-strategy"><span class="header-section-number">6.2</span> ESS Collapse Defense Strategy</h3>
+<p>When defending a weighted analysis against EAG critiques regarding a low Effective Sample Size, modellers should present the following defense arguments:</p>
+<blockquote class="blockquote">
+<p>“The reduction in Effective Sample Size (ESS) is the mathematically necessary cost of removing baseline confounding (bias) from the observational sample. The Love Plot confirms that the standardized mean differences (SMDs) for all critical confounders are brought below the HTA-standard 0.1 threshold, restoring balance.</p>
+<p>Accepting a lower ESS is a deliberate and defensible trade-off: it sacrifices statistical precision (widening the confidence intervals) in order to secure accuracy (eliminating selection bias). This is superior to a matched analysis (PSM) that would drop patients entirely and restrict the clinical representativeness of the appraisal.”</p>
+</blockquote>
+</section>
+<section id="methodological-trade-offs" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="methodological-trade-offs"><span class="header-section-number">6.3</span> Methodological Trade-offs</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Characteristic</th>
+<th style="text-align: left;">Propensity Score Matching (PSM)</th>
+<th style="text-align: left;">Inverse Probability Weighting (IPTW)</th>
+<th style="text-align: left;">Augmented IPTW (AIPW)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Sample Retention</strong></td>
+<td style="text-align: left;">Discards unmatched patients (sample loss)</td>
+<td style="text-align: left;">Retains entire sample via weighting</td>
+<td style="text-align: left;">Retains entire sample via weighting</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Causal Parameter</strong></td>
+<td style="text-align: left;">ATT (Effect on the Treated)</td>
+<td style="text-align: left;">ATE (Effect on the Population)</td>
+<td style="text-align: left;">ATE (Effect on the Population)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Sensitivity to Model Misspecification</strong></td>
+<td style="text-align: left;">High (Relies entirely on PS model correctness)</td>
+<td style="text-align: left;">High (Relies entirely on PS model correctness)</td>
+<td style="text-align: left;"><strong>Low (Doubly Robust: unbiased if either PS or outcome model is correct)</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Efficiency (Variance)</strong></td>
+<td style="text-align: left;">Lower (due to sample size reduction)</td>
+<td style="text-align: left;">Higher (uses all data, but can be skewed by extreme weights)</td>
+<td style="text-align: left;"><strong>Maximum (residual correction minimizes variance)</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Destabilization Risk</strong></td>
+<td style="text-align: left;">Low (extreme patients excluded naturally)</td>
+<td style="text-align: left;">High (due to extreme weights from poor overlap)</td>
+<td style="text-align: left;">Moderate (stabilized by outcome model residuals)</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -23,6 +23,7 @@ project:
     - 04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.qmd
     - 04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.qmd
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.qmd
+    - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.qmd
 
 website:
   title: "HEOR Technical Portfolio"
@@ -70,6 +71,8 @@ website:
         menu:
           - href: 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.qmd
             text: "NICE Framework & Confounding"
+          - href: 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.qmd
+            text: "PSM, IPTW & AIPW"
       - text: "Methodology Wiki"
         href: 00_HTA_LLM_Wiki/README.md
     right:
