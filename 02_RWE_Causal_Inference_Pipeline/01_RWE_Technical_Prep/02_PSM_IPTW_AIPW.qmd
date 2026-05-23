@@ -418,9 +418,10 @@ aipw_obj <- AIPW$new(
   g.SL.library = sl_lib_aipw
 )
 
-# Run double robust estimation and suppress console output
-invisible(capture.output(aipw_obj$fit()))
+# Run double robust estimation and suppress console messages/output
+suppressMessages(aipw_obj$fit())
 invisible(capture.output(aipw_obj$summary()))
+
 
 # Extract and format AIPW results
 aipw_res <- as.data.frame(aipw_obj$result)

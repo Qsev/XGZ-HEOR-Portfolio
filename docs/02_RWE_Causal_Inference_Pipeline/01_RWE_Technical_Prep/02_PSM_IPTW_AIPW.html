@@ -817,34 +817,29 @@ window.Quarto = {
 <span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">g.SL.library =</span> sl_lib_aipw</span>
 <span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Run double robust estimation and suppress console output</span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">capture.output</span>(aipw_obj<span class="sc">$</span><span class="fu">fit</span>()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Done!</code></pre>
-</div>
-<details class="code-fold">
-<summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">capture.output</span>(aipw_obj<span class="sc">$</span><span class="fu">summary</span>()))</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and format AIPW results</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>aipw_res <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(aipw_obj<span class="sc">$</span>result)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>aipw_est <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"Estimate"</span>]</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>aipw_se <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"SE"</span>]</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a clean data frame for AIPW outputs</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>aipw_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">row.names</span>(aipw_res),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate =</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span>Estimate, <span class="dv">4</span>),</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Std. Error"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span>SE, <span class="dv">4</span>),</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span><span class="st">`</span><span class="at">95% LCL</span><span class="st">`</span>, <span class="dv">4</span>),</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span><span class="st">`</span><span class="at">95% UCL</span><span class="st">`</span>, <span class="dv">4</span>),</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Sample Size (N)"</span> <span class="ot">=</span> <span class="fu">as.integer</span>(aipw_res<span class="sc">$</span>N),</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Output both tables</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(iptw_tbl, <span class="at">caption =</span> <span class="st">"Weighted Linear Regression Estimates via IPTW (Robust Standard Errors)"</span>, <span class="at">align =</span> <span class="st">"lrrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Run double robust estimation and suppress console messages/output</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(aipw_obj<span class="sc">$</span><span class="fu">fit</span>())</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">capture.output</span>(aipw_obj<span class="sc">$</span><span class="fu">summary</span>()))</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and format AIPW results</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>aipw_res <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(aipw_obj<span class="sc">$</span>result)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>aipw_est <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"Estimate"</span>]</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>aipw_se <span class="ot">&lt;-</span> aipw_res[<span class="st">"Risk Difference"</span>, <span class="st">"SE"</span>]</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a clean data frame for AIPW outputs</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>aipw_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">row.names</span>(aipw_res),</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate =</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span>Estimate, <span class="dv">4</span>),</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Std. Error"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span>SE, <span class="dv">4</span>),</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span><span class="st">`</span><span class="at">95% LCL</span><span class="st">`</span>, <span class="dv">4</span>),</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">round</span>(aipw_res<span class="sc">$</span><span class="st">`</span><span class="at">95% UCL</span><span class="st">`</span>, <span class="dv">4</span>),</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Sample Size (N)"</span> <span class="ot">=</span> <span class="fu">as.integer</span>(aipw_res<span class="sc">$</span>N),</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Output both tables</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(iptw_tbl, <span class="at">caption =</span> <span class="st">"Weighted Linear Regression Estimates via IPTW (Robust Standard Errors)"</span>, <span class="at">align =</span> <span class="st">"lrrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -893,7 +888,7 @@ window.Quarto = {
 </div>
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(aipw_tbl, <span class="at">caption =</span> <span class="st">"Doubly Robust Estimates via Augmented Inverse Probability Weighting (AIPW)"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(aipw_tbl, <span class="at">caption =</span> <span class="st">"Doubly Robust Estimates via Augmented Inverse Probability Weighting (AIPW)"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
