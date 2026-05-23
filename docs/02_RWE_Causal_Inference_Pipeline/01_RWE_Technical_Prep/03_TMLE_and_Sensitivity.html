@@ -302,11 +302,6 @@ window.Quarto = {
   <li><a href="#e-value-contour-visualization" id="toc-e-value-contour-visualization" class="nav-link" data-scroll-target="#e-value-contour-visualization"><span class="header-section-number">3.2</span> E-Value Contour Visualization</a></li>
   </ul></li>
   <li><a href="#causal-evidence-reconciliation" id="toc-causal-evidence-reconciliation" class="nav-link" data-scroll-target="#causal-evidence-reconciliation"><span class="header-section-number">4</span> Causal Evidence Reconciliation</a></li>
-  <li><a href="#eag-defense-strategy" id="toc-eag-defense-strategy" class="nav-link" data-scroll-target="#eag-defense-strategy"><span class="header-section-number">5</span> EAG Defense Strategy</a>
-  <ul class="collapse">
-  <li><a href="#justifying-tmle-over-parametric-regression" id="toc-justifying-tmle-over-parametric-regression" class="nav-link" data-scroll-target="#justifying-tmle-over-parametric-regression"><span class="header-section-number">5.1</span> Justifying TMLE Over Parametric Regression</a></li>
-  <li><a href="#auditing-sensitivity-via-e-value" id="toc-auditing-sensitivity-via-e-value" class="nav-link" data-scroll-target="#auditing-sensitivity-via-e-value"><span class="header-section-number">5.2</span> Auditing Sensitivity via E-Value</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -1188,27 +1183,8 @@ character</code></pre>
 </table>
 </div>
 </div>
-<hr>
-</section>
-<section id="eag-defense-strategy" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="eag-defense-strategy"><span class="header-section-number">5</span> EAG Defense Strategy</h2>
-<p>When defending causal estimates derived via TMLE and E-value sensitivity analysis during EAG reviews, modellers should leverage the following arguments:</p>
-<section id="justifying-tmle-over-parametric-regression" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="justifying-tmle-over-parametric-regression"><span class="header-section-number">5.1</span> Justifying TMLE Over Parametric Regression</h3>
-<blockquote class="blockquote">
-<p>“Rather than relying on arbitrary functional forms that assume linear log-odds relations for confounding covariates, we implemented TMLE coupled with the SuperLearner ensemble. This allows the data to non-parametrically determine the correct functional relations, minimizing model misspecification bias.</p>
-<p>Furthermore, TMLE is a substitution estimator, meaning that unlike influence function-based estimators (like AIPW) which can yield survival predictions outside the valid <span class="math inline">\([0, 1]\)</span> interval, TMLE is mathematically restricted to remain within the physical bounds of probability space. This ensures clinical plausibility in all extrapolated subgroups.”</p>
-</blockquote>
-</section>
-<section id="auditing-sensitivity-via-e-value" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="auditing-sensitivity-via-e-value"><span class="header-section-number">5.2</span> Auditing Sensitivity via E-Value</h3>
-<blockquote class="blockquote">
-<p>“The E-value of 2.87 demonstrates that our causal treatment effect is robust against unmeasured confounding. To invalidate this survival difference, an unmeasured baseline covariate would need to increase both the likelihood of treatment and the likelihood of survival by at least 2.87-fold.</p>
-<p>In our adjusted models, the strongest measured clinical confounders (such as poor ECOG performance status) only display hazard associations of approximately 1.8-fold. It is highly implausible that a missing, unmeasured confounder of greater magnitude exists that is completely uncorrelated with the clinical indicators adjusted for in this analysis.”</p>
-</blockquote>
 
 
-</section>
 </section>
 
 

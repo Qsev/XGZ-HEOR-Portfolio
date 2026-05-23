@@ -451,20 +451,3 @@ reconciliation_tbl[is.na(reconciliation_tbl)] <- "N/A"
 knitr::kable(reconciliation_tbl, caption = "Causal Evidence Reconciliation Across Estimators", align = "lrrrrr")
 ```
 
----
-
-## EAG Defense Strategy
-
-When defending causal estimates derived via TMLE and E-value sensitivity analysis during EAG reviews, modellers should leverage the following arguments:
-
-### Justifying TMLE Over Parametric Regression
-
-> "Rather than relying on arbitrary functional forms that assume linear log-odds relations for confounding covariates, we implemented TMLE coupled with the SuperLearner ensemble. This allows the data to non-parametrically determine the correct functional relations, minimizing model misspecification bias. 
-> 
-> Furthermore, TMLE is a substitution estimator, meaning that unlike influence function-based estimators (like AIPW) which can yield survival predictions outside the valid $[0, 1]$ interval, TMLE is mathematically restricted to remain within the physical bounds of probability space. This ensures clinical plausibility in all extrapolated subgroups."
-
-### Auditing Sensitivity via E-Value
-
-> "The E-value of `r round(ev_df["E-values", "point"], 2)` demonstrates that our causal treatment effect is robust against unmeasured confounding. To invalidate this survival difference, an unmeasured baseline covariate would need to increase both the likelihood of treatment and the likelihood of survival by at least `r round(ev_df["E-values", "point"], 2)`-fold. 
-> 
-> In our adjusted models, the strongest measured clinical confounders (such as poor ECOG performance status) only display hazard associations of approximately 1.8-fold. It is highly implausible that a missing, unmeasured confounder of greater magnitude exists that is completely uncorrelated with the clinical indicators adjusted for in this analysis."
