@@ -226,7 +226,7 @@ knitr::kable(h_tbl, digits = 4, caption = "Clever Covariates (First 5 Patients)"
 
 ### Step 4: The Fluctuation (Update) Step
 
-We update the initial outcome prediction $Q_0$ by fitting a logistic regression of the observed outcome $Y$ on the Clever Covariates $H_0(W)$ and $H_1(W)$ without an intercept, using the logit of the initial prediction $Q_0(D, W)$ as a fixed offset:
+We update the initial outcome prediction $Q_0$ by fitting a logistic regression of the observed outcome $Y$ on the Clever Covariates $H_0(W)$ and $H_1(W)$ without an intercept^[In R's `glm()`, starting the formula with `-1` (e.g., `survival_1yr ~ -1 + H0W + H1W`) removes the default intercept term. This is critical because the initial prediction `logit(Q0)` (the offset) already contains the baseline intercept. Adding a new intercept would distort the targeted bias correction and violate the TMLE framework.], using the logit of the initial prediction $Q_0(D, W)$ as a fixed offset^[An offset-only GLM refers to a model where a covariate is entered with a coefficient forced to 1 (using `offset = qlogis(Q0_A)` on the logit scale). Here, it locks the initial prediction `Q0_A` in place, allowing the regression to estimate only the residual fluctuation parameters (epsilon) that minimize bias.]:
 $$\text{logit}\left(Q_1(D, W)\right) = \text{logit}\left(Q_0(D, W)\right) + \epsilon_0 \cdot H_0(W) + \epsilon_1 \cdot H_1(W)$$
 
 Fitting this regression via Maximum Likelihood estimates the fluctuation parameters $\epsilon_0$ and $\epsilon_1$, which represent the residual bias correction. We then update the counterfactual predictions and bound them.
