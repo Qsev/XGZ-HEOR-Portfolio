@@ -408,8 +408,18 @@ window.Quarto = {
 <li><strong>Variance Inflation</strong>: Weighting introduces unequal weights (<span class="math inline">\(W_i \neq 1\)</span>), which violates the homoscedasticity assumption of standard OLS. Failing to adjust for this leads to severely underestimated standard errors and inflated Type I error rates.</li>
 <li><strong>Estimation Uncertainty of Propensity Scores</strong>: The propensity scores <span class="math inline">\(e(X)\)</span> are not true population parameters; they are <em>estimated</em> from the data. This estimation process introduces auxiliary uncertainty that must propagate into the final treatment effect variance.</li>
 </ol>
-<section id="m-estimation-the-sandwich-variance-estimator" class="level4" data-number="3.3.1">
-<h4 data-number="3.3.1" class="anchored" data-anchor-id="m-estimation-the-sandwich-variance-estimator"><span class="header-section-number">3.3.1</span> M-Estimation &amp; The Sandwich Variance Estimator</h4>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Technical Math: M-Estimation &amp; The Sandwich Variance Estimator
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <p>To obtain asymptotically correct standard errors, modern causal inference relies on the <strong>M-Estimation (Empirical Sandwich Covariance)</strong> framework. We stack the estimating equations for the treatment assignment model (propensity score) and the outcome regression model together as a joint system:</p>
 <p><span class="math display">\[\sum_{i=1}^n \Psi_i(\theta) = 0\]</span></p>
 <p>where <span class="math inline">\(\theta = [\beta, \alpha]^T\)</span> is the combined parameter vector containing the propensity model coefficients <span class="math inline">\(\beta\)</span> (logistic regression) and the outcome model coefficients <span class="math inline">\(\alpha\)</span> (WLS regression).</p>
@@ -426,7 +436,9 @@ W_i(\beta) \cdot Z_i \left( Y_i - Z_i \alpha \right)
 </ul>
 <p>Once the robust variance of the treatment effect coefficient <span class="math inline">\(\hat{\alpha}_1\)</span> (the ATE estimate) is extracted from the diagonal of <span class="math inline">\(V(\hat{\theta})\)</span> as <span class="math inline">\(SE_{\text{robust}}\)</span>, the 95% Confidence Interval is constructed using the standard Wald formulation: <span class="math display">\[CI_{95\%} = \hat{\alpha}_1 \pm 1.96 \cdot SE_{\text{robust}}\]</span></p>
 <p>This is the exact methodology executed by <code>lm_weightit</code> under the hood, ensuring that the confidence intervals presented in the portfolio are methodologically rigorous and defensible.</p>
-</section>
+</div>
+</div>
+</div>
 </section>
 <section id="effective-sample-size-ess" class="level3" data-number="3.4">
 <h3 data-number="3.4" class="anchored" data-anchor-id="effective-sample-size-ess"><span class="header-section-number">3.4</span> Effective Sample Size (ESS)</h3>
@@ -478,7 +490,7 @@ W_i(\beta) \cdot Z_i \left( Y_i - Z_i \alpha \right)
 <h3 data-number="4.3" class="anchored" data-anchor-id="step-by-step-proof-of-double-robustness"><span class="header-section-number">4.3</span> Step-by-Step Proof of Double Robustness</h3>
 <p>AIPW is doubly robust because it yields an unbiased estimate if <strong>either</strong> the propensity score model <span class="math inline">\(g(X)\)</span> <strong>or</strong> the outcome regression model <span class="math inline">\(m_1(X)\)</span> is correctly specified.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -487,7 +499,7 @@ W_i(\beta) \cdot Z_i \left( Y_i - Z_i \alpha \right)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>We prove this using the <strong>Law of Iterated Expectations (LIE)</strong>: <span class="math display">\[E[Z] = E_X \big[ E[Z \mid X] \big]\]</span></p>
 <section id="assumptions-required" class="level4" data-number="4.3.1">

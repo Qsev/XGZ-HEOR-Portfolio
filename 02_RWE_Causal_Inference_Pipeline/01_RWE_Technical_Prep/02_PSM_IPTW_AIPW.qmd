@@ -86,7 +86,8 @@ A common misconception in observational studies is that the standard error of th
 2. **Variance Inflation**: Weighting introduces unequal weights ($W_i \neq 1$), which violates the homoscedasticity assumption of standard OLS. Failing to adjust for this leads to severely underestimated standard errors and inflated Type I error rates.
 3. **Estimation Uncertainty of Propensity Scores**: The propensity scores $e(X)$ are not true population parameters; they are *estimated* from the data. This estimation process introduces auxiliary uncertainty that must propagate into the final treatment effect variance.
 
-#### M-Estimation & The Sandwich Variance Estimator
+::: {.callout-note collapse="true"}
+## Technical Math: M-Estimation & The Sandwich Variance Estimator
 
 To obtain asymptotically correct standard errors, modern causal inference relies on the **M-Estimation (Empirical Sandwich Covariance)** framework. We stack the estimating equations for the treatment assignment model (propensity score) and the outcome regression model together as a joint system:
 
@@ -117,6 +118,8 @@ Once the robust variance of the treatment effect coefficient $\hat{\alpha}_1$ (t
 $$CI_{95\%} = \hat{\alpha}_1 \pm 1.96 \cdot SE_{\text{robust}}$$
 
 This is the exact methodology executed by `lm_weightit` under the hood, ensuring that the confidence intervals presented in the portfolio are methodologically rigorous and defensible.
+:::
+
 
 ### Effective Sample Size (ESS)
 
