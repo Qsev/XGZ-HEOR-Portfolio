@@ -41,6 +41,14 @@ Target Trial Emulation is a structured design framework developed by Miguel Hern
 
 According to the official NICE RWE Framework (Section 5.2), a target trial must be defined across 7 core dimensions to prevent bias and ensure transparency:
 
+::: {.column-margin}
+**Official Source:**
+NICE Real-World Evidence Framework (2022), Section 5.2 ("The target trial approach").
+
+**Methodological Reference:**
+Hernán MA, Robins JM (2016). *Using Big Data to Emulate a Target Trial When a Randomized Trial Is Not Available*. Am J Epidemiol.
+:::
+
 | Dimension | NICE RWE Framework Requirement | Application to Survival Cohorts |
 | :--- | :--- | :--- |
 | **1. Eligibility criteria** | Define clear inclusion/exclusion criteria at baseline. | Patients must meet all criteria at Time Zero ($T_0$), ensuring no baseline selection bias. |
