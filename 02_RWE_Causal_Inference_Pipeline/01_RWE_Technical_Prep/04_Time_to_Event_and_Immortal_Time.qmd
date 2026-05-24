@@ -26,6 +26,7 @@ If time-to-event analysis is not bounded by strict causal constraints, observati
 ### The Coffee & Heart Disease Paradox (Reverse Causality)
 
 To understand why simple observational survival analysis fails, consider the "Coffee & Heart Disease Paradox":
+
 - **The Observation**: A cross-sectional analysis or simple regression shows that people who drink coffee have significantly lower rates of heart disease (e.g., Hazard Ratio < 1.0).
 - **The Reality**: This is driven by reverse causality. Patients who *already* have heart problems or are at high risk are often advised by their doctors to quit coffee.
 - **The Trap**: If we run a regression on cross-sectional data, we see "Coffee = Health." 
@@ -81,6 +82,7 @@ In a simple Cox regression, you often see:
 $$\text{Surv}(\text{time}, \text{event}) \sim \text{Treatment} + \text{Confounders}$$
 
 An auditor cannot see:
+
 - When was the treatment started?
 - Were the confounders measured *before* or *after* the drug was given?
 - Is there a "Healthy User Bias"?
@@ -117,6 +119,7 @@ To avoid Immortal Time Bias, we align $T_0$ as the moment a patient meets all el
 
 1. **Logic Paradox**: In RWD studies, patients from diagnosis to actual treatment initiation (Drug X) face delays (e.g., 1 month). If follow-up begins at diagnosis, but grouping is based on whether they ever received treatment, the period before receiving the drug is **immortal**—if the patient died on Day 15, they would never have lived long enough to receive the drug, and would automatically be classified into the control group.
 2. **Case Simulation**:
+
    - **Patient A**: Diagnosed Jan 1, scheduled for Drug X, dies Jan 15 (unexposed). Classified as Control.
    - **Patient B**: Diagnosed Jan 1, initiates Drug X Feb 1, survives until June.
    - **Result**: The Drug Y/X group artificially filters out those who die before drug administration, inflating the active group's survival.
@@ -125,6 +128,7 @@ To avoid Immortal Time Bias, we align $T_0$ as the moment a patient meets all el
 #### The Control Arm $T_0$
 
 Where does the control arm's $T_0$ start if they never receive the active treatment?
+
 - **Synchronicity Principle**: $T_0$ is the moment the patient meets all clinical eligibility criteria (e.g., METex14 diagnosis + ECOG status).
 - **Timeline Alignment**:
   - *Incorrect*: Treated group starts at "first drug administration", while controls start at "diagnosis". This gives the treated group an implicit survival benefit.
@@ -133,12 +137,14 @@ Where does the control arm's $T_0$ start if they never receive the active treatm
 #### Handling the Grace Period
 
 In RWD, a patient has a "window" of time (grace period) to initiate treatment (e.g., 30 days after diagnosis). 
+
 - If a patient initiates treatment on Day 20, they contribute 20 days of "unexposed" person-time to the control group.
 - Using cloning, we create two clones at diagnosis. The "Control Clone" is followed until Day 20, where it is censored because the patient initiated treatment. The "Treated Clone" starts contributing treated time from Day 20 onwards.
 
 ### Step 2: Cloning & Censoring Mechanics
 
 To maintain ITT principles:
+
 - **Anti-Future-Knowledge**: We cannot look ahead to see what the patient did. We clone them at $T_0$ into both paths.
 - **Artificial Censoring**: If the patient's actual path deviates from a clone's assigned arm, that clone is censored.
 - **IPCW Weighting**: Because censoring might be non-random, we estimate the probability of being censored at time $t$ based on baseline covariates and apply Inverse Probability of Censoring Weights to the remaining patients, dynamically restoring the balance.
@@ -150,6 +156,7 @@ To maintain ITT principles:
 ### The Meditation & Longevity Paradox
 
 Consider a study evaluating whether a 12-week intensive meditation course increases overall survival (OS):
+
 - **Cohort**: 1,000 participants followed for 5 years.
 - **Exposure Group ($Z=1$)**: Completed the full 12-week program.
 - **Control Group ($Z=0$)**: Did not complete the program (includes those who died or dropped out before week 12).
@@ -175,6 +182,7 @@ Landmark Analysis is a classical approach to resolve this:
 4. **Follow-up**: Set $T_L$ as the new baseline ($T_{start} = T_L$) and follow patients from that point.
 
 #### HTA Audit of Landmark Analysis
+
 - **Pros**: Simple, highly intuitive, and removes the immortal period.
 - **Cons**: 
   - **Information Loss**: Discards all events and person-time before $T_L$. If the drug has high early toxicity, this signal is completely lost.
@@ -228,6 +236,25 @@ library(EValue)
 set.seed(42)
 n <- 500
 
+# Helper function to render Cox model summaries as kable tables
+show_cox <- function(fit, caption) {
+  sum_fit <- summary(fit)
+  coefs <- sum_fit$coefficients
+  cis <- sum_fit$conf.int
+  tbl <- data.frame(
+    Covariate = rownames(coefs),
+    `Hazard Ratio` = round(coefs[, 2], 4),
+    `Log HR (coef)` = round(coefs[, 1], 4),
+    `Std Error` = round(coefs[, 3], 4),
+    `z-value` = round(coefs[, 4], 3),
+    `p-value` = format.pval(coefs[, 5], digits = 4),
+    `95% LCL` = round(cis[, 3], 4),
+    `95% UCL` = round(cis[, 4], 4),
+    check.names = FALSE
+  )
+  knitr::kable(tbl, caption = caption, align = "lrrrrrrr")
+}
+
 # 1. Simulate Baseline Confounders
 age <- rnorm(n, mean = 60, sd = 10)
 ecog <- rbinom(n, 1, 0.4)
@@ -272,10 +299,10 @@ df$ever_treated <- ifelse(df$t_init < df$time, 1, 0)
 
 # --- Biased Analysis: Static Cox Model ---
 fit_biased <- coxph(Surv(time, event) ~ ever_treated + age + ecog, data = df)
-summary(fit_biased)
+show_cox(fit_biased, "Biased Static Cox Proportional Hazards Model Results (Immortal Time Unadjusted)")
 ```
 
-The biased static Cox model yields a Hazard Ratio of **`r round(exp(coef(fit_biased)["ever_treated"]), 3)`**. This indicates an artificial survival benefit (overestimating drug efficacy) due to the unadjusted immortal time.
+The biased static Cox model overestimates drug efficacy due to the unadjusted immortal time.
 
 ### Method 1: Landmark Analysis (Day 90)
 
@@ -294,7 +321,7 @@ df_landmark$treated_at_landmark <- ifelse(df_landmark$t_init <= t_landmark, 1, 0
 df_landmark$time_shifted <- df_landmark$time - t_landmark
 
 fit_landmark <- coxph(Surv(time_shifted, event) ~ treated_at_landmark + age + ecog, data = df_landmark)
-summary(fit_landmark)
+show_cox(fit_landmark, "Landmark Analysis (Day 90) Cox Proportional Hazards Model Results")
 ```
 
 ### Method 2: Time-Varying Cox Model
@@ -308,12 +335,28 @@ df_tv <- tmerge(df, df, id = id, event = event(time, event))
 # 2. Merge the time-dependent treatment initiation event
 df_tv <- tmerge(df_tv, df, id = id, treatment_status = tdc(t_init))
 
-# Fit the time-varying Cox model
-fit_tv <- coxph(Surv(tstart, tstop, event) ~ treatment_status + age + ecog, data = df_tv)
-summary(fit_tv)
+# Display the split intervals for Patient ID 1 to 3 in table format
+knitr::kable(
+  head(df_tv[df_tv$id %in% 1:3, c("id", "tstart", "tstop", "event", "treatment_status")]),
+  caption = "Restructured Counting Process Intervals (Patient ID 1-3)",
+  align = "c"
+)
 ```
 
-The time-varying Cox model estimates a Hazard Ratio of **`r round(exp(coef(fit_tv)["treatment_status"]), 3)`**, successfully recovering the true treatment effect ($HR = 0.70$) without discarding data.
+As shown, if a patient receives treatment at a delayed time, their follow-up is split:
+
+- **Interval 1 `[0, t_init]`**: `treatment_status = 0` (contributes person-time to the control risk set).
+- **Interval 2 `[t_init, time]`**: `treatment_status = 1` (contributes person-time to the treated risk set after the first infusion).
+
+We fit the Cox model on the split intervals:
+
+```{r}
+# Fit the time-varying Cox model
+fit_tv <- coxph(Surv(tstart, tstop, event) ~ treatment_status + age + ecog, data = df_tv)
+show_cox(fit_tv, "Time-Varying Cox Proportional Hazards Model Results (Immortal Time Corrected)")
+```
+
+The time-varying Cox model successfully recovers the true treatment effect ($HR = 0.70$) without discarding data.
 
 ---
 
@@ -367,10 +410,12 @@ to fully explain away the observed treatment-outcome association.
 The formula depends on the cumulative incidence of the outcome:
 
 1. **Rare Outcome Assumption** (cumulative incidence < 15%):
+
    The Hazard Ratio approximates the Relative Risk ($RR \approx HR$). For protective effects ($HR < 1.0$), we first invert the HR ($HR^* = 1 / HR$) to get a value $> 1.0$:
    $$\text{E-value} = HR^* + \sqrt{HR^* \cdot (HR^* - 1)}$$
 
 2. **Common Outcome Correction** (cumulative incidence > 15%):
+
    The rare outcome assumption is violated, and we must apply the square root approximation:
    $$RR \approx \sqrt{HR}$$
    The corresponding E-value is calculated as:
@@ -413,6 +458,7 @@ where the Bias Factor is defined as:
 $$\text{Bias} = \frac{RR_{ZU} \times RR_{UY}}{RR_{ZU} + RR_{UY} - 1}$$
 
 Here:
+
 - $RR_{ZU}$ is the risk ratio associating the treatment $Z$ with the unmeasured confounder $U$.
 - $RR_{UY}$ is the risk ratio associating the unmeasured confounder $U$ with the outcome $Y$.
 
@@ -439,14 +485,17 @@ This is the exact mathematical derivation of the E-value formula. It represents 
 When auditing a manufacturer's RWE survival submission (or preparing for an HTA interview), follow these three key checks:
 
 1. **Zero-time Alignment Check**:
+
    - *Question*: Identify the exact calendar date of $T_0$ for both cohorts. Is $T_0$ defined by the clinical event (diagnosis) or the administrative event (first prescription)?
    - *Audit Rule*: Follow-up must start for both cohorts when they meet the eligibility criteria. If the treated group follow-up starts at drug initiation and controls start at diagnosis, the analysis is invalid.
 
 2. **Immortal Time Bias Screen**:
+
    - *Question*: Check the initial segment of the Kaplan-Meier curve. Does the treated arm show a "zero-risk" flat line at the start of follow-up?
    - *Audit Rule*: A flat line on the treatment curve indicates that patients who died early were excluded from the treated group, indicating Immortal Time Bias.
 
 3. **Statistical Correction Audit**:
+
    - *Question*: If a treatment initiation lag exists, was it addressed using a time-varying covariate or a Landmark approach?
    - *Audit Rule*: Standard Cox models using a static baseline treatment indicator are statistically invalid in the presence of treatment initiation delays.
 

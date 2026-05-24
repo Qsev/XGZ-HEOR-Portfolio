@@ -377,7 +377,12 @@ window.Quarto = {
 <p>If time-to-event analysis is not bounded by strict causal constraints, observational analyses can yield severe selection biases. A primary methodological challenge in retrospective registries is <strong>Immortal Time Bias (ITB)</strong>.</p>
 <section id="the-coffee-heart-disease-paradox-reverse-causality" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="the-coffee-heart-disease-paradox-reverse-causality"><span class="header-section-number">1.1</span> The Coffee &amp; Heart Disease Paradox (Reverse Causality)</h3>
-<p>To understand why simple observational survival analysis fails, consider the “Coffee &amp; Heart Disease Paradox”: - <strong>The Observation</strong>: A cross-sectional analysis or simple regression shows that people who drink coffee have significantly lower rates of heart disease (e.g., Hazard Ratio &lt; 1.0). - <strong>The Reality</strong>: This is driven by reverse causality. Patients who <em>already</em> have heart problems or are at high risk are often advised by their doctors to quit coffee. - <strong>The Trap</strong>: If we run a regression on cross-sectional data, we see “Coffee = Health.”</p>
+<p>To understand why simple observational survival analysis fails, consider the “Coffee &amp; Heart Disease Paradox”:</p>
+<ul>
+<li><strong>The Observation</strong>: A cross-sectional analysis or simple regression shows that people who drink coffee have significantly lower rates of heart disease (e.g., Hazard Ratio &lt; 1.0).</li>
+<li><strong>The Reality</strong>: This is driven by reverse causality. Patients who <em>already</em> have heart problems or are at high risk are often advised by their doctors to quit coffee.</li>
+<li><strong>The Trap</strong>: If we run a regression on cross-sectional data, we see “Coffee = Health.”</li>
+</ul>
 <p>To resolve this paradox, we cannot rely on simple regression adjustments; we must emulate a randomized trial to establish a clear chronological sequence of events.</p>
 <hr>
 </section>
@@ -465,7 +470,12 @@ window.Quarto = {
 <h3 data-number="2.4" class="anchored" data-anchor-id="auditors-view-why-tte-simple-regression"><span class="header-section-number">2.4</span> Auditor’s View: Why TTE &gt; Simple Regression</h3>
 <p>NICE prefers TTE because it enforces <strong>Transparency</strong>.</p>
 <p>In a simple Cox regression, you often see: <span class="math display">\[\text{Surv}(\text{time}, \text{event}) \sim \text{Treatment} + \text{Confounders}\]</span></p>
-<p>An auditor cannot see: - When was the treatment started? - Were the confounders measured <em>before</em> or <em>after</em> the drug was given? - Is there a “Healthy User Bias”?</p>
+<p>An auditor cannot see:</p>
+<ul>
+<li>When was the treatment started?</li>
+<li>Were the confounders measured <em>before</em> or <em>after</em> the drug was given?</li>
+<li>Is there a “Healthy User Bias”?</li>
+</ul>
 <p>By using the <strong>DataSAT</strong> tool (Data Suitability Assessment Tool), NICE auditors look for <strong>Provenance</strong>—the clear lineage of how a patient moved from a raw database record to a study row. TTE forces the researcher to write a “Trial Protocol” <em>before</em> touching the data, making it obvious where <span class="math inline">\(T_0\)</span> is. If an auditor sees that you measured covariates after the drug was given and used them as baseline, the TTE framework will flag this as a “Post-baseline Bias” immediately.</p>
 <hr>
 </section>
@@ -522,28 +532,45 @@ window.Quarto = {
 <section id="why-immortal-time-bias-is-a-statistical-killer" class="level4" data-number="3.3.1">
 <h4 data-number="3.3.1" class="anchored" data-anchor-id="why-immortal-time-bias-is-a-statistical-killer"><span class="header-section-number">3.3.1</span> Why Immortal Time Bias is a “Statistical Killer”</h4>
 <ol type="1">
-<li><strong>Logic Paradox</strong>: In RWD studies, patients from diagnosis to actual treatment initiation (Drug X) face delays (e.g., 1 month). If follow-up begins at diagnosis, but grouping is based on whether they ever received treatment, the period before receiving the drug is <strong>immortal</strong>—if the patient died on Day 15, they would never have lived long enough to receive the drug, and would automatically be classified into the control group.</li>
-<li><strong>Case Simulation</strong>:
+<li><p><strong>Logic Paradox</strong>: In RWD studies, patients from diagnosis to actual treatment initiation (Drug X) face delays (e.g., 1 month). If follow-up begins at diagnosis, but grouping is based on whether they ever received treatment, the period before receiving the drug is <strong>immortal</strong>—if the patient died on Day 15, they would never have lived long enough to receive the drug, and would automatically be classified into the control group.</p></li>
+<li><p><strong>Case Simulation</strong>:</p>
 <ul>
 <li><strong>Patient A</strong>: Diagnosed Jan 1, scheduled for Drug X, dies Jan 15 (unexposed). Classified as Control.</li>
 <li><strong>Patient B</strong>: Diagnosed Jan 1, initiates Drug X Feb 1, survives until June.</li>
 <li><strong>Result</strong>: The Drug Y/X group artificially filters out those who die before drug administration, inflating the active group’s survival.</li>
 </ul></li>
-<li><strong>TTE Surgery</strong>: The clock must start ticking exactly at treatment initiation, or grace periods must be modeled using cloning.</li>
+<li><p><strong>TTE Surgery</strong>: The clock must start ticking exactly at treatment initiation, or grace periods must be modeled using cloning.</p></li>
 </ol>
 </section>
 <section id="the-control-arm-t_0" class="level4" data-number="3.3.2">
 <h4 data-number="3.3.2" class="anchored" data-anchor-id="the-control-arm-t_0"><span class="header-section-number">3.3.2</span> The Control Arm <span class="math inline">\(T_0\)</span></h4>
-<p>Where does the control arm’s <span class="math inline">\(T_0\)</span> start if they never receive the active treatment? - <strong>Synchronicity Principle</strong>: <span class="math inline">\(T_0\)</span> is the moment the patient meets all clinical eligibility criteria (e.g., METex14 diagnosis + ECOG status). - <strong>Timeline Alignment</strong>: - <em>Incorrect</em>: Treated group starts at “first drug administration”, while controls start at “diagnosis”. This gives the treated group an implicit survival benefit. - <em>Correct TTE Approach</em>: Both groups start follow-up at the exact date they meet all eligibility criteria (the clinical decision point, or clinical equipoise).</p>
+<p>Where does the control arm’s <span class="math inline">\(T_0\)</span> start if they never receive the active treatment?</p>
+<ul>
+<li><strong>Synchronicity Principle</strong>: <span class="math inline">\(T_0\)</span> is the moment the patient meets all clinical eligibility criteria (e.g., METex14 diagnosis + ECOG status).</li>
+<li><strong>Timeline Alignment</strong>:
+<ul>
+<li><em>Incorrect</em>: Treated group starts at “first drug administration”, while controls start at “diagnosis”. This gives the treated group an implicit survival benefit.</li>
+<li><em>Correct TTE Approach</em>: Both groups start follow-up at the exact date they meet all eligibility criteria (the clinical decision point, or clinical equipoise).</li>
+</ul></li>
+</ul>
 </section>
 <section id="handling-the-grace-period" class="level4" data-number="3.3.3">
 <h4 data-number="3.3.3" class="anchored" data-anchor-id="handling-the-grace-period"><span class="header-section-number">3.3.3</span> Handling the Grace Period</h4>
-<p>In RWD, a patient has a “window” of time (grace period) to initiate treatment (e.g., 30 days after diagnosis). - If a patient initiates treatment on Day 20, they contribute 20 days of “unexposed” person-time to the control group. - Using cloning, we create two clones at diagnosis. The “Control Clone” is followed until Day 20, where it is censored because the patient initiated treatment. The “Treated Clone” starts contributing treated time from Day 20 onwards.</p>
+<p>In RWD, a patient has a “window” of time (grace period) to initiate treatment (e.g., 30 days after diagnosis).</p>
+<ul>
+<li>If a patient initiates treatment on Day 20, they contribute 20 days of “unexposed” person-time to the control group.</li>
+<li>Using cloning, we create two clones at diagnosis. The “Control Clone” is followed until Day 20, where it is censored because the patient initiated treatment. The “Treated Clone” starts contributing treated time from Day 20 onwards.</li>
+</ul>
 </section>
 </section>
 <section id="step-2-cloning-censoring-mechanics" class="level3" data-number="3.4">
 <h3 data-number="3.4" class="anchored" data-anchor-id="step-2-cloning-censoring-mechanics"><span class="header-section-number">3.4</span> Step 2: Cloning &amp; Censoring Mechanics</h3>
-<p>To maintain ITT principles: - <strong>Anti-Future-Knowledge</strong>: We cannot look ahead to see what the patient did. We clone them at <span class="math inline">\(T_0\)</span> into both paths. - <strong>Artificial Censoring</strong>: If the patient’s actual path deviates from a clone’s assigned arm, that clone is censored. - <strong>IPCW Weighting</strong>: Because censoring might be non-random, we estimate the probability of being censored at time <span class="math inline">\(t\)</span> based on baseline covariates and apply Inverse Probability of Censoring Weights to the remaining patients, dynamically restoring the balance.</p>
+<p>To maintain ITT principles:</p>
+<ul>
+<li><strong>Anti-Future-Knowledge</strong>: We cannot look ahead to see what the patient did. We clone them at <span class="math inline">\(T_0\)</span> into both paths.</li>
+<li><strong>Artificial Censoring</strong>: If the patient’s actual path deviates from a clone’s assigned arm, that clone is censored.</li>
+<li><strong>IPCW Weighting</strong>: Because censoring might be non-random, we estimate the probability of being censored at time <span class="math inline">\(t\)</span> based on baseline covariates and apply Inverse Probability of Censoring Weights to the remaining patients, dynamically restoring the balance.</li>
+</ul>
 <hr>
 </section>
 </section>
@@ -551,7 +578,14 @@ window.Quarto = {
 <h2 data-number="4" class="anchored" data-anchor-id="immortal-time-bias-itb-theory-landmark-analysis"><span class="header-section-number">4</span> Immortal Time Bias (ITB): Theory &amp; Landmark Analysis</h2>
 <section id="the-meditation-longevity-paradox" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="the-meditation-longevity-paradox"><span class="header-section-number">4.1</span> The Meditation &amp; Longevity Paradox</h3>
-<p>Consider a study evaluating whether a 12-week intensive meditation course increases overall survival (OS): - <strong>Cohort</strong>: 1,000 participants followed for 5 years. - <strong>Exposure Group (<span class="math inline">\(Z=1\)</span>)</strong>: Completed the full 12-week program. - <strong>Control Group (<span class="math inline">\(Z=0\)</span>)</strong>: Did not complete the program (includes those who died or dropped out before week 12). - <strong>The Result</strong>: Meditators show a Hazard Ratio (<span class="math inline">\(HR\)</span>) of 0.30 (70% risk reduction). - <strong>The Error</strong>: Since a patient had to survive 12 weeks to complete the program, the meditation group is guaranteed 0% mortality during the first 12 weeks. Sicker patients who died in weeks 1–11 were automatically allocated to the control group.</p>
+<p>Consider a study evaluating whether a 12-week intensive meditation course increases overall survival (OS):</p>
+<ul>
+<li><strong>Cohort</strong>: 1,000 participants followed for 5 years.</li>
+<li><strong>Exposure Group (<span class="math inline">\(Z=1\)</span>)</strong>: Completed the full 12-week program.</li>
+<li><strong>Control Group (<span class="math inline">\(Z=0\)</span>)</strong>: Did not complete the program (includes those who died or dropped out before week 12).</li>
+<li><strong>The Result</strong>: Meditators show a Hazard Ratio (<span class="math inline">\(HR\)</span>) of 0.30 (70% risk reduction).</li>
+<li><strong>The Error</strong>: Since a patient had to survive 12 weeks to complete the program, the meditation group is guaranteed 0% mortality during the first 12 weeks. Sicker patients who died in weeks 1–11 were automatically allocated to the control group.</li>
+</ul>
 </section>
 <section id="violating-the-non-anticipatory-constraint" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="violating-the-non-anticipatory-constraint"><span class="header-section-number">4.2</span> Violating the “Non-anticipatory Constraint”</h3>
@@ -682,78 +716,137 @@ window.Quarto = {
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Simulate Baseline Confounders</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">60</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>ecog <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.4</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Simulate Treatment Selection (Confounding by Indication)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Sicker (ECOG=1) and older patients are more likely to receive treatment</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ps_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="fl">1.5</span> <span class="sc">+</span> <span class="fl">0.02</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> ecog)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>z_treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_prob)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># For those treated, add a random initiation delay between 30 and 120 days</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>t_init <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(z_treatment <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">runif</span>(n, <span class="dv">30</span>, <span class="dv">120</span>), <span class="cn">Inf</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Simulate Survival Times (True treatment HR = 0.70)</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>true_hr <span class="ot">&lt;-</span> <span class="fl">0.70</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>lambda_base <span class="ot">&lt;-</span> <span class="fl">0.001</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="fl">0.02</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> ecog)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">runif</span>(n)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>log_u <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(u)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper function to render Cox model summaries as kable tables</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>show_cox <span class="ot">&lt;-</span> <span class="cf">function</span>(fit, caption) {</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  sum_fit <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  coefs <span class="ot">&lt;-</span> sum_fit<span class="sc">$</span>coefficients</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  cis <span class="ot">&lt;-</span> sum_fit<span class="sc">$</span>conf.int</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Covariate =</span> <span class="fu">rownames</span>(coefs),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Hazard Ratio</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, <span class="dv">2</span>], <span class="dv">4</span>),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Log HR (coef)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, <span class="dv">1</span>], <span class="dv">4</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Std Error</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, <span class="dv">3</span>], <span class="dv">4</span>),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">z-value</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, <span class="dv">4</span>], <span class="dv">3</span>),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format.pval</span>(coefs[, <span class="dv">5</span>], <span class="at">digits =</span> <span class="dv">4</span>),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">95% LCL</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(cis[, <span class="dv">3</span>], <span class="dv">4</span>),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">95% UCL</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(cis[, <span class="dv">4</span>], <span class="dv">4</span>),</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(tbl, <span class="at">caption =</span> caption, <span class="at">align =</span> <span class="st">"lrrrrrrr"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>t_event <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  l0 <span class="ot">&lt;-</span> lambda_base[i]</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  l1 <span class="ot">&lt;-</span> l0 <span class="sc">*</span> true_hr</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  t_tr <span class="ot">&lt;-</span> t_init[i]</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (log_u[i] <span class="sc">&lt;=</span> l0 <span class="sc">*</span> t_tr) {</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    t_event[i] <span class="ot">&lt;-</span> log_u[i] <span class="sc">/</span> l0</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    t_event[i] <span class="ot">&lt;-</span> t_tr <span class="sc">+</span> (log_u[i] <span class="sc">-</span> l0 <span class="sc">*</span> t_tr) <span class="sc">/</span> l1</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Censoring between 150 and 730 days</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>t_censor <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="dv">150</span>, <span class="dv">730</span>)</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">pmin</span>(t_event, t_censor)</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>event <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(t_event <span class="sc">&lt;=</span> t_censor)</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span>n, age, ecog, z_treatment, t_init, time, event)</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Determine treatment status based on actual follow-up (Biased approach)</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>ever_treated <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df<span class="sc">$</span>t_init <span class="sc">&lt;</span> df<span class="sc">$</span>time, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Biased Analysis: Static Cox Model ---</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>fit_biased <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ever_treated <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df)</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_biased)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Simulate Baseline Confounders</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">60</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>ecog <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.4</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Simulate Treatment Selection (Confounding by Indication)</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Sicker (ECOG=1) and older patients are more likely to receive treatment</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ps_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="fl">1.5</span> <span class="sc">+</span> <span class="fl">0.02</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> ecog)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>z_treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_prob)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># For those treated, add a random initiation delay between 30 and 120 days</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>t_init <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(z_treatment <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">runif</span>(n, <span class="dv">30</span>, <span class="dv">120</span>), <span class="cn">Inf</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Simulate Survival Times (True treatment HR = 0.70)</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>true_hr <span class="ot">&lt;-</span> <span class="fl">0.70</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>lambda_base <span class="ot">&lt;-</span> <span class="fl">0.001</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="fl">0.02</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> ecog)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">runif</span>(n)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>log_u <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(u)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>t_event <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  l0 <span class="ot">&lt;-</span> lambda_base[i]</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  l1 <span class="ot">&lt;-</span> l0 <span class="sc">*</span> true_hr</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  t_tr <span class="ot">&lt;-</span> t_init[i]</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (log_u[i] <span class="sc">&lt;=</span> l0 <span class="sc">*</span> t_tr) {</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    t_event[i] <span class="ot">&lt;-</span> log_u[i] <span class="sc">/</span> l0</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    t_event[i] <span class="ot">&lt;-</span> t_tr <span class="sc">+</span> (log_u[i] <span class="sc">-</span> l0 <span class="sc">*</span> t_tr) <span class="sc">/</span> l1</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Censoring between 150 and 730 days</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>t_censor <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="dv">150</span>, <span class="dv">730</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">pmin</span>(t_event, t_censor)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>event <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(t_event <span class="sc">&lt;=</span> t_censor)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span>n, age, ecog, z_treatment, t_init, time, event)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="co"># Determine treatment status based on actual follow-up (Biased approach)</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>ever_treated <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df<span class="sc">$</span>t_init <span class="sc">&lt;</span> df<span class="sc">$</span>time, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Biased Analysis: Static Cox Model ---</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>fit_biased <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ever_treated <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df)</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_biased, <span class="st">"Biased Static Cox Proportional Hazards Model Results (Immortal Time Unadjusted)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Call:
-coxph(formula = Surv(time, event) ~ ever_treated + age + ecog, 
-    data = df)
-
-  n= 500, number of events= 379 
-
-                  coef exp(coef)  se(coef)      z Pr(&gt;|z|)    
-ever_treated -0.900839  0.406229  0.113811 -7.915 2.47e-15 ***
-age           0.021632  1.021868  0.005615  3.853 0.000117 ***
-ecog          0.670985  1.956162  0.107121  6.264 3.76e-10 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-             exp(coef) exp(-coef) lower .95 upper .95
-ever_treated    0.4062     2.4617     0.325    0.5077
-age             1.0219     0.9786     1.011    1.0332
-ecog            1.9562     0.5112     1.586    2.4132
-
-Concordance= 0.672  (se = 0.013 )
-Likelihood ratio test= 107.8  on 3 df,   p=&lt;2e-16
-Wald test            = 103.8  on 3 df,   p=&lt;2e-16
-Score (logrank) test = 107.6  on 3 df,   p=&lt;2e-16</code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Biased Static Cox Proportional Hazards Model Results (Immortal Time Unadjusted)</caption>
+<colgroup>
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 14%">
+<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Covariate</th>
+<th style="text-align: right;">Hazard Ratio</th>
+<th style="text-align: right;">Log HR (coef)</th>
+<th style="text-align: right;">Std Error</th>
+<th style="text-align: right;">z-value</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">95% LCL</th>
+<th style="text-align: right;">95% UCL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ever_treated</td>
+<td style="text-align: left;">ever_treated</td>
+<td style="text-align: right;">0.4062</td>
+<td style="text-align: right;">-0.9008</td>
+<td style="text-align: right;">0.1138</td>
+<td style="text-align: right;">-7.915</td>
+<td style="text-align: right;">2.468e-15</td>
+<td style="text-align: right;">0.3250</td>
+<td style="text-align: right;">0.5077</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">1.0219</td>
+<td style="text-align: right;">0.0216</td>
+<td style="text-align: right;">0.0056</td>
+<td style="text-align: right;">3.853</td>
+<td style="text-align: right;">0.0001168</td>
+<td style="text-align: right;">1.0107</td>
+<td style="text-align: right;">1.0332</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ecog</td>
+<td style="text-align: left;">ecog</td>
+<td style="text-align: right;">1.9562</td>
+<td style="text-align: right;">0.6710</td>
+<td style="text-align: right;">0.1071</td>
+<td style="text-align: right;">6.264</td>
+<td style="text-align: right;">3.757e-10</td>
+<td style="text-align: right;">1.5857</td>
+<td style="text-align: right;">2.4132</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-<p>The biased static Cox model yields a Hazard Ratio of <strong>0.406</strong>. This indicates an artificial survival benefit (overestimating drug efficacy) due to the unadjusted immortal time.</p>
+<p>The biased static Cox model overestimates drug efficacy due to the unadjusted immortal time.</p>
 </section>
 <section id="method-1-landmark-analysis-day-90" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="method-1-landmark-analysis-day-90"><span class="header-section-number">6.2</span> Method 1: Landmark Analysis (Day 90)</h3>
@@ -761,43 +854,83 @@ Score (logrank) test = 107.6  on 3 df,   p=&lt;2e-16</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>t_landmark <span class="ot">&lt;-</span> <span class="dv">90</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Exclude patients who died or were censored before Day 90</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>df_landmark <span class="ot">&lt;-</span> df[df<span class="sc">$</span>time <span class="sc">&gt;</span> t_landmark, ]</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Classify status at Landmark</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>df_landmark<span class="sc">$</span>treated_at_landmark <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df_landmark<span class="sc">$</span>t_init <span class="sc">&lt;=</span> t_landmark, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Shift time</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>df_landmark<span class="sc">$</span>time_shifted <span class="ot">&lt;-</span> df_landmark<span class="sc">$</span>time <span class="sc">-</span> t_landmark</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>fit_landmark <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time_shifted, event) <span class="sc">~</span> treated_at_landmark <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df_landmark)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_landmark)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>t_landmark <span class="ot">&lt;-</span> <span class="dv">90</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Exclude patients who died or were censored before Day 90</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df_landmark <span class="ot">&lt;-</span> df[df<span class="sc">$</span>time <span class="sc">&gt;</span> t_landmark, ]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Classify status at Landmark</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df_landmark<span class="sc">$</span>treated_at_landmark <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df_landmark<span class="sc">$</span>t_init <span class="sc">&lt;=</span> t_landmark, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Shift time</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>df_landmark<span class="sc">$</span>time_shifted <span class="ot">&lt;-</span> df_landmark<span class="sc">$</span>time <span class="sc">-</span> t_landmark</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>fit_landmark <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time_shifted, event) <span class="sc">~</span> treated_at_landmark <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df_landmark)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_landmark, <span class="st">"Landmark Analysis (Day 90) Cox Proportional Hazards Model Results"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Call:
-coxph(formula = Surv(time_shifted, event) ~ treated_at_landmark + 
-    age + ecog, data = df_landmark)
-
-  n= 348, number of events= 227 
-
-                        coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-treated_at_landmark -0.23836   0.78792  0.14824 -1.608  0.10786    
-age                  0.02096   1.02118  0.00738  2.840  0.00452 ** 
-ecog                 0.77527   2.17117  0.14154  5.477 4.32e-08 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-                    exp(coef) exp(-coef) lower .95 upper .95
-treated_at_landmark    0.7879     1.2692    0.5893     1.054
-age                    1.0212     0.9793    1.0065     1.036
-ecog                   2.1712     0.4606    1.6452     2.865
-
-Concordance= 0.614  (se = 0.021 )
-Likelihood ratio test= 36.51  on 3 df,   p=6e-08
-Wald test            = 37.97  on 3 df,   p=3e-08
-Score (logrank) test = 39.26  on 3 df,   p=2e-08</code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Landmark Analysis (Day 90) Cox Proportional Hazards Model Results</caption>
+<colgroup>
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 11%">
+<col style="width: 12%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Covariate</th>
+<th style="text-align: right;">Hazard Ratio</th>
+<th style="text-align: right;">Log HR (coef)</th>
+<th style="text-align: right;">Std Error</th>
+<th style="text-align: right;">z-value</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">95% LCL</th>
+<th style="text-align: right;">95% UCL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">treated_at_landmark</td>
+<td style="text-align: left;">treated_at_landmark</td>
+<td style="text-align: right;">0.7879</td>
+<td style="text-align: right;">-0.2384</td>
+<td style="text-align: right;">0.1482</td>
+<td style="text-align: right;">-1.608</td>
+<td style="text-align: right;">0.107855</td>
+<td style="text-align: right;">0.5893</td>
+<td style="text-align: right;">1.0536</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">1.0212</td>
+<td style="text-align: right;">0.0210</td>
+<td style="text-align: right;">0.0074</td>
+<td style="text-align: right;">2.840</td>
+<td style="text-align: right;">0.004517</td>
+<td style="text-align: right;">1.0065</td>
+<td style="text-align: right;">1.0361</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ecog</td>
+<td style="text-align: left;">ecog</td>
+<td style="text-align: right;">2.1712</td>
+<td style="text-align: right;">0.7753</td>
+<td style="text-align: right;">0.1415</td>
+<td style="text-align: right;">5.477</td>
+<td style="text-align: right;">4.32e-08</td>
+<td style="text-align: right;">1.6452</td>
+<td style="text-align: right;">2.8653</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </section>
@@ -807,42 +940,150 @@ Score (logrank) test = 39.26  on 3 df,   p=2e-08</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Initialize dataset with the primary event time</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df_tv <span class="ot">&lt;-</span> <span class="fu">tmerge</span>(df, df, <span class="at">id =</span> id, <span class="at">event =</span> <span class="fu">event</span>(time, event))</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Merge the time-dependent treatment initiation event</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>df_tv <span class="ot">&lt;-</span> <span class="fu">tmerge</span>(df_tv, df, <span class="at">id =</span> id, <span class="at">treatment_status =</span> <span class="fu">tdc</span>(t_init))</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the time-varying Cox model</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>fit_tv <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(tstart, tstop, event) <span class="sc">~</span> treatment_status <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df_tv)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_tv)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Initialize dataset with the primary event time</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_tv <span class="ot">&lt;-</span> <span class="fu">tmerge</span>(df, df, <span class="at">id =</span> id, <span class="at">event =</span> <span class="fu">event</span>(time, event))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Merge the time-dependent treatment initiation event</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>df_tv <span class="ot">&lt;-</span> <span class="fu">tmerge</span>(df_tv, df, <span class="at">id =</span> id, <span class="at">treatment_status =</span> <span class="fu">tdc</span>(t_init))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the split intervals for Patient ID 1 to 3 in table format</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(df_tv[df_tv<span class="sc">$</span>id <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"tstart"</span>, <span class="st">"tstop"</span>, <span class="st">"event"</span>, <span class="st">"treatment_status"</span>)]),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Restructured Counting Process Intervals (Patient ID 1-3)"</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"c"</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Call:
-coxph(formula = Surv(tstart, tstop, event) ~ treatment_status + 
-    age + ecog, data = df_tv)
-
-  n= 681, number of events= 379 
-
-                      coef exp(coef)  se(coef)      z Pr(&gt;|z|)    
-treatment_status -0.366758  0.692977  0.125676 -2.918 0.003520 ** 
-age               0.018657  1.018832  0.005569  3.350 0.000807 ***
-ecog              0.620390  1.859654  0.106976  5.799 6.66e-09 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-                 exp(coef) exp(-coef) lower .95 upper .95
-treatment_status     0.693     1.4430    0.5417    0.8865
-age                  1.019     0.9815    1.0078    1.0300
-ecog                 1.860     0.5377    1.5079    2.2935
-
-Concordance= 0.594  (se = 0.015 )
-Likelihood ratio test= 48.4  on 3 df,   p=2e-10
-Wald test            = 49.14  on 3 df,   p=1e-10
-Score (logrank) test = 50.12  on 3 df,   p=8e-11</code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Restructured Counting Process Intervals (Patient ID 1-3)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: center;">id</th>
+<th style="text-align: center;">tstart</th>
+<th style="text-align: center;">tstop</th>
+<th style="text-align: center;">event</th>
+<th style="text-align: center;">treatment_status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.00000</td>
+<td style="text-align: center;">119.09690</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">119.09690</td>
+<td style="text-align: center;">308.79962</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0.00000</td>
+<td style="text-align: center;">23.38370</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0.00000</td>
+<td style="text-align: center;">92.99129</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">92.99129</td>
+<td style="text-align: center;">215.66793</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-<p>The time-varying Cox model estimates a Hazard Ratio of <strong>0.693</strong>, successfully recovering the true treatment effect (<span class="math inline">\(HR = 0.70\)</span>) without discarding data.</p>
+<p>As shown, if a patient receives treatment at a delayed time, their follow-up is split:</p>
+<ul>
+<li><strong>Interval 1 <code>[0, t_init]</code></strong>: <code>treatment_status = 0</code> (contributes person-time to the control risk set).</li>
+<li><strong>Interval 2 <code>[t_init, time]</code></strong>: <code>treatment_status = 1</code> (contributes person-time to the treated risk set after the first infusion).</li>
+</ul>
+<p>We fit the Cox model on the split intervals:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the time-varying Cox model</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fit_tv <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(tstart, tstop, event) <span class="sc">~</span> treatment_status <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df_tv)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_tv, <span class="st">"Time-Varying Cox Proportional Hazards Model Results (Immortal Time Corrected)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Time-Varying Cox Proportional Hazards Model Results (Immortal Time Corrected)</caption>
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Covariate</th>
+<th style="text-align: right;">Hazard Ratio</th>
+<th style="text-align: right;">Log HR (coef)</th>
+<th style="text-align: right;">Std Error</th>
+<th style="text-align: right;">z-value</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">95% LCL</th>
+<th style="text-align: right;">95% UCL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">treatment_status</td>
+<td style="text-align: left;">treatment_status</td>
+<td style="text-align: right;">0.6930</td>
+<td style="text-align: right;">-0.3668</td>
+<td style="text-align: right;">0.1257</td>
+<td style="text-align: right;">-2.918</td>
+<td style="text-align: right;">0.0035197</td>
+<td style="text-align: right;">0.5417</td>
+<td style="text-align: right;">0.8865</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">1.0188</td>
+<td style="text-align: right;">0.0187</td>
+<td style="text-align: right;">0.0056</td>
+<td style="text-align: right;">3.350</td>
+<td style="text-align: right;">0.0008068</td>
+<td style="text-align: right;">1.0078</td>
+<td style="text-align: right;">1.0300</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ecog</td>
+<td style="text-align: left;">ecog</td>
+<td style="text-align: right;">1.8597</td>
+<td style="text-align: right;">0.6204</td>
+<td style="text-align: right;">0.1070</td>
+<td style="text-align: right;">5.799</td>
+<td style="text-align: right;">6.658e-09</td>
+<td style="text-align: right;">1.5079</td>
+<td style="text-align: right;">2.2935</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The time-varying Cox model successfully recovers the true treatment effect (<span class="math inline">\(HR = 0.70\)</span>) without discarding data.</p>
 <hr>
 </section>
 </section>
@@ -852,32 +1093,32 @@ Score (logrank) test = 50.12  on 3 df,   p=8e-11</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract statistics</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>hr_biased  <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_biased)[<span class="st">"ever_treated"</span>])</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>se_biased  <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_biased)<span class="sc">$</span>coefficients[<span class="st">"ever_treated"</span>, <span class="st">"se(coef)"</span>]</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>hr_land    <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>])</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>se_land    <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_landmark)<span class="sc">$</span>coefficients[<span class="st">"treated_at_landmark"</span>, <span class="st">"se(coef)"</span>]</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>hr_tv      <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>se_tv      <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_tv)<span class="sc">$</span>coefficients[<span class="st">"treatment_status"</span>, <span class="st">"se(coef)"</span>]</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine into reconciliation matrix</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimator =</span> <span class="fu">c</span>(<span class="st">"Ground Truth (True Parameter)"</span>, <span class="st">"Biased Model (Static Baseline)"</span>, <span class="st">"Landmark Analysis (Day 90)"</span>, <span class="st">"Time-Varying Cox Model"</span>),</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hazard Ratio (HR)"</span> <span class="ot">=</span> <span class="fu">c</span>(true_hr, hr_biased, hr_land, hr_tv),</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Standard Error"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, se_biased, se_land, se_tv),</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">exp</span>(<span class="fu">confint</span>(fit_biased)[<span class="st">"ever_treated"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>])),</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">exp</span>(<span class="fu">confint</span>(fit_biased)[<span class="st">"ever_treated"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>])),</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Bias vs. Truth (Log HR)"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.0000</span>, <span class="fu">coef</span>(fit_biased)[<span class="st">"ever_treated"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr)),</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Format values for display</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], <span class="dv">4</span>)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[<span class="fu">is.na</span>(reconciliation_tbl)] <span class="ot">&lt;-</span> <span class="st">"N/A"</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(reconciliation_tbl, <span class="at">caption =</span> <span class="st">"Survival Parameter Reconciliation Across Estimators"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract statistics</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hr_biased  <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_biased)[<span class="st">"ever_treated"</span>])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>se_biased  <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_biased)<span class="sc">$</span>coefficients[<span class="st">"ever_treated"</span>, <span class="st">"se(coef)"</span>]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>hr_land    <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>])</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>se_land    <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_landmark)<span class="sc">$</span>coefficients[<span class="st">"treated_at_landmark"</span>, <span class="st">"se(coef)"</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>hr_tv      <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>se_tv      <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_tv)<span class="sc">$</span>coefficients[<span class="st">"treatment_status"</span>, <span class="st">"se(coef)"</span>]</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine into reconciliation matrix</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimator =</span> <span class="fu">c</span>(<span class="st">"Ground Truth (True Parameter)"</span>, <span class="st">"Biased Model (Static Baseline)"</span>, <span class="st">"Landmark Analysis (Day 90)"</span>, <span class="st">"Time-Varying Cox Model"</span>),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hazard Ratio (HR)"</span> <span class="ot">=</span> <span class="fu">c</span>(true_hr, hr_biased, hr_land, hr_tv),</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Standard Error"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, se_biased, se_land, se_tv),</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">exp</span>(<span class="fu">confint</span>(fit_biased)[<span class="st">"ever_treated"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>])),</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">exp</span>(<span class="fu">confint</span>(fit_biased)[<span class="st">"ever_treated"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>])),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Bias vs. Truth (Log HR)"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.0000</span>, <span class="fu">coef</span>(fit_biased)[<span class="st">"ever_treated"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr)),</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Format values for display</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], <span class="dv">4</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[<span class="fu">is.na</span>(reconciliation_tbl)] <span class="ot">&lt;-</span> <span class="st">"N/A"</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(reconciliation_tbl, <span class="at">caption =</span> <span class="st">"Survival Parameter Reconciliation Across Estimators"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -954,32 +1195,34 @@ Score (logrank) test = 50.12  on 3 df,   p=8e-11</code></pre>
 <p>to fully explain away the observed treatment-outcome association.</p>
 <p>The formula depends on the cumulative incidence of the outcome:</p>
 <ol type="1">
-<li><p><strong>Rare Outcome Assumption</strong> (cumulative incidence &lt; 15%): The Hazard Ratio approximates the Relative Risk (<span class="math inline">\(RR \approx HR\)</span>). For protective effects (<span class="math inline">\(HR &lt; 1.0\)</span>), we first invert the HR (<span class="math inline">\(HR^* = 1 / HR\)</span>) to get a value <span class="math inline">\(&gt; 1.0\)</span>: <span class="math display">\[\text{E-value} = HR^* + \sqrt{HR^* \cdot (HR^* - 1)}\]</span></p></li>
-<li><p><strong>Common Outcome Correction</strong> (cumulative incidence &gt; 15%): The rare outcome assumption is violated, and we must apply the square root approximation: <span class="math display">\[RR \approx \sqrt{HR}\]</span> The corresponding E-value is calculated as: <span class="math display">\[\text{E-value} = \sqrt{HR^*} + \sqrt{\sqrt{HR^*} \cdot (\sqrt{HR^*} - 1)}\]</span></p></li>
+<li><p><strong>Rare Outcome Assumption</strong> (cumulative incidence &lt; 15%):</p>
+<p>The Hazard Ratio approximates the Relative Risk (<span class="math inline">\(RR \approx HR\)</span>). For protective effects (<span class="math inline">\(HR &lt; 1.0\)</span>), we first invert the HR (<span class="math inline">\(HR^* = 1 / HR\)</span>) to get a value <span class="math inline">\(&gt; 1.0\)</span>: <span class="math display">\[\text{E-value} = HR^* + \sqrt{HR^* \cdot (HR^* - 1)}\]</span></p></li>
+<li><p><strong>Common Outcome Correction</strong> (cumulative incidence &gt; 15%):</p>
+<p>The rare outcome assumption is violated, and we must apply the square root approximation: <span class="math display">\[RR \approx \sqrt{HR}\]</span> The corresponding E-value is calculated as: <span class="math display">\[\text{E-value} = \sqrt{HR^*} + \sqrt{\sqrt{HR^*} \cdot (\sqrt{HR^*} - 1)}\]</span></p></li>
 </ol>
 <p>In our cohort, <span class="math inline">\(379\)</span> out of <span class="math inline">\(500\)</span> patients (<span class="math inline">\(75.8\%\)</span>) experienced the event, meaning the outcome is common. We must apply the common outcome correction.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract HR and confidence limits from the time-varying Cox model</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>hr_est_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>hr_lcl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>])</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>hr_ucl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>])</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Compute E-value (common outcome correction: rare = FALSE)</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>ev_survival <span class="ot">&lt;-</span> <span class="fu">evalues.HR</span>(<span class="at">est =</span> hr_est_val, <span class="at">lo =</span> hr_lcl_val, <span class="at">hi =</span> hr_ucl_val, <span class="at">rare =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ev_survival_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(ev_survival)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Format E-value table</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>ev_survival_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Metric / Parameter"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Hazard Ratio (HR)"</span>, <span class="st">"E-value (Treatment Effect Bound)"</span>),</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Point Estimate"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"point"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"point"</span>])),</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Lower Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"lower"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"lower"</span>])),</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Upper Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"upper"</span>]), <span class="st">"N/A"</span>),</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ev_survival_tbl, <span class="at">caption =</span> <span class="st">"E-Value Analysis for Survival Sensitivity to Unmeasured Confounding"</span>, <span class="at">align =</span> <span class="st">"lrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract HR and confidence limits from the time-varying Cox model</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>hr_est_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>hr_lcl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>])</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>hr_ucl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>])</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Compute E-value (common outcome correction: rare = FALSE)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ev_survival <span class="ot">&lt;-</span> <span class="fu">evalues.HR</span>(<span class="at">est =</span> hr_est_val, <span class="at">lo =</span> hr_lcl_val, <span class="at">hi =</span> hr_ucl_val, <span class="at">rare =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>ev_survival_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(ev_survival)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Format E-value table</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>ev_survival_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Metric / Parameter"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Hazard Ratio (HR)"</span>, <span class="st">"E-value (Treatment Effect Bound)"</span>),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Point Estimate"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"point"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"point"</span>])),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Lower Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"lower"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"lower"</span>])),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Upper Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"upper"</span>]), <span class="st">"N/A"</span>),</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ev_survival_tbl, <span class="at">caption =</span> <span class="st">"E-Value Analysis for Survival Sensitivity to Unmeasured Confounding"</span>, <span class="at">align =</span> <span class="st">"lrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1022,7 +1265,11 @@ Score (logrank) test = 50.12  on 3 df,   p=8e-11</code></pre>
 <p>To understand the mathematical strength of the E-value, we trace its algebraic derivation from the <strong>Bias Factor</strong> model.</p>
 <p>Let <span class="math inline">\(U\)</span> be a binary unmeasured confounder. The observed relative risk <span class="math inline">\(RR_{obs}\)</span> is related to the true relative risk <span class="math inline">\(RR_{true}\)</span> by: <span class="math display">\[RR_{obs} = RR_{true} \times \text{Bias}\]</span></p>
 <p>where the Bias Factor is defined as: <span class="math display">\[\text{Bias} = \frac{RR_{ZU} \times RR_{UY}}{RR_{ZU} + RR_{UY} - 1}\]</span></p>
-<p>Here: - <span class="math inline">\(RR_{ZU}\)</span> is the risk ratio associating the treatment <span class="math inline">\(Z\)</span> with the unmeasured confounder <span class="math inline">\(U\)</span>. - <span class="math inline">\(RR_{UY}\)</span> is the risk ratio associating the unmeasured confounder <span class="math inline">\(U\)</span> with the outcome <span class="math inline">\(Y\)</span>.</p>
+<p>Here:</p>
+<ul>
+<li><span class="math inline">\(RR_{ZU}\)</span> is the risk ratio associating the treatment <span class="math inline">\(Z\)</span> with the unmeasured confounder <span class="math inline">\(U\)</span>.</li>
+<li><span class="math inline">\(RR_{UY}\)</span> is the risk ratio associating the unmeasured confounder <span class="math inline">\(U\)</span> with the outcome <span class="math inline">\(Y\)</span>.</li>
+</ul>
 <p>To explain away an observed effect (i.e., to show that the true effect is null, <span class="math inline">\(RR_{true} = 1.0\)</span>), the Bias Factor must equal or exceed the observed relative risk: <span class="math display">\[\text{Bias} \ge RR_{obs}\]</span></p>
 <p>To find the minimum strength of association required for both relationships, we define a single threshold <span class="math inline">\(E = RR_{ZU} = RR_{UY}\)</span>. Substituting <span class="math inline">\(E\)</span> into the Bias formula: <span class="math display">\[\frac{E^2}{2E - 1} \ge RR_{obs}\]</span></p>
 <p>This can be rearranged into a quadratic inequality: <span class="math display">\[E^2 - 2RR_{obs} \cdot E + RR_{obs} \ge 0\]</span></p>
@@ -1037,17 +1284,17 @@ Score (logrank) test = 50.12  on 3 df,   p=8e-11</code></pre>
 <h3 data-number="9.1" class="anchored" data-anchor-id="interview-audit-checklist"><span class="header-section-number">9.1</span> Interview Audit Checklist</h3>
 <p>When auditing a manufacturer’s RWE survival submission (or preparing for an HTA interview), follow these three key checks:</p>
 <ol type="1">
-<li><strong>Zero-time Alignment Check</strong>:
+<li><p><strong>Zero-time Alignment Check</strong>:</p>
 <ul>
 <li><em>Question</em>: Identify the exact calendar date of <span class="math inline">\(T_0\)</span> for both cohorts. Is <span class="math inline">\(T_0\)</span> defined by the clinical event (diagnosis) or the administrative event (first prescription)?</li>
 <li><em>Audit Rule</em>: Follow-up must start for both cohorts when they meet the eligibility criteria. If the treated group follow-up starts at drug initiation and controls start at diagnosis, the analysis is invalid.</li>
 </ul></li>
-<li><strong>Immortal Time Bias Screen</strong>:
+<li><p><strong>Immortal Time Bias Screen</strong>:</p>
 <ul>
 <li><em>Question</em>: Check the initial segment of the Kaplan-Meier curve. Does the treated arm show a “zero-risk” flat line at the start of follow-up?</li>
 <li><em>Audit Rule</em>: A flat line on the treatment curve indicates that patients who died early were excluded from the treated group, indicating Immortal Time Bias.</li>
 </ul></li>
-<li><strong>Statistical Correction Audit</strong>:
+<li><p><strong>Statistical Correction Audit</strong>:</p>
 <ul>
 <li><em>Question</em>: If a treatment initiation lag exists, was it addressed using a time-varying covariate or a Landmark approach?</li>
 <li><em>Audit Rule</em>: Standard Cox models using a static baseline treatment indicator are statistically invalid in the presence of treatment initiation delays.</li>
