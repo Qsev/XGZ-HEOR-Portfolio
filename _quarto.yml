@@ -25,6 +25,7 @@ project:
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.qmd
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.qmd
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/03_TMLE_and_Sensitivity.qmd
+    - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/04_Time_to_Event_and_Immortal_Time.qmd
 
 
 website:
@@ -77,6 +78,8 @@ website:
             text: "PSM, IPTW & AIPW"
           - href: 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/03_TMLE_and_Sensitivity.qmd
             text: "TMLE & Sensitivity Analysis"
+          - href: 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/04_Time_to_Event_and_Immortal_Time.qmd
+            text: "Survival & Immortal Time"
       - text: "Methodology Wiki"
         href: 00_HTA_LLM_Wiki/README.md
     right:
