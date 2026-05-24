@@ -95,7 +95,7 @@ By using the **DataSAT** tool (Data Suitability Assessment Tool), NICE auditors 
 
 To see how these principles apply to a real-world submission, we examine the case of **Drug X**, a precision oncology therapy for METex14-mutated non-small cell lung cancer (NSCLC). 
 
-::: {.callout-note}
+::: {.callout-note collapse="true"}
 ### Note on Case Selection
 While the official NICE RWE Framework (2022) guidelines reference clinical examples like Hormone Replacement Therapy (HRT) and dialysis initiation to teach these methods, this METex14 oncology case study represents an applied industry consulting scenario. It demonstrates how the framework's target trial dimensions and DataSAT requirements are executed in oncology HTA appraisals, where single-arm trials and external controls are frequently required.
 :::
