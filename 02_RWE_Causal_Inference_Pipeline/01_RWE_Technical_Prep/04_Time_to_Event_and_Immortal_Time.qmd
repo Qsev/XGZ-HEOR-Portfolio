@@ -17,7 +17,7 @@ format:
 
 ## Introduction: Causal Inference in Time-to-Event Data
 
-In health technology assessment (HTA), clinical endpoints are frequently time-to-event outcomes, such as Overall Survival (OS) or Progression-Free Survival (PFS). When randomized controlled trials (RCTs) are unfeasible or ethical constraints limit comparator arms, observational real-world data (RWD) is analyzed to construct External Control Arms (ECAs). 
+In health technology assessment (HTA), clinical endpoints are frequently **time-to-event outcomes**. While aggregate summaries like Overall Survival (OS) or Progression-Free Survival (PFS) are represented as curves showing the *proportion* or *probability* of surviving patients at specific points in time, the underlying outcome measured at the patient level is the actual **duration of time** (e.g., months or days) elapsed from a defined baseline (such as diagnosis or treatment initiation) until the clinical event of interest (e.g., death, relapse) occurs.
 
 Unlike binary outcomes where logistic regression or propensity score matching are applied statically, survival data introduces a critical dimension: **Time**. 
 
