@@ -514,7 +514,9 @@ In a cloned analysis, each patient is copied into every treatment strategy at $T
 
 Each clone is followed from the same $T_0$. If the patient's observed behavior becomes incompatible with a clone's assigned strategy, that clone is artificially censored. For example, if the "no treatment" clone initiates Drug X on Day 20, that clone is censored on Day 20.
 
-This artificial censoring is not necessarily random. Patients who start treatment early may differ systematically from patients who do not start treatment, and patients who remain compatible with a strategy may no longer represent the original target population. IPCW is used to reduce this selection bias.
+**Artificial censoring** can create selection bias because patients who violate a strategy are **not random**. For example, patients who start Drug X early may be younger, fitter, more urgent clinically, or treated in faster diagnostic pathways. After censoring the clones that violate their assigned strategy, the **remaining uncensored clones** may no longer represent the original eligible population. IPCW is used to reweight the remaining clones back toward that target population.
+
+The **direction of this bias** depends on the clinical mechanism driving treatment timing. If more urgent patients start Drug X earlier, their "no initiation" clones are more likely to be censored, leaving a less urgent untreated-strategy group and potentially **underestimating the benefit** of Drug X. If earlier initiation is mainly driven by better access or fitter patients, the bias could move in the **opposite direction**.
 
 ### IPCW Intuition
 
