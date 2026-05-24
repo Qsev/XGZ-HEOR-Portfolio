@@ -131,7 +131,7 @@ If all weights are uniform ($W_i=1$), the ESS equals the actual sample size $N$.
 
 ---
 
-## Augmented Inverse Probability Weighting (AIPW)
+## Augmented Inverse Probability Weighting (AIPW) {#sec-aipw}
 
 **Augmented IPTW (AIPW)** is a **Doubly Robust (DR)** estimator that resolves the primary vulnerability of both standard regression models and propensity score weighting. It achieves this by combining an **outcome regression (OR)** model with a **treatment assignment (propensity score)** model.
 

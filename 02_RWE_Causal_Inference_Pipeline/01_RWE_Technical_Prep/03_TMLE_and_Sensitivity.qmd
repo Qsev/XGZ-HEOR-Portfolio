@@ -24,7 +24,7 @@ If the propensity score model **omits crucial confounders** or **misspecifies th
 
 ### Doubly Robust Estimators
 
-To address this, doubly robust estimators combine the treatment model with an outcome regression model. For a detailed algebraic proof of the double robustness property, see the [AIPW section in Page 2](./02_PSM_IPTW_AIPW.qmd#augmented-inverse-probability-weighting-aipw):
+To address this, doubly robust estimators combine the treatment model with an outcome regression model. For a detailed algebraic proof of the double robustness property, see the [AIPW section in Page 2](./02_PSM_IPTW_AIPW.qmd#sec-aipw):
 $$m(D, X) = E[Y \mid D, W]$$
 
 This ensures that the treatment effect estimate is unbiased if *either* the treatment model *or* the outcome model is correctly specified.

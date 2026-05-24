@@ -91,22 +91,22 @@ An auditor cannot see:
 
 By using the **DataSAT** tool (Data Suitability Assessment Tool), NICE auditors look for **Provenance**—the clear lineage of how a patient moved from a raw database record to a study row. TTE forces the researcher to write a "Trial Protocol" *before* touching the data, making it obvious where $T_0$ is. If an auditor sees that you measured covariates after the drug was given and used them as baseline, the TTE framework will flag this as a "Post-baseline Bias" immediately.
 
-## HTA Case Study: Drug X (METex14) Applied Case Study
+## Applied Scenario: Zero-Time Alignment in an Oncology External Control Arm
 
-To see how these principles apply to a real-world submission, we examine the case of **Drug X**, a precision oncology therapy for METex14-mutated non-small cell lung cancer (NSCLC). 
+To see how these principles apply in an HTA-facing RWE setting, consider **Drug X**, a precision oncology therapy for METex14-mutated non-small cell lung cancer (NSCLC).
 
 ::: {.callout-note collapse="true"}
-### Note on Case Selection
-While the official NICE RWE Framework (2022) guidelines reference clinical examples like Hormone Replacement Therapy (HRT) and dialysis initiation to teach these methods, this METex14 oncology case study represents an applied industry consulting scenario. It demonstrates how the framework's target trial dimensions and DataSAT requirements are executed in oncology HTA appraisals, where single-arm trials and external controls are frequently required.
+### Declaration: Simulated Proof-of-Methodology Scenario
+This METex14 scenario is a **self-generated proof-of-methodology example**, not a real NICE submission, manufacturer dossier, or clinical claim about an identifiable medicine. Drug X, the sample sizes, data source details, and audit responses are simplified or fictionalized to demonstrate how target trial emulation, immortal time bias correction, and DataSAT-style reasoning can be documented in an HTA-facing RWE workflow.
 :::
 
-### Case Overview: The Drug X Conflict
+### Scenario Overview: The Drug X Challenge
 
 - **The Innovation**: Due to the rarity of the METex14 mutation and ethical constraints, only a **Single-arm Trial (N=40)** was conducted for Drug X.
 - **The Challenge**: A single-arm submission faces a high risk of rejection due to the lack of a randomized head-to-head comparison. Given the aggressive natural history of METex14 NSCLC, simple unadjusted benchmarking is insufficient for demonstrating comparative effectiveness.
-- **The Strategy**: We leverage the UK Hospital Episode Statistics (HES) database to construct an External Control Arm (ECA) of 200 patients, using the Target Trial Emulation (TTE) framework to satisfy NICE's demand for rigorous causal inference.
+- **The Strategy**: We leverage the UK **Hospital Episode Statistics (HES)** database to construct an External Control Arm (ECA) of 200 patients, using the Target Trial Emulation (TTE) framework to satisfy NICE's demand for rigorous causal inference.
 
-### Step 1: Data Suitability Audit (DataSAT)
+### Data Suitability Considerations (DataSAT)
 
 According to Sections 3.1–3.3 of the NICE RWE Framework, we must prove the data is fit for purpose across three core dimensions:
 
@@ -118,35 +118,35 @@ According to Sections 3.1–3.3 of the NICE RWE Framework, we must prove the dat
 
 ### Defining $T_0$ (Zero-time Alignment)
 
-To avoid Immortal Time Bias, we align $T_0$ as the moment a patient meets all eligibility criteria **AND** is assigned to treatment (Section 5.2).
+To avoid Immortal Time Bias, we align $T_0$ as the moment a patient meets all eligibility criteria **AND** is assigned to treatment, following the target trial approach described in **Section 5.2 of the NICE RWE Framework**. Basically, the index date and treatment strategy assignment must be defined **without using future information**. Treatment status observed after $T_0$ cannot be used retrospectively to create baseline groups unless it is handled through a pre-specified grace-period strategy, such as cloning and censoring.
 
-#### Why Immortal Time Bias is a "Statistical Killer"
+#### Why Immortal Time Bias is a "Statistical Killer" {.unnumbered}
 
-1. **Logic Paradox**: In RWD studies, patients from diagnosis to actual treatment initiation (Drug X) face delays (e.g., 1 month). If follow-up begins at diagnosis, but grouping is based on whether they ever received treatment, the period before receiving the drug is **immortal**—if the patient died on Day 15, they would never have lived long enough to receive the drug, and would automatically be classified into the control group.
+1. **Logic Paradox**: In RWD studies, patients from diagnosis to actual treatment initiation (Drug X) face delays (e.g., 1 month). If follow-up begins at diagnosis, but grouping is based on whether they ever received treatment, the period before receiving the drug is **immortal**—if the patient **died on Day 15**, they would **never** have lived long enough to receive the drug, and would automatically be classified into the control group (since they are not "treated").
 2. **Case Simulation**:
 
    - **Patient A**: Diagnosed Jan 1, scheduled for Drug X, dies Jan 15 (unexposed). Classified as Control.
    - **Patient B**: Diagnosed Jan 1, initiates Drug X Feb 1, survives until June.
-   - **Result**: The Drug Y/X group artificially filters out those who die before drug administration, inflating the active group's survival.
-3. **TTE Surgery**: The clock must start ticking exactly at treatment initiation, or grace periods must be modeled using cloning.
+   - **Result**: The Drug X group artificially filters out those who die before treatment initiation, inflating the active group's survival.
+3. **TTE Correction**: The survival follow-up clock must be aligned to a clearly defined index date that is comparable across arms. If the estimand starts at diagnosis but treatment can begin during a grace period, the waiting time must not be retrospectively credited to the treated group; it should be handled using cloning-and-censoring, a time-varying exposure model, or a pre-specified landmark strategy.
 
-#### The Control Arm $T_0$
+#### The Control Arm $T_0$ {.unnumbered}
 
 Where does the control arm's $T_0$ start if they never receive the active treatment?
 
 - **Synchronicity Principle**: $T_0$ is the moment the patient meets all clinical eligibility criteria (e.g., METex14 diagnosis + ECOG status).
 - **Timeline Alignment**:
-  - *Incorrect*: Treated group starts at "first drug administration", while controls start at "diagnosis". This gives the treated group an implicit survival benefit.
+  - *Incorrect*: Treated group starts at the "first recorded treatment start date", while controls start at "diagnosis". This gives the treated group an implicit survival benefit.
   - *Correct TTE Approach*: Both groups start follow-up at the exact date they meet all eligibility criteria (the clinical decision point, or clinical equipoise). 
 
-#### Handling the Grace Period
+#### Handling the Grace Period {.unnumbered}
 
 In RWD, a patient has a "window" of time (grace period) to initiate treatment (e.g., 30 days after diagnosis). 
 
 - If a patient initiates treatment on Day 20, they contribute 20 days of "unexposed" person-time to the control group.
 - Using cloning, we create two clones at diagnosis. The "Control Clone" is followed until Day 20, where it is censored because the patient initiated treatment. The "Treated Clone" starts contributing treated time from Day 20 onwards.
 
-### Step 2: Cloning & Censoring Mechanics
+### Implication for Cloning & Censoring
 
 To maintain ITT principles:
 
@@ -163,17 +163,10 @@ Consider a study evaluating whether a 12-week intensive meditation course increa
 - **Cohort**: 1,000 participants followed for 5 years.
 - **Exposure Group ($Z=1$)**: Completed the full 12-week program.
 - **Control Group ($Z=0$)**: Did not complete the program (includes those who died or dropped out before week 12).
-- **The Result**: Meditators show a Hazard Ratio ($HR$) of 0.30 (70% risk reduction).
+- **The Result**: Participants who completed the course show a Hazard Ratio ($HR$) of 0.30 (70% risk reduction).[^meditation-completion]
 - **The Error**: Since a patient had to survive 12 weeks to complete the program, the meditation group is guaranteed 0% mortality during the first 12 weeks. Sicker patients who died in weeks 1–11 were automatically allocated to the control group.
 
-### Violating the "Non-anticipatory Constraint"
-
-Mathematically, let $\mathcal{F}_t$ be the filtration (information history) up to time $t$. A treatment assignment indicator $Z_t$ must be adapted to the filtration:
-$$Z_t \in \mathcal{F}_t$$
-
-If we define a static indicator $Z$ based on whether the event occurred in the future:
-$$Z = f(Y_{t \in [0, 12]})$$
-we condition on a post-baseline outcome $Y$. This violates the non-anticipatory constraint, leading to "time travel" in the statistical model.
+[^meditation-completion]: Completion status at Week 12 is post-baseline information. It **cannot** be used retrospectively to define the baseline exposure group; otherwise, the first 12 weeks of survival are incorrectly credited to the intervention.
 
 ### Landmark Analysis
 
@@ -184,22 +177,44 @@ Landmark Analysis is a classical approach to resolve this:
 3. **Re-classify**: Classify survivors at $T_L$ based on their exposure status at $T_L$.
 4. **Follow-up**: Set $T_L$ as the new baseline ($T_{start} = T_L$) and follow patients from that point.
 
-#### HTA Audit of Landmark Analysis
+#### HTA Audit of Landmark Analysis {.unnumbered}
 
 - **Pros**: Simple, highly intuitive, and removes the immortal period.
 - **Cons**: 
-  - **Information Loss**: Discards all events and person-time before $T_L$. If the drug has high early toxicity, this signal is completely lost.
+  - **Information Loss**: Discards all events and person-time before $T_L$. If the drug **has high early toxicity**, this signal is completely lost.
   - **Selection Bias**: The populations at $T_L$ may no longer be balanced, as sicker patients in the control group may have died, while sicker patients in the treated group were protected by the "immortal" definition.
+
+Therefore, landmark analysis is usually better positioned as an intuitive diagnostic or sensitivity analysis, rather than the preferred primary analysis for HTA submissions. It is most defensible when the clinical question is explicitly conditional on surviving and remaining eligible until the landmark time; otherwise, time-varying exposure models or cloning-censoring-IPCW are generally more aligned with the original target trial estimand.
 
 ## Time-Dependent Cox Model & HTA Practice
 
-The time-dependent Cox model is the industry standard for auditing and correcting immortal time bias in HTA submissions.
+The time-dependent Cox model is an extension of the standard Cox proportional hazards model that allows a patient's exposure status to **change during follow-up**. This makes it useful for auditing and correcting immortal time bias when treatment initiation is delayed.
+
+### What the Model Does
+
+In a standard Cox model, treatment is usually treated as fixed at baseline:
+
+$$
+h_i(t) = h_0(t)\exp(\beta Z_i + \gamma L_i)
+$$
+
+where $Z_i$ is a single treatment indicator for patient $i$, and $L_i$ represents baseline covariates such as age or ECOG status.
+
+The problem is that delayed treatment is not fixed at baseline. A patient may be untreated from Day 0 to Day 60, then treated from Day 60 onward. A time-dependent Cox model replaces the fixed treatment indicator $Z_i$ with a time-updated treatment indicator $Z_i(t)$:
+
+$$
+h_i(t) = h_0(t)\exp(\beta Z_i(t) + \gamma L_i)
+$$
+
+Here, $Z_i(t)=0$ before treatment starts and $Z_i(t)=1$ after treatment starts. At each event time, the Cox model compares patients according to their treatment status **at that moment**, not according to information observed later in follow-up.
+
+This is the key correction for immortal time bias: the waiting period before treatment is counted as untreated person-time, rather than being retrospectively assigned to the treated group.
 
 ### Counting Process Data Structure
 
-Rather than one row per patient, the counting process format splits each patient's follow-up into multiple intervals `(tstart, tstop]` where treatment status remains constant.
+To estimate this model, the data usually need to be written in counting process format. Rather than one row per patient, the dataset is split into multiple intervals `(tstart, tstop]` where treatment status remains constant.
 
-#### Restructuring Example (Patient #101)
+#### Start-Stop Data Format Example (Patient #101) {.unnumbered}
 Patient #101 has a treatment initiation lag of 60 days and dies on Day 500. We split this patient's record into two lines:
 
 | Patient ID | Start (Day) | Stop (Day) | Status (Event) | Treatment ($Z$) |
@@ -207,7 +222,7 @@ Patient #101 has a treatment initiation lag of 60 days and dies on Day 500. We s
 | #101 | 0 | 60 | 0 (Alive) | 0 (Unexposed) |
 | #101 | 60 | 500 | 1 (Death) | 1 (Exposed) |
 
-At Day 60, the patient is right-censored in the control group and enters the treated group.
+At Day 60, the patient's treatment status switches from unexposed to exposed. The patient is not removed from follow-up; instead, their contribution to the risk set is updated from untreated person-time to treated person-time.
 
 ### Landmark vs. Time-Dependent Cox
 
@@ -217,6 +232,55 @@ At Day 60, the patient is right-censored in the control group and enters the tre
 | **Causal Question** | Causal effect starting from Day 0. | Conditional effect given survival to $T_L$. |
 | **Early Toxicity** | Captures early adverse event signals. | Masked if events occur before $T_L$. |
 | **HTA Audit Preference** | Preferred for primary analysis. | Used primarily as a sensitivity analysis. |
+
+## Cloning, Censoring, and IPCW in Target Trial Emulation
+
+Time-dependent Cox models are useful for auditing whether delayed treatment initiation has created immortal time bias. However, when the target trial estimand is defined as a comparison of **treatment strategies**—for example, "initiate Drug X within 90 days of diagnosis" versus "do not initiate Drug X within 90 days"—a trial-emulation analysis often requires **cloning, artificial censoring, and inverse probability of censoring weighting (IPCW)**.
+
+### Why Artificial Censoring Creates Bias
+
+In a cloned analysis, each patient is copied into every treatment strategy at $T_0$:
+
+- One clone is assigned to the "initiate within grace period" strategy.
+- One clone is assigned to the "do not initiate within grace period" strategy.
+
+Each clone is followed from the same $T_0$. If the patient's observed behavior becomes incompatible with a clone's assigned strategy, that clone is artificially censored. For example, if the "no treatment" clone initiates Drug X on Day 20, that clone is censored on Day 20.
+
+This artificial censoring is not necessarily random. Patients who start treatment early may differ systematically from patients who do not start treatment, and patients who remain compatible with a strategy may no longer represent the original target population. IPCW is used to reduce this selection bias.
+
+### IPCW Intuition
+
+The "C" in IPCW stands for **censoring**. The core idea is to weight each remaining uncensored clone by the inverse of its probability of remaining uncensored:
+
+$$
+w_i(t) = \frac{1}{P(C_i(t)=0 \mid L_i)}
+$$
+
+where $C_i(t)=0$ means clone $i$ remains uncensored at time $t$, and $L_i$ represents baseline or time-updated covariate history.
+
+The intuition is simple: if a type of patient is highly likely to be censored, but one such patient remains uncensored, that patient receives more weight because they represent similar patients who were censored.
+
+### Stabilized Weights
+
+In practice, stabilized weights are often preferred because they reduce variance:
+
+$$
+SW_i(t) =
+\frac{P(C_i(t)=0 \mid A_i)}
+{P(C_i(t)=0 \mid A_i, L_i)}
+$$
+
+The denominator models censoring using strategy assignment and prognostic covariates. The numerator uses a simpler model, often including strategy assignment only. Extreme weights should be inspected and, if necessary, truncated using a pre-specified rule.
+
+### HTA Audit Checks
+
+For an HTA-facing analysis, IPCW should not be presented as a black box. The submission should document:
+
+- the protocol rule that triggers artificial censoring;
+- the censoring model covariates and timing;
+- the distribution of stabilized weights;
+- any truncation threshold and its sensitivity analysis;
+- whether positivity is plausible across clinically relevant subgroups.
 
 ## R Simulation: Validation of Estimators
 
@@ -240,13 +304,15 @@ show_cox <- function(fit, caption) {
   sum_fit <- summary(fit)
   coefs <- sum_fit$coefficients
   cis <- sum_fit$conf.int
+  se_col <- if ("robust se" %in% colnames(coefs)) "robust se" else "se(coef)"
+  z_col <- if ("z" %in% colnames(coefs)) "z" else colnames(coefs)[4]
   tbl <- data.frame(
     Covariate = rownames(coefs),
-    `Hazard Ratio` = round(coefs[, 2], 4),
-    `Log HR (coef)` = round(coefs[, 1], 4),
-    `Std Error` = round(coefs[, 3], 4),
-    `z-value` = round(coefs[, 4], 3),
-    `p-value` = format.pval(coefs[, 5], digits = 4),
+    `Hazard Ratio` = round(coefs[, "exp(coef)"], 4),
+    `Log HR (coef)` = round(coefs[, "coef"], 4),
+    `Std Error` = round(coefs[, se_col], 4),
+    `z-value` = round(coefs[, z_col], 3),
+    `p-value` = format.pval(coefs[, "Pr(>|z|)"], digits = 4),
     `95% LCL` = round(cis[, 3], 4),
     `95% UCL` = round(cis[, 4], 4),
     check.names = FALSE
@@ -357,9 +423,97 @@ show_cox(fit_tv, "Time-Varying Cox Proportional Hazards Model Results (Immortal 
 
 The time-varying Cox model successfully recovers the true treatment effect ($HR = 0.70$) without discarding data.
 
+### Method 3: Cloning-Censoring-IPCW Analysis
+
+We now emulate a strategy-level target trial with a 90-day grace period:
+
+- **Strategy 1**: initiate Drug X within 90 days of diagnosis.
+- **Strategy 0**: do not initiate Drug X within 90 days of diagnosis.
+
+Each patient is cloned into both strategies. A clone is artificially censored when the observed treatment path becomes incompatible with its assigned strategy.
+
+```{r}
+grace_period <- 90
+
+# 1. Clone each patient into both treatment strategies
+df_clone <- rbind(
+  transform(df, strategy = 1, strategy_label = "Initiate within 90 days"),
+  transform(df, strategy = 0, strategy_label = "No initiation within 90 days")
+)
+
+# 2. Define artificial censoring rules
+df_clone$artificial_censor_time <- Inf
+
+# Strategy 1 violation: no treatment initiation by the end of the grace period
+df_clone$artificial_censor_time[
+  df_clone$strategy == 1 &
+    df_clone$t_init > grace_period &
+    df_clone$time > grace_period
+] <- grace_period
+
+# Strategy 0 violation: treatment initiation during the grace period
+df_clone$artificial_censor_time[
+  df_clone$strategy == 0 &
+    df_clone$t_init <= grace_period &
+    df_clone$t_init < df_clone$time
+] <- df_clone$t_init[
+  df_clone$strategy == 0 &
+    df_clone$t_init <= grace_period &
+    df_clone$t_init < df_clone$time
+]
+
+# 3. Observed follow-up under each assigned strategy
+df_clone$obs_time <- pmin(df_clone$time, df_clone$artificial_censor_time)
+df_clone$outcome_event <- as.integer(df_clone$event == 1 & df_clone$time <= df_clone$artificial_censor_time)
+df_clone$artificial_censored <- as.integer(df_clone$artificial_censor_time < df_clone$time)
+df_clone$uncensored <- 1 - df_clone$artificial_censored
+
+knitr::kable(
+  head(df_clone[, c("id", "strategy_label", "time", "event", "t_init", "obs_time", "outcome_event", "artificial_censored")], 8),
+  caption = "Cloned Target Trial Dataset with Artificial Censoring Rules",
+  align = "c"
+)
+```
+
+Next, we estimate stabilized IPCW. This is a simplified subject-level implementation for demonstration; production analyses commonly estimate censoring probabilities over time using discrete-time pooled logistic models or start-stop data.
+
+```{r}
+# 4. Estimate stabilized inverse probability of censoring weights
+censor_den <- glm(uncensored ~ strategy + age + ecog, family = binomial(), data = df_clone)
+censor_num <- glm(uncensored ~ strategy, family = binomial(), data = df_clone)
+
+df_clone$p_uncens_den <- predict(censor_den, type = "response")
+df_clone$p_uncens_num <- predict(censor_num, type = "response")
+df_clone$ipcw <- df_clone$p_uncens_num / df_clone$p_uncens_den
+
+weight_summary <- data.frame(
+  Metric = c("Minimum", "1st Quartile", "Median", "Mean", "3rd Quartile", "Maximum"),
+  Stabilized_IPCW = as.numeric(summary(df_clone$ipcw))
+)
+
+knitr::kable(
+  weight_summary,
+  caption = "Stabilized IPCW Distribution",
+  digits = 3,
+  align = "lr"
+)
+```
+
+Finally, we fit a weighted Cox model comparing the two grace-period strategies. The `cluster(id)` term accounts for the fact that each original patient contributes two cloned records.
+
+```{r}
+fit_ipcw <- coxph(
+  Surv(obs_time, outcome_event) ~ strategy + age + ecog + cluster(id),
+  data = df_clone,
+  weights = ipcw
+)
+
+show_cox(fit_ipcw, "Cloning-Censoring-IPCW Cox Model Results")
+```
+
 ## Causal Evidence Reconciliation
 
-The table below summarizes the estimates across all three models compared to the true parameter.
+The table below summarizes the estimates across all four models compared to the true parameter.
 
 ```{r}
 # Extract statistics
@@ -372,14 +526,17 @@ se_land    <- summary(fit_landmark)$coefficients["treated_at_landmark", "se(coef
 hr_tv      <- exp(coef(fit_tv)["treatment_status"])
 se_tv      <- summary(fit_tv)$coefficients["treatment_status", "se(coef)"]
 
+hr_ipcw    <- exp(coef(fit_ipcw)["strategy"])
+se_ipcw    <- summary(fit_ipcw)$coefficients["strategy", "robust se"]
+
 # Combine into reconciliation matrix
 reconciliation_tbl <- data.frame(
-  Estimator = c("Ground Truth (True Parameter)", "Biased Model (Static Baseline)", "Landmark Analysis (Day 90)", "Time-Varying Cox Model"),
-  "Hazard Ratio (HR)" = c(true_hr, hr_biased, hr_land, hr_tv),
-  "Standard Error" = c(NA, se_biased, se_land, se_tv),
-  "95% LCL" = c(NA, exp(confint(fit_biased)["ever_treated", 1]), exp(confint(fit_landmark)["treated_at_landmark", 1]), exp(confint(fit_tv)["treatment_status", 1])),
-  "95% UCL" = c(NA, exp(confint(fit_biased)["ever_treated", 2]), exp(confint(fit_landmark)["treated_at_landmark", 2]), exp(confint(fit_tv)["treatment_status", 2])),
-  "Bias vs. Truth (Log HR)" = c(0.0000, coef(fit_biased)["ever_treated"] - log(true_hr), coef(fit_landmark)["treated_at_landmark"] - log(true_hr), coef(fit_tv)["treatment_status"] - log(true_hr)),
+  Estimator = c("Ground Truth (True Parameter)", "Biased Model (Static Baseline)", "Landmark Analysis (Day 90)", "Time-Varying Cox Model", "Cloning-Censoring-IPCW"),
+  "Hazard Ratio (HR)" = c(true_hr, hr_biased, hr_land, hr_tv, hr_ipcw),
+  "Standard Error" = c(NA, se_biased, se_land, se_tv, se_ipcw),
+  "95% LCL" = c(NA, exp(confint(fit_biased)["ever_treated", 1]), exp(confint(fit_landmark)["treated_at_landmark", 1]), exp(confint(fit_tv)["treatment_status", 1]), exp(confint(fit_ipcw)["strategy", 1])),
+  "95% UCL" = c(NA, exp(confint(fit_biased)["ever_treated", 2]), exp(confint(fit_landmark)["treated_at_landmark", 2]), exp(confint(fit_tv)["treatment_status", 2]), exp(confint(fit_ipcw)["strategy", 2])),
+  "Bias vs. Truth (Log HR)" = c(0.0000, coef(fit_biased)["ever_treated"] - log(true_hr), coef(fit_landmark)["treated_at_landmark"] - log(true_hr), coef(fit_tv)["treatment_status"] - log(true_hr), coef(fit_ipcw)["strategy"] - log(true_hr)),
   check.names = FALSE
 )
 

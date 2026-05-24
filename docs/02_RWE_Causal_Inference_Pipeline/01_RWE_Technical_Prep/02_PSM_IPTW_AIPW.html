@@ -301,7 +301,7 @@ window.Quarto = {
   <li><a href="#statistical-inference-robust-standard-errors" id="toc-statistical-inference-robust-standard-errors" class="nav-link" data-scroll-target="#statistical-inference-robust-standard-errors"><span class="header-section-number">3.3</span> Statistical Inference &amp; Robust Standard Errors</a></li>
   <li><a href="#effective-sample-size-ess" id="toc-effective-sample-size-ess" class="nav-link" data-scroll-target="#effective-sample-size-ess"><span class="header-section-number">3.4</span> Effective Sample Size (ESS)</a></li>
   </ul></li>
-  <li><a href="#augmented-inverse-probability-weighting-aipw" id="toc-augmented-inverse-probability-weighting-aipw" class="nav-link" data-scroll-target="#augmented-inverse-probability-weighting-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</a>
+  <li><a href="#sec-aipw" id="toc-sec-aipw" class="nav-link" data-scroll-target="#sec-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</a>
   <ul class="collapse">
   <li><a href="#the-belt-and-suspenders-philosophy" id="toc-the-belt-and-suspenders-philosophy" class="nav-link" data-scroll-target="#the-belt-and-suspenders-philosophy"><span class="header-section-number">4.1</span> The “Belt and Suspenders” Philosophy</a></li>
   <li><a href="#structural-anatomy-of-the-estimator" id="toc-structural-anatomy-of-the-estimator" class="nav-link" data-scroll-target="#structural-anatomy-of-the-estimator"><span class="header-section-number">4.2</span> Structural Anatomy of the Estimator</a></li>
@@ -454,8 +454,8 @@ W_i(\beta) \cdot Z_i \left( Y_i - Z_i \alpha \right)
 <hr>
 </section>
 </section>
-<section id="augmented-inverse-probability-weighting-aipw" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="augmented-inverse-probability-weighting-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</h2>
+<section id="sec-aipw" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sec-aipw"><span class="header-section-number">4</span> Augmented Inverse Probability Weighting (AIPW)</h2>
 <p><strong>Augmented IPTW (AIPW)</strong> is a <strong>Doubly Robust (DR)</strong> estimator that resolves the primary vulnerability of both standard regression models and propensity score weighting. It achieves this by combining an <strong>outcome regression (OR)</strong> model with a <strong>treatment assignment (propensity score)</strong> model.</p>
 <section id="the-belt-and-suspenders-philosophy" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="the-belt-and-suspenders-philosophy"><span class="header-section-number">4.1</span> The “Belt and Suspenders” Philosophy</h3>

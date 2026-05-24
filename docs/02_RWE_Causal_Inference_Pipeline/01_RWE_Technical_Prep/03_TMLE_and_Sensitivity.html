@@ -350,7 +350,7 @@ window.Quarto = {
 <p>If the propensity score model <strong>omits crucial confounders</strong> or <strong>misspecifies their functional forms (e.g., ignoring non-linearities or interactions)</strong>, these single-robust estimators yield biased estimates of the treatment effect.</p>
 <section id="doubly-robust-estimators" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="doubly-robust-estimators"><span class="header-section-number">1.1</span> Doubly Robust Estimators</h3>
-<p>To address this, doubly robust estimators combine the treatment model with an outcome regression model. For a detailed algebraic proof of the double robustness property, see the <a href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.html#augmented-inverse-probability-weighting-aipw">AIPW section in Page 2</a>: <span class="math display">\[m(D, X) = E[Y \mid D, W]\]</span></p>
+<p>To address this, doubly robust estimators combine the treatment model with an outcome regression model. For a detailed algebraic proof of the double robustness property, see the <a href="../../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.html#sec-aipw">AIPW section in Page 2</a>: <span class="math display">\[m(D, X) = E[Y \mid D, W]\]</span></p>
 <p>This ensures that the treatment effect estimate is unbiased if <em>either</em> the treatment model <em>or</em> the outcome model is correctly specified.</p>
 </section>
 <section id="why-tmle-over-aipw" class="level3" data-number="1.2">
