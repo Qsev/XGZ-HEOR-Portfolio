@@ -384,7 +384,6 @@ window.Quarto = {
 <li><strong>The Trap</strong>: If we run a regression on cross-sectional data, we see “Coffee = Health.”</li>
 </ul>
 <p>To resolve this paradox, we cannot rely on simple regression adjustments; we must emulate a randomized trial to establish a clear chronological sequence of events.</p>
-<hr>
 </section>
 </section>
 <section id="the-target-trial-emulation-tte-framework" class="level2" data-number="2">
@@ -477,7 +476,6 @@ window.Quarto = {
 <li>Is there a “Healthy User Bias”?</li>
 </ul>
 <p>By using the <strong>DataSAT</strong> tool (Data Suitability Assessment Tool), NICE auditors look for <strong>Provenance</strong>—the clear lineage of how a patient moved from a raw database record to a study row. TTE forces the researcher to write a “Trial Protocol” <em>before</em> touching the data, making it obvious where <span class="math inline">\(T_0\)</span> is. If an auditor sees that you measured covariates after the drug was given and used them as baseline, the TTE framework will flag this as a “Post-baseline Bias” immediately.</p>
-<hr>
 </section>
 </section>
 <section id="hta-case-study-drug-x-metex14-case-study" class="level2" data-number="3">
@@ -571,7 +569,6 @@ window.Quarto = {
 <li><strong>Artificial Censoring</strong>: If the patient’s actual path deviates from a clone’s assigned arm, that clone is censored.</li>
 <li><strong>IPCW Weighting</strong>: Because censoring might be non-random, we estimate the probability of being censored at time <span class="math inline">\(t\)</span> based on baseline covariates and apply Inverse Probability of Censoring Weights to the remaining patients, dynamically restoring the balance.</li>
 </ul>
-<hr>
 </section>
 </section>
 <section id="immortal-time-bias-itb-theory-landmark-analysis" class="level2" data-number="4">
@@ -611,7 +608,6 @@ window.Quarto = {
 <li><strong>Selection Bias</strong>: The populations at <span class="math inline">\(T_L\)</span> may no longer be balanced, as sicker patients in the control group may have died, while sicker patients in the treated group were protected by the “immortal” definition.</li>
 </ul></li>
 </ul>
-<hr>
 </section>
 </section>
 </section>
@@ -699,7 +695,6 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<hr>
 </section>
 </section>
 <section id="r-simulation-validation-of-estimators" class="level2" data-number="6">
@@ -1084,7 +1079,6 @@ window.Quarto = {
 </div>
 </div>
 <p>The time-varying Cox model successfully recovers the true treatment effect (<span class="math inline">\(HR = 0.70\)</span>) without discarding data.</p>
-<hr>
 </section>
 </section>
 <section id="causal-evidence-reconciliation" class="level2" data-number="7">
@@ -1184,7 +1178,6 @@ window.Quarto = {
 </table>
 </div>
 </div>
-<hr>
 </section>
 <section id="quantitative-bias-analysis-e-value-sensitivity-analysis" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="quantitative-bias-analysis-e-value-sensitivity-analysis"><span class="header-section-number">8</span> Quantitative Bias Analysis: E-Value Sensitivity Analysis</h2>
@@ -1275,7 +1268,6 @@ window.Quarto = {
 <p>This can be rearranged into a quadratic inequality: <span class="math display">\[E^2 - 2RR_{obs} \cdot E + RR_{obs} \ge 0\]</span></p>
 <p>Solving the quadratic equation <span class="math inline">\(E^2 - 2RR_{obs} \cdot E + RR_{obs} = 0\)</span> using the quadratic formula: <span class="math display">\[E = \frac{2RR_{obs} \pm \sqrt{4RR_{obs}^2 - 4RR_{obs}}}{2} = RR_{obs} + \sqrt{RR_{obs}(RR_{obs} - 1)}\]</span></p>
 <p>This is the exact mathematical derivation of the E-value formula. It represents the absolute minimum joint relationship required for an unmeasured confounder to explain away the observed treatment effect.</p>
-<hr>
 </section>
 </section>
 <section id="hta-audit-interview-guide" class="level2" data-number="9">

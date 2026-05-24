@@ -33,8 +33,6 @@ To understand why simple observational survival analysis fails, consider the "Co
 
 To resolve this paradox, we cannot rely on simple regression adjustments; we must emulate a randomized trial to establish a clear chronological sequence of events.
 
----
-
 ## The Target Trial Emulation (TTE) Framework
 
 Target Trial Emulation is a structured design framework developed by Miguel Hernán and colleagues to guide the design and analysis of observational studies. The core principle is that **we should design our observational study to mimic a hypothetical randomized trial as closely as possible.**
@@ -88,8 +86,6 @@ An auditor cannot see:
 - Is there a "Healthy User Bias"?
 
 By using the **DataSAT** tool (Data Suitability Assessment Tool), NICE auditors look for **Provenance**—the clear lineage of how a patient moved from a raw database record to a study row. TTE forces the researcher to write a "Trial Protocol" *before* touching the data, making it obvious where $T_0$ is. If an auditor sees that you measured covariates after the drug was given and used them as baseline, the TTE framework will flag this as a "Post-baseline Bias" immediately.
-
----
 
 ## HTA Case Study: Drug X (METex14) Case Study
 
@@ -149,8 +145,6 @@ To maintain ITT principles:
 - **Artificial Censoring**: If the patient's actual path deviates from a clone's assigned arm, that clone is censored.
 - **IPCW Weighting**: Because censoring might be non-random, we estimate the probability of being censored at time $t$ based on baseline covariates and apply Inverse Probability of Censoring Weights to the remaining patients, dynamically restoring the balance.
 
----
-
 ## Immortal Time Bias (ITB): Theory & Landmark Analysis
 
 ### The Meditation & Longevity Paradox
@@ -188,8 +182,6 @@ Landmark Analysis is a classical approach to resolve this:
   - **Information Loss**: Discards all events and person-time before $T_L$. If the drug has high early toxicity, this signal is completely lost.
   - **Selection Bias**: The populations at $T_L$ may no longer be balanced, as sicker patients in the control group may have died, while sicker patients in the treated group were protected by the "immortal" definition.
 
----
-
 ## Time-Dependent Cox Model & HTA Practice
 
 The time-dependent Cox model is the industry standard for auditing and correcting immortal time bias in HTA submissions.
@@ -216,8 +208,6 @@ At Day 60, the patient is right-censored in the control group and enters the tre
 | **Causal Question** | Causal effect starting from Day 0. | Conditional effect given survival to $T_L$. |
 | **Early Toxicity** | Captures early adverse event signals. | Masked if events occur before $T_L$. |
 | **HTA Audit Preference** | Preferred for primary analysis. | Used primarily as a sensitivity analysis. |
-
----
 
 ## R Simulation: Validation of Estimators
 
@@ -358,8 +348,6 @@ show_cox(fit_tv, "Time-Varying Cox Proportional Hazards Model Results (Immortal 
 
 The time-varying Cox model successfully recovers the true treatment effect ($HR = 0.70$) without discarding data.
 
----
-
 ## Causal Evidence Reconciliation
 
 The table below summarizes the estimates across all three models compared to the true parameter.
@@ -392,8 +380,6 @@ reconciliation_tbl[is.na(reconciliation_tbl)] <- "N/A"
 
 knitr::kable(reconciliation_tbl, caption = "Survival Parameter Reconciliation Across Estimators", align = "lrrrrr")
 ```
-
----
 
 ## Quantitative Bias Analysis: E-Value Sensitivity Analysis
 
@@ -475,8 +461,6 @@ Solving the quadratic equation $E^2 - 2RR_{obs} \cdot E + RR_{obs} = 0$ using th
 $$E = \frac{2RR_{obs} \pm \sqrt{4RR_{obs}^2 - 4RR_{obs}}}{2} = RR_{obs} + \sqrt{RR_{obs}(RR_{obs} - 1)}$$
 
 This is the exact mathematical derivation of the E-value formula. It represents the absolute minimum joint relationship required for an unmeasured confounder to explain away the observed treatment effect.
-
----
 
 ## HTA Audit & Interview Guide
 
