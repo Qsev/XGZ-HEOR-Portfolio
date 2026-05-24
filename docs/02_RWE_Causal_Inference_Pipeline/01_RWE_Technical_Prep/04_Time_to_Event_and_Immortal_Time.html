@@ -303,30 +303,30 @@ window.Quarto = {
   <li><a href="#defining-t_0-zero-time-alignment" id="toc-defining-t_0-zero-time-alignment" class="nav-link" data-scroll-target="#defining-t_0-zero-time-alignment"><span class="header-section-number">3.3</span> Defining <span class="math inline">\(T_0\)</span> (Zero-time Alignment)</a></li>
   <li><a href="#implication-for-cloning-censoring" id="toc-implication-for-cloning-censoring" class="nav-link" data-scroll-target="#implication-for-cloning-censoring"><span class="header-section-number">3.4</span> Implication for Cloning &amp; Censoring</a></li>
   </ul></li>
-  <li><a href="#immortal-time-bias-itb-theory-landmark-analysis" id="toc-immortal-time-bias-itb-theory-landmark-analysis" class="nav-link" data-scroll-target="#immortal-time-bias-itb-theory-landmark-analysis"><span class="header-section-number">4</span> Immortal Time Bias (ITB): Theory &amp; Landmark Analysis</a>
+  <li><a href="#simulated-rwd-cohort-delayed-treatment-initiation" id="toc-simulated-rwd-cohort-delayed-treatment-initiation" class="nav-link" data-scroll-target="#simulated-rwd-cohort-delayed-treatment-initiation"><span class="header-section-number">4</span> Simulated RWD Cohort: Delayed Treatment Initiation</a>
   <ul class="collapse">
-  <li><a href="#the-meditation-longevity-paradox" id="toc-the-meditation-longevity-paradox" class="nav-link" data-scroll-target="#the-meditation-longevity-paradox"><span class="header-section-number">4.1</span> The Meditation &amp; Longevity Paradox</a></li>
-  <li><a href="#landmark-analysis" id="toc-landmark-analysis" class="nav-link" data-scroll-target="#landmark-analysis"><span class="header-section-number">4.2</span> Landmark Analysis</a></li>
+  <li><a href="#description-of-the-simulated-cohort" id="toc-description-of-the-simulated-cohort" class="nav-link" data-scroll-target="#description-of-the-simulated-cohort"><span class="header-section-number">4.1</span> Description of the Simulated Cohort</a></li>
+  <li><a href="#naive-static-cox-model-the-biased-starting-point" id="toc-naive-static-cox-model-the-biased-starting-point" class="nav-link" data-scroll-target="#naive-static-cox-model-the-biased-starting-point"><span class="header-section-number">4.2</span> Naive Static Cox Model: The Biased Starting Point</a></li>
   </ul></li>
-  <li><a href="#time-dependent-cox-model-hta-practice" id="toc-time-dependent-cox-model-hta-practice" class="nav-link" data-scroll-target="#time-dependent-cox-model-hta-practice"><span class="header-section-number">5</span> Time-Dependent Cox Model &amp; HTA Practice</a>
+  <li><a href="#immortal-time-bias-in-the-simulated-drug-x-cohort" id="toc-immortal-time-bias-in-the-simulated-drug-x-cohort" class="nav-link" data-scroll-target="#immortal-time-bias-in-the-simulated-drug-x-cohort"><span class="header-section-number">5</span> Immortal Time Bias in the Simulated Drug X Cohort</a>
   <ul class="collapse">
-  <li><a href="#what-the-model-does" id="toc-what-the-model-does" class="nav-link" data-scroll-target="#what-the-model-does"><span class="header-section-number">5.1</span> What the Model Does</a></li>
-  <li><a href="#counting-process-data-structure" id="toc-counting-process-data-structure" class="nav-link" data-scroll-target="#counting-process-data-structure"><span class="header-section-number">5.2</span> Counting Process Data Structure</a></li>
-  <li><a href="#landmark-vs.-time-dependent-cox" id="toc-landmark-vs.-time-dependent-cox" class="nav-link" data-scroll-target="#landmark-vs.-time-dependent-cox"><span class="header-section-number">5.3</span> Landmark vs.&nbsp;Time-Dependent Cox</a></li>
+  <li><a href="#first-correction-landmark-analysis" id="toc-first-correction-landmark-analysis" class="nav-link" data-scroll-target="#first-correction-landmark-analysis"><span class="header-section-number">5.1</span> First Correction: Landmark Analysis</a></li>
+  <li><a href="#applying-landmark-analysis-to-the-simulated-cohort" id="toc-applying-landmark-analysis-to-the-simulated-cohort" class="nav-link" data-scroll-target="#applying-landmark-analysis-to-the-simulated-cohort"><span class="header-section-number">5.2</span> Applying Landmark Analysis to the Simulated Cohort</a></li>
   </ul></li>
-  <li><a href="#cloning-censoring-and-ipcw-in-target-trial-emulation" id="toc-cloning-censoring-and-ipcw-in-target-trial-emulation" class="nav-link" data-scroll-target="#cloning-censoring-and-ipcw-in-target-trial-emulation"><span class="header-section-number">6</span> Cloning, Censoring, and IPCW in Target Trial Emulation</a>
+  <li><a href="#time-dependent-cox-model-hta-practice" id="toc-time-dependent-cox-model-hta-practice" class="nav-link" data-scroll-target="#time-dependent-cox-model-hta-practice"><span class="header-section-number">6</span> Time-Dependent Cox Model &amp; HTA Practice</a>
   <ul class="collapse">
-  <li><a href="#why-artificial-censoring-creates-bias" id="toc-why-artificial-censoring-creates-bias" class="nav-link" data-scroll-target="#why-artificial-censoring-creates-bias"><span class="header-section-number">6.1</span> Why Artificial Censoring Creates Bias</a></li>
-  <li><a href="#ipcw-intuition" id="toc-ipcw-intuition" class="nav-link" data-scroll-target="#ipcw-intuition"><span class="header-section-number">6.2</span> IPCW Intuition</a></li>
-  <li><a href="#stabilized-weights" id="toc-stabilized-weights" class="nav-link" data-scroll-target="#stabilized-weights"><span class="header-section-number">6.3</span> Stabilized Weights</a></li>
-  <li><a href="#hta-audit-checks" id="toc-hta-audit-checks" class="nav-link" data-scroll-target="#hta-audit-checks"><span class="header-section-number">6.4</span> HTA Audit Checks</a></li>
+  <li><a href="#what-the-model-does" id="toc-what-the-model-does" class="nav-link" data-scroll-target="#what-the-model-does"><span class="header-section-number">6.1</span> What the Model Does</a></li>
+  <li><a href="#counting-process-data-structure" id="toc-counting-process-data-structure" class="nav-link" data-scroll-target="#counting-process-data-structure"><span class="header-section-number">6.2</span> Counting Process Data Structure</a></li>
+  <li><a href="#landmark-vs.-time-dependent-cox" id="toc-landmark-vs.-time-dependent-cox" class="nav-link" data-scroll-target="#landmark-vs.-time-dependent-cox"><span class="header-section-number">6.3</span> Landmark vs.&nbsp;Time-Dependent Cox</a></li>
+  <li><a href="#applying-the-time-dependent-cox-model" id="toc-applying-the-time-dependent-cox-model" class="nav-link" data-scroll-target="#applying-the-time-dependent-cox-model"><span class="header-section-number">6.4</span> Applying the Time-Dependent Cox Model</a></li>
   </ul></li>
-  <li><a href="#r-simulation-validation-of-estimators" id="toc-r-simulation-validation-of-estimators" class="nav-link" data-scroll-target="#r-simulation-validation-of-estimators"><span class="header-section-number">7</span> R Simulation: Validation of Estimators</a>
+  <li><a href="#cloning-censoring-and-ipcw-in-target-trial-emulation" id="toc-cloning-censoring-and-ipcw-in-target-trial-emulation" class="nav-link" data-scroll-target="#cloning-censoring-and-ipcw-in-target-trial-emulation"><span class="header-section-number">7</span> Cloning, Censoring, and IPCW in Target Trial Emulation</a>
   <ul class="collapse">
-  <li><a href="#simulating-the-cohort-and-biased-analysis" id="toc-simulating-the-cohort-and-biased-analysis" class="nav-link" data-scroll-target="#simulating-the-cohort-and-biased-analysis"><span class="header-section-number">7.1</span> Simulating the Cohort and Biased Analysis</a></li>
-  <li><a href="#method-1-landmark-analysis-day-90" id="toc-method-1-landmark-analysis-day-90" class="nav-link" data-scroll-target="#method-1-landmark-analysis-day-90"><span class="header-section-number">7.2</span> Method 1: Landmark Analysis (Day 90)</a></li>
-  <li><a href="#method-2-time-varying-cox-model" id="toc-method-2-time-varying-cox-model" class="nav-link" data-scroll-target="#method-2-time-varying-cox-model"><span class="header-section-number">7.3</span> Method 2: Time-Varying Cox Model</a></li>
-  <li><a href="#method-3-cloning-censoring-ipcw-analysis" id="toc-method-3-cloning-censoring-ipcw-analysis" class="nav-link" data-scroll-target="#method-3-cloning-censoring-ipcw-analysis"><span class="header-section-number">7.4</span> Method 3: Cloning-Censoring-IPCW Analysis</a></li>
+  <li><a href="#why-artificial-censoring-creates-bias" id="toc-why-artificial-censoring-creates-bias" class="nav-link" data-scroll-target="#why-artificial-censoring-creates-bias"><span class="header-section-number">7.1</span> Why Artificial Censoring Creates Bias</a></li>
+  <li><a href="#ipcw-intuition" id="toc-ipcw-intuition" class="nav-link" data-scroll-target="#ipcw-intuition"><span class="header-section-number">7.2</span> IPCW Intuition</a></li>
+  <li><a href="#stabilized-weights" id="toc-stabilized-weights" class="nav-link" data-scroll-target="#stabilized-weights"><span class="header-section-number">7.3</span> Stabilized Weights</a></li>
+  <li><a href="#hta-audit-checks" id="toc-hta-audit-checks" class="nav-link" data-scroll-target="#hta-audit-checks"><span class="header-section-number">7.4</span> HTA Audit Checks</a></li>
+  <li><a href="#applying-cloning-censoring-ipcw" id="toc-applying-cloning-censoring-ipcw" class="nav-link" data-scroll-target="#applying-cloning-censoring-ipcw"><span class="header-section-number">7.5</span> Applying Cloning-Censoring-IPCW</a></li>
   </ul></li>
   <li><a href="#causal-evidence-reconciliation" id="toc-causal-evidence-reconciliation" class="nav-link" data-scroll-target="#causal-evidence-reconciliation"><span class="header-section-number">8</span> Causal Evidence Reconciliation</a></li>
   <li><a href="#quantitative-bias-analysis-e-value-sensitivity-analysis" id="toc-quantitative-bias-analysis-e-value-sensitivity-analysis" class="nav-link" data-scroll-target="#quantitative-bias-analysis-e-value-sensitivity-analysis"><span class="header-section-number">9</span> Quantitative Bias Analysis: E-Value Sensitivity Analysis</a>
@@ -348,7 +348,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Survival Analysis &amp; Immortal Time Bias in Real-World Evidence</h1>
-<p class="subtitle lead">Target Trial Emulation, Landmark Analysis, and Time-Varying Cox Regression</p>
+<p class="subtitle lead">Target Trial Emulation, Landmark Analysis, Time-Dependent Cox Models, and IPCW</p>
 </div>
 
 
@@ -561,7 +561,7 @@ window.Quarto = {
 <li><strong>Patient B</strong>: Diagnosed Jan 1, initiates Drug X Feb 1, survives until June.</li>
 <li><strong>Result</strong>: The Drug X group artificially filters out those who die before treatment initiation, inflating the active group’s survival.</li>
 </ul></li>
-<li><p><strong>TTE Correction</strong>: The survival follow-up clock must be aligned to a clearly defined index date that is comparable across arms. If the estimand starts at diagnosis but treatment can begin during a grace period, the waiting time must not be retrospectively credited to the treated group; it should be handled using cloning-and-censoring, a time-varying exposure model, or a pre-specified landmark strategy.</p></li>
+<li><p><strong>TTE Correction</strong>: The survival follow-up clock must be aligned to a clearly defined index date that is comparable across arms. If the causal question starts at diagnosis but treatment can begin during a grace period, the waiting time must not be retrospectively credited to the treated group; it should be handled using cloning-and-censoring, a time-varying exposure model, or a pre-specified landmark strategy.</p></li>
 </ol>
 </section>
 <section id="the-control-arm-t_0" class="level4 unnumbered">
@@ -595,26 +595,354 @@ window.Quarto = {
 </ul>
 </section>
 </section>
-<section id="immortal-time-bias-itb-theory-landmark-analysis" class="level2 page-columns page-full" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="immortal-time-bias-itb-theory-landmark-analysis"><span class="header-section-number">4</span> Immortal Time Bias (ITB): Theory &amp; Landmark Analysis</h2>
-<section id="the-meditation-longevity-paradox" class="level3 page-columns page-full" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="the-meditation-longevity-paradox"><span class="header-section-number">4.1</span> The Meditation &amp; Longevity Paradox</h3>
-<p>Consider a study evaluating whether a 12-week intensive meditation course increases overall survival (OS):</p>
+<section id="simulated-rwd-cohort-delayed-treatment-initiation" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="simulated-rwd-cohort-delayed-treatment-initiation"><span class="header-section-number">4</span> Simulated RWD Cohort: Delayed Treatment Initiation</h2>
+<p>To make the Drug X scenario concrete, we simulate a simplified RWD cohort with delayed treatment initiation. The simulated dataset is intentionally small enough to audit line by line, but it contains the core features that create immortal time bias:</p>
 <ul>
-<li><strong>Cohort</strong>: 1,000 participants followed for 5 years.</li>
-<li><strong>Exposure Group (<span class="math inline">\(Z=1\)</span>)</strong>: Completed the full 12-week program.</li>
-<li><strong>Control Group (<span class="math inline">\(Z=0\)</span>)</strong>: Did not complete the program (includes those who died or dropped out before week 12).</li>
-<li><strong>The Result</strong>: Participants who completed the course show a Hazard Ratio (<span class="math inline">\(HR\)</span>) of 0.30 (70% risk reduction).<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></li>
-<li><strong>The Error</strong>: Since a patient had to survive 12 weeks to complete the program, the meditation group is guaranteed 0% mortality during the first 12 weeks. Sicker patients who died in weeks 1–11 were automatically allocated to the control group.</li>
+<li>baseline prognostic covariates: age and ECOG status;</li>
+<li>treatment selection: older and sicker patients are more likely to receive Drug X;</li>
+<li>treatment delay: treated patients have an observed treatment-initiation delay of 30 to 120 days; later, a 90-day grace period is used to define the target trial strategy;</li>
+<li>time-to-event outcome: death or censoring during follow-up.</li>
 </ul>
-<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;Completion status at Week 12 is post-baseline information. It <strong>cannot</strong> be used retrospectively to define the baseline exposure group; otherwise, the first 12 weeks of survival are incorrectly credited to the intervention.</p></div></div></section>
-<section id="landmark-analysis" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="landmark-analysis"><span class="header-section-number">4.2</span> Landmark Analysis</h3>
+<p>We simulate a true treatment Hazard Ratio of <strong>0.70</strong> (30% risk reduction). The purpose of the simulation is not to recreate a real METex14 dataset, but to create a controlled setting where the true parameter is known and different analytic choices can be compared.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EValue)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Simulate baseline confounders</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">60</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>ecog <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.4</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Simulate treatment selection (confounding by indication)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Sicker (ECOG=1) and older patients are more likely to receive Drug X</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ps_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="fl">1.5</span> <span class="sc">+</span> <span class="fl">0.02</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> ecog)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>z_treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_prob)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Untreated patients are assigned Inf to indicate that treatment initiation never occurs</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>t_init <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(z_treatment <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">runif</span>(n, <span class="dv">30</span>, <span class="dv">120</span>), <span class="cn">Inf</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Simulate survival times (true treatment HR = 0.70)</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>true_hr <span class="ot">&lt;-</span> <span class="fl">0.70</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>lambda_base <span class="ot">&lt;-</span> <span class="fl">0.001</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="fl">0.02</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> ecog)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">runif</span>(n)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>log_u <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(u)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>pre_treatment_hazard <span class="ot">&lt;-</span> lambda_base <span class="sc">*</span> t_init</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>event_before_treatment <span class="ot">&lt;-</span> log_u <span class="sc">&lt;=</span> pre_treatment_hazard</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>t_event <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  event_before_treatment,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  log_u <span class="sc">/</span> lambda_base,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  t_init <span class="sc">+</span> (log_u <span class="sc">-</span> pre_treatment_hazard) <span class="sc">/</span> (lambda_base <span class="sc">*</span> true_hr)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Censoring between 150 and 730 days</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>t_censor <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="dv">150</span>, <span class="dv">730</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">pmin</span>(t_event, t_censor)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>event <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(t_event <span class="sc">&lt;=</span> t_censor)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span>n, age, ecog, z_treatment, t_init, time, event)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Future-informed treatment status: this is intentionally biased</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>ever_treated <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df<span class="sc">$</span>t_init <span class="sc">&lt;</span> df<span class="sc">$</span>time, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>t_init_display <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">is.infinite</span>(df<span class="sc">$</span>t_init), <span class="cn">NA</span>, df<span class="sc">$</span>t_init)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>event_count <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>event)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>event_pct <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>event) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper function used later to render Cox model summaries as kable tables</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>show_cox <span class="ot">&lt;-</span> <span class="cf">function</span>(fit, caption) {</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  sum_fit <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  coefs <span class="ot">&lt;-</span> sum_fit<span class="sc">$</span>coefficients</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  cis <span class="ot">&lt;-</span> sum_fit<span class="sc">$</span>conf.int</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  se_col <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="st">"robust se"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(coefs)) <span class="st">"robust se"</span> <span class="cf">else</span> <span class="st">"se(coef)"</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  z_col <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="st">"z"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(coefs)) <span class="st">"z"</span> <span class="cf">else</span> <span class="fu">colnames</span>(coefs)[<span class="dv">4</span>]</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">Covariate =</span> <span class="fu">rownames</span>(coefs),</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Hazard Ratio</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, <span class="st">"exp(coef)"</span>], <span class="dv">4</span>),</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Log HR (coef)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, <span class="st">"coef"</span>], <span class="dv">4</span>),</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Std Error</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, se_col], <span class="dv">4</span>),</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">z-value</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, z_col], <span class="dv">3</span>),</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format.pval</span>(coefs[, <span class="st">"Pr(&gt;|z|)"</span>], <span class="at">digits =</span> <span class="dv">4</span>),</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">95% LCL</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(cis[, <span class="dv">3</span>], <span class="dv">4</span>),</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">95% UCL</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(cis[, <span class="dv">4</span>], <span class="dv">4</span>),</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(tbl, <span class="at">caption =</span> caption, <span class="at">align =</span> <span class="st">"lrrrrrrr"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>How to Read the Survival-Time Simulation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The simulation uses a simple <strong>piecewise hazard</strong> structure. Before Drug X starts, each patient has an untreated baseline hazard, <code>lambda_base</code>. After Drug X starts, the hazard becomes <code>lambda_base * true_hr</code>. Because <code>true_hr = 0.70</code>, treatment reduces the hazard to 70% of the untreated level.</p>
+<p>The quantity <code>log_u = -log(u)</code> can be read as each patient’s randomly assigned <strong>cumulative hazard threshold</strong>. An event occurs when the cumulative hazard experienced by the patient reaches this threshold.</p>
+<p>Before treatment starts, cumulative hazard accumulates at the untreated rate:</p>
+<p><span class="math display">\[
+\text{pre-treatment cumulative hazard} = \lambda_{\text{base}} \times t_{\text{init}}
+\]</span></p>
+<p>If <code>log_u &lt;= pre_treatment_hazard</code>, the patient uses up their cumulative hazard threshold before treatment begins, so the event occurs during the untreated period:</p>
+<p><span class="math display">\[
+t_{\text{event}} = \frac{\text{log\_u}}{\lambda_{\text{base}}}
+\]</span></p>
+<p>If the patient survives until treatment initiation, only part of the cumulative hazard threshold has been used. The remaining hazard budget is:</p>
+<p><span class="math display">\[
+\text{log\_u} - \text{pre-treatment cumulative hazard}
+\]</span></p>
+<p>After treatment starts, hazard continues to accumulate, but at the lower treated rate, <span class="math inline">\(\lambda_{\text{base}} \times HR\)</span>. Therefore, the total event time is:</p>
+<p><span class="math display">\[
+t_{\text{event}} =
+t_{\text{init}} +
+\frac{\text{log\_u} - \text{pre-treatment cumulative hazard}}
+{\lambda_{\text{base}} \times HR}
+\]</span></p>
+<p>In short, the code simulates a patient who first experiences untreated risk, then, if they live long enough to initiate Drug X, continues accumulating hazard at a lower treated rate.</p>
+</div>
+</div>
+</div>
+<section id="description-of-the-simulated-cohort" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="description-of-the-simulated-cohort"><span class="header-section-number">4.1</span> Description of the Simulated Cohort</h3>
+<p>Before fitting any model, we inspect the simulated cohort. The key feature is that treatment is not assigned at time zero. Patients who eventually receive Drug X have a waiting period before their first recorded treatment start date.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>cohort_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Total patients"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Ever received Drug X during observed follow-up"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Observed deaths"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Mean age"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ECOG 1 proportion"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Median observed follow-up (days)"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Median treatment initiation delay among treated (days)"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Value =</span> <span class="fu">c</span>(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(df),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(df<span class="sc">$</span>ever_treated),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%s (%.1f%%)"</span>, event_count, event_pct),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, <span class="fu">mean</span>(df<span class="sc">$</span>age)),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f%%"</span>, <span class="fu">mean</span>(df<span class="sc">$</span>ecog <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>),</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, <span class="fu">median</span>(df<span class="sc">$</span>time)),</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, <span class="fu">median</span>(df<span class="sc">$</span>t_init_display[df<span class="sc">$</span>ever_treated <span class="sc">==</span> <span class="dv">1</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  cohort_summary,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Simulated RWD Cohort Description"</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"ll"</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Simulated RWD Cohort Description</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Metric</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Total patients</td>
+<td style="text-align: left;">500</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ever received Drug X during observed follow-up</td>
+<td style="text-align: left;">181</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Observed deaths</td>
+<td style="text-align: left;">379 (75.8%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mean age</td>
+<td style="text-align: left;">59.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ECOG 1 proportion</td>
+<td style="text-align: left;">38.4%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Median observed follow-up (days)</td>
+<td style="text-align: left;">179.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Median treatment initiation delay among treated (days)</td>
+<td style="text-align: left;">71.3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>baseline_by_group <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(age, ecog, time, event) <span class="sc">~</span> ever_treated,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> mean</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>baseline_by_group<span class="sc">$</span>Group <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  baseline_by_group<span class="sc">$</span>ever_treated <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Received Drug X"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Did not receive Drug X"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>baseline_display <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Group =</span> baseline_by_group<span class="sc">$</span>Group,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Mean&amp;nbsp;Age</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(baseline_by_group<span class="sc">$</span>age, <span class="dv">1</span>),</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">ECOG&amp;nbsp;1&amp;nbsp;(%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(baseline_by_group<span class="sc">$</span>ecog <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Mean&amp;nbsp;Follow-up&amp;nbsp;(days)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(baseline_by_group<span class="sc">$</span>time, <span class="dv">1</span>),</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Event&amp;nbsp;Rate&amp;nbsp;(%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(baseline_by_group<span class="sc">$</span>event <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  baseline_display,</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Naive Future-Informed Treatment Groups"</span>,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"lrrrr"</span>,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">escape =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Naive Future-Informed Treatment Groups</caption>
+<colgroup>
+<col style="width: 20%">
+<col style="width: 12%">
+<col style="width: 18%">
+<col style="width: 27%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Group</th>
+<th style="text-align: right;">Mean&nbsp;Age</th>
+<th style="text-align: right;">ECOG&nbsp;1&nbsp;(%)</th>
+<th style="text-align: right;">Mean&nbsp;Follow-up&nbsp;(days)</th>
+<th style="text-align: right;">Event&nbsp;Rate&nbsp;(%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Did not receive Drug X</td>
+<td style="text-align: right;">59.5</td>
+<td style="text-align: right;">38.2</td>
+<td style="text-align: right;">168.2</td>
+<td style="text-align: right;">82.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Received Drug X</td>
+<td style="text-align: right;">60.1</td>
+<td style="text-align: right;">38.7</td>
+<td style="text-align: right;">296.9</td>
+<td style="text-align: right;">64.6</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This table is deliberately labelled as “future-informed” because the group definition uses information that was not available at <span class="math inline">\(T_0\)</span>. A patient who died before treatment initiation could never become “ever treated,” so this baseline grouping already embeds immortal time bias.</p>
+</section>
+<section id="naive-static-cox-model-the-biased-starting-point" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="naive-static-cox-model-the-biased-starting-point"><span class="header-section-number">4.2</span> Naive Static Cox Model: The Biased Starting Point</h3>
+<p>The simplest analysis treats <code>ever_treated</code> as if it were a baseline treatment variable:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fit_biased <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ever_treated <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_biased, <span class="st">"Naive Static Cox Model Results (Immortal Time Unadjusted)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Naive Static Cox Model Results (Immortal Time Unadjusted)</caption>
+<colgroup>
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 16%">
+<col style="width: 11%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 9%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Covariate</th>
+<th style="text-align: right;">Hazard Ratio</th>
+<th style="text-align: right;">Log HR (coef)</th>
+<th style="text-align: right;">Std Error</th>
+<th style="text-align: right;">z-value</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">95% LCL</th>
+<th style="text-align: right;">95% UCL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ever_treated</td>
+<td style="text-align: right;">0.4062</td>
+<td style="text-align: right;">-0.9008</td>
+<td style="text-align: right;">0.1138</td>
+<td style="text-align: right;">-7.915</td>
+<td style="text-align: right;">2.468e-15</td>
+<td style="text-align: right;">0.3250</td>
+<td style="text-align: right;">0.5077</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">1.0219</td>
+<td style="text-align: right;">0.0216</td>
+<td style="text-align: right;">0.0056</td>
+<td style="text-align: right;">3.853</td>
+<td style="text-align: right;">0.0001168</td>
+<td style="text-align: right;">1.0107</td>
+<td style="text-align: right;">1.0332</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ecog</td>
+<td style="text-align: right;">1.9562</td>
+<td style="text-align: right;">0.6710</td>
+<td style="text-align: right;">0.1071</td>
+<td style="text-align: right;">6.264</td>
+<td style="text-align: right;">3.757e-10</td>
+<td style="text-align: right;">1.5857</td>
+<td style="text-align: right;">2.4132</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This model is intentionally wrong. The <code>ever_treated</code> hazard ratio is far below the true simulated HR of 0.70 because patients had to survive long enough to initiate Drug X before they could be classified as treated. Early deaths before treatment initiation are pushed into the untreated group, so the model incorrectly credits this survival selection to the drug.</p>
+</section>
+</section>
+<section id="immortal-time-bias-in-the-simulated-drug-x-cohort" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="immortal-time-bias-in-the-simulated-drug-x-cohort"><span class="header-section-number">5</span> Immortal Time Bias in the Simulated Drug X Cohort</h2>
+<p>This specific problem is known in epidemiology and survival analysis as <strong>Immortal Time Bias (ITB)</strong>. The naive Cox result above illustrates the mechanism: survival time before Drug X initiation is incorrectly credited to the treated group because treatment status was defined using information observed after <span class="math inline">\(T_0\)</span>.</p>
+<p>Now that the bias mechanism is visible, we evaluate three ways to handle delayed treatment initiation: landmark analysis, time-dependent Cox regression, and cloning-censoring-IPCW.</p>
+<section id="first-correction-landmark-analysis" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="first-correction-landmark-analysis"><span class="header-section-number">5.1</span> First Correction: Landmark Analysis</h3>
 <p>Landmark Analysis is a classical approach to resolve this:</p>
 <ol type="1">
-<li><strong>Select Landmark Time (<span class="math inline">\(T_L\)</span>)</strong>: E.g., Week 12.</li>
+<li><strong>Select Landmark Time (<span class="math inline">\(T_L\)</span>)</strong>: E.g., Day 90.</li>
 <li><strong>Exclude Early Events</strong>: Exclude all patients who died or were censored before <span class="math inline">\(T_L\)</span>.</li>
-<li><strong>Re-classify</strong>: Classify survivors at <span class="math inline">\(T_L\)</span> based on their exposure status at <span class="math inline">\(T_L\)</span>.</li>
+<li><strong>Re-classify</strong>: Classify survivors at <span class="math inline">\(T_L\)</span> based on their treatment status at <span class="math inline">\(T_L\)</span>.</li>
 <li><strong>Follow-up</strong>: Set <span class="math inline">\(T_L\)</span> as the new baseline (<span class="math inline">\(T_{start} = T_L\)</span>) and follow patients from that point.</li>
 </ol>
 <section id="hta-audit-of-landmark-analysis" class="level4 unnumbered">
@@ -625,17 +953,104 @@ window.Quarto = {
 <ul>
 <li><strong>Information Loss</strong>: Discards all events and person-time before <span class="math inline">\(T_L\)</span>. If the drug <strong>has high early toxicity</strong>, this signal is completely lost.</li>
 <li><strong>Selection Bias</strong>: The populations at <span class="math inline">\(T_L\)</span> may no longer be balanced, as sicker patients in the control group may have died, while sicker patients in the treated group were protected by the “immortal” definition.</li>
+<li><strong>Arbitrary Landmark Choice</strong>: The selected landmark time is a design decision, not a statistical truth. If <span class="math inline">\(T_L\)</span> is too early, many later initiators remain classified as untreated; if <span class="math inline">\(T_L\)</span> is too late, more early events are discarded.</li>
 </ul></li>
 </ul>
-<p>Therefore, landmark analysis is usually better positioned as an intuitive diagnostic or sensitivity analysis, rather than the preferred primary analysis for HTA submissions. It is most defensible when the clinical question is explicitly conditional on surviving and remaining eligible until the landmark time; otherwise, time-varying exposure models or cloning-censoring-IPCW are generally more aligned with the original target trial estimand.</p>
+<p>Therefore, landmark analysis is usually better positioned as an intuitive diagnostic or sensitivity analysis, rather than the preferred primary analysis for HTA submissions. It is most defensible when the clinical question is explicitly conditional on surviving and remaining eligible until the landmark time; otherwise, time-varying exposure models or cloning-censoring-IPCW are generally more aligned with the original target trial question.</p>
 </section>
 </section>
+<section id="applying-landmark-analysis-to-the-simulated-cohort" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="applying-landmark-analysis-to-the-simulated-cohort"><span class="header-section-number">5.2</span> Applying Landmark Analysis to the Simulated Cohort</h3>
+<p>We now apply a Day 90 landmark analysis to the simulated Drug X cohort. Patients who died or were censored before Day 90 are excluded. Among those who remain under observation at Day 90, treatment status is re-defined based on whether Drug X had started by that date.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>t_landmark <span class="ot">&lt;-</span> <span class="dv">90</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Exclude patients who died or were censored before Day 90</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>df_landmark <span class="ot">&lt;-</span> df[df<span class="sc">$</span>time <span class="sc">&gt;</span> t_landmark, ]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Classify treatment status at the landmark</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>df_landmark<span class="sc">$</span>treated_at_landmark <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df_landmark<span class="sc">$</span>t_init <span class="sc">&lt;=</span> t_landmark, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Shift follow-up time so Day 90 becomes the new time zero</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>df_landmark<span class="sc">$</span>time_shifted <span class="ot">&lt;-</span> df_landmark<span class="sc">$</span>time <span class="sc">-</span> t_landmark</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>fit_landmark <span class="ot">&lt;-</span> <span class="fu">coxph</span>(</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(time_shifted, event) <span class="sc">~</span> treated_at_landmark <span class="sc">+</span> age <span class="sc">+</span> ecog,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_landmark</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_landmark, <span class="st">"Landmark Analysis (Day 90) Cox Model Results"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Landmark Analysis (Day 90) Cox Model Results</caption>
+<colgroup>
+<col style="width: 22%">
+<col style="width: 14%">
+<col style="width: 15%">
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Covariate</th>
+<th style="text-align: right;">Hazard Ratio</th>
+<th style="text-align: right;">Log HR (coef)</th>
+<th style="text-align: right;">Std Error</th>
+<th style="text-align: right;">z-value</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">95% LCL</th>
+<th style="text-align: right;">95% UCL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">treated_at_landmark</td>
+<td style="text-align: right;">0.7879</td>
+<td style="text-align: right;">-0.2384</td>
+<td style="text-align: right;">0.1482</td>
+<td style="text-align: right;">-1.608</td>
+<td style="text-align: right;">0.107855</td>
+<td style="text-align: right;">0.5893</td>
+<td style="text-align: right;">1.0536</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">1.0212</td>
+<td style="text-align: right;">0.0210</td>
+<td style="text-align: right;">0.0074</td>
+<td style="text-align: right;">2.840</td>
+<td style="text-align: right;">0.004517</td>
+<td style="text-align: right;">1.0065</td>
+<td style="text-align: right;">1.0361</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ecog</td>
+<td style="text-align: right;">2.1712</td>
+<td style="text-align: right;">0.7753</td>
+<td style="text-align: right;">0.1415</td>
+<td style="text-align: right;">5.477</td>
+<td style="text-align: right;">4.32e-08</td>
+<td style="text-align: right;">1.6452</td>
+<td style="text-align: right;">2.8653</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The landmark model avoids using Day 90 treatment status to define baseline groups at Day 0. However, it changes the causal question: the result applies only to patients who survived and remained observable until the landmark time.</p>
 </section>
-<section id="time-dependent-cox-model-hta-practice" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="time-dependent-cox-model-hta-practice"><span class="header-section-number">5</span> Time-Dependent Cox Model &amp; HTA Practice</h2>
-<p>The time-dependent Cox model is an extension of the standard Cox proportional hazards model that allows a patient’s exposure status to <strong>change during follow-up</strong>. This makes it useful for auditing and correcting immortal time bias when treatment initiation is delayed.</p>
-<section id="what-the-model-does" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="what-the-model-does"><span class="header-section-number">5.1</span> What the Model Does</h3>
+</section>
+<section id="time-dependent-cox-model-hta-practice" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="time-dependent-cox-model-hta-practice"><span class="header-section-number">6</span> Time-Dependent Cox Model &amp; HTA Practice</h2>
+<p>The time-dependent Cox model is an extension of the standard Cox proportional hazards model that allows a patient’s treatment status to <strong>change during follow-up</strong>. This makes it useful for auditing and correcting immortal time bias when treatment initiation is delayed.</p>
+<section id="what-the-model-does" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="what-the-model-does"><span class="header-section-number">6.1</span> What the Model Does</h3>
 <p>In a standard Cox model, treatment is usually treated as fixed at baseline:</p>
 <p><span class="math display">\[
 h_i(t) = h_0(t)\exp(\beta Z_i + \gamma L_i)
@@ -648,8 +1063,8 @@ h_i(t) = h_0(t)\exp(\beta Z_i(t) + \gamma L_i)
 <p>Here, <span class="math inline">\(Z_i(t)=0\)</span> before treatment starts and <span class="math inline">\(Z_i(t)=1\)</span> after treatment starts. At each event time, the Cox model compares patients according to their treatment status <strong>at that moment</strong>, not according to information observed later in follow-up.</p>
 <p>This is the key correction for immortal time bias: the waiting period before treatment is counted as untreated person-time, rather than being retrospectively assigned to the treated group.</p>
 </section>
-<section id="counting-process-data-structure" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="counting-process-data-structure"><span class="header-section-number">5.2</span> Counting Process Data Structure</h3>
+<section id="counting-process-data-structure" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="counting-process-data-structure"><span class="header-section-number">6.2</span> Counting Process Data Structure</h3>
 <p>To estimate this model, the data usually need to be written in counting process format. Rather than one row per patient, the dataset is split into multiple intervals <code>(tstart, tstop]</code> where treatment status remains constant.</p>
 <section id="start-stop-data-format-example-patient-101" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="start-stop-data-format-example-patient-101">Start-Stop Data Format Example (Patient #101)</h4>
@@ -677,22 +1092,46 @@ h_i(t) = h_0(t)\exp(\beta Z_i(t) + \gamma L_i)
 <td style="text-align: left;">0</td>
 <td style="text-align: left;">60</td>
 <td style="text-align: left;">0 (Alive)</td>
-<td style="text-align: left;">0 (Unexposed)</td>
+<td style="text-align: left;">0 (Not treated)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">#101</td>
 <td style="text-align: left;">60</td>
 <td style="text-align: left;">500</td>
 <td style="text-align: left;">1 (Death)</td>
-<td style="text-align: left;">1 (Exposed)</td>
+<td style="text-align: left;">1 (Treated)</td>
 </tr>
 </tbody>
 </table>
-<p>At Day 60, the patient’s treatment status switches from unexposed to exposed. The patient is not removed from follow-up; instead, their contribution to the risk set is updated from untreated person-time to treated person-time.</p>
+<p>At Day 60, the patient’s treatment status switches from not treated to treated. The patient is not removed from follow-up; instead, their contribution to the risk set is updated from untreated person-time to treated person-time.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why This Is Not Duplicating the Patient
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In a Cox model, the partial likelihood is built at each observed event time. At each event time, the model rebuilds the risk set: who is still alive, still under follow-up, and what are their covariate values at that moment?</p>
+<p>In a standard Cox model, treatment status is fixed, so the model always reads the same <span class="math inline">\(Z_i\)</span> for patient <span class="math inline">\(i\)</span>. In a time-dependent Cox model, the model reads <span class="math inline">\(Z_i(t)\)</span>, meaning the patient’s treatment status at the event time being evaluated.</p>
+<p>For Patient #101, this means:</p>
+<ul>
+<li>before Day 60, the patient can enter risk sets as <code>Z = 0</code>;</li>
+<li>after Day 60, the same patient can enter risk sets as <code>Z = 1</code>;</li>
+<li>at no event time do both rows enter the same risk set simultaneously.</li>
+</ul>
+<p>The two rows therefore represent two non-overlapping risk intervals for the same patient, not two independent patients. The patient contributes untreated person-time before Day 60, treated person-time after Day 60, and one death event at Day 500.</p>
+</div>
+</div>
+</div>
 </section>
 </section>
-<section id="landmark-vs.-time-dependent-cox" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="landmark-vs.-time-dependent-cox"><span class="header-section-number">5.3</span> Landmark vs.&nbsp;Time-Dependent Cox</h3>
+<section id="landmark-vs.-time-dependent-cox" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="landmark-vs.-time-dependent-cox"><span class="header-section-number">6.3</span> Landmark vs.&nbsp;Time-Dependent Cox</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -730,303 +1169,23 @@ h_i(t) = h_0(t)\exp(\beta Z_i(t) + \gamma L_i)
 </tbody>
 </table>
 </section>
-</section>
-<section id="cloning-censoring-and-ipcw-in-target-trial-emulation" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="cloning-censoring-and-ipcw-in-target-trial-emulation"><span class="header-section-number">6</span> Cloning, Censoring, and IPCW in Target Trial Emulation</h2>
-<p>Time-dependent Cox models are useful for auditing whether delayed treatment initiation has created immortal time bias. However, when the target trial estimand is defined as a comparison of <strong>treatment strategies</strong>—for example, “initiate Drug X within 90 days of diagnosis” versus “do not initiate Drug X within 90 days”—a trial-emulation analysis often requires <strong>cloning, artificial censoring, and inverse probability of censoring weighting (IPCW)</strong>.</p>
-<section id="why-artificial-censoring-creates-bias" class="level3" data-number="6.1">
-<h3 data-number="6.1" class="anchored" data-anchor-id="why-artificial-censoring-creates-bias"><span class="header-section-number">6.1</span> Why Artificial Censoring Creates Bias</h3>
-<p>In a cloned analysis, each patient is copied into every treatment strategy at <span class="math inline">\(T_0\)</span>:</p>
-<ul>
-<li>One clone is assigned to the “initiate within grace period” strategy.</li>
-<li>One clone is assigned to the “do not initiate within grace period” strategy.</li>
-</ul>
-<p>Each clone is followed from the same <span class="math inline">\(T_0\)</span>. If the patient’s observed behavior becomes incompatible with a clone’s assigned strategy, that clone is artificially censored. For example, if the “no treatment” clone initiates Drug X on Day 20, that clone is censored on Day 20.</p>
-<p>This artificial censoring is not necessarily random. Patients who start treatment early may differ systematically from patients who do not start treatment, and patients who remain compatible with a strategy may no longer represent the original target population. IPCW is used to reduce this selection bias.</p>
-</section>
-<section id="ipcw-intuition" class="level3" data-number="6.2">
-<h3 data-number="6.2" class="anchored" data-anchor-id="ipcw-intuition"><span class="header-section-number">6.2</span> IPCW Intuition</h3>
-<p>The “C” in IPCW stands for <strong>censoring</strong>. The core idea is to weight each remaining uncensored clone by the inverse of its probability of remaining uncensored:</p>
-<p><span class="math display">\[
-w_i(t) = \frac{1}{P(C_i(t)=0 \mid L_i)}
-\]</span></p>
-<p>where <span class="math inline">\(C_i(t)=0\)</span> means clone <span class="math inline">\(i\)</span> remains uncensored at time <span class="math inline">\(t\)</span>, and <span class="math inline">\(L_i\)</span> represents baseline or time-updated covariate history.</p>
-<p>The intuition is simple: if a type of patient is highly likely to be censored, but one such patient remains uncensored, that patient receives more weight because they represent similar patients who were censored.</p>
-</section>
-<section id="stabilized-weights" class="level3" data-number="6.3">
-<h3 data-number="6.3" class="anchored" data-anchor-id="stabilized-weights"><span class="header-section-number">6.3</span> Stabilized Weights</h3>
-<p>In practice, stabilized weights are often preferred because they reduce variance:</p>
-<p><span class="math display">\[
-SW_i(t) =
-\frac{P(C_i(t)=0 \mid A_i)}
-{P(C_i(t)=0 \mid A_i, L_i)}
-\]</span></p>
-<p>The denominator models censoring using strategy assignment and prognostic covariates. The numerator uses a simpler model, often including strategy assignment only. Extreme weights should be inspected and, if necessary, truncated using a pre-specified rule.</p>
-</section>
-<section id="hta-audit-checks" class="level3" data-number="6.4">
-<h3 data-number="6.4" class="anchored" data-anchor-id="hta-audit-checks"><span class="header-section-number">6.4</span> HTA Audit Checks</h3>
-<p>For an HTA-facing analysis, IPCW should not be presented as a black box. The submission should document:</p>
-<ul>
-<li>the protocol rule that triggers artificial censoring;</li>
-<li>the censoring model covariates and timing;</li>
-<li>the distribution of stabilized weights;</li>
-<li>any truncation threshold and its sensitivity analysis;</li>
-<li>whether positivity is plausible across clinically relevant subgroups.</li>
-</ul>
-</section>
-</section>
-<section id="r-simulation-validation-of-estimators" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="r-simulation-validation-of-estimators"><span class="header-section-number">7</span> R Simulation: Validation of Estimators</h2>
-<p>We simulate a cohort of 500 patients where treatment initiation is delayed due to an administrative “Approval Lag.”</p>
-<section id="simulating-the-cohort-and-biased-analysis" class="level3" data-number="7.1">
-<h3 data-number="7.1" class="anchored" data-anchor-id="simulating-the-cohort-and-biased-analysis"><span class="header-section-number">7.1</span> Simulating the Cohort and Biased Analysis</h3>
-<p>We simulate a true treatment Hazard Ratio of <strong>0.70</strong> (30% risk reduction). Age and ECOG status act as baseline confounders.</p>
+<section id="applying-the-time-dependent-cox-model" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="applying-the-time-dependent-cox-model"><span class="header-section-number">6.4</span> Applying the Time-Dependent Cox Model</h3>
+<p>We now restructure the same simulated cohort into counting process format using <code>tmerge()</code>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EValue)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper function to render Cox model summaries as kable tables</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>show_cox <span class="ot">&lt;-</span> <span class="cf">function</span>(fit, caption) {</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  sum_fit <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  coefs <span class="ot">&lt;-</span> sum_fit<span class="sc">$</span>coefficients</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  cis <span class="ot">&lt;-</span> sum_fit<span class="sc">$</span>conf.int</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  se_col <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="st">"robust se"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(coefs)) <span class="st">"robust se"</span> <span class="cf">else</span> <span class="st">"se(coef)"</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  z_col <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="st">"z"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(coefs)) <span class="st">"z"</span> <span class="cf">else</span> <span class="fu">colnames</span>(coefs)[<span class="dv">4</span>]</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">Covariate =</span> <span class="fu">rownames</span>(coefs),</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Hazard Ratio</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, <span class="st">"exp(coef)"</span>], <span class="dv">4</span>),</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Log HR (coef)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, <span class="st">"coef"</span>], <span class="dv">4</span>),</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Std Error</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, se_col], <span class="dv">4</span>),</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">z-value</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(coefs[, z_col], <span class="dv">3</span>),</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format.pval</span>(coefs[, <span class="st">"Pr(&gt;|z|)"</span>], <span class="at">digits =</span> <span class="dv">4</span>),</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">95% LCL</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(cis[, <span class="dv">3</span>], <span class="dv">4</span>),</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">95% UCL</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(cis[, <span class="dv">4</span>], <span class="dv">4</span>),</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(tbl, <span class="at">caption =</span> caption, <span class="at">align =</span> <span class="st">"lrrrrrrr"</span>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Simulate Baseline Confounders</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">60</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>ecog <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.4</span>)</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Simulate Treatment Selection (Confounding by Indication)</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Sicker (ECOG=1) and older patients are more likely to receive treatment</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>ps_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="fl">1.5</span> <span class="sc">+</span> <span class="fl">0.02</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> ecog)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>z_treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_prob)</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># For those treated, add a random initiation delay between 30 and 120 days</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>t_init <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(z_treatment <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">runif</span>(n, <span class="dv">30</span>, <span class="dv">120</span>), <span class="cn">Inf</span>)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Simulate Survival Times (True treatment HR = 0.70)</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>true_hr <span class="ot">&lt;-</span> <span class="fl">0.70</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>lambda_base <span class="ot">&lt;-</span> <span class="fl">0.001</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="fl">0.02</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> ecog)</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">runif</span>(n)</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>log_u <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(u)</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>t_event <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  l0 <span class="ot">&lt;-</span> lambda_base[i]</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  l1 <span class="ot">&lt;-</span> l0 <span class="sc">*</span> true_hr</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  t_tr <span class="ot">&lt;-</span> t_init[i]</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (log_u[i] <span class="sc">&lt;=</span> l0 <span class="sc">*</span> t_tr) {</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    t_event[i] <span class="ot">&lt;-</span> log_u[i] <span class="sc">/</span> l0</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    t_event[i] <span class="ot">&lt;-</span> t_tr <span class="sc">+</span> (log_u[i] <span class="sc">-</span> l0 <span class="sc">*</span> t_tr) <span class="sc">/</span> l1</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="co"># Censoring between 150 and 730 days</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>t_censor <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="dv">150</span>, <span class="dv">730</span>)</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">pmin</span>(t_event, t_censor)</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>event <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(t_event <span class="sc">&lt;=</span> t_censor)</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span>n, age, ecog, z_treatment, t_init, time, event)</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Determine treatment status based on actual follow-up (Biased approach)</span></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>ever_treated <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df<span class="sc">$</span>t_init <span class="sc">&lt;</span> df<span class="sc">$</span>time, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Biased Analysis: Static Cox Model ---</span></span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>fit_biased <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ever_treated <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df)</span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_biased, <span class="st">"Biased Static Cox Proportional Hazards Model Results (Immortal Time Unadjusted)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Biased Static Cox Proportional Hazards Model Results (Immortal Time Unadjusted)</caption>
-<colgroup>
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 14%">
-<col style="width: 10%">
-<col style="width: 8%">
-<col style="width: 10%">
-<col style="width: 8%">
-<col style="width: 8%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: left;">Covariate</th>
-<th style="text-align: right;">Hazard Ratio</th>
-<th style="text-align: right;">Log HR (coef)</th>
-<th style="text-align: right;">Std Error</th>
-<th style="text-align: right;">z-value</th>
-<th style="text-align: right;">p-value</th>
-<th style="text-align: right;">95% LCL</th>
-<th style="text-align: right;">95% UCL</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">ever_treated</td>
-<td style="text-align: left;">ever_treated</td>
-<td style="text-align: right;">0.4062</td>
-<td style="text-align: right;">-0.9008</td>
-<td style="text-align: right;">0.1138</td>
-<td style="text-align: right;">-7.915</td>
-<td style="text-align: right;">2.468e-15</td>
-<td style="text-align: right;">0.3250</td>
-<td style="text-align: right;">0.5077</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">age</td>
-<td style="text-align: left;">age</td>
-<td style="text-align: right;">1.0219</td>
-<td style="text-align: right;">0.0216</td>
-<td style="text-align: right;">0.0056</td>
-<td style="text-align: right;">3.853</td>
-<td style="text-align: right;">0.0001168</td>
-<td style="text-align: right;">1.0107</td>
-<td style="text-align: right;">1.0332</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">ecog</td>
-<td style="text-align: left;">ecog</td>
-<td style="text-align: right;">1.9562</td>
-<td style="text-align: right;">0.6710</td>
-<td style="text-align: right;">0.1071</td>
-<td style="text-align: right;">6.264</td>
-<td style="text-align: right;">3.757e-10</td>
-<td style="text-align: right;">1.5857</td>
-<td style="text-align: right;">2.4132</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>The biased static Cox model overestimates drug efficacy due to the unadjusted immortal time.</p>
-</section>
-<section id="method-1-landmark-analysis-day-90" class="level3" data-number="7.2">
-<h3 data-number="7.2" class="anchored" data-anchor-id="method-1-landmark-analysis-day-90"><span class="header-section-number">7.2</span> Method 1: Landmark Analysis (Day 90)</h3>
-<p>We apply Landmark Analysis at Day 90:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>t_landmark <span class="ot">&lt;-</span> <span class="dv">90</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Exclude patients who died or were censored before Day 90</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df_landmark <span class="ot">&lt;-</span> df[df<span class="sc">$</span>time <span class="sc">&gt;</span> t_landmark, ]</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Classify status at Landmark</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df_landmark<span class="sc">$</span>treated_at_landmark <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df_landmark<span class="sc">$</span>t_init <span class="sc">&lt;=</span> t_landmark, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Shift time</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>df_landmark<span class="sc">$</span>time_shifted <span class="ot">&lt;-</span> df_landmark<span class="sc">$</span>time <span class="sc">-</span> t_landmark</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>fit_landmark <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time_shifted, event) <span class="sc">~</span> treated_at_landmark <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df_landmark)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_landmark, <span class="st">"Landmark Analysis (Day 90) Cox Proportional Hazards Model Results"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Landmark Analysis (Day 90) Cox Proportional Hazards Model Results</caption>
-<colgroup>
-<col style="width: 18%">
-<col style="width: 18%">
-<col style="width: 11%">
-<col style="width: 12%">
-<col style="width: 9%">
-<col style="width: 7%">
-<col style="width: 8%">
-<col style="width: 7%">
-<col style="width: 7%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: left;">Covariate</th>
-<th style="text-align: right;">Hazard Ratio</th>
-<th style="text-align: right;">Log HR (coef)</th>
-<th style="text-align: right;">Std Error</th>
-<th style="text-align: right;">z-value</th>
-<th style="text-align: right;">p-value</th>
-<th style="text-align: right;">95% LCL</th>
-<th style="text-align: right;">95% UCL</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">treated_at_landmark</td>
-<td style="text-align: left;">treated_at_landmark</td>
-<td style="text-align: right;">0.7879</td>
-<td style="text-align: right;">-0.2384</td>
-<td style="text-align: right;">0.1482</td>
-<td style="text-align: right;">-1.608</td>
-<td style="text-align: right;">0.107855</td>
-<td style="text-align: right;">0.5893</td>
-<td style="text-align: right;">1.0536</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">age</td>
-<td style="text-align: left;">age</td>
-<td style="text-align: right;">1.0212</td>
-<td style="text-align: right;">0.0210</td>
-<td style="text-align: right;">0.0074</td>
-<td style="text-align: right;">2.840</td>
-<td style="text-align: right;">0.004517</td>
-<td style="text-align: right;">1.0065</td>
-<td style="text-align: right;">1.0361</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">ecog</td>
-<td style="text-align: left;">ecog</td>
-<td style="text-align: right;">2.1712</td>
-<td style="text-align: right;">0.7753</td>
-<td style="text-align: right;">0.1415</td>
-<td style="text-align: right;">5.477</td>
-<td style="text-align: right;">4.32e-08</td>
-<td style="text-align: right;">1.6452</td>
-<td style="text-align: right;">2.8653</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</section>
-<section id="method-2-time-varying-cox-model" class="level3" data-number="7.3">
-<h3 data-number="7.3" class="anchored" data-anchor-id="method-2-time-varying-cox-model"><span class="header-section-number">7.3</span> Method 2: Time-Varying Cox Model</h3>
-<p>We restructure the dataset into a counting process format using <code>tmerge()</code> and fit the time-varying Cox model:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Initialize dataset with the primary event time</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_tv <span class="ot">&lt;-</span> <span class="fu">tmerge</span>(df, df, <span class="at">id =</span> id, <span class="at">event =</span> <span class="fu">event</span>(time, event))</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Merge the time-dependent treatment initiation event</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>df_tv <span class="ot">&lt;-</span> <span class="fu">tmerge</span>(df_tv, df, <span class="at">id =</span> id, <span class="at">treatment_status =</span> <span class="fu">tdc</span>(t_init))</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the split intervals for Patient ID 1 to 3 in table format</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(df_tv[df_tv<span class="sc">$</span>id <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"tstart"</span>, <span class="st">"tstop"</span>, <span class="st">"event"</span>, <span class="st">"treatment_status"</span>)]),</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Restructured Counting Process Intervals (Patient ID 1-3)"</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"c"</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Initialize dataset with the primary event time</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df_tv <span class="ot">&lt;-</span> <span class="fu">tmerge</span>(df, df, <span class="at">id =</span> id, <span class="at">event =</span> <span class="fu">event</span>(time, event))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Merge the time-dependent treatment initiation event</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>df_tv <span class="ot">&lt;-</span> <span class="fu">tmerge</span>(df_tv, df, <span class="at">id =</span> id, <span class="at">treatment_status =</span> <span class="fu">tdc</span>(t_init))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(df_tv[df_tv<span class="sc">$</span>id <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"tstart"</span>, <span class="st">"tstop"</span>, <span class="st">"event"</span>, <span class="st">"treatment_status"</span>)]),</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Restructured Counting Process Intervals (Patient ID 1-3)"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"c"</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1082,34 +1241,34 @@ SW_i(t) =
 </div>
 <p>As shown, if a patient receives treatment at a delayed time, their follow-up is split:</p>
 <ul>
-<li><strong>Interval 1 <code>[0, t_init]</code></strong>: <code>treatment_status = 0</code> (contributes person-time to the control risk set).</li>
-<li><strong>Interval 2 <code>[t_init, time]</code></strong>: <code>treatment_status = 1</code> (contributes person-time to the treated risk set after the first infusion).</li>
+<li><strong>Interval 1 <code>[0, t_init]</code></strong>: <code>treatment_status = 0</code>, contributing untreated person-time.</li>
+<li><strong>Interval 2 <code>[t_init, time]</code></strong>: <code>treatment_status = 1</code>, contributing treated person-time after Drug X starts.</li>
 </ul>
-<p>We fit the Cox model on the split intervals:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the time-varying Cox model</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fit_tv <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(tstart, tstop, event) <span class="sc">~</span> treatment_status <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">data =</span> df_tv)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_tv, <span class="st">"Time-Varying Cox Proportional Hazards Model Results (Immortal Time Corrected)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fit_tv <span class="ot">&lt;-</span> <span class="fu">coxph</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(tstart, tstop, event) <span class="sc">~</span> treatment_status <span class="sc">+</span> age <span class="sc">+</span> ecog,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_tv</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_tv, <span class="st">"Time-Dependent Cox Model Results (Immortal Time Corrected)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Time-Varying Cox Proportional Hazards Model Results (Immortal Time Corrected)</caption>
+<caption>Time-Dependent Cox Model Results (Immortal Time Corrected)</caption>
 <colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 12%">
-<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 14%">
+<col style="width: 15%">
+<col style="width: 11%">
 <col style="width: 9%">
-<col style="width: 7%">
+<col style="width: 11%">
 <col style="width: 9%">
-<col style="width: 7%">
-<col style="width: 7%">
+<col style="width: 9%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;"></th>
 <th style="text-align: left;">Covariate</th>
 <th style="text-align: right;">Hazard Ratio</th>
 <th style="text-align: right;">Log HR (coef)</th>
@@ -1123,7 +1282,6 @@ SW_i(t) =
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">treatment_status</td>
-<td style="text-align: left;">treatment_status</td>
 <td style="text-align: right;">0.6930</td>
 <td style="text-align: right;">-0.3668</td>
 <td style="text-align: right;">0.1257</td>
@@ -1134,7 +1292,6 @@ SW_i(t) =
 </tr>
 <tr class="even">
 <td style="text-align: left;">age</td>
-<td style="text-align: left;">age</td>
 <td style="text-align: right;">1.0188</td>
 <td style="text-align: right;">0.0187</td>
 <td style="text-align: right;">0.0056</td>
@@ -1144,7 +1301,6 @@ SW_i(t) =
 <td style="text-align: right;">1.0300</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">ecog</td>
 <td style="text-align: left;">ecog</td>
 <td style="text-align: right;">1.8597</td>
 <td style="text-align: right;">0.6204</td>
@@ -1158,10 +1314,54 @@ SW_i(t) =
 </table>
 </div>
 </div>
-<p>The time-varying Cox model successfully recovers the true treatment effect (<span class="math inline">\(HR = 0.70\)</span>) without discarding data.</p>
+<p>The time-dependent Cox model keeps the early follow-up time and assigns it to the correct treatment state. In this simulation, it is expected to recover a hazard ratio closer to the true treatment effect than the naive static model.</p>
 </section>
-<section id="method-3-cloning-censoring-ipcw-analysis" class="level3" data-number="7.4">
-<h3 data-number="7.4" class="anchored" data-anchor-id="method-3-cloning-censoring-ipcw-analysis"><span class="header-section-number">7.4</span> Method 3: Cloning-Censoring-IPCW Analysis</h3>
+</section>
+<section id="cloning-censoring-and-ipcw-in-target-trial-emulation" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="cloning-censoring-and-ipcw-in-target-trial-emulation"><span class="header-section-number">7</span> Cloning, Censoring, and IPCW in Target Trial Emulation</h2>
+<p>Time-dependent Cox models are useful for auditing whether delayed treatment initiation has created immortal time bias. However, when the target trial question is defined as a comparison of <strong>treatment strategies</strong>—for example, “initiate Drug X within 90 days of diagnosis” versus “do not initiate Drug X within 90 days”—a trial-emulation analysis often requires <strong>cloning, artificial censoring, and inverse probability of censoring weighting (IPCW)</strong>.</p>
+<section id="why-artificial-censoring-creates-bias" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="why-artificial-censoring-creates-bias"><span class="header-section-number">7.1</span> Why Artificial Censoring Creates Bias</h3>
+<p>In a cloned analysis, each patient is copied into every treatment strategy at <span class="math inline">\(T_0\)</span>:</p>
+<ul>
+<li>One clone is assigned to the “initiate within grace period” strategy.</li>
+<li>One clone is assigned to the “do not initiate within grace period” strategy.</li>
+</ul>
+<p>Each clone is followed from the same <span class="math inline">\(T_0\)</span>. If the patient’s observed behavior becomes incompatible with a clone’s assigned strategy, that clone is artificially censored. For example, if the “no treatment” clone initiates Drug X on Day 20, that clone is censored on Day 20.</p>
+<p>This artificial censoring is not necessarily random. Patients who start treatment early may differ systematically from patients who do not start treatment, and patients who remain compatible with a strategy may no longer represent the original target population. IPCW is used to reduce this selection bias.</p>
+</section>
+<section id="ipcw-intuition" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="ipcw-intuition"><span class="header-section-number">7.2</span> IPCW Intuition</h3>
+<p>The “C” in IPCW stands for <strong>censoring</strong>. The core idea is to weight each remaining uncensored clone by the inverse of its probability of remaining uncensored:</p>
+<p><span class="math display">\[
+w_i(t) = \frac{1}{P(C_i(t)=0 \mid L_i)}
+\]</span></p>
+<p>where <span class="math inline">\(C_i(t)=0\)</span> means clone <span class="math inline">\(i\)</span> remains uncensored at time <span class="math inline">\(t\)</span>, and <span class="math inline">\(L_i\)</span> represents baseline or time-updated covariate history.</p>
+<p>The intuition is simple: if a type of patient is highly likely to be censored, but one such patient remains uncensored, that patient receives more weight because they represent similar patients who were censored.</p>
+</section>
+<section id="stabilized-weights" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="stabilized-weights"><span class="header-section-number">7.3</span> Stabilized Weights</h3>
+<p>In practice, stabilized weights are often preferred because they reduce variance:</p>
+<p><span class="math display">\[
+SW_i(t) =
+\frac{P(C_i(t)=0 \mid A_i)}
+{P(C_i(t)=0 \mid A_i, L_i)}
+\]</span></p>
+<p>The denominator models censoring using strategy assignment and prognostic covariates. The numerator uses a simpler model, often including strategy assignment only. Extreme weights should be inspected and, if necessary, truncated using a pre-specified rule.</p>
+</section>
+<section id="hta-audit-checks" class="level3" data-number="7.4">
+<h3 data-number="7.4" class="anchored" data-anchor-id="hta-audit-checks"><span class="header-section-number">7.4</span> HTA Audit Checks</h3>
+<p>For an HTA-facing analysis, IPCW should not be presented as a black box. The submission should document:</p>
+<ul>
+<li>the protocol rule that triggers artificial censoring;</li>
+<li>the censoring model covariates and timing;</li>
+<li>the distribution of stabilized weights;</li>
+<li>any truncation threshold and its sensitivity analysis;</li>
+<li>whether positivity is plausible across clinically relevant subgroups.</li>
+</ul>
+</section>
+<section id="applying-cloning-censoring-ipcw" class="level3" data-number="7.5">
+<h3 data-number="7.5" class="anchored" data-anchor-id="applying-cloning-censoring-ipcw"><span class="header-section-number">7.5</span> Applying Cloning-Censoring-IPCW</h3>
 <p>We now emulate a strategy-level target trial with a 90-day grace period:</p>
 <ul>
 <li><strong>Strategy 1</strong>: initiate Drug X within 90 days of diagnosis.</li>
@@ -1171,46 +1371,46 @@ SW_i(t) =
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>grace_period <span class="ot">&lt;-</span> <span class="dv">90</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Clone each patient into both treatment strategies</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>df_clone <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform</span>(df, <span class="at">strategy =</span> <span class="dv">1</span>, <span class="at">strategy_label =</span> <span class="st">"Initiate within 90 days"</span>),</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform</span>(df, <span class="at">strategy =</span> <span class="dv">0</span>, <span class="at">strategy_label =</span> <span class="st">"No initiation within 90 days"</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Define artificial censoring rules</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censor_time <span class="ot">&lt;-</span> <span class="cn">Inf</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Strategy 1 violation: no treatment initiation by the end of the grace period</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censor_time[</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  df_clone<span class="sc">$</span>strategy <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&gt;</span> grace_period <span class="sc">&amp;</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>time <span class="sc">&gt;</span> grace_period</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>] <span class="ot">&lt;-</span> grace_period</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Strategy 0 violation: treatment initiation during the grace period</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censor_time[</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  df_clone<span class="sc">$</span>strategy <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&lt;=</span> grace_period <span class="sc">&amp;</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&lt;</span> df_clone<span class="sc">$</span>time</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>] <span class="ot">&lt;-</span> df_clone<span class="sc">$</span>t_init[</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  df_clone<span class="sc">$</span>strategy <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&lt;=</span> grace_period <span class="sc">&amp;</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&lt;</span> df_clone<span class="sc">$</span>time</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Observed follow-up under each assigned strategy</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>obs_time <span class="ot">&lt;-</span> <span class="fu">pmin</span>(df_clone<span class="sc">$</span>time, df_clone<span class="sc">$</span>artificial_censor_time)</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>outcome_event <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_clone<span class="sc">$</span>event <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> df_clone<span class="sc">$</span>time <span class="sc">&lt;=</span> df_clone<span class="sc">$</span>artificial_censor_time)</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censored <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_clone<span class="sc">$</span>artificial_censor_time <span class="sc">&lt;</span> df_clone<span class="sc">$</span>time)</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>uncensored <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> df_clone<span class="sc">$</span>artificial_censored</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(df_clone[, <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"strategy_label"</span>, <span class="st">"time"</span>, <span class="st">"event"</span>, <span class="st">"t_init"</span>, <span class="st">"obs_time"</span>, <span class="st">"outcome_event"</span>, <span class="st">"artificial_censored"</span>)], <span class="dv">8</span>),</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Cloned Target Trial Dataset with Artificial Censoring Rules"</span>,</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"c"</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>grace_period <span class="ot">&lt;-</span> <span class="dv">90</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Clone each patient into both treatment strategies</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>df_clone <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform</span>(df, <span class="at">strategy =</span> <span class="dv">1</span>, <span class="at">strategy_label =</span> <span class="st">"Initiate within 90 days"</span>),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform</span>(df, <span class="at">strategy =</span> <span class="dv">0</span>, <span class="at">strategy_label =</span> <span class="st">"No initiation within 90 days"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Define artificial censoring rules</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censor_time <span class="ot">&lt;-</span> <span class="cn">Inf</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Strategy 1 violation: no treatment initiation by the end of the grace period</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censor_time[</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  df_clone<span class="sc">$</span>strategy <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&gt;</span> grace_period <span class="sc">&amp;</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>time <span class="sc">&gt;</span> grace_period</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>] <span class="ot">&lt;-</span> grace_period</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Strategy 0 violation: treatment initiation during the grace period</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censor_time[</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  df_clone<span class="sc">$</span>strategy <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&lt;=</span> grace_period <span class="sc">&amp;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&lt;</span> df_clone<span class="sc">$</span>time</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>] <span class="ot">&lt;-</span> df_clone<span class="sc">$</span>t_init[</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  df_clone<span class="sc">$</span>strategy <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&lt;=</span> grace_period <span class="sc">&amp;</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    df_clone<span class="sc">$</span>t_init <span class="sc">&lt;</span> df_clone<span class="sc">$</span>time</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Observed follow-up under each assigned strategy</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>obs_time <span class="ot">&lt;-</span> <span class="fu">pmin</span>(df_clone<span class="sc">$</span>time, df_clone<span class="sc">$</span>artificial_censor_time)</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>outcome_event <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_clone<span class="sc">$</span>event <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> df_clone<span class="sc">$</span>time <span class="sc">&lt;=</span> df_clone<span class="sc">$</span>artificial_censor_time)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censored <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_clone<span class="sc">$</span>artificial_censor_time <span class="sc">&lt;</span> df_clone<span class="sc">$</span>time)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>uncensored <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> df_clone<span class="sc">$</span>artificial_censored</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(df_clone[, <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"strategy_label"</span>, <span class="st">"time"</span>, <span class="st">"event"</span>, <span class="st">"t_init"</span>, <span class="st">"obs_time"</span>, <span class="st">"outcome_event"</span>, <span class="st">"artificial_censored"</span>)], <span class="dv">8</span>),</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Cloned Target Trial Dataset with Artificial Censoring Rules"</span>,</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"c"</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1326,25 +1526,25 @@ SW_i(t) =
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Estimate stabilized inverse probability of censoring weights</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>censor_den <span class="ot">&lt;-</span> <span class="fu">glm</span>(uncensored <span class="sc">~</span> strategy <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> df_clone)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>censor_num <span class="ot">&lt;-</span> <span class="fu">glm</span>(uncensored <span class="sc">~</span> strategy, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> df_clone)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>p_uncens_den <span class="ot">&lt;-</span> <span class="fu">predict</span>(censor_den, <span class="at">type =</span> <span class="st">"response"</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>p_uncens_num <span class="ot">&lt;-</span> <span class="fu">predict</span>(censor_num, <span class="at">type =</span> <span class="st">"response"</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>ipcw <span class="ot">&lt;-</span> df_clone<span class="sc">$</span>p_uncens_num <span class="sc">/</span> df_clone<span class="sc">$</span>p_uncens_den</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>weight_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(<span class="st">"Minimum"</span>, <span class="st">"1st Quartile"</span>, <span class="st">"Median"</span>, <span class="st">"Mean"</span>, <span class="st">"3rd Quartile"</span>, <span class="st">"Maximum"</span>),</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stabilized_IPCW =</span> <span class="fu">as.numeric</span>(<span class="fu">summary</span>(df_clone<span class="sc">$</span>ipcw))</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  weight_summary,</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Stabilized IPCW Distribution"</span>,</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">3</span>,</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"lr"</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Estimate stabilized inverse probability of censoring weights</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>censor_den <span class="ot">&lt;-</span> <span class="fu">glm</span>(uncensored <span class="sc">~</span> strategy <span class="sc">+</span> age <span class="sc">+</span> ecog, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> df_clone)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>censor_num <span class="ot">&lt;-</span> <span class="fu">glm</span>(uncensored <span class="sc">~</span> strategy, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> df_clone)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>p_uncens_den <span class="ot">&lt;-</span> <span class="fu">predict</span>(censor_den, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>p_uncens_num <span class="ot">&lt;-</span> <span class="fu">predict</span>(censor_num, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>ipcw <span class="ot">&lt;-</span> df_clone<span class="sc">$</span>p_uncens_num <span class="sc">/</span> df_clone<span class="sc">$</span>p_uncens_den</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>weight_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(<span class="st">"Minimum"</span>, <span class="st">"1st Quartile"</span>, <span class="st">"Median"</span>, <span class="st">"Mean"</span>, <span class="st">"3rd Quartile"</span>, <span class="st">"Maximum"</span>),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stabilized_IPCW =</span> <span class="fu">as.numeric</span>(<span class="fu">summary</span>(df_clone<span class="sc">$</span>ipcw))</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  weight_summary,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Stabilized IPCW Distribution"</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"lr"</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1388,31 +1588,29 @@ SW_i(t) =
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fit_ipcw <span class="ot">&lt;-</span> <span class="fu">coxph</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(obs_time, outcome_event) <span class="sc">~</span> strategy <span class="sc">+</span> age <span class="sc">+</span> ecog <span class="sc">+</span> <span class="fu">cluster</span>(id),</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_clone,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> ipcw</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_ipcw, <span class="st">"Cloning-Censoring-IPCW Cox Model Results"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fit_ipcw <span class="ot">&lt;-</span> <span class="fu">coxph</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(obs_time, outcome_event) <span class="sc">~</span> strategy <span class="sc">+</span> age <span class="sc">+</span> ecog <span class="sc">+</span> <span class="fu">cluster</span>(id),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_clone,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> ipcw</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">show_cox</span>(fit_ipcw, <span class="st">"Cloning-Censoring-IPCW Cox Model Results"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Cloning-Censoring-IPCW Cox Model Results</caption>
 <colgroup>
-<col style="width: 10%">
-<col style="width: 11%">
-<col style="width: 14%">
-<col style="width: 15%">
-<col style="width: 11%">
-<col style="width: 8%">
-<col style="width: 11%">
-<col style="width: 8%">
-<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 16%">
+<col style="width: 17%">
+<col style="width: 12%">
+<col style="width: 9%">
+<col style="width: 12%">
+<col style="width: 9%">
+<col style="width: 9%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;"></th>
 <th style="text-align: left;">Covariate</th>
 <th style="text-align: right;">Hazard Ratio</th>
 <th style="text-align: right;">Log HR (coef)</th>
@@ -1426,7 +1624,6 @@ SW_i(t) =
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">strategy</td>
-<td style="text-align: left;">strategy</td>
 <td style="text-align: right;">0.9042</td>
 <td style="text-align: right;">-0.1007</td>
 <td style="text-align: right;">0.0584</td>
@@ -1437,7 +1634,6 @@ SW_i(t) =
 </tr>
 <tr class="even">
 <td style="text-align: left;">age</td>
-<td style="text-align: left;">age</td>
 <td style="text-align: right;">1.0169</td>
 <td style="text-align: right;">0.0168</td>
 <td style="text-align: right;">0.0058</td>
@@ -1447,7 +1643,6 @@ SW_i(t) =
 <td style="text-align: right;">1.0285</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">ecog</td>
 <td style="text-align: left;">ecog</td>
 <td style="text-align: right;">1.7407</td>
 <td style="text-align: right;">0.5543</td>
@@ -1465,39 +1660,46 @@ SW_i(t) =
 </section>
 <section id="causal-evidence-reconciliation" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="causal-evidence-reconciliation"><span class="header-section-number">8</span> Causal Evidence Reconciliation</h2>
-<p>The table below summarizes the estimates across all four models compared to the true parameter.</p>
+<p>An <strong>estimand</strong> means the exact causal question being estimated. The methods below all address delayed treatment initiation, but they do not answer precisely the same question:</p>
+<ul>
+<li><strong>Naive static Cox</strong> asks a biased future-informed question: did patients who eventually received Drug X survive longer than those who did not?</li>
+<li><strong>Landmark analysis</strong> estimates a conditional effect among patients who survived and remained observable until Day 90.</li>
+<li><strong>Time-dependent Cox</strong> estimates the hazard contrast associated with current treatment status at each event time.</li>
+<li><strong>Cloning-censoring-IPCW</strong> estimates a strategy contrast, such as “initiate Drug X within 90 days” versus “do not initiate within 90 days,” starting from the original eligibility date.</li>
+</ul>
+<p>The table below summarizes the estimates across the four analyses compared with the true simulated treatment effect.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract statistics</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>hr_biased  <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_biased)[<span class="st">"ever_treated"</span>])</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>se_biased  <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_biased)<span class="sc">$</span>coefficients[<span class="st">"ever_treated"</span>, <span class="st">"se(coef)"</span>]</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>hr_land    <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>])</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>se_land    <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_landmark)<span class="sc">$</span>coefficients[<span class="st">"treated_at_landmark"</span>, <span class="st">"se(coef)"</span>]</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>hr_tv      <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>se_tv      <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_tv)<span class="sc">$</span>coefficients[<span class="st">"treatment_status"</span>, <span class="st">"se(coef)"</span>]</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>hr_ipcw    <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_ipcw)[<span class="st">"strategy"</span>])</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>se_ipcw    <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_ipcw)<span class="sc">$</span>coefficients[<span class="st">"strategy"</span>, <span class="st">"robust se"</span>]</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine into reconciliation matrix</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimator =</span> <span class="fu">c</span>(<span class="st">"Ground Truth (True Parameter)"</span>, <span class="st">"Biased Model (Static Baseline)"</span>, <span class="st">"Landmark Analysis (Day 90)"</span>, <span class="st">"Time-Varying Cox Model"</span>, <span class="st">"Cloning-Censoring-IPCW"</span>),</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hazard Ratio (HR)"</span> <span class="ot">=</span> <span class="fu">c</span>(true_hr, hr_biased, hr_land, hr_tv, hr_ipcw),</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Standard Error"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, se_biased, se_land, se_tv, se_ipcw),</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">exp</span>(<span class="fu">confint</span>(fit_biased)[<span class="st">"ever_treated"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_ipcw)[<span class="st">"strategy"</span>, <span class="dv">1</span>])),</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">exp</span>(<span class="fu">confint</span>(fit_biased)[<span class="st">"ever_treated"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_ipcw)[<span class="st">"strategy"</span>, <span class="dv">2</span>])),</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Bias vs. Truth (Log HR)"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.0000</span>, <span class="fu">coef</span>(fit_biased)[<span class="st">"ever_treated"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_ipcw)[<span class="st">"strategy"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr)),</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Format values for display</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], <span class="dv">4</span>)</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[<span class="fu">is.na</span>(reconciliation_tbl)] <span class="ot">&lt;-</span> <span class="st">"N/A"</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(reconciliation_tbl, <span class="at">caption =</span> <span class="st">"Survival Parameter Reconciliation Across Estimators"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract statistics</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>hr_biased  <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_biased)[<span class="st">"ever_treated"</span>])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>se_biased  <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_biased)<span class="sc">$</span>coefficients[<span class="st">"ever_treated"</span>, <span class="st">"se(coef)"</span>]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>hr_land    <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>])</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>se_land    <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_landmark)<span class="sc">$</span>coefficients[<span class="st">"treated_at_landmark"</span>, <span class="st">"se(coef)"</span>]</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>hr_tv      <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>se_tv      <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_tv)<span class="sc">$</span>coefficients[<span class="st">"treatment_status"</span>, <span class="st">"se(coef)"</span>]</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>hr_ipcw    <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_ipcw)[<span class="st">"strategy"</span>])</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>se_ipcw    <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_ipcw)<span class="sc">$</span>coefficients[<span class="st">"strategy"</span>, <span class="st">"robust se"</span>]</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine into reconciliation matrix</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimator =</span> <span class="fu">c</span>(<span class="st">"Ground Truth (True Parameter)"</span>, <span class="st">"Biased Model (Static Baseline)"</span>, <span class="st">"Landmark Analysis (Day 90)"</span>, <span class="st">"Time-Dependent Cox Model"</span>, <span class="st">"Cloning-Censoring-IPCW"</span>),</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hazard Ratio (HR)"</span> <span class="ot">=</span> <span class="fu">c</span>(true_hr, hr_biased, hr_land, hr_tv, hr_ipcw),</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Standard Error"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, se_biased, se_land, se_tv, se_ipcw),</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% LCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">exp</span>(<span class="fu">confint</span>(fit_biased)[<span class="st">"ever_treated"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_ipcw)[<span class="st">"strategy"</span>, <span class="dv">1</span>])),</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% UCL"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">exp</span>(<span class="fu">confint</span>(fit_biased)[<span class="st">"ever_treated"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>]), <span class="fu">exp</span>(<span class="fu">confint</span>(fit_ipcw)[<span class="st">"strategy"</span>, <span class="dv">2</span>])),</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Bias vs. Truth (Log HR)"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.0000</span>, <span class="fu">coef</span>(fit_biased)[<span class="st">"ever_treated"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_landmark)[<span class="st">"treated_at_landmark"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr), <span class="fu">coef</span>(fit_ipcw)[<span class="st">"strategy"</span>] <span class="sc">-</span> <span class="fu">log</span>(true_hr)),</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Format values for display</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(reconciliation_tbl[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], <span class="dv">4</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>reconciliation_tbl[<span class="fu">is.na</span>(reconciliation_tbl)] <span class="ot">&lt;-</span> <span class="st">"N/A"</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(reconciliation_tbl, <span class="at">caption =</span> <span class="st">"Survival Parameter Reconciliation Across Estimators"</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1552,7 +1754,7 @@ SW_i(t) =
 </tr>
 <tr class="even">
 <td style="text-align: left;">treatment_status</td>
-<td style="text-align: left;">Time-Varying Cox Model</td>
+<td style="text-align: left;">Time-Dependent Cox Model</td>
 <td style="text-align: right;">0.6930</td>
 <td style="text-align: right;">0.1257</td>
 <td style="text-align: right;">0.5417</td>
@@ -1575,7 +1777,7 @@ SW_i(t) =
 </section>
 <section id="quantitative-bias-analysis-e-value-sensitivity-analysis" class="level2" data-number="9">
 <h2 data-number="9" class="anchored" data-anchor-id="quantitative-bias-analysis-e-value-sensitivity-analysis"><span class="header-section-number">9</span> Quantitative Bias Analysis: E-Value Sensitivity Analysis</h2>
-<p>When submitting RWE to HTA bodies, we must audit the robustness of our findings against unmeasured confounding. We compute the E-value for the time-varying Hazard Ratio (<span class="math inline">\(HR = 0.693\)</span>).</p>
+<p>When submitting RWE to HTA bodies, we must audit the robustness of our findings against unmeasured confounding. We compute the E-value for the time-dependent Cox Hazard Ratio (<span class="math inline">\(HR = 0.693\)</span>).</p>
 <section id="e-value-math-formula-setup" class="level3" data-number="9.1">
 <h3 data-number="9.1" class="anchored" data-anchor-id="e-value-math-formula-setup"><span class="header-section-number">9.1</span> E-Value Math &amp; Formula Setup</h3>
 <p>The E-value is defined as the minimum strength of association on the risk ratio scale that an unmeasured confounder (<span class="math inline">\(U\)</span>) must have with both: 1. The treatment assignment (<span class="math inline">\(Z\)</span>) 2. The clinical outcome (<span class="math inline">\(Y\)</span>)</p>
@@ -1587,29 +1789,29 @@ SW_i(t) =
 <li><p><strong>Common Outcome Correction</strong> (cumulative incidence &gt; 15%):</p>
 <p>The rare outcome assumption is violated, and we must apply the square root approximation: <span class="math display">\[RR \approx \sqrt{HR}\]</span> The corresponding E-value is calculated as: <span class="math display">\[\text{E-value} = \sqrt{HR^*} + \sqrt{\sqrt{HR^*} \cdot (\sqrt{HR^*} - 1)}\]</span></p></li>
 </ol>
-<p>In our cohort, <span class="math inline">\(379\)</span> out of <span class="math inline">\(500\)</span> patients (<span class="math inline">\(75.8\%\)</span>) experienced the event, meaning the outcome is common. We must apply the common outcome correction.</p>
+<p>In our cohort, 379 out of 500 patients (75.8%) experienced the event, meaning the outcome is common. We must apply the common outcome correction.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract HR and confidence limits from the time-varying Cox model</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>hr_est_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>hr_lcl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>])</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>hr_ucl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>])</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Compute E-value (common outcome correction: rare = FALSE)</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>ev_survival <span class="ot">&lt;-</span> <span class="fu">evalues.HR</span>(<span class="at">est =</span> hr_est_val, <span class="at">lo =</span> hr_lcl_val, <span class="at">hi =</span> hr_ucl_val, <span class="at">rare =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>ev_survival_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(ev_survival)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Format E-value table</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>ev_survival_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Metric / Parameter"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Hazard Ratio (HR)"</span>, <span class="st">"E-value (Treatment Effect Bound)"</span>),</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Point Estimate"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"point"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"point"</span>])),</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Lower Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"lower"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"lower"</span>])),</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Upper Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"upper"</span>]), <span class="st">"N/A"</span>),</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ev_survival_tbl, <span class="at">caption =</span> <span class="st">"E-Value Analysis for Survival Sensitivity to Unmeasured Confounding"</span>, <span class="at">align =</span> <span class="st">"lrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract HR and confidence limits from the time-varying Cox model</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>hr_est_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>hr_lcl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>])</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>hr_ucl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>])</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Compute E-value (common outcome correction: rare = FALSE)</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>ev_survival <span class="ot">&lt;-</span> <span class="fu">evalues.HR</span>(<span class="at">est =</span> hr_est_val, <span class="at">lo =</span> hr_lcl_val, <span class="at">hi =</span> hr_ucl_val, <span class="at">rare =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>ev_survival_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(ev_survival)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Format E-value table</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>ev_survival_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Metric / Parameter"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Hazard Ratio (HR)"</span>, <span class="st">"E-value (Treatment Effect Bound)"</span>),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Point Estimate"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"point"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"point"</span>])),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Lower Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"lower"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"lower"</span>])),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Upper Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"upper"</span>]), <span class="st">"N/A"</span>),</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ev_survival_tbl, <span class="at">caption =</span> <span class="st">"E-Value Analysis for Survival Sensitivity to Unmeasured Confounding"</span>, <span class="at">align =</span> <span class="st">"lrrr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">

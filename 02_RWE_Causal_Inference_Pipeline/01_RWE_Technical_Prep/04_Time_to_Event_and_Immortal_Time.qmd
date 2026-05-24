@@ -1,6 +1,6 @@
 ---
 title: "Survival Analysis & Immortal Time Bias in Real-World Evidence"
-subtitle: "Target Trial Emulation, Landmark Analysis, and Time-Varying Cox Regression"
+subtitle: "Target Trial Emulation, Landmark Analysis, Time-Dependent Cox Models, and IPCW"
 author: "Xiaoge Zhang, PhD"
 date: today
 format:
@@ -128,7 +128,7 @@ To avoid Immortal Time Bias, we align $T_0$ as the moment a patient meets all el
    - **Patient A**: Diagnosed Jan 1, scheduled for Drug X, dies Jan 15 (unexposed). Classified as Control.
    - **Patient B**: Diagnosed Jan 1, initiates Drug X Feb 1, survives until June.
    - **Result**: The Drug X group artificially filters out those who die before treatment initiation, inflating the active group's survival.
-3. **TTE Correction**: The survival follow-up clock must be aligned to a clearly defined index date that is comparable across arms. If the estimand starts at diagnosis but treatment can begin during a grace period, the waiting time must not be retrospectively credited to the treated group; it should be handled using cloning-and-censoring, a time-varying exposure model, or a pre-specified landmark strategy.
+3. **TTE Correction**: The survival follow-up clock must be aligned to a clearly defined index date that is comparable across arms. If the causal question starts at diagnosis but treatment can begin during a grace period, the waiting time must not be retrospectively credited to the treated group; it should be handled using cloning-and-censoring, a time-varying exposure model, or a pre-specified landmark strategy.
 
 #### The Control Arm $T_0$ {.unnumbered}
 
@@ -154,27 +154,216 @@ To maintain ITT principles:
 - **Artificial Censoring**: If the patient's actual path deviates from a clone's assigned arm, that clone is censored.
 - **IPCW Weighting**: Because censoring might be non-random, we estimate the probability of being censored at time $t$ based on baseline covariates and apply Inverse Probability of Censoring Weights to the remaining patients, dynamically restoring the balance.
 
-## Immortal Time Bias (ITB): Theory & Landmark Analysis
+## Simulated RWD Cohort: Delayed Treatment Initiation
 
-### The Meditation & Longevity Paradox
+To make the Drug X scenario concrete, we simulate a simplified RWD cohort with delayed treatment initiation. The simulated dataset is intentionally small enough to audit line by line, but it contains the core features that create immortal time bias:
 
-Consider a study evaluating whether a 12-week intensive meditation course increases overall survival (OS):
+- baseline prognostic covariates: age and ECOG status;
+- treatment selection: older and sicker patients are more likely to receive Drug X;
+- treatment delay: treated patients have an observed treatment-initiation delay of 30 to 120 days; later, a 90-day grace period is used to define the target trial strategy;
+- time-to-event outcome: death or censoring during follow-up.
 
-- **Cohort**: 1,000 participants followed for 5 years.
-- **Exposure Group ($Z=1$)**: Completed the full 12-week program.
-- **Control Group ($Z=0$)**: Did not complete the program (includes those who died or dropped out before week 12).
-- **The Result**: Participants who completed the course show a Hazard Ratio ($HR$) of 0.30 (70% risk reduction).[^meditation-completion]
-- **The Error**: Since a patient had to survive 12 weeks to complete the program, the meditation group is guaranteed 0% mortality during the first 12 weeks. Sicker patients who died in weeks 1–11 were automatically allocated to the control group.
+We simulate a true treatment Hazard Ratio of **0.70** (30% risk reduction). The purpose of the simulation is not to recreate a real METex14 dataset, but to create a controlled setting where the true parameter is known and different analytic choices can be compared.
 
-[^meditation-completion]: Completion status at Week 12 is post-baseline information. It **cannot** be used retrospectively to define the baseline exposure group; otherwise, the first 12 weeks of survival are incorrectly credited to the intervention.
+```{r}
+#| message: false
+#| warning: false
 
-### Landmark Analysis
+library(survival)
+library(EValue)
+set.seed(42)
+n <- 500
+
+# 1. Simulate baseline confounders
+age <- rnorm(n, mean = 60, sd = 10)
+ecog <- rbinom(n, 1, 0.4)
+
+# 2. Simulate treatment selection (confounding by indication)
+# Sicker (ECOG=1) and older patients are more likely to receive Drug X
+ps_prob <- plogis(-1.5 + 0.02 * age + 0.5 * ecog)
+z_treatment <- rbinom(n, 1, ps_prob)
+
+# Untreated patients are assigned Inf to indicate that treatment initiation never occurs
+t_init <- ifelse(z_treatment == 1, runif(n, 30, 120), Inf)
+
+# 3. Simulate survival times (true treatment HR = 0.70)
+true_hr <- 0.70
+lambda_base <- 0.001 * exp(0.02 * age + 0.5 * ecog)
+
+u <- runif(n)
+log_u <- -log(u)
+
+pre_treatment_hazard <- lambda_base * t_init
+event_before_treatment <- log_u <= pre_treatment_hazard
+
+t_event <- ifelse(
+  event_before_treatment,
+  log_u / lambda_base,
+  t_init + (log_u - pre_treatment_hazard) / (lambda_base * true_hr)
+)
+
+# Censoring between 150 and 730 days
+t_censor <- runif(n, 150, 730)
+time <- pmin(t_event, t_censor)
+event <- as.integer(t_event <= t_censor)
+
+df <- data.frame(id = 1:n, age, ecog, z_treatment, t_init, time, event)
+
+# Future-informed treatment status: this is intentionally biased
+df$ever_treated <- ifelse(df$t_init < df$time, 1, 0)
+df$t_init_display <- ifelse(is.infinite(df$t_init), NA, df$t_init)
+
+event_count <- sum(df$event)
+event_pct <- mean(df$event) * 100
+
+# Helper function used later to render Cox model summaries as kable tables
+show_cox <- function(fit, caption) {
+  sum_fit <- summary(fit)
+  coefs <- sum_fit$coefficients
+  cis <- sum_fit$conf.int
+  se_col <- if ("robust se" %in% colnames(coefs)) "robust se" else "se(coef)"
+  z_col <- if ("z" %in% colnames(coefs)) "z" else colnames(coefs)[4]
+  tbl <- data.frame(
+    Covariate = rownames(coefs),
+    `Hazard Ratio` = round(coefs[, "exp(coef)"], 4),
+    `Log HR (coef)` = round(coefs[, "coef"], 4),
+    `Std Error` = round(coefs[, se_col], 4),
+    `z-value` = round(coefs[, z_col], 3),
+    `p-value` = format.pval(coefs[, "Pr(>|z|)"], digits = 4),
+    `95% LCL` = round(cis[, 3], 4),
+    `95% UCL` = round(cis[, 4], 4),
+    check.names = FALSE
+  )
+  knitr::kable(tbl, caption = caption, align = "lrrrrrrr", row.names = FALSE)
+}
+```
+
+::: {.callout-note collapse="true"}
+### How to Read the Survival-Time Simulation
+
+The simulation uses a simple **piecewise hazard** structure. Before Drug X starts, each patient has an untreated baseline hazard, `lambda_base`. After Drug X starts, the hazard becomes `lambda_base * true_hr`. Because `true_hr = 0.70`, treatment reduces the hazard to 70% of the untreated level.
+
+The quantity `log_u = -log(u)` can be read as each patient's randomly assigned **cumulative hazard threshold**. An event occurs when the cumulative hazard experienced by the patient reaches this threshold.
+
+Before treatment starts, cumulative hazard accumulates at the untreated rate:
+
+$$
+\text{pre-treatment cumulative hazard} = \lambda_{\text{base}} \times t_{\text{init}}
+$$
+
+If `log_u <= pre_treatment_hazard`, the patient uses up their cumulative hazard threshold before treatment begins, so the event occurs during the untreated period:
+
+$$
+t_{\text{event}} = \frac{\text{log\_u}}{\lambda_{\text{base}}}
+$$
+
+If the patient survives until treatment initiation, only part of the cumulative hazard threshold has been used. The remaining hazard budget is:
+
+$$
+\text{log\_u} - \text{pre-treatment cumulative hazard}
+$$
+
+After treatment starts, hazard continues to accumulate, but at the lower treated rate, $\lambda_{\text{base}} \times HR$. Therefore, the total event time is:
+
+$$
+t_{\text{event}} =
+t_{\text{init}} +
+\frac{\text{log\_u} - \text{pre-treatment cumulative hazard}}
+{\lambda_{\text{base}} \times HR}
+$$
+
+In short, the code simulates a patient who first experiences untreated risk, then, if they live long enough to initiate Drug X, continues accumulating hazard at a lower treated rate.
+:::
+
+### Description of the Simulated Cohort
+
+Before fitting any model, we inspect the simulated cohort. The key feature is that treatment is not assigned at time zero. Patients who eventually receive Drug X have a waiting period before their first recorded treatment start date.
+
+```{r}
+cohort_summary <- data.frame(
+  Metric = c(
+    "Total patients",
+    "Ever received Drug X during observed follow-up",
+    "Observed deaths",
+    "Mean age",
+    "ECOG 1 proportion",
+    "Median observed follow-up (days)",
+    "Median treatment initiation delay among treated (days)"
+  ),
+  Value = c(
+    nrow(df),
+    sum(df$ever_treated),
+    sprintf("%s (%.1f%%)", event_count, event_pct),
+    sprintf("%.1f", mean(df$age)),
+    sprintf("%.1f%%", mean(df$ecog == 1) * 100),
+    sprintf("%.1f", median(df$time)),
+    sprintf("%.1f", median(df$t_init_display[df$ever_treated == 1], na.rm = TRUE))
+  )
+)
+
+knitr::kable(
+  cohort_summary,
+  caption = "Simulated RWD Cohort Description",
+  align = "ll"
+)
+```
+
+```{r}
+baseline_by_group <- aggregate(
+  cbind(age, ecog, time, event) ~ ever_treated,
+  data = df,
+  FUN = mean
+)
+
+baseline_by_group$Group <- ifelse(
+  baseline_by_group$ever_treated == 1,
+  "Received Drug X",
+  "Did not receive Drug X"
+)
+
+baseline_display <- data.frame(
+  Group = baseline_by_group$Group,
+  `Mean&nbsp;Age` = round(baseline_by_group$age, 1),
+  `ECOG&nbsp;1&nbsp;(%)` = round(baseline_by_group$ecog * 100, 1),
+  `Mean&nbsp;Follow-up&nbsp;(days)` = round(baseline_by_group$time, 1),
+  `Event&nbsp;Rate&nbsp;(%)` = round(baseline_by_group$event * 100, 1),
+  check.names = FALSE
+)
+
+knitr::kable(
+  baseline_display,
+  caption = "Naive Future-Informed Treatment Groups",
+  align = "lrrrr",
+  escape = FALSE
+)
+```
+
+This table is deliberately labelled as "future-informed" because the group definition uses information that was not available at $T_0$. A patient who died before treatment initiation could never become "ever treated," so this baseline grouping already embeds immortal time bias.
+
+### Naive Static Cox Model: The Biased Starting Point
+
+The simplest analysis treats `ever_treated` as if it were a baseline treatment variable:
+
+```{r}
+fit_biased <- coxph(Surv(time, event) ~ ever_treated + age + ecog, data = df)
+show_cox(fit_biased, "Naive Static Cox Model Results (Immortal Time Unadjusted)")
+```
+
+This model is intentionally wrong. The `ever_treated` hazard ratio is far below the true simulated HR of 0.70 because patients had to survive long enough to initiate Drug X before they could be classified as treated. Early deaths before treatment initiation are pushed into the untreated group, so the model incorrectly credits this survival selection to the drug.
+
+## Immortal Time Bias in the Simulated Drug X Cohort
+
+This specific problem is known in epidemiology and survival analysis as **Immortal Time Bias (ITB)**. The naive Cox result above illustrates the mechanism: survival time before Drug X initiation is incorrectly credited to the treated group because treatment status was defined using information observed after $T_0$.
+
+Now that the bias mechanism is visible, we evaluate three ways to handle delayed treatment initiation: landmark analysis, time-dependent Cox regression, and cloning-censoring-IPCW.
+
+### First Correction: Landmark Analysis
 
 Landmark Analysis is a classical approach to resolve this:
 
-1. **Select Landmark Time ($T_L$)**: E.g., Week 12.
+1. **Select Landmark Time ($T_L$)**: E.g., Day 90.
 2. **Exclude Early Events**: Exclude all patients who died or were censored before $T_L$.
-3. **Re-classify**: Classify survivors at $T_L$ based on their exposure status at $T_L$.
+3. **Re-classify**: Classify survivors at $T_L$ based on their treatment status at $T_L$.
 4. **Follow-up**: Set $T_L$ as the new baseline ($T_{start} = T_L$) and follow patients from that point.
 
 #### HTA Audit of Landmark Analysis {.unnumbered}
@@ -183,12 +372,39 @@ Landmark Analysis is a classical approach to resolve this:
 - **Cons**: 
   - **Information Loss**: Discards all events and person-time before $T_L$. If the drug **has high early toxicity**, this signal is completely lost.
   - **Selection Bias**: The populations at $T_L$ may no longer be balanced, as sicker patients in the control group may have died, while sicker patients in the treated group were protected by the "immortal" definition.
+  - **Arbitrary Landmark Choice**: The selected landmark time is a design decision, not a statistical truth. If $T_L$ is too early, many later initiators remain classified as untreated; if $T_L$ is too late, more early events are discarded.
 
-Therefore, landmark analysis is usually better positioned as an intuitive diagnostic or sensitivity analysis, rather than the preferred primary analysis for HTA submissions. It is most defensible when the clinical question is explicitly conditional on surviving and remaining eligible until the landmark time; otherwise, time-varying exposure models or cloning-censoring-IPCW are generally more aligned with the original target trial estimand.
+Therefore, landmark analysis is usually better positioned as an intuitive diagnostic or sensitivity analysis, rather than the preferred primary analysis for HTA submissions. It is most defensible when the clinical question is explicitly conditional on surviving and remaining eligible until the landmark time; otherwise, time-varying exposure models or cloning-censoring-IPCW are generally more aligned with the original target trial question.
+
+### Applying Landmark Analysis to the Simulated Cohort
+
+We now apply a Day 90 landmark analysis to the simulated Drug X cohort. Patients who died or were censored before Day 90 are excluded. Among those who remain under observation at Day 90, treatment status is re-defined based on whether Drug X had started by that date.
+
+```{r}
+t_landmark <- 90
+
+# Exclude patients who died or were censored before Day 90
+df_landmark <- df[df$time > t_landmark, ]
+
+# Classify treatment status at the landmark
+df_landmark$treated_at_landmark <- ifelse(df_landmark$t_init <= t_landmark, 1, 0)
+
+# Shift follow-up time so Day 90 becomes the new time zero
+df_landmark$time_shifted <- df_landmark$time - t_landmark
+
+fit_landmark <- coxph(
+  Surv(time_shifted, event) ~ treated_at_landmark + age + ecog,
+  data = df_landmark
+)
+
+show_cox(fit_landmark, "Landmark Analysis (Day 90) Cox Model Results")
+```
+
+The landmark model avoids using Day 90 treatment status to define baseline groups at Day 0. However, it changes the causal question: the result applies only to patients who survived and remained observable until the landmark time.
 
 ## Time-Dependent Cox Model & HTA Practice
 
-The time-dependent Cox model is an extension of the standard Cox proportional hazards model that allows a patient's exposure status to **change during follow-up**. This makes it useful for auditing and correcting immortal time bias when treatment initiation is delayed.
+The time-dependent Cox model is an extension of the standard Cox proportional hazards model that allows a patient's treatment status to **change during follow-up**. This makes it useful for auditing and correcting immortal time bias when treatment initiation is delayed.
 
 ### What the Model Does
 
@@ -219,10 +435,26 @@ Patient #101 has a treatment initiation lag of 60 days and dies on Day 500. We s
 
 | Patient ID | Start (Day) | Stop (Day) | Status (Event) | Treatment ($Z$) |
 | :--- | :--- | :--- | :--- | :--- |
-| #101 | 0 | 60 | 0 (Alive) | 0 (Unexposed) |
-| #101 | 60 | 500 | 1 (Death) | 1 (Exposed) |
+| #101 | 0 | 60 | 0 (Alive) | 0 (Not treated) |
+| #101 | 60 | 500 | 1 (Death) | 1 (Treated) |
 
-At Day 60, the patient's treatment status switches from unexposed to exposed. The patient is not removed from follow-up; instead, their contribution to the risk set is updated from untreated person-time to treated person-time.
+At Day 60, the patient's treatment status switches from not treated to treated. The patient is not removed from follow-up; instead, their contribution to the risk set is updated from untreated person-time to treated person-time.
+
+::: {.callout-note collapse="true"}
+### Why This Is Not Duplicating the Patient
+
+In a Cox model, the partial likelihood is built at each observed event time. At each event time, the model rebuilds the risk set: who is still alive, still under follow-up, and what are their covariate values at that moment?
+
+In a standard Cox model, treatment status is fixed, so the model always reads the same $Z_i$ for patient $i$. In a time-dependent Cox model, the model reads $Z_i(t)$, meaning the patient's treatment status at the event time being evaluated.
+
+For Patient #101, this means:
+
+- before Day 60, the patient can enter risk sets as `Z = 0`;
+- after Day 60, the same patient can enter risk sets as `Z = 1`;
+- at no event time do both rows enter the same risk set simultaneously.
+
+The two rows therefore represent two non-overlapping risk intervals for the same patient, not two independent patients. The patient contributes untreated person-time before Day 60, treated person-time after Day 60, and one death event at Day 500.
+:::
 
 ### Landmark vs. Time-Dependent Cox
 
@@ -233,9 +465,43 @@ At Day 60, the patient's treatment status switches from unexposed to exposed. Th
 | **Early Toxicity** | Captures early adverse event signals. | Masked if events occur before $T_L$. |
 | **HTA Audit Preference** | Preferred for primary analysis. | Used primarily as a sensitivity analysis. |
 
+### Applying the Time-Dependent Cox Model
+
+We now restructure the same simulated cohort into counting process format using `tmerge()`.
+
+```{r}
+# 1. Initialize dataset with the primary event time
+df_tv <- tmerge(df, df, id = id, event = event(time, event))
+
+# 2. Merge the time-dependent treatment initiation event
+df_tv <- tmerge(df_tv, df, id = id, treatment_status = tdc(t_init))
+
+knitr::kable(
+  head(df_tv[df_tv$id %in% 1:3, c("id", "tstart", "tstop", "event", "treatment_status")]),
+  caption = "Restructured Counting Process Intervals (Patient ID 1-3)",
+  align = "c"
+)
+```
+
+As shown, if a patient receives treatment at a delayed time, their follow-up is split:
+
+- **Interval 1 `[0, t_init]`**: `treatment_status = 0`, contributing untreated person-time.
+- **Interval 2 `[t_init, time]`**: `treatment_status = 1`, contributing treated person-time after Drug X starts.
+
+```{r}
+fit_tv <- coxph(
+  Surv(tstart, tstop, event) ~ treatment_status + age + ecog,
+  data = df_tv
+)
+
+show_cox(fit_tv, "Time-Dependent Cox Model Results (Immortal Time Corrected)")
+```
+
+The time-dependent Cox model keeps the early follow-up time and assigns it to the correct treatment state. In this simulation, it is expected to recover a hazard ratio closer to the true treatment effect than the naive static model.
+
 ## Cloning, Censoring, and IPCW in Target Trial Emulation
 
-Time-dependent Cox models are useful for auditing whether delayed treatment initiation has created immortal time bias. However, when the target trial estimand is defined as a comparison of **treatment strategies**—for example, "initiate Drug X within 90 days of diagnosis" versus "do not initiate Drug X within 90 days"—a trial-emulation analysis often requires **cloning, artificial censoring, and inverse probability of censoring weighting (IPCW)**.
+Time-dependent Cox models are useful for auditing whether delayed treatment initiation has created immortal time bias. However, when the target trial question is defined as a comparison of **treatment strategies**—for example, "initiate Drug X within 90 days of diagnosis" versus "do not initiate Drug X within 90 days"—a trial-emulation analysis often requires **cloning, artificial censoring, and inverse probability of censoring weighting (IPCW)**.
 
 ### Why Artificial Censoring Creates Bias
 
@@ -282,148 +548,7 @@ For an HTA-facing analysis, IPCW should not be presented as a black box. The sub
 - any truncation threshold and its sensitivity analysis;
 - whether positivity is plausible across clinically relevant subgroups.
 
-## R Simulation: Validation of Estimators
-
-We simulate a cohort of 500 patients where treatment initiation is delayed due to an administrative "Approval Lag."
-
-### Simulating the Cohort and Biased Analysis
-
-We simulate a true treatment Hazard Ratio of **0.70** (30% risk reduction). Age and ECOG status act as baseline confounders.
-
-```{r}
-#| message: false
-#| warning: false
-
-library(survival)
-library(EValue)
-set.seed(42)
-n <- 500
-
-# Helper function to render Cox model summaries as kable tables
-show_cox <- function(fit, caption) {
-  sum_fit <- summary(fit)
-  coefs <- sum_fit$coefficients
-  cis <- sum_fit$conf.int
-  se_col <- if ("robust se" %in% colnames(coefs)) "robust se" else "se(coef)"
-  z_col <- if ("z" %in% colnames(coefs)) "z" else colnames(coefs)[4]
-  tbl <- data.frame(
-    Covariate = rownames(coefs),
-    `Hazard Ratio` = round(coefs[, "exp(coef)"], 4),
-    `Log HR (coef)` = round(coefs[, "coef"], 4),
-    `Std Error` = round(coefs[, se_col], 4),
-    `z-value` = round(coefs[, z_col], 3),
-    `p-value` = format.pval(coefs[, "Pr(>|z|)"], digits = 4),
-    `95% LCL` = round(cis[, 3], 4),
-    `95% UCL` = round(cis[, 4], 4),
-    check.names = FALSE
-  )
-  knitr::kable(tbl, caption = caption, align = "lrrrrrrr")
-}
-
-# 1. Simulate Baseline Confounders
-age <- rnorm(n, mean = 60, sd = 10)
-ecog <- rbinom(n, 1, 0.4)
-
-# 2. Simulate Treatment Selection (Confounding by Indication)
-# Sicker (ECOG=1) and older patients are more likely to receive treatment
-ps_prob <- plogis(-1.5 + 0.02 * age + 0.5 * ecog)
-z_treatment <- rbinom(n, 1, ps_prob)
-
-# For those treated, add a random initiation delay between 30 and 120 days
-t_init <- ifelse(z_treatment == 1, runif(n, 30, 120), Inf)
-
-# 3. Simulate Survival Times (True treatment HR = 0.70)
-true_hr <- 0.70
-lambda_base <- 0.001 * exp(0.02 * age + 0.5 * ecog)
-
-u <- runif(n)
-log_u <- -log(u)
-
-t_event <- numeric(n)
-for(i in 1:n) {
-  l0 <- lambda_base[i]
-  l1 <- l0 * true_hr
-  t_tr <- t_init[i]
-  
-  if (log_u[i] <= l0 * t_tr) {
-    t_event[i] <- log_u[i] / l0
-  } else {
-    t_event[i] <- t_tr + (log_u[i] - l0 * t_tr) / l1
-  }
-}
-
-# Censoring between 150 and 730 days
-t_censor <- runif(n, 150, 730)
-time <- pmin(t_event, t_censor)
-event <- as.integer(t_event <= t_censor)
-
-df <- data.frame(id = 1:n, age, ecog, z_treatment, t_init, time, event)
-
-# Determine treatment status based on actual follow-up (Biased approach)
-df$ever_treated <- ifelse(df$t_init < df$time, 1, 0)
-
-# --- Biased Analysis: Static Cox Model ---
-fit_biased <- coxph(Surv(time, event) ~ ever_treated + age + ecog, data = df)
-show_cox(fit_biased, "Biased Static Cox Proportional Hazards Model Results (Immortal Time Unadjusted)")
-```
-
-The biased static Cox model overestimates drug efficacy due to the unadjusted immortal time.
-
-### Method 1: Landmark Analysis (Day 90)
-
-We apply Landmark Analysis at Day 90:
-
-```{r}
-t_landmark <- 90
-
-# Exclude patients who died or were censored before Day 90
-df_landmark <- df[df$time > t_landmark, ]
-
-# Classify status at Landmark
-df_landmark$treated_at_landmark <- ifelse(df_landmark$t_init <= t_landmark, 1, 0)
-
-# Shift time
-df_landmark$time_shifted <- df_landmark$time - t_landmark
-
-fit_landmark <- coxph(Surv(time_shifted, event) ~ treated_at_landmark + age + ecog, data = df_landmark)
-show_cox(fit_landmark, "Landmark Analysis (Day 90) Cox Proportional Hazards Model Results")
-```
-
-### Method 2: Time-Varying Cox Model
-
-We restructure the dataset into a counting process format using `tmerge()` and fit the time-varying Cox model:
-
-```{r}
-# 1. Initialize dataset with the primary event time
-df_tv <- tmerge(df, df, id = id, event = event(time, event))
-
-# 2. Merge the time-dependent treatment initiation event
-df_tv <- tmerge(df_tv, df, id = id, treatment_status = tdc(t_init))
-
-# Display the split intervals for Patient ID 1 to 3 in table format
-knitr::kable(
-  head(df_tv[df_tv$id %in% 1:3, c("id", "tstart", "tstop", "event", "treatment_status")]),
-  caption = "Restructured Counting Process Intervals (Patient ID 1-3)",
-  align = "c"
-)
-```
-
-As shown, if a patient receives treatment at a delayed time, their follow-up is split:
-
-- **Interval 1 `[0, t_init]`**: `treatment_status = 0` (contributes person-time to the control risk set).
-- **Interval 2 `[t_init, time]`**: `treatment_status = 1` (contributes person-time to the treated risk set after the first infusion).
-
-We fit the Cox model on the split intervals:
-
-```{r}
-# Fit the time-varying Cox model
-fit_tv <- coxph(Surv(tstart, tstop, event) ~ treatment_status + age + ecog, data = df_tv)
-show_cox(fit_tv, "Time-Varying Cox Proportional Hazards Model Results (Immortal Time Corrected)")
-```
-
-The time-varying Cox model successfully recovers the true treatment effect ($HR = 0.70$) without discarding data.
-
-### Method 3: Cloning-Censoring-IPCW Analysis
+### Applying Cloning-Censoring-IPCW
 
 We now emulate a strategy-level target trial with a 90-day grace period:
 
@@ -513,7 +638,14 @@ show_cox(fit_ipcw, "Cloning-Censoring-IPCW Cox Model Results")
 
 ## Causal Evidence Reconciliation
 
-The table below summarizes the estimates across all four models compared to the true parameter.
+An **estimand** means the exact causal question being estimated. The methods below all address delayed treatment initiation, but they do not answer precisely the same question:
+
+- **Naive static Cox** asks a biased future-informed question: did patients who eventually received Drug X survive longer than those who did not?
+- **Landmark analysis** estimates a conditional effect among patients who survived and remained observable until Day 90.
+- **Time-dependent Cox** estimates the hazard contrast associated with current treatment status at each event time.
+- **Cloning-censoring-IPCW** estimates a strategy contrast, such as "initiate Drug X within 90 days" versus "do not initiate within 90 days," starting from the original eligibility date.
+
+The table below summarizes the estimates across the four analyses compared with the true simulated treatment effect.
 
 ```{r}
 # Extract statistics
@@ -531,7 +663,7 @@ se_ipcw    <- summary(fit_ipcw)$coefficients["strategy", "robust se"]
 
 # Combine into reconciliation matrix
 reconciliation_tbl <- data.frame(
-  Estimator = c("Ground Truth (True Parameter)", "Biased Model (Static Baseline)", "Landmark Analysis (Day 90)", "Time-Varying Cox Model", "Cloning-Censoring-IPCW"),
+  Estimator = c("Ground Truth (True Parameter)", "Biased Model (Static Baseline)", "Landmark Analysis (Day 90)", "Time-Dependent Cox Model", "Cloning-Censoring-IPCW"),
   "Hazard Ratio (HR)" = c(true_hr, hr_biased, hr_land, hr_tv, hr_ipcw),
   "Standard Error" = c(NA, se_biased, se_land, se_tv, se_ipcw),
   "95% LCL" = c(NA, exp(confint(fit_biased)["ever_treated", 1]), exp(confint(fit_landmark)["treated_at_landmark", 1]), exp(confint(fit_tv)["treatment_status", 1]), exp(confint(fit_ipcw)["strategy", 1])),
@@ -549,7 +681,7 @@ knitr::kable(reconciliation_tbl, caption = "Survival Parameter Reconciliation Ac
 
 ## Quantitative Bias Analysis: E-Value Sensitivity Analysis
 
-When submitting RWE to HTA bodies, we must audit the robustness of our findings against unmeasured confounding. We compute the E-value for the time-varying Hazard Ratio ($HR = 0.693$).
+When submitting RWE to HTA bodies, we must audit the robustness of our findings against unmeasured confounding. We compute the E-value for the time-dependent Cox Hazard Ratio ($HR = `r round(exp(coef(fit_tv)["treatment_status"]), 3)`$).
 
 ### E-Value Math & Formula Setup
 
@@ -573,7 +705,7 @@ The formula depends on the cumulative incidence of the outcome:
    The corresponding E-value is calculated as:
    $$\text{E-value} = \sqrt{HR^*} + \sqrt{\sqrt{HR^*} \cdot (\sqrt{HR^*} - 1)}$$
 
-In our cohort, $379$ out of $500$ patients ($75.8\%$) experienced the event, meaning the outcome is common. We must apply the common outcome correction.
+In our cohort, `r event_count` out of `r n` patients (`r round(event_pct, 1)`%) experienced the event, meaning the outcome is common. We must apply the common outcome correction.
 
 ```{r}
 # 1. Extract HR and confidence limits from the time-varying Cox model
