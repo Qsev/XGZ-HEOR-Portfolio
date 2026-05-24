@@ -29,27 +29,27 @@ To understand why a strict time-to-event framework is necessary, consider the "C
 
 - **The Paradox**: Observational studies often show that coffee drinkers have lower rates of heart disease than non-coffee drinkers (Hazard Ratio < 1.0).
 - **The Reverse Causality**: In reality, patients who develop heart symptoms or are diagnosed with high risk are advised by doctors to quit coffee.
-- **The Methodological Connection**: If we classify exposure statically based on whether a patient drinks coffee during follow-up, we violate the chronological ordering of causal inference. A patient who develops heart disease on Day 50 and subsequently quits coffee will be misclassified as a "non-coffee drinker" at the end of the study. This attributes their heart event (which occurred *before* quitting) to the non-exposure group, violating the non-anticipatory constraint of time-to-event outcomes. 
+- **The Methodological Connection**: If we classify exposure statically based on whether a patient drinks coffee during follow-up, we violate the **chronological ordering** of causal inference. A patient who develops heart disease on **Day 50** and **subsequently** quits coffee will be misclassified as a "non-coffee drinker" at the **end of the study**. This attributes their heart event (which occurred **before** quitting) to the non-exposure group, violating the non-anticipatory constraint of time-to-event outcomes. 
 
 To resolve this paradox, we must align the study baseline ($T_0$), measure confounders (like baseline heart risk) strictly *before* exposure initiation, and model exposure dynamically over time. This is exactly what Target Trial Emulation and Time-Varying survival models achieve.
 
 ## The Target Trial Emulation (TTE) Framework
 
-Target Trial Emulation is a structured design framework developed by Miguel Hernán and colleagues to guide the design and analysis of observational studies. The core principle is that **we should design our observational study to mimic a hypothetical randomized trial as closely as possible.**
+Target Trial Emulation is a structured design framework developed by Miguel Hernán and colleagues to **guide the design** and analysis of observational studies. The core principle is that we should design our observational study **to mimic a hypothetical randomized trial as closely as possible.**
 
-### The 7 Pillars of Target Trial Emulation
+### The 7 Dimensions of the Target Trial Approach
 
-To translate observational data into robust evidence, researchers must define a protocol addressing seven protocol components:
+According to the official NICE RWE Framework (Section 5.2), a target trial must be defined across 7 core dimensions to prevent bias and ensure transparency:
 
-| Pillar | NICE RWE Framework Requirement | Application to Survival Cohorts |
+| Dimension | NICE RWE Framework Requirement | Application to Survival Cohorts |
 | :--- | :--- | :--- |
-| **1. Eligibility** | Define clear inclusion/exclusion criteria at baseline. | Patients must meet all criteria at Time Zero ($T_0$), ensuring no baseline selection bias. |
-| **2. Treatment Strategy** | Specify the interventions being compared. | **Arm A:** Initiate active treatment within a defined window. **Arm B:** Initiate Standard of Care (SOC) / no treatment. |
-| **3. Assignment** | Define how treatment groups are formed. | Emulate randomization at $T_0$ using Propensity Scores (IPTW or matching) based on baseline covariates. |
-| **4. Follow-up** | Align follow-up start exactly with $T_0$. | Clock starts ticking for all patients at $T_0$. Ends at the event, death, censoring, or study end. |
-| **5. Outcome** | Define a standardized clinical endpoint. | First occurrence of the event (e.g., death, progression) during the follow-up period. |
-| **6. Causal Contrast** | Specify the effect of interest. | **Intention-to-Treat (ITT):** Effect of treatment assignment at $T_0$, regardless of later compliance. |
-| **7. Analysis Plan** | Specify the statistical estimator. | Cox Proportional Hazards model or parametric survival models, adjusted for baseline confounding. |
+| **1. Eligibility criteria** | Define clear inclusion/exclusion criteria at baseline. | Patients must meet all criteria at Time Zero ($T_0$), ensuring no baseline selection bias. |
+| **2. Treatment strategies** | Specify the interventions being compared. | **Arm A:** Initiate active treatment within a defined window. **Arm B:** Initiate Standard of Care (SOC) / no treatment. |
+| **3. Assignment procedure** | Define how treatment groups are formed. | Emulate randomization at $T_0$ using Propensity Scores (IPTW or matching) based on baseline covariates. |
+| **4. Follow-up period** | Align follow-up start exactly with $T_0$. | Clock starts ticking for all patients at $T_0$. Ends at the event, death, censoring, or study end. |
+| **5. Outcomes** | Define a standardized clinical endpoint. | First occurrence of the event (e.g., death, progression) during the follow-up period. |
+| **6. Causal effect of interest** | Specify the causal contrast of interest. | **Intention-to-Treat (ITT):** Effect of treatment assignment at $T_0$, regardless of later compliance. |
+| **7. Analysis plan** | Specify the statistical estimator. | Cox Proportional Hazards model or parametric survival models, adjusted for baseline confounding. |
 
 ### Deep Dive: The New User Design
 

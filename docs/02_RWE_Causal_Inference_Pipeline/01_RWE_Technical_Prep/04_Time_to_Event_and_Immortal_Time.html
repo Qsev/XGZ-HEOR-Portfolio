@@ -291,7 +291,7 @@ window.Quarto = {
   </ul></li>
   <li><a href="#the-target-trial-emulation-tte-framework" id="toc-the-target-trial-emulation-tte-framework" class="nav-link" data-scroll-target="#the-target-trial-emulation-tte-framework"><span class="header-section-number">2</span> The Target Trial Emulation (TTE) Framework</a>
   <ul class="collapse">
-  <li><a href="#the-7-pillars-of-target-trial-emulation" id="toc-the-7-pillars-of-target-trial-emulation" class="nav-link" data-scroll-target="#the-7-pillars-of-target-trial-emulation"><span class="header-section-number">2.1</span> The 7 Pillars of Target Trial Emulation</a></li>
+  <li><a href="#the-7-dimensions-of-the-target-trial-approach" id="toc-the-7-dimensions-of-the-target-trial-approach" class="nav-link" data-scroll-target="#the-7-dimensions-of-the-target-trial-approach"><span class="header-section-number">2.1</span> The 7 Dimensions of the Target Trial Approach</a></li>
   <li><a href="#deep-dive-the-new-user-design" id="toc-deep-dive-the-new-user-design" class="nav-link" data-scroll-target="#deep-dive-the-new-user-design"><span class="header-section-number">2.2</span> Deep Dive: The New User Design</a></li>
   <li><a href="#deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring" id="toc-deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring" class="nav-link" data-scroll-target="#deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring"><span class="header-section-number">2.3</span> Deep Dive: Intention-to-Treat (ITT) in RWD (Cloning &amp; Censoring)</a></li>
   <li><a href="#auditors-view-why-tte-simple-regression" id="toc-auditors-view-why-tte-simple-regression" class="nav-link" data-scroll-target="#auditors-view-why-tte-simple-regression"><span class="header-section-number">2.4</span> Auditor’s View: Why TTE &gt; Simple Regression</a></li>
@@ -381,17 +381,17 @@ window.Quarto = {
 <ul>
 <li><strong>The Paradox</strong>: Observational studies often show that coffee drinkers have lower rates of heart disease than non-coffee drinkers (Hazard Ratio &lt; 1.0).</li>
 <li><strong>The Reverse Causality</strong>: In reality, patients who develop heart symptoms or are diagnosed with high risk are advised by doctors to quit coffee.</li>
-<li><strong>The Methodological Connection</strong>: If we classify exposure statically based on whether a patient drinks coffee during follow-up, we violate the chronological ordering of causal inference. A patient who develops heart disease on Day 50 and subsequently quits coffee will be misclassified as a “non-coffee drinker” at the end of the study. This attributes their heart event (which occurred <em>before</em> quitting) to the non-exposure group, violating the non-anticipatory constraint of time-to-event outcomes.</li>
+<li><strong>The Methodological Connection</strong>: If we classify exposure statically based on whether a patient drinks coffee during follow-up, we violate the <strong>chronological ordering</strong> of causal inference. A patient who develops heart disease on <strong>Day 50</strong> and <strong>subsequently</strong> quits coffee will be misclassified as a “non-coffee drinker” at the <strong>end of the study</strong>. This attributes their heart event (which occurred <strong>before</strong> quitting) to the non-exposure group, violating the non-anticipatory constraint of time-to-event outcomes.</li>
 </ul>
 <p>To resolve this paradox, we must align the study baseline (<span class="math inline">\(T_0\)</span>), measure confounders (like baseline heart risk) strictly <em>before</em> exposure initiation, and model exposure dynamically over time. This is exactly what Target Trial Emulation and Time-Varying survival models achieve.</p>
 </section>
 </section>
 <section id="the-target-trial-emulation-tte-framework" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="the-target-trial-emulation-tte-framework"><span class="header-section-number">2</span> The Target Trial Emulation (TTE) Framework</h2>
-<p>Target Trial Emulation is a structured design framework developed by Miguel Hernán and colleagues to guide the design and analysis of observational studies. The core principle is that <strong>we should design our observational study to mimic a hypothetical randomized trial as closely as possible.</strong></p>
-<section id="the-7-pillars-of-target-trial-emulation" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="the-7-pillars-of-target-trial-emulation"><span class="header-section-number">2.1</span> The 7 Pillars of Target Trial Emulation</h3>
-<p>To translate observational data into robust evidence, researchers must define a protocol addressing seven protocol components:</p>
+<p>Target Trial Emulation is a structured design framework developed by Miguel Hernán and colleagues to <strong>guide the design</strong> and analysis of observational studies. The core principle is that we should design our observational study <strong>to mimic a hypothetical randomized trial as closely as possible.</strong></p>
+<section id="the-7-dimensions-of-the-target-trial-approach" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="the-7-dimensions-of-the-target-trial-approach"><span class="header-section-number">2.1</span> The 7 Dimensions of the Target Trial Approach</h3>
+<p>According to the official NICE RWE Framework (Section 5.2), a target trial must be defined across 7 core dimensions to prevent bias and ensure transparency:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -400,44 +400,44 @@ window.Quarto = {
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Pillar</th>
+<th style="text-align: left;">Dimension</th>
 <th style="text-align: left;">NICE RWE Framework Requirement</th>
 <th style="text-align: left;">Application to Survival Cohorts</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><strong>1. Eligibility</strong></td>
+<td style="text-align: left;"><strong>1. Eligibility criteria</strong></td>
 <td style="text-align: left;">Define clear inclusion/exclusion criteria at baseline.</td>
 <td style="text-align: left;">Patients must meet all criteria at Time Zero (<span class="math inline">\(T_0\)</span>), ensuring no baseline selection bias.</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><strong>2. Treatment Strategy</strong></td>
+<td style="text-align: left;"><strong>2. Treatment strategies</strong></td>
 <td style="text-align: left;">Specify the interventions being compared.</td>
 <td style="text-align: left;"><strong>Arm A:</strong> Initiate active treatment within a defined window. <strong>Arm B:</strong> Initiate Standard of Care (SOC) / no treatment.</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><strong>3. Assignment</strong></td>
+<td style="text-align: left;"><strong>3. Assignment procedure</strong></td>
 <td style="text-align: left;">Define how treatment groups are formed.</td>
 <td style="text-align: left;">Emulate randomization at <span class="math inline">\(T_0\)</span> using Propensity Scores (IPTW or matching) based on baseline covariates.</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><strong>4. Follow-up</strong></td>
+<td style="text-align: left;"><strong>4. Follow-up period</strong></td>
 <td style="text-align: left;">Align follow-up start exactly with <span class="math inline">\(T_0\)</span>.</td>
 <td style="text-align: left;">Clock starts ticking for all patients at <span class="math inline">\(T_0\)</span>. Ends at the event, death, censoring, or study end.</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><strong>5. Outcome</strong></td>
+<td style="text-align: left;"><strong>5. Outcomes</strong></td>
 <td style="text-align: left;">Define a standardized clinical endpoint.</td>
 <td style="text-align: left;">First occurrence of the event (e.g., death, progression) during the follow-up period.</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><strong>6. Causal Contrast</strong></td>
-<td style="text-align: left;">Specify the effect of interest.</td>
+<td style="text-align: left;"><strong>6. Causal effect of interest</strong></td>
+<td style="text-align: left;">Specify the causal contrast of interest.</td>
 <td style="text-align: left;"><strong>Intention-to-Treat (ITT):</strong> Effect of treatment assignment at <span class="math inline">\(T_0\)</span>, regardless of later compliance.</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><strong>7. Analysis Plan</strong></td>
+<td style="text-align: left;"><strong>7. Analysis plan</strong></td>
 <td style="text-align: left;">Specify the statistical estimator.</td>
 <td style="text-align: left;">Cox Proportional Hazards model or parametric survival models, adjusted for baseline confounding.</td>
 </tr>
