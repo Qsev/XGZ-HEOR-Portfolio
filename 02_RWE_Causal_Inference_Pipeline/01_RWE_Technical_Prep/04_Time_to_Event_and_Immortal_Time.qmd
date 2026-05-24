@@ -103,7 +103,7 @@ While the official NICE RWE Framework (2022) guidelines reference clinical examp
 ### Case Overview: The Drug X Conflict
 
 - **The Innovation**: Due to the rarity of the METex14 mutation and ethical constraints, only a **Single-arm Trial (N=40)** was conducted for Drug X.
-- **The Objection**: The Evidence Assessment Group (EAG) flagged the submission as "high risk" because there was no randomized head-to-head comparison. Natural history for METex14 is aggressive, and simple benchmarking is insufficient.
+- **The Challenge**: A single-arm submission faces a high risk of rejection due to the lack of a randomized head-to-head comparison. Given the aggressive natural history of METex14 NSCLC, simple unadjusted benchmarking is insufficient for demonstrating comparative effectiveness.
 - **The Strategy**: We leverage the UK Hospital Episode Statistics (HES) database to construct an External Control Arm (ECA) of 200 patients, using the Target Trial Emulation (TTE) framework to satisfy NICE's demand for rigorous causal inference.
 
 ### Step 1: Data Suitability Audit (DataSAT)
