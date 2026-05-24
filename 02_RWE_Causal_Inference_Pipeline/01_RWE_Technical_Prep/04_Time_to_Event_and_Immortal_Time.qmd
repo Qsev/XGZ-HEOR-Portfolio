@@ -23,15 +23,15 @@ Unlike binary outcomes where logistic regression or propensity score matching ar
 
 If time-to-event analysis is not bounded by strict causal constraints, observational analyses can yield severe selection biases. A primary methodological challenge in retrospective registries is **Immortal Time Bias (ITB)**. 
 
-### The Coffee & Heart Disease Paradox (Reverse Causality)
+### The Coffee & Heart Disease Paradox: Temporal Ordering and Selection Bias
 
-To understand why simple observational survival analysis fails, consider the "Coffee & Heart Disease Paradox":
+To understand why a strict time-to-event framework is necessary, consider the "Coffee & Heart Disease Paradox":
 
-- **The Observation**: A cross-sectional analysis or simple regression shows that people who drink coffee have significantly lower rates of heart disease (e.g., Hazard Ratio < 1.0).
-- **The Reality**: This is driven by reverse causality. Patients who *already* have heart problems or are at high risk are often advised by their doctors to quit coffee.
-- **The Trap**: If we run a regression on cross-sectional data, we see "Coffee = Health." 
+- **The Paradox**: Observational studies often show that coffee drinkers have lower rates of heart disease than non-coffee drinkers (Hazard Ratio < 1.0).
+- **The Reverse Causality**: In reality, patients who develop heart symptoms or are diagnosed with high risk are advised by doctors to quit coffee.
+- **The Methodological Connection**: If we classify exposure statically based on whether a patient drinks coffee during follow-up, we violate the chronological ordering of causal inference. A patient who develops heart disease on Day 50 and subsequently quits coffee will be misclassified as a "non-coffee drinker" at the end of the study. This attributes their heart event (which occurred *before* quitting) to the non-exposure group, violating the non-anticipatory constraint of time-to-event outcomes. 
 
-To resolve this paradox, we cannot rely on simple regression adjustments; we must emulate a randomized trial to establish a clear chronological sequence of events.
+To resolve this paradox, we must align the study baseline ($T_0$), measure confounders (like baseline heart risk) strictly *before* exposure initiation, and model exposure dynamically over time. This is exactly what Target Trial Emulation and Time-Varying survival models achieve.
 
 ## The Target Trial Emulation (TTE) Framework
 
