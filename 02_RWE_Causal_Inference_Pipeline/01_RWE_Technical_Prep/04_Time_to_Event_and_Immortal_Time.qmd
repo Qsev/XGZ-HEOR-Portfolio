@@ -76,7 +76,7 @@ If we assign patients to the "treated" group because they initiated treatment on
 3. **Censoring**: If a patient assigned to Arm B initiates treatment on day 30, their Arm B clone is **censored** at day 30 (because they violated the "no treatment" protocol). The Arm A clone continues to be followed.
 4. **IPCW Adjustment**: To correct for selection bias introduced by this artificial censoring, we apply **Inverse Probability of Censoring Weights (IPCW)**, which upweights the remaining uncensored clones who share similar baseline characteristics.
 
-### Auditor's View: Why TTE > Simple Regression
+### Causal Transparency: Why TTE Aligns with the DataSAT Tool
 
 NICE prefers TTE because it enforces **Transparency**. 
 

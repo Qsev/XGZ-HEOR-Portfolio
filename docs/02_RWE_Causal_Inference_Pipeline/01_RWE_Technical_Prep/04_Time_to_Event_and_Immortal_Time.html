@@ -294,7 +294,7 @@ window.Quarto = {
   <li><a href="#the-7-dimensions-of-the-target-trial-approach" id="toc-the-7-dimensions-of-the-target-trial-approach" class="nav-link" data-scroll-target="#the-7-dimensions-of-the-target-trial-approach"><span class="header-section-number">2.1</span> The 7 Dimensions of the Target Trial Approach</a></li>
   <li><a href="#deep-dive-the-new-user-design" id="toc-deep-dive-the-new-user-design" class="nav-link" data-scroll-target="#deep-dive-the-new-user-design"><span class="header-section-number">2.2</span> Deep Dive: The New User Design</a></li>
   <li><a href="#deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring" id="toc-deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring" class="nav-link" data-scroll-target="#deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring"><span class="header-section-number">2.3</span> Deep Dive: Intention-to-Treat (ITT) in RWD (Cloning &amp; Censoring)</a></li>
-  <li><a href="#auditors-view-why-tte-simple-regression" id="toc-auditors-view-why-tte-simple-regression" class="nav-link" data-scroll-target="#auditors-view-why-tte-simple-regression"><span class="header-section-number">2.4</span> Auditor’s View: Why TTE &gt; Simple Regression</a></li>
+  <li><a href="#causal-transparency-why-tte-aligns-with-the-datasat-tool" id="toc-causal-transparency-why-tte-aligns-with-the-datasat-tool" class="nav-link" data-scroll-target="#causal-transparency-why-tte-aligns-with-the-datasat-tool"><span class="header-section-number">2.4</span> Causal Transparency: Why TTE Aligns with the DataSAT Tool</a></li>
   </ul></li>
   <li><a href="#hta-case-study-drug-x-metex14-case-study" id="toc-hta-case-study-drug-x-metex14-case-study" class="nav-link" data-scroll-target="#hta-case-study-drug-x-metex14-case-study"><span class="header-section-number">3</span> HTA Case Study: Drug X (METex14) Case Study</a>
   <ul class="collapse">
@@ -465,8 +465,8 @@ window.Quarto = {
 <li><strong>IPCW Adjustment</strong>: To correct for selection bias introduced by this artificial censoring, we apply <strong>Inverse Probability of Censoring Weights (IPCW)</strong>, which upweights the remaining uncensored clones who share similar baseline characteristics.</li>
 </ol>
 </section>
-<section id="auditors-view-why-tte-simple-regression" class="level3" data-number="2.4">
-<h3 data-number="2.4" class="anchored" data-anchor-id="auditors-view-why-tte-simple-regression"><span class="header-section-number">2.4</span> Auditor’s View: Why TTE &gt; Simple Regression</h3>
+<section id="causal-transparency-why-tte-aligns-with-the-datasat-tool" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="causal-transparency-why-tte-aligns-with-the-datasat-tool"><span class="header-section-number">2.4</span> Causal Transparency: Why TTE Aligns with the DataSAT Tool</h3>
 <p>NICE prefers TTE because it enforces <strong>Transparency</strong>.</p>
 <p>In a simple Cox regression, you often see: <span class="math display">\[\text{Surv}(\text{time}, \text{event}) \sim \text{Treatment} + \text{Confounders}\]</span></p>
 <p>An auditor cannot see:</p>
