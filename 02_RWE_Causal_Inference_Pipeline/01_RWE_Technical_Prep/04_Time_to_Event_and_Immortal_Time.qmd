@@ -39,15 +39,9 @@ Target Trial Emulation is a structured design framework developed by Miguel Hern
 
 ### The 7 Dimensions of the Target Trial Approach
 
-According to the official NICE RWE Framework (Section 5.2), a target trial must be defined across 7 core dimensions to prevent bias and ensure transparency:
+According to the official NICE RWE Framework (Section 5.2)[^1], a target trial must be defined across 7 core dimensions to prevent bias and ensure transparency:
 
-::: {.column-margin}
-**Official Source:**
-NICE Real-World Evidence Framework (2022), Section 5.2 ("The target trial approach").
-
-**Methodological Reference:**
-Hernán MA, Robins JM (2016). *Using Big Data to Emulate a Target Trial When a Randomized Trial Is Not Available*. Am J Epidemiol.
-:::
+[^1]: **Official Source:** NICE Real-World Evidence Framework (2022), Section 5.2 ("The target trial approach"). **Methodological Reference:** Hernán MA, Robins JM (2016). *Using Big Data to Emulate a Target Trial When a Randomized Trial Is Not Available*. Am J Epidemiol.
 
 | Dimension | NICE RWE Framework Requirement | Application to Survival Cohorts |
 | :--- | :--- | :--- |
@@ -61,12 +55,9 @@ Hernán MA, Robins JM (2016). *Using Big Data to Emulate a Target Trial When a R
 
 ### Deep Dive: The New User Design
 
-::: {.column-margin}
-**Defining a "New User":**
-A patient is classified as a "new user" only if they initiate the drug of interest for the first time at $T_0$. This requires establishing a **washout period** (e.g., 180 or 365 days prior to $T_0$) during which they have no records of the drug in the database, ensuring they are not "prevalent users."
-:::
+A fundamental rule of TTE is the **New User Design**[^2]. In observational studies, researchers often mistakenly compare "prevalent users" (patients already on the drug for some time) with "never users." This introduces three major issues:
 
-A fundamental rule of TTE is the **New User Design**. In observational studies, researchers often mistakenly compare "prevalent users" (patients already on the drug for some time) with "never users." This introduces three major issues:
+[^2]: **Defining a "New User":** A patient is classified as a "new user" only if they initiate the drug of interest for the first time at $T_0$. This requires establishing a **washout period** (e.g., 180 or 365 days prior to $T_0$) during which they have no records of the drug in the database, ensuring they are not "prevalent users."
 
 - **Survivor Bias**: Prevalent users are, by definition, "survivors" who have tolerated the drug and survived long enough to be observed in the database. Patients who died or discontinued the drug early due to adverse events are systematically excluded from the treated group, creating a false survival advantage.
 - **Baseline Contamination**: To adjust for confounding, we must measure covariates **before** treatment starts. For prevalent users, their baseline measurements (e.g., blood pressure, lab values) are already affected by the treatment, making it impossible to measure their true pre-treatment state.
