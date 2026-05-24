@@ -296,7 +296,7 @@ window.Quarto = {
   <li><a href="#deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring" id="toc-deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring" class="nav-link" data-scroll-target="#deep-dive-intention-to-treat-itt-in-rwd-cloning-censoring"><span class="header-section-number">2.3</span> Deep Dive: Intention-to-Treat (ITT) in RWD (Cloning &amp; Censoring)</a></li>
   <li><a href="#causal-transparency-why-tte-aligns-with-the-datasat-tool" id="toc-causal-transparency-why-tte-aligns-with-the-datasat-tool" class="nav-link" data-scroll-target="#causal-transparency-why-tte-aligns-with-the-datasat-tool"><span class="header-section-number">2.4</span> Causal Transparency: Why TTE Aligns with the DataSAT Tool</a></li>
   </ul></li>
-  <li><a href="#hta-case-study-drug-x-metex14-case-study" id="toc-hta-case-study-drug-x-metex14-case-study" class="nav-link" data-scroll-target="#hta-case-study-drug-x-metex14-case-study"><span class="header-section-number">3</span> HTA Case Study: Drug X (METex14) Case Study</a>
+  <li><a href="#hta-case-study-drug-x-metex14-applied-case-study" id="toc-hta-case-study-drug-x-metex14-applied-case-study" class="nav-link" data-scroll-target="#hta-case-study-drug-x-metex14-applied-case-study"><span class="header-section-number">3</span> HTA Case Study: Drug X (METex14) Applied Case Study</a>
   <ul class="collapse">
   <li><a href="#case-overview-the-drug-x-conflict" id="toc-case-overview-the-drug-x-conflict" class="nav-link" data-scroll-target="#case-overview-the-drug-x-conflict"><span class="header-section-number">3.1</span> Case Overview: The Drug X Conflict</a></li>
   <li><a href="#step-1-data-suitability-audit-datasat" id="toc-step-1-data-suitability-audit-datasat" class="nav-link" data-scroll-target="#step-1-data-suitability-audit-datasat"><span class="header-section-number">3.2</span> Step 1: Data Suitability Audit (DataSAT)</a></li>
@@ -478,9 +478,22 @@ window.Quarto = {
 <p>By using the <strong>DataSAT</strong> tool (Data Suitability Assessment Tool), NICE auditors look for <strong>Provenance</strong>—the clear lineage of how a patient moved from a raw database record to a study row. TTE forces the researcher to write a “Trial Protocol” <em>before</em> touching the data, making it obvious where <span class="math inline">\(T_0\)</span> is. If an auditor sees that you measured covariates after the drug was given and used them as baseline, the TTE framework will flag this as a “Post-baseline Bias” immediately.</p>
 </section>
 </section>
-<section id="hta-case-study-drug-x-metex14-case-study" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="hta-case-study-drug-x-metex14-case-study"><span class="header-section-number">3</span> HTA Case Study: Drug X (METex14) Case Study</h2>
-<p>To see how these principles apply to a real submission, we examine the case of <strong>Drug X</strong>, a precision oncology therapy for METex14-mutated non-small cell lung cancer (NSCLC).</p>
+<section id="hta-case-study-drug-x-metex14-applied-case-study" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="hta-case-study-drug-x-metex14-applied-case-study"><span class="header-section-number">3</span> HTA Case Study: Drug X (METex14) Applied Case Study</h2>
+<p>To see how these principles apply to a real-world submission, we examine the case of <strong>Drug X</strong>, a precision oncology therapy for METex14-mutated non-small cell lung cancer (NSCLC).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Note on Case Selection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>While the official NICE RWE Framework (2022) guidelines reference clinical examples like Hormone Replacement Therapy (HRT) and dialysis initiation to teach these methods, this METex14 oncology case study represents an applied industry consulting scenario. It demonstrates how the framework’s target trial dimensions and DataSAT requirements are executed in oncology HTA appraisals, where single-arm trials and external controls are frequently required.</p>
+</div>
+</div>
 <section id="case-overview-the-drug-x-conflict" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="case-overview-the-drug-x-conflict"><span class="header-section-number">3.1</span> Case Overview: The Drug X Conflict</h3>
 <ul>

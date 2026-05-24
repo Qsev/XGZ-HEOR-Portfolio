@@ -91,9 +91,14 @@ An auditor cannot see:
 
 By using the **DataSAT** tool (Data Suitability Assessment Tool), NICE auditors look for **Provenance**—the clear lineage of how a patient moved from a raw database record to a study row. TTE forces the researcher to write a "Trial Protocol" *before* touching the data, making it obvious where $T_0$ is. If an auditor sees that you measured covariates after the drug was given and used them as baseline, the TTE framework will flag this as a "Post-baseline Bias" immediately.
 
-## HTA Case Study: Drug X (METex14) Case Study
+## HTA Case Study: Drug X (METex14) Applied Case Study
 
-To see how these principles apply to a real submission, we examine the case of **Drug X**, a precision oncology therapy for METex14-mutated non-small cell lung cancer (NSCLC).
+To see how these principles apply to a real-world submission, we examine the case of **Drug X**, a precision oncology therapy for METex14-mutated non-small cell lung cancer (NSCLC). 
+
+::: {.callout-note}
+### Note on Case Selection
+While the official NICE RWE Framework (2022) guidelines reference clinical examples like Hormone Replacement Therapy (HRT) and dialysis initiation to teach these methods, this METex14 oncology case study represents an applied industry consulting scenario. It demonstrates how the framework's target trial dimensions and DataSAT requirements are executed in oncology HTA appraisals, where single-arm trials and external controls are frequently required.
+:::
 
 ### Case Overview: The Drug X Conflict
 
