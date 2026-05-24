@@ -448,12 +448,15 @@ window.Quarto = {
 </tbody>
 </table>
 </section>
-<section id="deep-dive-the-new-user-design" class="level3" data-number="2.2">
+<section id="deep-dive-the-new-user-design" class="level3 page-columns page-full" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="deep-dive-the-new-user-design"><span class="header-section-number">2.2</span> Deep Dive: The New User Design</h3>
-<p>A fundamental rule of TTE is the <strong>New User Design</strong>. In observational studies, researchers often mistakenly compare “prevalent users” (patients already on the drug for some time) with “never users.” This introduces three major issues:</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><strong>Defining a “New User”:</strong> A patient is classified as a “new user” only if they initiate the drug of interest for the first time at <span class="math inline">\(T_0\)</span>. This requires establishing a <strong>washout period</strong> (e.g., 180 or 365 days prior to <span class="math inline">\(T_0\)</span>) during which they have no records of the drug in the database, ensuring they are not “prevalent users.”</p>
+</div></div><p>A fundamental rule of TTE is the <strong>New User Design</strong>. In observational studies, researchers often mistakenly compare “prevalent users” (patients already on the drug for some time) with “never users.” This introduces three major issues:</p>
 <ul>
 <li><strong>Survivor Bias</strong>: Prevalent users are, by definition, “survivors” who have tolerated the drug and survived long enough to be observed in the database. Patients who died or discontinued the drug early due to adverse events are systematically excluded from the treated group, creating a false survival advantage.</li>
-<li><strong>Baseline Contamination</strong>: To adjust for confounding, we must measure covariates <em>before</em> treatment starts. For prevalent users, their baseline measurements (e.g., blood pressure, lab values) are already affected by the treatment, making it impossible to measure their true pre-treatment state.</li>
+<li><strong>Baseline Contamination</strong>: To adjust for confounding, we must measure covariates <strong>before</strong> treatment starts. For prevalent users, their baseline measurements (e.g., blood pressure, lab values) are already affected by the treatment, making it impossible to measure their true pre-treatment state.</li>
 <li><strong><span class="math inline">\(T_0\)</span> Synchronization</strong>: We cannot align the start of follow-up with the start of treatment if treatment began years before the observation period.</li>
 </ul>
 <p>A New User Design enforces that patients are only entered into the cohort at the exact moment they <strong>initiate</strong> the treatment of interest.</p>
