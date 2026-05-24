@@ -499,9 +499,11 @@ show_cox(fit_tv, "Time-Dependent Cox Model Results (Immortal Time Corrected)")
 
 The time-dependent Cox model keeps the early follow-up time and assigns it to the correct treatment state. In this simulation, it is expected to recover a hazard ratio closer to the true treatment effect than the naive static model.
 
+[^strategy-vs-status]: **Treatment status vs. treatment strategy:** Imagine Drug X has strong biological efficacy once started, but testing and approval delays mean many patients die before receiving it. A time-dependent Cox model may show a large hazard reduction once patients are on Drug X. A cloning-censoring-IPCW analysis may still find limited benefit for the overall "start within 90 days" strategy unless treatment can actually be started fast enough. This is the difference between estimating an on-treatment effect and evaluating a baseline treatment-initiation strategy.
+
 ## Cloning, Censoring, and IPCW in Target Trial Emulation
 
-Time-dependent Cox models are useful for auditing whether delayed treatment initiation has created immortal time bias. However, when the target trial question is defined as a comparison of **treatment strategies**—for example, "initiate Drug X within 90 days of diagnosis" versus "do not initiate Drug X within 90 days"—a trial-emulation analysis often requires **cloning, artificial censoring, and inverse probability of censoring weighting (IPCW)**.
+Time-dependent Cox models are useful for auditing whether delayed treatment initiation has created immortal time bias. However, when the target trial question is defined as a comparison of **treatment strategies**—for example, "initiate Drug X within 90 days of diagnosis" versus "do not initiate Drug X within 90 days"—a trial-emulation analysis often requires **cloning, artificial censoring, and inverse probability of censoring weighting (IPCW)**. Here, the 90-day grace period is not a minor technical detail; it is part of the strategy definition itself and should be justified, audited, and tested in sensitivity analyses.[^strategy-vs-status]
 
 ### Why Artificial Censoring Creates Bias
 
