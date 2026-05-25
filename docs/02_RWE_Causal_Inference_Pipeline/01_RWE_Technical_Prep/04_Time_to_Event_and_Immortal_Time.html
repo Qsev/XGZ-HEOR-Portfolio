@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Xiaoge Zhang, PhD">
-<meta name="dcterms.date" content="2026-05-24">
+<meta name="dcterms.date" content="2026-05-25">
 
 <title>Survival Analysis &amp; Immortal Time Bias in Real-World Evidence – HEOR Technical Portfolio</title>
 <style>
@@ -332,12 +332,11 @@ window.Quarto = {
   <li><a href="#quantitative-bias-analysis-e-value-sensitivity-analysis" id="toc-quantitative-bias-analysis-e-value-sensitivity-analysis" class="nav-link" data-scroll-target="#quantitative-bias-analysis-e-value-sensitivity-analysis"><span class="header-section-number">9</span> Quantitative Bias Analysis: E-Value Sensitivity Analysis</a>
   <ul class="collapse">
   <li><a href="#e-value-math-formula-setup" id="toc-e-value-math-formula-setup" class="nav-link" data-scroll-target="#e-value-math-formula-setup"><span class="header-section-number">9.1</span> E-Value Math &amp; Formula Setup</a></li>
-  <li><a href="#algebraic-derivation-of-the-e-value-vanderweele-ding-2016" id="toc-algebraic-derivation-of-the-e-value-vanderweele-ding-2016" class="nav-link" data-scroll-target="#algebraic-derivation-of-the-e-value-vanderweele-ding-2016"><span class="header-section-number">9.2</span> Algebraic Derivation of the E-Value (VanderWeele &amp; Ding 2016)</a></li>
   </ul></li>
-  <li><a href="#hta-audit-interview-guide" id="toc-hta-audit-interview-guide" class="nav-link" data-scroll-target="#hta-audit-interview-guide"><span class="header-section-number">10</span> HTA Audit &amp; Interview Guide</a>
+  <li><a href="#hta-documentation-technical-audit-summary" id="toc-hta-documentation-technical-audit-summary" class="nav-link" data-scroll-target="#hta-documentation-technical-audit-summary"><span class="header-section-number">10</span> HTA Documentation &amp; Technical Audit Summary</a>
   <ul class="collapse">
-  <li><a href="#interview-audit-checklist" id="toc-interview-audit-checklist" class="nav-link" data-scroll-target="#interview-audit-checklist"><span class="header-section-number">10.1</span> Interview Audit Checklist</a></li>
-  <li><a href="#expert-hta-articulation" id="toc-expert-hta-articulation" class="nav-link" data-scroll-target="#expert-hta-articulation"><span class="header-section-number">10.2</span> Expert HTA Articulation</a></li>
+  <li><a href="#technical-documentation-checklist" id="toc-technical-documentation-checklist" class="nav-link" data-scroll-target="#technical-documentation-checklist"><span class="header-section-number">10.1</span> Technical Documentation Checklist</a></li>
+  <li><a href="#suggested-technical-wording" id="toc-suggested-technical-wording" class="nav-link" data-scroll-target="#suggested-technical-wording"><span class="header-section-number">10.2</span> Suggested Technical Wording</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -365,7 +364,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 24, 2026</p>
+      <p class="date">May 25, 2026</p>
     </div>
   </div>
   
@@ -391,7 +390,7 @@ window.Quarto = {
 <li><strong>The Reverse Causality</strong>: In reality, patients who develop heart symptoms or are diagnosed with high risk are advised by doctors to quit coffee.</li>
 <li><strong>The Methodological Connection</strong>: If we classify exposure statically based on whether a patient drinks coffee during follow-up, we violate the <strong>chronological ordering</strong> of causal inference. A patient who develops heart disease on <strong>Day 50</strong> and <strong>subsequently</strong> quits coffee will be misclassified as a “non-coffee drinker” at the <strong>end of the study</strong>. This attributes their heart event (which occurred <strong>before</strong> quitting) to the non-exposure group, violating the non-anticipatory constraint of time-to-event outcomes.</li>
 </ul>
-<p>To resolve this paradox, we must align the study baseline (<span class="math inline">\(T_0\)</span>), measure confounders (like baseline heart risk) strictly <em>before</em> exposure initiation, and model exposure dynamically over time. This is exactly what Target Trial Emulation and Time-Varying survival models achieve.</p>
+<p>To resolve this paradox, we must align the study baseline (<span class="math inline">\(T_0\)</span>), measure confounders (like baseline heart risk) strictly <em>before</em> exposure initiation, and update treatment or exposure status over time when it changes. This is exactly what target trial emulation and time-dependent survival models are designed to support.</p>
 </section>
 </section>
 <section id="the-target-trial-emulation-tte-framework" class="level2 page-columns page-full" data-number="2">
@@ -557,11 +556,11 @@ window.Quarto = {
 <li><p><strong>Logic Paradox</strong>: In RWD studies, patients from diagnosis to actual treatment initiation (Drug X) face delays (e.g., 1 month). If follow-up begins at diagnosis, but grouping is based on whether they ever received treatment, the period before receiving the drug is <strong>immortal</strong>—if the patient <strong>died on Day 15</strong>, they would <strong>never</strong> have lived long enough to receive the drug, and would automatically be classified into the control group (since they are not “treated”).</p></li>
 <li><p><strong>Case Simulation</strong>:</p>
 <ul>
-<li><strong>Patient A</strong>: Diagnosed Jan 1, scheduled for Drug X, dies Jan 15 (unexposed). Classified as Control.</li>
+<li><strong>Patient A</strong>: Diagnosed Jan 1, scheduled for Drug X, dies Jan 15 (not treated). Classified as Control.</li>
 <li><strong>Patient B</strong>: Diagnosed Jan 1, initiates Drug X Feb 1, survives until June.</li>
 <li><strong>Result</strong>: The Drug X group artificially filters out those who die before treatment initiation, inflating the active group’s survival.</li>
 </ul></li>
-<li><p><strong>TTE Correction</strong>: The survival follow-up clock must be aligned to a clearly defined index date that is comparable across arms. If the causal question starts at diagnosis but treatment can begin during a grace period, the waiting time must not be retrospectively credited to the treated group; it should be handled using cloning-and-censoring, a time-varying exposure model, or a pre-specified landmark strategy.</p></li>
+<li><p><strong>TTE Correction</strong>: The survival follow-up clock must be aligned to a clearly defined index date that is comparable across arms. If the causal question starts at diagnosis but treatment can begin during a grace period, the waiting time must not be retrospectively credited to the treated group; it should be handled using cloning-and-censoring, a time-dependent treatment model, or a pre-specified landmark strategy.</p></li>
 </ol>
 </section>
 <section id="the-control-arm-t_0" class="level4 unnumbered">
@@ -580,7 +579,7 @@ window.Quarto = {
 <h4 class="unnumbered anchored" data-anchor-id="handling-the-grace-period">Handling the Grace Period</h4>
 <p>In RWD, a patient has a “window” of time (grace period) to initiate treatment (e.g., 30 days after diagnosis).</p>
 <ul>
-<li>If a patient initiates treatment on Day 20, they contribute 20 days of “unexposed” person-time to the control group.</li>
+<li>If a patient initiates treatment on Day 20, they contribute 20 days of untreated person-time before treatment begins.</li>
 <li>Using cloning, we create two clones at diagnosis. The “Control Clone” is followed until Day 20, where it is censored because the patient initiated treatment. The “Treated Clone” starts contributing treated time from Day 20 onwards.</li>
 </ul>
 </section>
@@ -956,7 +955,7 @@ t_{\text{init}} +
 <li><strong>Arbitrary Landmark Choice</strong>: The selected landmark time is a design decision, not a statistical truth. If <span class="math inline">\(T_L\)</span> is too early, many later initiators remain classified as untreated; if <span class="math inline">\(T_L\)</span> is too late, more early events are discarded.</li>
 </ul></li>
 </ul>
-<p>Therefore, landmark analysis is usually better positioned as an intuitive diagnostic or sensitivity analysis, rather than the preferred primary analysis for HTA submissions. It is most defensible when the clinical question is explicitly conditional on surviving and remaining eligible until the landmark time; otherwise, time-varying exposure models or cloning-censoring-IPCW are generally more aligned with the original target trial question.</p>
+<p>Therefore, landmark analysis is usually better positioned as an intuitive diagnostic or sensitivity analysis, rather than the preferred primary analysis for HTA submissions. It is most defensible when the clinical question is explicitly conditional on surviving and remaining eligible until the landmark time; otherwise, time-dependent treatment models or cloning-censoring-IPCW are generally more aligned with the original target trial question.</p>
 </section>
 </section>
 <section id="applying-landmark-analysis-to-the-simulated-cohort" class="level3" data-number="5.2">
@@ -1333,7 +1332,7 @@ h_i(t) = h_0(t)\exp(\beta Z_i(t) + \gamma L_i)
 </section>
 <section id="ipcw-intuition" class="level3" data-number="7.2">
 <h3 data-number="7.2" class="anchored" data-anchor-id="ipcw-intuition"><span class="header-section-number">7.2</span> IPCW Intuition</h3>
-<p>The “C” in IPCW stands for <strong>censoring</strong>. The core idea is to weight each remaining uncensored clone by the inverse of its probability of remaining uncensored:</p>
+<p>The “C” in IPCW stands for <strong>censoring</strong>. The core idea is to <strong>weight</strong> each remaining <strong>uncensored clone</strong> by the <strong>inverse of its probability of remaining uncensored</strong>:</p>
 <p><span class="math display">\[
 w_i(t) = \frac{1}{P(C_i(t)=0 \mid L_i)}
 \]</span></p>
@@ -1342,7 +1341,7 @@ w_i(t) = \frac{1}{P(C_i(t)=0 \mid L_i)}
 </section>
 <section id="stabilized-weights" class="level3" data-number="7.3">
 <h3 data-number="7.3" class="anchored" data-anchor-id="stabilized-weights"><span class="header-section-number">7.3</span> Stabilized Weights</h3>
-<p>In practice, stabilized weights are often preferred because they reduce variance:</p>
+<p>In practice, stabilized weights are often preferred because they reduce variance. They are the practical replacement for the simple inverse-probability weight above: the core idea is unchanged, but the numerator helps keep the weights from becoming unnecessarily extreme.</p>
 <p><span class="math display">\[
 SW_i(t) =
 \frac{P(C_i(t)=0 \mid A_i)}
@@ -1407,115 +1406,134 @@ SW_i(t) =
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>artificial_censored <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_clone<span class="sc">$</span>artificial_censor_time <span class="sc">&lt;</span> df_clone<span class="sc">$</span>time)</span>
 <span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>uncensored <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> df_clone<span class="sc">$</span>artificial_censored</span>
 <span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(df_clone[, <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"strategy_label"</span>, <span class="st">"time"</span>, <span class="st">"event"</span>, <span class="st">"t_init"</span>, <span class="st">"obs_time"</span>, <span class="st">"outcome_event"</span>, <span class="st">"artificial_censored"</span>)], <span class="dv">8</span>),</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Cloned Target Trial Dataset with Artificial Censoring Rules"</span>,</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"c"</span></span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>never_started_id <span class="ot">&lt;-</span> df<span class="sc">$</span>id[<span class="fu">is.infinite</span>(df<span class="sc">$</span>t_init)][<span class="dv">1</span>]</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>clone_display_ids <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, never_started_id))</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>clone_display <span class="ot">&lt;-</span> df_clone[</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>  df_clone<span class="sc">$</span>id <span class="sc">%in%</span> clone_display_ids,</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"strategy"</span>, <span class="st">"t_init"</span>, <span class="st">"obs_time"</span>, <span class="st">"outcome_event"</span>, <span class="st">"artificial_censored"</span>)</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>clone_display <span class="ot">&lt;-</span> clone_display[<span class="fu">order</span>(clone_display<span class="sc">$</span>id, clone_display<span class="sc">$</span>strategy), ]</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>clone_display<span class="sc">$</span>t_init <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">is.infinite</span>(clone_display<span class="sc">$</span>t_init),</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Not started"</span>,</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, clone_display<span class="sc">$</span>t_init)</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>clone_display<span class="sc">$</span>obs_time <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, clone_display<span class="sc">$</span>obs_time)</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(clone_display) <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Patient ID"</span>, <span class="st">"Strategy"</span>, <span class="st">"Drug X Start Day"</span>, <span class="st">"Strategy Follow-up Stop"</span>,</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Death Observed"</span>, <span class="st">"Artificially Censored"</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  clone_display,</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Cloned Target Trial Dataset: Two Strategy Records per Patient, Including a Never-Started Patient"</span>,</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"c"</span>,</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Cloned Target Trial Dataset with Artificial Censoring Rules</caption>
+<caption>Cloned Target Trial Dataset: Two Strategy Records per Patient, Including a Never-Started Patient</caption>
 <colgroup>
-<col style="width: 3%">
-<col style="width: 24%">
-<col style="width: 10%">
-<col style="width: 6%">
-<col style="width: 10%">
+<col style="width: 11%">
 <col style="width: 9%">
-<col style="width: 14%">
-<col style="width: 20%">
+<col style="width: 17%">
+<col style="width: 24%">
+<col style="width: 15%">
+<col style="width: 22%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: center;">id</th>
-<th style="text-align: center;">strategy_label</th>
-<th style="text-align: center;">time</th>
-<th style="text-align: center;">event</th>
-<th style="text-align: center;">t_init</th>
-<th style="text-align: center;">obs_time</th>
-<th style="text-align: center;">outcome_event</th>
-<th style="text-align: center;">artificial_censored</th>
+<th style="text-align: center;">Patient ID</th>
+<th style="text-align: center;">Strategy</th>
+<th style="text-align: center;">Drug X Start Day</th>
+<th style="text-align: center;">Strategy Follow-up Stop</th>
+<th style="text-align: center;">Death Observed</th>
+<th style="text-align: center;">Artificially Censored</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">1</td>
-<td style="text-align: center;">Initiate within 90 days</td>
-<td style="text-align: center;">308.79962</td>
 <td style="text-align: center;">0</td>
-<td style="text-align: center;">119.09690</td>
-<td style="text-align: center;">90.00000</td>
+<td style="text-align: center;">119.1</td>
+<td style="text-align: center;">308.8</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">119.1</td>
+<td style="text-align: center;">90.0</td>
 <td style="text-align: center;">0</td>
 <td style="text-align: center;">1</td>
 </tr>
+<tr class="odd">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">69.5</td>
+<td style="text-align: center;">23.4</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
 <tr class="even">
 <td style="text-align: center;">2</td>
-<td style="text-align: center;">Initiate within 90 days</td>
-<td style="text-align: center;">23.38370</td>
 <td style="text-align: center;">1</td>
-<td style="text-align: center;">69.46443</td>
-<td style="text-align: center;">23.38370</td>
+<td style="text-align: center;">69.5</td>
+<td style="text-align: center;">23.4</td>
 <td style="text-align: center;">1</td>
 <td style="text-align: center;">0</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">3</td>
-<td style="text-align: center;">Initiate within 90 days</td>
-<td style="text-align: center;">215.66793</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">93.0</td>
+<td style="text-align: center;">215.7</td>
 <td style="text-align: center;">1</td>
-<td style="text-align: center;">92.99129</td>
-<td style="text-align: center;">90.00000</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">93.0</td>
+<td style="text-align: center;">90.0</td>
 <td style="text-align: center;">0</td>
 <td style="text-align: center;">1</td>
 </tr>
+<tr class="odd">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">110.0</td>
+<td style="text-align: center;">289.2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
 <tr class="even">
 <td style="text-align: center;">4</td>
-<td style="text-align: center;">Initiate within 90 days</td>
-<td style="text-align: center;">289.21538</td>
 <td style="text-align: center;">1</td>
-<td style="text-align: center;">110.01693</td>
-<td style="text-align: center;">90.00000</td>
+<td style="text-align: center;">110.0</td>
+<td style="text-align: center;">90.0</td>
 <td style="text-align: center;">0</td>
 <td style="text-align: center;">1</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">5</td>
-<td style="text-align: center;">Initiate within 90 days</td>
-<td style="text-align: center;">11.00879</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">Inf</td>
-<td style="text-align: center;">11.00879</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">Not started</td>
+<td style="text-align: center;">11.0</td>
 <td style="text-align: center;">1</td>
 <td style="text-align: center;">0</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">6</td>
-<td style="text-align: center;">Initiate within 90 days</td>
-<td style="text-align: center;">236.96021</td>
+<td style="text-align: center;">5</td>
 <td style="text-align: center;">1</td>
-<td style="text-align: center;">96.09793</td>
-<td style="text-align: center;">90.00000</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">7</td>
-<td style="text-align: center;">Initiate within 90 days</td>
-<td style="text-align: center;">241.13736</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">Inf</td>
-<td style="text-align: center;">90.00000</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">1</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">8</td>
-<td style="text-align: center;">Initiate within 90 days</td>
-<td style="text-align: center;">85.79655</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">105.85904</td>
-<td style="text-align: center;">85.79655</td>
+<td style="text-align: center;">Not started</td>
+<td style="text-align: center;">11.0</td>
 <td style="text-align: center;">1</td>
 <td style="text-align: center;">0</td>
 </tr>
@@ -1536,50 +1554,44 @@ SW_i(t) =
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>df_clone<span class="sc">$</span>ipcw <span class="ot">&lt;-</span> df_clone<span class="sc">$</span>p_uncens_num <span class="sc">/</span> df_clone<span class="sc">$</span>p_uncens_den</span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>weight_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(<span class="st">"Minimum"</span>, <span class="st">"1st Quartile"</span>, <span class="st">"Median"</span>, <span class="st">"Mean"</span>, <span class="st">"3rd Quartile"</span>, <span class="st">"Maximum"</span>),</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stabilized_IPCW =</span> <span class="fu">as.numeric</span>(<span class="fu">summary</span>(df_clone<span class="sc">$</span>ipcw))</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  weight_summary,</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Stabilized IPCW Distribution"</span>,</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">3</span>,</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"lr"</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Min =</span> <span class="fu">min</span>(df_clone<span class="sc">$</span>ipcw),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q1 =</span> <span class="fu">as.numeric</span>(<span class="fu">quantile</span>(df_clone<span class="sc">$</span>ipcw, <span class="fl">0.25</span>)),</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Median =</span> <span class="fu">median</span>(df_clone<span class="sc">$</span>ipcw),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mean =</span> <span class="fu">mean</span>(df_clone<span class="sc">$</span>ipcw),</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q3 =</span> <span class="fu">as.numeric</span>(<span class="fu">quantile</span>(df_clone<span class="sc">$</span>ipcw, <span class="fl">0.75</span>)),</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">Max =</span> <span class="fu">max</span>(df_clone<span class="sc">$</span>ipcw),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  weight_summary,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Stabilized IPCW Distribution"</span>,</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"rrrrrr"</span>,</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Stabilized IPCW Distribution</caption>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Metric</th>
-<th style="text-align: right;">Stabilized_IPCW</th>
+<th style="text-align: right;">Min</th>
+<th style="text-align: right;">Q1</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Q3</th>
+<th style="text-align: right;">Max</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Minimum</td>
 <td style="text-align: right;">0.865</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1st Quartile</td>
 <td style="text-align: right;">0.964</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Median</td>
 <td style="text-align: right;">1.011</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Mean</td>
 <td style="text-align: right;">1.003</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">3rd Quartile</td>
 <td style="text-align: right;">1.038</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Maximum</td>
-<td style="text-align: right;">1.160</td>
+<td style="text-align: right;">1.16</td>
 </tr>
 </tbody>
 </table>
@@ -1775,13 +1787,18 @@ SW_i(t) =
 </table>
 </div>
 </div>
+<p>The time-dependent Cox estimate is expected to sit closer to the simulated biological treatment effect because the data were generated with a treatment-onset hazard ratio of 0.70. In contrast, the cloning-censoring-IPCW estimate reflects the effect of a <strong>90-day treatment-initiation strategy</strong> from diagnosis. Because this strategy includes untreated waiting time before Drug X starts, its HR can be closer to the null than the on-treatment HR. This does not mean IPCW “performs worse”; it means the method is estimating a different causal question.</p>
 </section>
 <section id="quantitative-bias-analysis-e-value-sensitivity-analysis" class="level2" data-number="9">
 <h2 data-number="9" class="anchored" data-anchor-id="quantitative-bias-analysis-e-value-sensitivity-analysis"><span class="header-section-number">9</span> Quantitative Bias Analysis: E-Value Sensitivity Analysis</h2>
-<p>When submitting RWE to HTA bodies, we must audit the robustness of our findings against unmeasured confounding. We compute the E-value for the time-dependent Cox Hazard Ratio (<span class="math inline">\(HR = 0.693\)</span>).</p>
+<p>When submitting RWE to HTA bodies, we must audit the robustness of our findings against unmeasured confounding. Here, the E-value is calculated for the <strong>time-dependent Cox estimate</strong> (<span class="math inline">\(HR = 0.693\)</span>), rather than for the strategy-level IPCW estimate.</p>
 <section id="e-value-math-formula-setup" class="level3" data-number="9.1">
 <h3 data-number="9.1" class="anchored" data-anchor-id="e-value-math-formula-setup"><span class="header-section-number">9.1</span> E-Value Math &amp; Formula Setup</h3>
-<p>The E-value is defined as the minimum strength of association on the risk ratio scale that an unmeasured confounder (<span class="math inline">\(U\)</span>) must have with both: 1. The treatment assignment (<span class="math inline">\(Z\)</span>) 2. The clinical outcome (<span class="math inline">\(Y\)</span>)</p>
+<p>The E-value is defined as the minimum strength of association on the risk ratio scale that an unmeasured confounder (<span class="math inline">\(U\)</span>) must have with both:</p>
+<ol type="1">
+<li>The treatment assignment (<span class="math inline">\(Z\)</span>)</li>
+<li>The clinical outcome (<span class="math inline">\(Y\)</span>)</li>
+</ol>
 <p>to fully explain away the observed treatment-outcome association.</p>
 <p>The formula depends on the cumulative incidence of the outcome:</p>
 <ol type="1">
@@ -1794,7 +1811,7 @@ SW_i(t) =
 <div class="cell">
 <details class="code-fold">
 <summary>R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract HR and confidence limits from the time-varying Cox model</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract HR and confidence limits from the time-dependent Cox model</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>hr_est_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(fit_tv)[<span class="st">"treatment_status"</span>])</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>hr_lcl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">1</span>])</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>hr_ucl_val <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">confint</span>(fit_tv)[<span class="st">"treatment_status"</span>, <span class="dv">2</span>])</span>
@@ -1806,9 +1823,9 @@ SW_i(t) =
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Format E-value table</span></span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>ev_survival_tbl <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Metric / Parameter"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Hazard Ratio (HR)"</span>, <span class="st">"E-value (Treatment Effect Bound)"</span>),</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Point Estimate"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"point"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"point"</span>])),</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Lower Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"lower"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"lower"</span>])),</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Upper Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"HR"</span>, <span class="st">"upper"</span>]), <span class="st">"N/A"</span>),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Point Estimate"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, hr_est_val), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"point"</span>])),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Lower Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, hr_lcl_val), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, ev_survival_df[<span class="st">"E-values"</span>, <span class="st">"lower"</span>])),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"95% CI Upper Bound"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, hr_ucl_val), <span class="st">"N/A"</span>),</span>
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
@@ -1834,9 +1851,9 @@ SW_i(t) =
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Hazard Ratio (HR)</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0.693</td>
+<td style="text-align: right;">0.542</td>
+<td style="text-align: right;">0.887</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">E-value (Treatment Effect Bound)</td>
@@ -1849,9 +1866,18 @@ SW_i(t) =
 </div>
 </div>
 <p>The point estimate E-value of <strong>1.899</strong> means that an unmeasured confounder would need to increase the probability of treatment assignment by <strong>1.899-fold</strong> and increase the hazard of death by <strong>1.899-fold</strong> to fully explain away the observed survival benefit.</p>
-</section>
-<section id="algebraic-derivation-of-the-e-value-vanderweele-ding-2016" class="level3" data-number="9.2">
-<h3 data-number="9.2" class="anchored" data-anchor-id="algebraic-derivation-of-the-e-value-vanderweele-ding-2016"><span class="header-section-number">9.2</span> Algebraic Derivation of the E-Value (VanderWeele &amp; Ding 2016)</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algebraic Derivation of the E-Value (VanderWeele &amp; Ding 2016)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <p>To understand the mathematical strength of the E-value, we trace its algebraic derivation from the <strong>Bias Factor</strong> model.</p>
 <p>Let <span class="math inline">\(U\)</span> be a binary unmeasured confounder. The observed relative risk <span class="math inline">\(RR_{obs}\)</span> is related to the true relative risk <span class="math inline">\(RR_{true}\)</span> by: <span class="math display">\[RR_{obs} = RR_{true} \times \text{Bias}\]</span></p>
 <p>where the Bias Factor is defined as: <span class="math display">\[\text{Bias} = \frac{RR_{ZU} \times RR_{UY}}{RR_{ZU} + RR_{UY} - 1}\]</span></p>
@@ -1865,39 +1891,54 @@ SW_i(t) =
 <p>This can be rearranged into a quadratic inequality: <span class="math display">\[E^2 - 2RR_{obs} \cdot E + RR_{obs} \ge 0\]</span></p>
 <p>Solving the quadratic equation <span class="math inline">\(E^2 - 2RR_{obs} \cdot E + RR_{obs} = 0\)</span> using the quadratic formula: <span class="math display">\[E = \frac{2RR_{obs} \pm \sqrt{4RR_{obs}^2 - 4RR_{obs}}}{2} = RR_{obs} + \sqrt{RR_{obs}(RR_{obs} - 1)}\]</span></p>
 <p>This is the exact mathematical derivation of the E-value formula. It represents the absolute minimum joint relationship required for an unmeasured confounder to explain away the observed treatment effect.</p>
+</div>
+</div>
+</div>
 </section>
 </section>
-<section id="hta-audit-interview-guide" class="level2" data-number="10">
-<h2 data-number="10" class="anchored" data-anchor-id="hta-audit-interview-guide"><span class="header-section-number">10</span> HTA Audit &amp; Interview Guide</h2>
-<section id="interview-audit-checklist" class="level3" data-number="10.1">
-<h3 data-number="10.1" class="anchored" data-anchor-id="interview-audit-checklist"><span class="header-section-number">10.1</span> Interview Audit Checklist</h3>
-<p>When auditing a manufacturer’s RWE survival submission (or preparing for an HTA interview), follow these three key checks:</p>
+<section id="hta-documentation-technical-audit-summary" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="hta-documentation-technical-audit-summary"><span class="header-section-number">10</span> HTA Documentation &amp; Technical Audit Summary</h2>
+<section id="technical-documentation-checklist" class="level3" data-number="10.1">
+<h3 data-number="10.1" class="anchored" data-anchor-id="technical-documentation-checklist"><span class="header-section-number">10.1</span> Technical Documentation Checklist</h3>
+<p>When preparing or reviewing an HTA-facing RWE survival analysis, the technical documentation should make the following checks explicit:</p>
 <ol type="1">
 <li><p><strong>Zero-time Alignment Check</strong>:</p>
 <ul>
-<li><em>Question</em>: Identify the exact calendar date of <span class="math inline">\(T_0\)</span> for both cohorts. Is <span class="math inline">\(T_0\)</span> defined by the clinical event (diagnosis) or the administrative event (first prescription)?</li>
-<li><em>Audit Rule</em>: Follow-up must start for both cohorts when they meet the eligibility criteria. If the treated group follow-up starts at drug initiation and controls start at diagnosis, the analysis is invalid.</li>
+<li><em>Documentation check</em>: Identify the exact calendar date of <span class="math inline">\(T_0\)</span> for both cohorts. Clarify whether <span class="math inline">\(T_0\)</span> is defined by the clinical event (diagnosis), treatment decision point, first prescription, or another index rule.</li>
+<li><em>Technical implication</em>: Follow-up must start from a comparable index date across cohorts. If the treated group starts follow-up at drug initiation while controls start at diagnosis, the analysis is vulnerable to immortal time bias.</li>
 </ul></li>
 <li><p><strong>Immortal Time Bias Screen</strong>:</p>
 <ul>
-<li><em>Question</em>: Check the initial segment of the Kaplan-Meier curve. Does the treated arm show a “zero-risk” flat line at the start of follow-up?</li>
-<li><em>Audit Rule</em>: A flat line on the treatment curve indicates that patients who died early were excluded from the treated group, indicating Immortal Time Bias.</li>
+<li><em>Documentation check</em>: Inspect the early segment of the Kaplan-Meier curve. Does the treated arm show a “zero-risk” flat line at the start of follow-up?</li>
+<li><em>Technical implication</em>: A flat early treatment curve may indicate that patients who died before treatment initiation were excluded from the treated group or misclassified into the comparator group.</li>
 </ul></li>
 <li><p><strong>Statistical Correction Audit</strong>:</p>
 <ul>
-<li><em>Question</em>: If a treatment initiation lag exists, was it addressed using a time-varying covariate or a Landmark approach?</li>
-<li><em>Audit Rule</em>: Standard Cox models using a static baseline treatment indicator are statistically invalid in the presence of treatment initiation delays.</li>
+<li><em>Documentation check</em>: If a treatment initiation lag exists, specify whether it was addressed using landmark analysis, a time-dependent Cox model, or cloning-censoring-IPCW.</li>
+<li><em>Technical implication</em>: Standard Cox models using a static baseline treatment indicator are not appropriate when treatment status is defined using post-baseline information.</li>
 </ul></li>
 </ol>
 </section>
-<section id="expert-hta-articulation" class="level3" data-number="10.2">
-<h3 data-number="10.2" class="anchored" data-anchor-id="expert-hta-articulation"><span class="header-section-number">10.2</span> Expert HTA Articulation</h3>
-<p>Use the following professional statements to articulate survival analysis defense strategies during HTA reviews or interviews:</p>
+<section id="suggested-technical-wording" class="level3" data-number="10.2">
+<h3 data-number="10.2" class="anchored" data-anchor-id="suggested-technical-wording"><span class="header-section-number">10.2</span> Suggested Technical Wording</h3>
+<p>The following wording can be adapted for methods sections, technical appendices, or response-to-query documents:</p>
 <ul>
-<li><p><strong>Justifying Time-Varying Cox Models Over Static Models</strong>: &gt; “To prevent the introduction of lead-time and immortal time biases, we did not define treatment statically at baseline based on retrospective treatment status. Instead, we modeled treatment as a time-varying exposure using a counting process framework with start-stop intervals via the <code>tmerge</code> protocol. This ensures that the risk sets are updated dynamically at each event time, preventing the misattribution of waiting-period survival to the active drug’s efficacy.”</p></li>
-<li><p><strong>Defending the Conditional Exchangeability Assumption</strong>: &gt; “Second, to maintain conditional exchangeability over time despite treatment delays, we utilized a cloning-and-censoring approach with IPCW, ensuring the counterfactual baseline characteristics remained balanced as the retrospective follow-up progressed.”</p></li>
-<li><p><strong>Empirically Validating the Positivity Assumption</strong>: &gt; “Finally, we empirically validated the positivity assumption by confirming that patients across all covariate strata in our HES data had a non-zero probability of receiving standard of care, preventing structurally empty cells in our propensity score distributions.”</p></li>
-<li><p><strong>Defending against Unmeasured Confounding via E-Values</strong>: &gt; “Although our real-world registry lacks smoking history, our E-value of 1.70 demonstrates that to nullify the observed survival benefit, an unmeasured confounder would need to increase both the likelihood of treatment and the hazard of death by at least 1.70-fold. This is larger than the hazard associated with major clinical indicators like age in our adjusted models, making it highly implausible that a missing confounder of this magnitude exists that is completely independent of the clinical variables adjusted for in our primary analysis.”</p></li>
+<li><p><strong>Time-dependent Cox model rationale</strong>:</p>
+<blockquote class="blockquote">
+<p>To prevent the introduction of lead-time and immortal time biases, we did not define treatment statically at baseline based on retrospective treatment status. Instead, we modeled treatment as a time-dependent treatment indicator using a counting process framework with start-stop intervals via the <code>tmerge</code> protocol. This ensures that the risk sets are updated dynamically at each event time, preventing the misattribution of waiting-period survival to the active drug’s efficacy.</p>
+</blockquote></li>
+<li><p><strong>Cloning-censoring-IPCW rationale</strong>:</p>
+<blockquote class="blockquote">
+<p>To evaluate a pre-specified treatment-initiation strategy, we used a cloning-and-censoring approach with IPCW. Artificial censoring was applied when observed treatment behavior became incompatible with the assigned strategy, and censoring weights were used to reduce selection bias among the remaining uncensored clones.</p>
+</blockquote></li>
+<li><p><strong>Positivity assessment</strong>:</p>
+<blockquote class="blockquote">
+<p>We assessed the positivity assumption by confirming that patients across clinically relevant covariate strata had a non-zero probability of following each treatment strategy. This reduces reliance on extrapolation from structurally unsupported subgroups.</p>
+</blockquote></li>
+<li><p><strong>Unmeasured confounding assessment via E-values</strong>:</p>
+<blockquote class="blockquote">
+<p>The E-value quantifies the minimum strength of association that an unmeasured confounder would need to have with both treatment assignment and the outcome to fully explain away the observed effect. This provides a transparent sensitivity analysis for residual confounding not captured in the measured covariates.</p>
+</blockquote></li>
 </ul>
 
 
