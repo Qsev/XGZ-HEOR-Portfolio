@@ -1,0 +1,417 @@
+.bia-shell {
+  --bia-ink: #172033;
+  --bia-muted: #5f6b7a;
+  --bia-border: #d9e0e8;
+  --bia-soft: #f6f8fb;
+  --bia-panel: #ffffff;
+  --bia-blue: #2f6fbd;
+  --bia-green: #2f8f6b;
+  --bia-red: #b24b4b;
+  --bia-amber: #b7791f;
+  color: var(--bia-ink);
+}
+
+#bia-app {
+  max-width: 100%;
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
+
+#bia-app.page-columns.page-full {
+  grid-column: body-content-start / body-content-end !important;
+  width: 100% !important;
+}
+
+#bia-app .page-columns,
+#bia-app .page-full {
+  grid-column: auto !important;
+}
+
+.bia-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.bia-shell .bia-grid.page-columns {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 1rem !important;
+}
+
+.bia-shell .bia-grid.page-columns > * {
+  grid-column: auto !important;
+}
+
+.bia-panel {
+  background: var(--bia-panel);
+  border: 1px solid var(--bia-border);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(23, 32, 51, 0.05);
+}
+
+#bia-app .bia-panel,
+#bia-app .bia-results-grid,
+#bia-app .bia-chart-grid,
+#bia-app .bia-interpretation {
+  margin-top: 1.25rem;
+}
+
+.bia-inputs {
+  position: static;
+}
+
+.bia-input-group-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.bia-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0.9rem 0 0.55rem;
+  color: var(--bia-ink);
+}
+
+.bia-section-title:first-child {
+  margin-top: 0;
+}
+
+.bia-control {
+  margin-bottom: 0.7rem;
+}
+
+.bia-control label {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.84rem;
+  color: var(--bia-muted);
+  margin-bottom: 0.25rem;
+}
+
+.bia-control input[type="range"] {
+  width: 100%;
+  accent-color: var(--bia-blue);
+}
+
+.bia-value {
+  color: var(--bia-ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bia-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
+
+.bia-card {
+  background: var(--bia-soft);
+  border: 1px solid var(--bia-border);
+  border-radius: 8px;
+  padding: 0.9rem;
+  min-height: 104px;
+}
+
+.bia-card-label {
+  color: var(--bia-muted);
+  font-size: 0.78rem;
+  line-height: 1.3;
+  min-height: 2.1em;
+}
+
+.bia-card-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-top: 0.45rem;
+  color: var(--bia-ink);
+}
+
+.bia-card-note {
+  color: var(--bia-muted);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.bia-scenario-panel {
+  margin-top: 1.25rem;
+}
+
+.bia-scenario-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.9rem;
+}
+
+.bia-scenario-title {
+  font-weight: 800;
+  color: var(--bia-ink);
+  margin-bottom: 0.2rem;
+}
+
+.bia-scenario-copy {
+  color: var(--bia-muted);
+  font-size: 0.86rem;
+  margin: 0;
+}
+
+.bia-scenario-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.bia-scenario-button {
+  border: 1px solid var(--bia-border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--bia-ink);
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 700;
+  padding: 0.42rem 0.72rem;
+}
+
+.bia-scenario-button:hover {
+  border-color: var(--bia-blue);
+  color: var(--bia-blue);
+}
+
+.bia-scenario-button.active {
+  background: var(--bia-blue);
+  border-color: var(--bia-blue);
+  color: #ffffff;
+}
+
+.bia-scenario-detail {
+  background: var(--bia-soft);
+  border-left: 4px solid var(--bia-green);
+  border-radius: 6px;
+  color: var(--bia-muted);
+  font-size: 0.88rem;
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+}
+
+.bia-scenario-learning {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 1rem;
+  margin-top: 0.85rem;
+}
+
+.bia-scenario-box {
+  background: #ffffff;
+  border: 1px solid var(--bia-border);
+  border-radius: 8px;
+  padding: 0.85rem;
+}
+
+.bia-scenario-box h4 {
+  color: var(--bia-ink);
+  font-size: 0.92rem;
+  margin: 0 0 0.45rem;
+}
+
+.bia-scenario-box p {
+  color: var(--bia-muted);
+  font-size: 0.86rem;
+  margin: 0 0 0.5rem;
+}
+
+.bia-scenario-box ul {
+  color: var(--bia-muted);
+  font-size: 0.84rem;
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.bia-scenario-box li {
+  margin-bottom: 0.25rem;
+}
+
+.bia-delta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.bia-delta-card {
+  background: var(--bia-soft);
+  border-radius: 6px;
+  padding: 0.7rem;
+}
+
+.bia-delta-label {
+  color: var(--bia-muted);
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+
+.bia-delta-value {
+  color: var(--bia-ink);
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-top: 0.25rem;
+}
+
+.bia-delta-note {
+  color: var(--bia-muted);
+  font-size: 0.78rem;
+  margin-top: 0.45rem;
+}
+
+.bia-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.bia-chart-title {
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.bia-chart-subtitle {
+  font-size: 0.8rem;
+  color: var(--bia-muted);
+  margin-bottom: 0.65rem;
+}
+
+.bia-svg {
+  width: 100%;
+  min-height: 220px;
+  display: block;
+}
+
+.bia-table-wrap {
+  overflow-x: auto;
+}
+
+.bia-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.bia-table th,
+.bia-table td {
+  border-bottom: 1px solid var(--bia-border);
+  padding: 0.55rem 0.5rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.bia-table th:first-child,
+.bia-table td:first-child {
+  text-align: left;
+}
+
+.bia-table th {
+  color: var(--bia-muted);
+  font-weight: 700;
+  background: var(--bia-soft);
+}
+
+.bia-interpretation {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.bia-note {
+  background: var(--bia-soft);
+  border-left: 4px solid var(--bia-blue);
+  border-radius: 6px;
+  padding: 0.9rem;
+}
+
+.bia-note h4 {
+  font-size: 0.95rem;
+  margin: 0 0 0.35rem;
+}
+
+.bia-note p {
+  color: var(--bia-muted);
+  font-size: 0.86rem;
+  margin-bottom: 0;
+}
+
+.bia-formula-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.bia-formula {
+  border: 1px solid var(--bia-border);
+  border-radius: 8px;
+  background: var(--bia-soft);
+  padding: 1rem;
+}
+
+.bia-formula h4 {
+  font-size: 0.95rem;
+  margin: 0 0 0.6rem;
+}
+
+.bia-equation {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--bia-ink);
+}
+
+.bia-equation strong {
+  font-weight: 800;
+}
+
+.bia-equation .operator {
+  color: var(--bia-blue);
+  font-weight: 800;
+  margin: 0 0.25rem;
+}
+
+
+@media (max-width: 1100px) {
+  .bia-grid,
+  .bia-chart-grid,
+  .bia-formula-grid,
+  .bia-input-group-grid,
+  .bia-scenario-learning,
+  .bia-interpretation {
+    grid-template-columns: 1fr;
+  }
+
+  .bia-shell .bia-grid.page-columns {
+    grid-template-columns: 1fr !important;
+  }
+
+  .bia-inputs {
+    position: static;
+  }
+
+  .bia-results-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  #bia-app {
+    padding: 0 0.75rem;
+  }
+
+  .bia-results-grid {
+    grid-template-columns: 1fr;
+  }
+}

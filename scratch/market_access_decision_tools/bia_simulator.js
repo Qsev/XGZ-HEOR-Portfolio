@@ -1,0 +1,668 @@
+(() => {
+  const app = document.getElementById("bia-app");
+  if (!app) return;
+  app.className = "bia-shell";
+  app.innerHTML = `  <div class="bia-grid">
+
+    <main>
+      <section class="bia-results-grid" aria-label="Headline results">
+        <div class="bia-card">
+          <div class="bia-card-label">Eligible patients</div>
+          <div class="bia-card-value" id="eligible-card"></div>
+          <div class="bia-card-note">final funnel estimate</div>
+        </div>
+        <div class="bia-card">
+          <div class="bia-card-label">Year 1 treated patients</div>
+          <div class="bia-card-value" id="treated-card"></div>
+          <div class="bia-card-note">eligible x Year 1 uptake</div>
+        </div>
+        <div class="bia-card">
+          <div class="bia-card-label">Net annual price</div>
+          <div class="bia-card-value" id="net-price-card"></div>
+          <div class="bia-card-note">after PAS discount</div>
+        </div>
+        <div class="bia-card">
+          <div class="bia-card-label">Year 1 net budget impact</div>
+          <div class="bia-card-value" id="year1-card"></div>
+          <div class="bia-card-note">incremental annual impact</div>
+        </div>
+        <div class="bia-card">
+          <div class="bia-card-label">5-year cumulative impact</div>
+          <div class="bia-card-value" id="cum-card"></div>
+          <div class="bia-card-note">sum across Years 1-5</div>
+        </div>
+      </section>
+
+      <section class="bia-panel bia-scenario-panel" aria-label="Scenario presets">
+        <div class="bia-scenario-header">
+          <div>
+            <div class="bia-scenario-title">Scenario Layer: How Market Access Assumptions Change the Story</div>
+            <p class="bia-scenario-copy">Each scenario represents a plausible payer-facing discussion, not just a shortcut for moving sliders. Use the buttons to see which business assumption changes and how the budget impact moves compared with the Base Case.</p>
+          </div>
+        </div>
+        <div class="bia-scenario-buttons" id="scenario-buttons"></div>
+        <p class="bia-scenario-detail" id="scenario-detail"></p>
+        <div class="bia-scenario-learning">
+          <div class="bia-scenario-box">
+            <h4>What this scenario is testing</h4>
+            <p id="scenario-use-case"></p>
+            <h4>Assumptions changed</h4>
+            <ul id="scenario-assumptions"></ul>
+          </div>
+          <div class="bia-scenario-box">
+            <h4>Compared with Base Case</h4>
+            <div class="bia-delta-grid">
+              <div class="bia-delta-card">
+                <div class="bia-delta-label">Year 1 net budget impact</div>
+                <div class="bia-delta-value" id="scenario-delta-y1"></div>
+              </div>
+              <div class="bia-delta-card">
+                <div class="bia-delta-label">5-year cumulative impact</div>
+                <div class="bia-delta-value" id="scenario-delta-cum"></div>
+              </div>
+            </div>
+            <p class="bia-delta-note" id="scenario-delta-note"></p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="bia-panel bia-inputs">
+        <div class="bia-input-group-grid">
+          <div>
+            <div class="bia-section-title">Population Funnel</div>
+            <div class="bia-control">
+              <label for="incident">Annual incident population <span class="bia-value" data-display="incident"></span></label>
+              <input id="incident" data-input="incident" type="range" min="1000" max="20000" step="100" value="8000">
+            </div>
+            <div class="bia-control">
+              <label for="diagnosis">Diagnosis rate <span class="bia-value" data-display="diagnosis"></span></label>
+              <input id="diagnosis" data-input="diagnosis" type="range" min="50" max="100" step="1" value="90">
+            </div>
+            <div class="bia-control">
+              <label for="biomarker">Biomarker prevalence <span class="bia-value" data-display="biomarker"></span></label>
+              <input id="biomarker" data-input="biomarker" type="range" min="5" max="80" step="1" value="30">
+            </div>
+            <div class="bia-control">
+              <label for="line">Treatment-line eligibility <span class="bia-value" data-display="line"></span></label>
+              <input id="line" data-input="line" type="range" min="10" max="90" step="1" value="45">
+            </div>
+            <div class="bia-control">
+              <label for="suitability">Clinical suitability <span class="bia-value" data-display="suitability"></span></label>
+              <input id="suitability" data-input="suitability" type="range" min="40" max="100" step="1" value="80">
+            </div>
+          </div>
+
+          <div>
+            <div class="bia-section-title">Annual Uptake</div>
+            <div class="bia-control">
+              <label for="uptake1">Year 1 uptake <span class="bia-value" data-display="uptake1"></span></label>
+              <input id="uptake1" data-input="uptake1" type="range" min="0" max="100" step="1" value="10">
+            </div>
+            <div class="bia-control">
+              <label for="uptake2">Year 2 uptake <span class="bia-value" data-display="uptake2"></span></label>
+              <input id="uptake2" data-input="uptake2" type="range" min="0" max="100" step="1" value="20">
+            </div>
+            <div class="bia-control">
+              <label for="uptake3">Year 3 uptake <span class="bia-value" data-display="uptake3"></span></label>
+              <input id="uptake3" data-input="uptake3" type="range" min="0" max="100" step="1" value="30">
+            </div>
+            <div class="bia-control">
+              <label for="uptake4">Year 4 uptake <span class="bia-value" data-display="uptake4"></span></label>
+              <input id="uptake4" data-input="uptake4" type="range" min="0" max="100" step="1" value="40">
+            </div>
+            <div class="bia-control">
+              <label for="uptake5">Year 5 uptake <span class="bia-value" data-display="uptake5"></span></label>
+              <input id="uptake5" data-input="uptake5" type="range" min="0" max="100" step="1" value="45">
+            </div>
+          </div>
+
+          <div>
+            <div class="bia-section-title">Costs and Offsets</div>
+            <div class="bia-control">
+              <label for="listPrice">Annual list price <span class="bia-value" data-display="listPrice"></span></label>
+              <input id="listPrice" data-input="listPrice" type="range" min="10000" max="150000" step="1000" value="75000">
+            </div>
+            <div class="bia-control">
+              <label for="discount">PAS discount <span class="bia-value" data-display="discount"></span></label>
+              <input id="discount" data-input="discount" type="range" min="0" max="60" step="1" value="20">
+            </div>
+            <div class="bia-control">
+              <label for="duration">Mean treatment duration <span class="bia-value" data-display="duration"></span></label>
+              <input id="duration" data-input="duration" type="range" min="0.1" max="1.5" step="0.05" value="0.75">
+            </div>
+            <div class="bia-control">
+              <label for="admin">Administration cost <span class="bia-value" data-display="admin"></span></label>
+              <input id="admin" data-input="admin" type="range" min="0" max="15000" step="250" value="2500">
+            </div>
+            <div class="bia-control">
+              <label for="monitoring">Monitoring cost <span class="bia-value" data-display="monitoring"></span></label>
+              <input id="monitoring" data-input="monitoring" type="range" min="0" max="10000" step="250" value="1500">
+            </div>
+            <div class="bia-control">
+              <label for="ae">Adverse event cost <span class="bia-value" data-display="ae"></span></label>
+              <input id="ae" data-input="ae" type="range" min="0" max="20000" step="250" value="2000">
+            </div>
+            <div class="bia-control">
+              <label for="comparator">Comparator annual cost <span class="bia-value" data-display="comparator"></span></label>
+              <input id="comparator" data-input="comparator" type="range" min="0" max="100000" step="1000" value="25000">
+            </div>
+            <div class="bia-control">
+              <label for="displacement">Comparator displacement <span class="bia-value" data-display="displacement"></span></label>
+              <input id="displacement" data-input="displacement" type="range" min="0" max="100" step="1" value="80">
+            </div>
+          </div>
+        </div>
+      </aside>
+
+
+      <section class="bia-panel" style="margin-top: 1rem;">
+        <div class="bia-chart-title">Year-by-Year Results</div>
+        <div class="bia-table-wrap">
+          <table class="bia-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Uptake</th>
+                <th>Treated patients</th>
+                <th>Drug B cost</th>
+                <th>Other costs</th>
+                <th>Displaced comparator</th>
+                <th>Net budget impact</th>
+                <th>Cumulative impact</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="bia-chart-grid">
+        <div class="bia-panel">
+          <div class="bia-chart-title">Population Funnel</div>
+          <div class="bia-chart-subtitle">From incident population to clinically suitable eligible patients.</div>
+          <svg class="bia-svg" id="funnel-chart" viewBox="0 0 640 260" role="img" aria-label="Population funnel chart"></svg>
+        </div>
+        <div class="bia-panel">
+          <div class="bia-chart-title">Uptake Curve</div>
+          <div class="bia-chart-subtitle">Annual proportion of eligible patients expected to receive Drug B.</div>
+          <svg class="bia-svg" id="uptake-chart" viewBox="0 0 640 260" role="img" aria-label="Uptake curve chart"></svg>
+        </div>
+        <div class="bia-panel">
+          <div class="bia-chart-title">Annual Net Budget Impact</div>
+          <div class="bia-chart-subtitle">Incremental budget impact after comparator displacement.</div>
+          <svg class="bia-svg" id="annual-chart" viewBox="0 0 640 260" role="img" aria-label="Annual net budget impact chart"></svg>
+        </div>
+        <div class="bia-panel">
+          <div class="bia-chart-title">Cumulative Budget Impact</div>
+          <div class="bia-chart-subtitle">Running total across the 5-year model horizon.</div>
+          <svg class="bia-svg" id="cumulative-chart" viewBox="0 0 640 260" role="img" aria-label="Cumulative budget impact chart"></svg>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section class="bia-interpretation" style="margin-top: 1rem;">
+    <div class="bia-note">
+      <h4>Affordability signal</h4>
+      <p id="interpret-affordability"></p>
+    </div>
+    <div class="bia-note">
+      <h4>Likely payer challenge</h4>
+      <p id="interpret-challenge"></p>
+    </div>
+    <div class="bia-note">
+      <h4>Commercial lever</h4>
+      <p id="interpret-lever"></p>
+    </div>
+  </section>
+  `;
+
+  const ids = [
+    "incident", "diagnosis", "biomarker", "line", "suitability",
+    "uptake1", "uptake2", "uptake3", "uptake4", "uptake5",
+    "listPrice", "discount", "duration", "admin", "monitoring",
+    "ae", "comparator", "displacement"
+  ];
+
+  const percentIds = new Set([
+    "diagnosis", "biomarker", "line", "suitability",
+    "uptake1", "uptake2", "uptake3", "uptake4", "uptake5",
+    "discount", "displacement"
+  ]);
+  const gbpIds = new Set(["listPrice", "admin", "monitoring", "ae", "comparator"]);
+
+  const fmtInt = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 });
+  const fmtOne = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
+  const fmtDuration = new Intl.NumberFormat("en-GB", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  const fmtCurrency = new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+    maximumFractionDigits: 0
+  });
+
+  const baseValues = {
+    incident: 8000,
+    diagnosis: 90,
+    biomarker: 30,
+    line: 45,
+    suitability: 80,
+    uptake1: 10,
+    uptake2: 20,
+    uptake3: 30,
+    uptake4: 40,
+    uptake5: 45,
+    listPrice: 75000,
+    discount: 20,
+    duration: 0.75,
+    admin: 2500,
+    monitoring: 1500,
+    ae: 2000,
+    comparator: 25000,
+    displacement: 80
+  };
+
+  const scenarios = [
+    {
+      id: "base",
+      label: "Base Case",
+      description: "The reference scenario: moderate uptake, 20% PAS discount, and 0.75-year mean treatment duration.",
+      useCase: "This is the anchor scenario. In a real project, the base case is the version that stakeholders use as the main reference point before testing uncertainty or alternative access strategies.",
+      values: {},
+      assumptions: ["Reference assumptions for all inputs."]
+    },
+    {
+      id: "high-uptake",
+      label: "Rapid Adoption",
+      description: "Tests a faster launch curve where eligible patients switch to Drug B more quickly than in the base case.",
+      useCase: "This reflects a strong clinical pull or successful formulary implementation. It is commercially attractive, but it can create an early affordability challenge for the payer.",
+      values: { uptake1: 20, uptake2: 35, uptake3: 50, uptake4: 60, uptake5: 65 },
+      assumptions: ["Year 1 uptake increases from 10% to 20%.", "Year 5 uptake increases from 45% to 65%.", "Price, duration, and eligible population stay unchanged."]
+    },
+    {
+      id: "low-uptake",
+      label: "Phased Adoption",
+      description: "Tests slower uptake, as if local systems adopt the therapy gradually or apply access management.",
+      useCase: "This is relevant when a payer wants to manage near-term budget pressure through phased rollout, pathway restrictions, or slower implementation.",
+      values: { uptake1: 5, uptake2: 10, uptake3: 18, uptake4: 25, uptake5: 30 },
+      assumptions: ["Year 1 uptake decreases from 10% to 5%.", "Year 5 uptake decreases from 45% to 30%.", "Other assumptions stay unchanged."]
+    },
+    {
+      id: "higher-population",
+      label: "Expanded Eligible Population",
+      description: "Tests what happens if the eligible population is larger than expected.",
+      useCase: "This reflects a common payer challenge: whether epidemiology, biomarker prevalence, treatment-line eligibility, or clinical suitability assumptions underestimate patient volume.",
+      values: { incident: 9500, biomarker: 35, line: 50, suitability: 85 },
+      assumptions: ["Incident population increases from 8,000 to 9,500.", "Biomarker prevalence increases from 30% to 35%.", "Treatment-line eligibility increases from 45% to 50%.", "Clinical suitability increases from 80% to 85%."]
+    },
+    {
+      id: "pas-discount",
+      label: "Deeper PAS Discount",
+      description: "Tests whether a deeper net price adjustment could reduce affordability pressure.",
+      useCase: "This is the commercial access question behind a PAS scenario: how much budget pressure is reduced if the net price is lower, and whether the remaining impact is still material.",
+      values: { discount: 40 },
+      assumptions: ["PAS discount increases from 20% to 40%.", "Eligible population, uptake, duration, and comparator displacement stay unchanged."]
+    },
+    {
+      id: "shorter-duration",
+      label: "Shorter Treatment Duration",
+      description: "Tests what happens if patients remain on treatment for a shorter average duration.",
+      useCase: "Treatment duration is often a major budget driver. A shorter duration reduces Drug B acquisition costs, but it also reduces the comparator cost offset in this simplified model.",
+      values: { duration: 0.5 },
+      assumptions: ["Mean treatment duration decreases from 0.75 years to 0.50 years.", "All uptake, population, price, and comparator assumptions stay unchanged."]
+    }
+  ];
+
+  let activeScenarioId = "base";
+
+  const setInputValue = (id, value) => {
+    const input = app.querySelector(`[data-input="${id}"]`);
+    if (input) input.value = value;
+  };
+
+  const applyScenario = (scenarioId) => {
+    const scenario = scenarios.find((item) => item.id === scenarioId) || scenarios[0];
+    activeScenarioId = scenario.id;
+    const values = { ...baseValues, ...scenario.values };
+    Object.entries(values).forEach(([id, value]) => setInputValue(id, value));
+    updateScenarioUI();
+    update();
+  };
+
+  const updateScenarioUI = () => {
+    app.querySelectorAll("[data-scenario]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.scenario === activeScenarioId);
+    });
+    const scenario = scenarios.find((item) => item.id === activeScenarioId) || scenarios[0];
+    const detail = app.querySelector("#scenario-detail");
+    if (detail) detail.textContent = scenario.description;
+    const useCase = app.querySelector("#scenario-use-case");
+    if (useCase) useCase.textContent = scenario.useCase;
+    const assumptionList = app.querySelector("#scenario-assumptions");
+    if (assumptionList) {
+      assumptionList.innerHTML = "";
+      scenario.assumptions.forEach((assumption) => {
+        const item = document.createElement("li");
+        item.textContent = assumption;
+        assumptionList.appendChild(item);
+      });
+    }
+  };
+
+  const renderScenarioButtons = () => {
+    const container = app.querySelector("#scenario-buttons");
+    if (!container) return;
+    container.innerHTML = "";
+    scenarios.forEach((scenario) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "bia-scenario-button";
+      button.dataset.scenario = scenario.id;
+      button.textContent = scenario.label;
+      button.addEventListener("click", () => applyScenario(scenario.id));
+      container.appendChild(button);
+    });
+    updateScenarioUI();
+  };
+
+  const getInputs = () => {
+    const raw = {};
+    ids.forEach((id) => {
+      raw[id] = Number(app.querySelector(`[data-input="${id}"]`).value);
+    });
+
+    return valuesToInputs(raw);
+  };
+
+  const calculate = (p) => {
+    const diagnosed = p.incident * p.diagnosis;
+    const biomarkerPositive = diagnosed * p.biomarker;
+    const lineEligible = biomarkerPositive * p.line;
+    const eligible = lineEligible * p.suitability;
+    const netPrice = p.listPrice * (1 - p.discount);
+
+    let cumulative = 0;
+    const years = p.uptake.map((uptake, index) => {
+      const treated = eligible * uptake;
+      const drugCost = treated * netPrice * p.duration;
+      const otherCosts = treated * (p.admin + p.monitoring + p.ae);
+      const displaced = treated * p.comparator * p.displacement * p.duration;
+      const netImpact = drugCost + otherCosts - displaced;
+      cumulative += netImpact;
+
+      return {
+        year: index + 1,
+        uptake,
+        treated,
+        drugCost,
+        otherCosts,
+        displaced,
+        netImpact,
+        cumulative
+      };
+    });
+
+    return {
+      funnel: [
+        { label: "Incident population", value: p.incident },
+        { label: "Diagnosed", value: diagnosed },
+        { label: "Biomarker-positive", value: biomarkerPositive },
+        { label: "Line eligible", value: lineEligible },
+        { label: "Clinically suitable", value: eligible }
+      ],
+      eligible,
+      netPrice,
+      years
+    };
+  };
+
+  const formatDisplay = (id, value) => {
+    if (percentIds.has(id)) return `${value}%`;
+    if (gbpIds.has(id)) return fmtCurrency.format(value);
+    if (id === "duration") return `${fmtDuration.format(value)} years`;
+    return fmtInt.format(value);
+  };
+
+  const formatMillions = (value) => {
+    const sign = value < 0 ? "-" : "";
+    return `${sign}£${(Math.abs(value) / 1_000_000).toFixed(2)}m`;
+  };
+
+  const formatDelta = (value) => {
+    if (Math.abs(value) < 1) return "No change";
+    const sign = value > 0 ? "+" : "-";
+    return `${sign}£${(Math.abs(value) / 1_000_000).toFixed(2)}m`;
+  };
+
+  const valuesToInputs = (raw) => ({
+    raw,
+    incident: raw.incident,
+    diagnosis: raw.diagnosis / 100,
+    biomarker: raw.biomarker / 100,
+    line: raw.line / 100,
+    suitability: raw.suitability / 100,
+    uptake: [raw.uptake1, raw.uptake2, raw.uptake3, raw.uptake4, raw.uptake5].map((v) => v / 100),
+    listPrice: raw.listPrice,
+    discount: raw.discount / 100,
+    duration: raw.duration,
+    admin: raw.admin,
+    monitoring: raw.monitoring,
+    ae: raw.ae,
+    comparator: raw.comparator,
+    displacement: raw.displacement / 100
+  });
+
+  const clearSvg = (svg) => {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+  };
+
+  const add = (svg, tag, attrs = {}, text = "") => {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+    if (text) el.textContent = text;
+    svg.appendChild(el);
+    return el;
+  };
+
+  const drawAxes = (svg, width, height, margin) => {
+    add(svg, "line", {
+      x1: margin.left, y1: height - margin.bottom,
+      x2: width - margin.right, y2: height - margin.bottom,
+      stroke: "#b9c2cf", "stroke-width": 1
+    });
+    add(svg, "line", {
+      x1: margin.left, y1: margin.top,
+      x2: margin.left, y2: height - margin.bottom,
+      stroke: "#b9c2cf", "stroke-width": 1
+    });
+  };
+
+  const drawFunnel = (data) => {
+    const svg = app.querySelector("#funnel-chart");
+    clearSvg(svg);
+    const width = 640;
+    const rowH = 40;
+    const max = data[0].value || 1;
+    data.forEach((d, i) => {
+      const y = 22 + i * 45;
+      const w = Math.max(18, (d.value / max) * 390);
+      add(svg, "rect", {
+        x: 218,
+        y,
+        width: w,
+        height: rowH,
+        rx: 5,
+        fill: i === data.length - 1 ? "#2f8f6b" : "#2f6fbd",
+        opacity: 1 - i * 0.08
+      });
+      add(svg, "text", { x: 20, y: y + 25, "font-size": 14, fill: "#172033" }, d.label);
+      add(svg, "text", {
+        x: 218 + w + 10,
+        y: y + 25,
+        "font-size": 13,
+        fill: "#5f6b7a"
+      }, fmtInt.format(d.value));
+    });
+  };
+
+  const drawUptake = (years) => {
+    const svg = app.querySelector("#uptake-chart");
+    clearSvg(svg);
+    const width = 640;
+    const height = 260;
+    const margin = { top: 24, right: 28, bottom: 42, left: 54 };
+    drawAxes(svg, width, height, margin);
+    const max = Math.max(0.1, ...years.map((d) => d.uptake));
+    const x = (i) => margin.left + (i / 4) * (width - margin.left - margin.right);
+    const y = (v) => height - margin.bottom - (v / max) * (height - margin.top - margin.bottom);
+    const points = years.map((d, i) => `${x(i)},${y(d.uptake)}`).join(" ");
+    add(svg, "polyline", { points, fill: "none", stroke: "#2f6fbd", "stroke-width": 4, "stroke-linejoin": "round" });
+    years.forEach((d, i) => {
+      add(svg, "circle", { cx: x(i), cy: y(d.uptake), r: 5, fill: "#2f6fbd" });
+      add(svg, "text", { x: x(i), y: height - 14, "font-size": 12, fill: "#5f6b7a", "text-anchor": "middle" }, `Y${d.year}`);
+      add(svg, "text", { x: x(i), y: y(d.uptake) - 10, "font-size": 12, fill: "#172033", "text-anchor": "middle" }, `${Math.round(d.uptake * 100)}%`);
+    });
+  };
+
+  const drawBars = (years) => {
+    const svg = app.querySelector("#annual-chart");
+    clearSvg(svg);
+    const width = 640;
+    const height = 260;
+    const margin = { top: 24, right: 28, bottom: 42, left: 68 };
+    drawAxes(svg, width, height, margin);
+    const values = years.map((d) => d.netImpact);
+    const max = Math.max(1, ...values.map((v) => Math.abs(v)));
+    const chartW = width - margin.left - margin.right;
+    const barW = chartW / years.length * 0.58;
+    years.forEach((d, i) => {
+      const x = margin.left + i * (chartW / years.length) + (chartW / years.length - barW) / 2;
+      const barH = Math.abs(d.netImpact) / max * (height - margin.top - margin.bottom);
+      const y = height - margin.bottom - barH;
+      add(svg, "rect", { x, y, width: barW, height: barH, rx: 5, fill: d.netImpact >= 0 ? "#b24b4b" : "#2f8f6b" });
+      add(svg, "text", { x: x + barW / 2, y: y - 8, "font-size": 12, fill: "#172033", "text-anchor": "middle" }, formatMillions(d.netImpact));
+      add(svg, "text", { x: x + barW / 2, y: height - 14, "font-size": 12, fill: "#5f6b7a", "text-anchor": "middle" }, `Y${d.year}`);
+    });
+  };
+
+  const drawCumulative = (years) => {
+    const svg = app.querySelector("#cumulative-chart");
+    clearSvg(svg);
+    const width = 640;
+    const height = 260;
+    const margin = { top: 24, right: 28, bottom: 42, left: 68 };
+    drawAxes(svg, width, height, margin);
+    const max = Math.max(1, ...years.map((d) => Math.abs(d.cumulative)));
+    const x = (i) => margin.left + (i / 4) * (width - margin.left - margin.right);
+    const y = (v) => height - margin.bottom - (v / max) * (height - margin.top - margin.bottom);
+    const points = years.map((d, i) => `${x(i)},${y(d.cumulative)}`).join(" ");
+    add(svg, "polyline", { points, fill: "none", stroke: "#b7791f", "stroke-width": 4, "stroke-linejoin": "round" });
+    years.forEach((d, i) => {
+      add(svg, "circle", { cx: x(i), cy: y(d.cumulative), r: 5, fill: "#b7791f" });
+      add(svg, "text", { x: x(i), y: height - 14, "font-size": 12, fill: "#5f6b7a", "text-anchor": "middle" }, `Y${d.year}`);
+      add(svg, "text", { x: x(i), y: y(d.cumulative) - 10, "font-size": 12, fill: "#172033", "text-anchor": "middle" }, formatMillions(d.cumulative));
+    });
+  };
+
+  const updateTable = (years) => {
+    const body = app.querySelector("#results-body");
+    body.innerHTML = "";
+    years.forEach((d) => {
+      const row = document.createElement("tr");
+      const cells = [
+        `Year ${d.year}`,
+        `${Math.round(d.uptake * 100)}%`,
+        fmtOne.format(d.treated),
+        formatMillions(d.drugCost),
+        formatMillions(d.otherCosts),
+        formatMillions(d.displaced),
+        formatMillions(d.netImpact),
+        formatMillions(d.cumulative)
+      ];
+      cells.forEach((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+      body.appendChild(row);
+    });
+  };
+
+  const updateInterpretation = (p, result) => {
+    const last = result.years[result.years.length - 1];
+    const total = last.cumulative;
+    const y1 = result.years[0].netImpact;
+    const offsetRatio = result.years[0].displaced / Math.max(1, result.years[0].drugCost + result.years[0].otherCosts);
+
+    app.querySelector("#interpret-affordability").textContent =
+      `The current settings generate ${formatMillions(total)} cumulative net budget impact over 5 years, with Year 1 impact of ${formatMillions(y1)}. The result is additional budget pressure rather than a cost-saving scenario.`;
+
+    const challenge = p.uptake[4] >= 0.5
+      ? "Year 5 uptake is high, so a payer may challenge whether adoption can realistically reach this level within local pathway constraints."
+      : "The main challenge is likely to focus on eligible population size, treatment duration, and whether the uptake curve reflects realistic local adoption.";
+    app.querySelector("#interpret-challenge").textContent = challenge;
+
+    app.querySelector("#interpret-lever").textContent =
+      `Comparator displacement offsets approximately ${Math.round(offsetRatio * 100)}% of Year 1 gross Drug B-related costs. The most direct affordability levers are PAS discount, phased uptake, and treatment duration.`;
+  };
+
+  const updateScenarioComparison = (result) => {
+    const baseResult = calculate(valuesToInputs({ ...baseValues }));
+    const currentY1 = result.years[0].netImpact;
+    const currentCum = result.years[result.years.length - 1].cumulative;
+    const baseY1 = baseResult.years[0].netImpact;
+    const baseCum = baseResult.years[baseResult.years.length - 1].cumulative;
+    const deltaY1 = currentY1 - baseY1;
+    const deltaCum = currentCum - baseCum;
+
+    const y1El = app.querySelector("#scenario-delta-y1");
+    const cumEl = app.querySelector("#scenario-delta-cum");
+    const noteEl = app.querySelector("#scenario-delta-note");
+    if (y1El) y1El.textContent = formatDelta(deltaY1);
+    if (cumEl) cumEl.textContent = formatDelta(deltaCum);
+
+    if (!noteEl) return;
+    if (activeScenarioId === "base") {
+      noteEl.textContent = "This is the reference scenario, so the comparison values show no change.";
+    } else if (deltaCum > 0) {
+      noteEl.textContent = "Positive values mean this scenario increases affordability pressure compared with the Base Case.";
+    } else if (deltaCum < 0) {
+      noteEl.textContent = "Negative values mean this scenario reduces affordability pressure compared with the Base Case.";
+    } else {
+      noteEl.textContent = "This scenario has no material impact on cumulative budget impact compared with the Base Case.";
+    }
+  };
+
+  const update = () => {
+    const p = getInputs();
+    const result = calculate(p);
+
+    Object.entries(p.raw).forEach(([id, value]) => {
+      const el = app.querySelector(`[data-display="${id}"]`);
+      if (el) el.textContent = formatDisplay(id, value);
+    });
+
+    app.querySelector("#eligible-card").textContent = fmtInt.format(result.eligible);
+    app.querySelector("#treated-card").textContent = fmtOne.format(result.years[0].treated);
+    app.querySelector("#net-price-card").textContent = fmtCurrency.format(result.netPrice);
+    app.querySelector("#year1-card").textContent = formatMillions(result.years[0].netImpact);
+    app.querySelector("#cum-card").textContent = formatMillions(result.years[4].cumulative);
+
+    drawFunnel(result.funnel);
+    drawUptake(result.years);
+    drawBars(result.years);
+    drawCumulative(result.years);
+    updateTable(result.years);
+    updateInterpretation(p, result);
+    updateScenarioComparison(result);
+  };
+
+  ids.forEach((id) => {
+    app.querySelector(`[data-input="${id}"]`).addEventListener("input", update);
+  });
+
+  renderScenarioButtons();
+  update();
+})();

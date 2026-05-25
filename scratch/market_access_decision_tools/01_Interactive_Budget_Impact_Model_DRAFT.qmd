@@ -1,0 +1,104 @@
+---
+title: "Interactive Budget Impact Model"
+subtitle: "Market Access Decision Tool for a Simulated Oncology Therapy"
+author: "Xiaoge Zhang, PhD"
+date: today
+page-layout: full
+toc: false
+toc-depth: 2
+number-sections: false
+format:
+  html:
+    code-fold: true
+    self-contained: false
+---
+
+::: {.callout-note icon=false}
+## Simulated Model Disclosure
+
+This is a proof-of-capability decision tool using fully simulated assumptions. Drug B is a fictional biomarker-targeted therapy for relapsed lymphoma. The model demonstrates transparent Budget Impact Analysis (BIA) logic and payer-facing scenario exploration. It is not a validated reimbursement model, a pricing recommendation, or a representation of a real product.
+:::
+
+## From Workbook Logic to Decision Support
+
+Budget Impact Analysis asks a different question from cost-effectiveness analysis. A cost-effectiveness model asks whether a therapy provides value for money, often through ICERs, QALYs, and long-term outcomes. A budget impact model asks whether a payer can absorb adoption within a short-to-medium-term budget.
+
+This page translates a conventional BIA structure into a static interactive simulator. The tool focuses on the assumptions that typically matter in payer-facing affordability discussions: eligible population, adoption speed, net price, treatment duration, and displaced comparator costs.
+
+The purpose is not to add another technical methods page. The purpose is to show how model logic can be turned into a practical decision-support interface for market access, payer engagement, and commercial planning discussions.
+
+## Simulated Market Access Scenario
+
+Drug B is introduced into an NHS treatment pathway for relapsed lymphoma. Eligible patients are estimated using a population funnel from broad disease incidence to the final clinically suitable population. The model then applies annual uptake assumptions over 5 years and estimates the net budget impact after accounting for PAS discount and displaced comparator costs.
+
+The decision question is:
+
+> Under different assumptions about patient eligibility, uptake, net price, treatment duration, and comparator displacement, what annual and cumulative budget impact would an NHS payer need to plan for over 5 years?
+
+## Interactive Budget Impact Simulator
+
+Use the headline cards to read the current base-case outputs, then adjust the assumptions underneath them. The year-by-year table shows the calculation trace, while the charts translate the same results into a payer-facing view of uptake, annual pressure, and cumulative exposure.
+
+```{=html}
+<link rel="stylesheet" href="bia_simulator.css">
+<div id="bia-app"></div>
+<script src="bia_simulator.js"></script>
+```
+
+## Model Logic
+
+The model deliberately keeps the calculation structure simple. The population funnel makes the eligible population assumption auditable, and the net budget impact calculation separates new therapy costs from comparator cost offsets.
+
+```{=html}
+<div class="bia-shell">
+  <div class="bia-formula-grid">
+    <div class="bia-formula">
+      <h4>Eligible population</h4>
+      <div class="bia-equation">
+        <strong>Eligible patients</strong><br>
+        = incident population<br>
+        <span class="operator">x</span> diagnosis rate<br>
+        <span class="operator">x</span> biomarker prevalence<br>
+        <span class="operator">x</span> treatment-line eligibility<br>
+        <span class="operator">x</span> clinical suitability
+      </div>
+    </div>
+    <div class="bia-formula">
+      <h4>Annual net budget impact</h4>
+      <div class="bia-equation">
+        <strong>Net budget impact</strong><br>
+        = Drug B acquisition cost<br>
+        <span class="operator">+</span> administration, monitoring, and adverse event costs<br>
+        <span class="operator">-</span> displaced comparator costs
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+For each model year, treated patients are calculated as eligible patients multiplied by the annual uptake assumption. The distinction between gross Drug B cost and net budget impact is important: comparator displacement is treated as a cost offset rather than ignored.
+
+This is a deterministic base-case simulator. It is designed to make assumptions visible and testable, not to hide complexity inside workbook logic.
+
+## Commercial Interpretation
+
+The base-case scenario is deliberately not cost-saving. This is realistic for many oncology therapies, where clinical value and cost-effectiveness may coexist with short-term affordability pressure. The purpose of the tool is to show how market access teams and payer-facing stakeholders can explore that pressure through transparent assumptions.
+
+A payer or commissioner may challenge the assumed eligible population, speed of uptake, mean treatment duration, PAS discount, or comparator displacement. These assumptions are therefore kept visible and adjustable rather than hidden inside workbook logic.
+
+The commercial interpretation is not simply whether Drug B "saves money". In many market access situations, the more realistic question is whether additional budget pressure can be justified, phased, discounted, or partly offset. This is why the tool reports both annual impact and cumulative impact: the former supports short-term affordability planning, while the latter shows total exposure over the launch horizon.
+
+## Technical Audit Notes
+
+- The prototype is static and browser-based.
+- No Shiny server, Python backend, database, or authentication is required.
+- All calculations are performed in visible client-side JavaScript.
+- All input assumptions are displayed through the interface.
+- The model is designed for transparency and scenario exploration, not production validation.
+- The page is deployable as static HTML and is compatible with GitHub Pages.
+
+## Limitations and Extensions
+
+Version 1 excludes QALYs, ICERs, probabilistic sensitivity analysis, detailed treatment sequencing, capacity modelling, and regional heterogeneity. These exclusions are intentional: the first version prioritises clarity, payer-facing interpretation, and static deployment.
+
+Future extensions could include scenario presets, one-way sensitivity analysis, local NHS population scaling, per-member-per-month outputs, logistic diffusion uptake curves, threshold discount analysis, and a downloadable scenario summary.
