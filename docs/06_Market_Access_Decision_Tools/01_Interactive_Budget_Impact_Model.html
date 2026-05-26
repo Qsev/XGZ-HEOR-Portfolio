@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Xiaoge Zhang, PhD">
+<meta name="dcterms.date" content="2026-05-26">
 
-<title>readme – HEOR Technical Portfolio</title>
+<title>Interactive Budget Impact Model – HEOR Technical Portfolio</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -204,7 +206,7 @@ ul.task-list li input[type="checkbox"] {
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link active" href="../00_HTA_LLM_Wiki/README.html" aria-current="page"> 
+    <a class="nav-link" href="../00_HTA_LLM_Wiki/README.html"> 
 <span class="menu-text">Methodology Wiki</span></a>
   </li>  
 </ul>
@@ -222,116 +224,170 @@ ul.task-list li input[type="checkbox"] {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#hta-methodology-wiki-an-llm-native-strategic-intelligence-hub" id="toc-hta-methodology-wiki-an-llm-native-strategic-intelligence-hub" class="nav-link active" data-scroll-target="#hta-methodology-wiki-an-llm-native-strategic-intelligence-hub">🧠 HTA Methodology Wiki: An LLM-Native Strategic Intelligence Hub</a>
-  <ul class="collapse">
-  <li><a href="#the-knowledge-landscape" id="toc-the-knowledge-landscape" class="nav-link" data-scroll-target="#the-knowledge-landscape">🌌 The Knowledge Landscape</a></li>
-  <li><a href="#the-philosophy-knowledge-as-code" id="toc-the-philosophy-knowledge-as-code" class="nav-link" data-scroll-target="#the-philosophy-knowledge-as-code">🚀 The Philosophy: Knowledge as Code</a></li>
-  <li><a href="#system-architecture-atomic-node-design" id="toc-system-architecture-atomic-node-design" class="nav-link" data-scroll-target="#system-architecture-atomic-node-design">📂 System Architecture: Atomic Node Design</a>
-  <ul class="collapse">
-  <li><a href="#case-audit-storyboards" id="toc-case-audit-storyboards" class="nav-link" data-scroll-target="#case-audit-storyboards">1. Case Audit Storyboards</a></li>
-  <li><a href="#technical-method-cards" id="toc-technical-method-cards" class="nav-link" data-scroll-target="#technical-method-cards">2. Technical Method Cards</a></li>
-  <li><a href="#knowledge-automation-devops" id="toc-knowledge-automation-devops" class="nav-link" data-scroll-target="#knowledge-automation-devops">3. Knowledge Automation (DevOps)</a></li>
-  </ul></li>
-  <li><a href="#strategic-utility-anticipatory-intelligence" id="toc-strategic-utility-anticipatory-intelligence" class="nav-link" data-scroll-target="#strategic-utility-anticipatory-intelligence">🎯 Strategic Utility: Anticipatory Intelligence</a></li>
-  <li><a href="#operational-standards" id="toc-operational-standards" class="nav-link" data-scroll-target="#operational-standards">🛡️ Operational Standards</a></li>
-  </ul></li>
-  </ul>
-</nav>
-    </div>
+    
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content column-page" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Interactive Budget Impact Model</h1>
+<p class="subtitle lead">Market Access Decision Tool for a Simulated Oncology Therapy</p>
+</div>
 
 
 
+<div class="quarto-title-meta column-page">
 
-<section id="hta-methodology-wiki-an-llm-native-strategic-intelligence-hub" class="level1">
-<h1>🧠 HTA Methodology Wiki: An LLM-Native Strategic Intelligence Hub</h1>
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xiaoge Zhang, PhD </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 26, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Simulated Model Disclosure
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a proof-of-capability decision tool using fully simulated assumptions. Drug B is a fictional biomarker-targeted therapy for relapsed lymphoma. The model demonstrates transparent Budget Impact Analysis (BIA) logic and payer-facing scenario exploration. It is not a validated reimbursement model, a pricing recommendation, or a representation of a real product.</p>
+</div>
+</div>
+<section id="from-workbook-logic-to-decision-support" class="level2">
+<h2 class="anchored" data-anchor-id="from-workbook-logic-to-decision-support">From Workbook Logic to Decision Support</h2>
+<p>Budget Impact Analysis asks a different question from cost-effectiveness analysis. A cost-effectiveness model asks whether a therapy provides value for money, often through ICERs, QALYs, and long-term outcomes. A budget impact model asks whether a payer can absorb adoption within a short-to-medium-term budget.</p>
+<p>This page translates a conventional BIA structure into a static interactive simulator. The tool focuses on the assumptions that typically matter in payer-facing affordability discussions: eligible population, adoption speed, net price, treatment duration, and displaced comparator costs.</p>
+<p>The purpose is not to add another technical methods page. The purpose is to show how model logic can be turned into a practical decision-support interface for market access, payer engagement, and commercial planning discussions.</p>
+</section>
+<section id="simulated-market-access-scenario" class="level2">
+<h2 class="anchored" data-anchor-id="simulated-market-access-scenario">Simulated Market Access Scenario</h2>
+<p>Drug B is introduced into an NHS treatment pathway for relapsed lymphoma. Eligible patients are estimated using a population funnel from broad disease incidence to the final clinically suitable population. The model then applies annual uptake assumptions over 5 years and estimates the net budget impact after accounting for PAS discount and displaced comparator costs.</p>
+<p>The decision question is:</p>
 <blockquote class="blockquote">
-<p><strong>“Knowledge should not be re-derived on every query; it should be compiled into a persistent, compounding codebase.”</strong></p>
+<p>Under different assumptions about patient eligibility, uptake, net price, treatment duration, and comparator displacement, what annual and cumulative budget impact would an NHS payer need to plan for over 5 years?</p>
 </blockquote>
-<hr>
-<blockquote class="blockquote">
-<p>[!IMPORTANT] <strong>Portfolio Showcase Notice:</strong> This directory is a curated <strong>static demonstration</strong> of the system’s output. It is designed to showcase the methodology, structural logic, and high-fidelity synthesis results. <strong>Downloading this folder will not provide a functional “Live Wiki” engine</strong>, as the underlying LLM-native automation scripts and full private datasets are not included in this public repository.</p>
-</blockquote>
-<hr>
-<section id="the-knowledge-landscape" class="level2">
-<h2 class="anchored" data-anchor-id="the-knowledge-landscape">🌌 The Knowledge Landscape</h2>
-<p>Every technical decision in an economic model—from a survival distribution choice to a utility decrement—is a potential battlefield. I visualize these interdependencies through an LLM-augmented <strong>Knowledge Graph</strong>.</p>
-<p><img src="./visuals/knowledge_graph.png" class="img-fluid" alt="HTA Knowledge Graph"> <em>Figure 1: High-dimensional relationship map linking Clinical Endpoints, Statistical Methodologies, and NICE Committee Decision Pillars.</em></p>
-<hr>
 </section>
-<section id="the-philosophy-knowledge-as-code" class="level2">
-<h2 class="anchored" data-anchor-id="the-philosophy-knowledge-as-code">🚀 The Philosophy: Knowledge as Code</h2>
-<p>Unlike traditional RAG (Retrieval-Augmented Generation) systems that “rediscover” knowledge from scratch every time, this Wiki functions as a <strong>Compounding Artifact</strong>.</p>
+<section id="interactive-budget-impact-simulator" class="level2">
+<h2 class="anchored" data-anchor-id="interactive-budget-impact-simulator">Interactive Budget Impact Simulator</h2>
+<p>Use the headline cards to read the current base-case outputs, then adjust the assumptions underneath them. The year-by-year table shows the calculation trace, while the charts translate the same results into a payer-facing view of uptake, annual pressure, and cumulative exposure.</p>
+<link rel="stylesheet" href="bia_simulator.css">
+<div id="bia-app"></div>
+<script src="bia_simulator.js"></script>
+</section>
+<section id="model-logic" class="level2">
+<h2 class="anchored" data-anchor-id="model-logic">Model Logic</h2>
+<p>The model deliberately keeps the calculation structure simple. The population funnel makes the eligible population assumption auditable, and the net budget impact calculation separates new therapy costs from comparator cost offsets.</p>
+<div class="bia-shell">
+  <div class="bia-formula-grid">
+    <div class="bia-formula">
+      <h4 class="anchored">Eligible population</h4>
+      <div class="bia-equation">
+        <strong>Eligible patients</strong><br>
+        = incident population<br>
+        <span class="operator">x</span> diagnosis rate<br>
+        <span class="operator">x</span> biomarker prevalence<br>
+        <span class="operator">x</span> treatment-line eligibility<br>
+        <span class="operator">x</span> clinical suitability
+      </div>
+    </div>
+    <div class="bia-formula">
+      <h4 class="anchored">Annual net budget impact</h4>
+      <div class="bia-equation">
+        <strong>Net budget impact</strong><br>
+        = Drug B acquisition cost<br>
+        <span class="operator">+</span> administration, monitoring, and adverse event costs<br>
+        <span class="operator">-</span> displaced comparator costs
+      </div>
+    </div>
+  </div>
+</div>
+<p>For each model year, treated patients are calculated as eligible patients multiplied by the annual uptake assumption. The distinction between gross Drug B cost and net budget impact is important: comparator displacement is treated as a cost offset rather than ignored.</p>
+<p>This is a deterministic base-case simulator. It is designed to make assumptions visible and testable, not to hide complexity inside workbook logic.</p>
+</section>
+<section id="commercial-interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="commercial-interpretation">Commercial Interpretation</h2>
+<p>The base-case scenario is deliberately not cost-saving. This is realistic for many oncology therapies, where clinical value and cost-effectiveness may coexist with short-term affordability pressure. The purpose of the tool is to show how market access teams and payer-facing stakeholders can explore that pressure through transparent assumptions.</p>
+<p>A payer or commissioner may challenge the assumed eligible population, speed of uptake, mean treatment duration, PAS discount, or comparator displacement. These assumptions are therefore kept visible and adjustable rather than hidden inside workbook logic.</p>
+<p>The commercial interpretation is not simply whether Drug B “saves money”. In many market access situations, the more realistic question is whether additional budget pressure can be justified, phased, discounted, or partly offset. This is why the tool reports both annual impact and cumulative impact: the former supports short-term affordability planning, while the latter shows total exposure over the launch horizon.</p>
+<div class="bia-shell">
+  <div class="bia-perspectives">
+
+    <div class="bia-perspective-card">
+      <div class="bia-perspective-label">Perspective 1</div>
+      <h4 class="bia-perspective-title anchored">The NHS Payer's Affordability Calculation</h4>
+      <div class="bia-perspective-stat">
+        <span class="bia-perspective-stat-value">£12.60m</span>
+        <span class="bia-perspective-stat-note">peak annual impact at Year 5</span>
+      </div>
+      <p>The base-case Year 1 impact of £2.80m is manageable within most NHS commissioning budgets. The challenge is the growth curve: by Year 5, annual impact reaches £12.60m — a 4.5-fold increase driven by uptake reaching 45% of the eligible pool. This ramp-up speed, not the headline total, is the central affordability question.</p>
+      <p>The practical question for a commissioner is whether that spending growth can be absorbed within existing budgets without cutting funding elsewhere. Under these assumptions, the trajectory is likely large enough to require either a gradual rollout — treating only a subset of eligible patients in early years — or an expenditure cap, where the manufacturer reimburses the NHS if total spend exceeds an agreed ceiling.</p>
+    </div>
+
+    <div class="bia-perspective-card">
+      <div class="bia-perspective-label">Perspective 2</div>
+      <h4 class="bia-perspective-title anchored">The PAS Discount and Its Limits</h4>
+      <div class="bia-perspective-stat">
+        <span class="bia-perspective-stat-value">~£30m</span>
+        <span class="bia-perspective-stat-note">5-year impact if discount doubled to 40%</span>
+      </div>
+      <p>The current 20% PAS discount brings the net price from £75,000 to £60,000 per patient. Doubling it to 40% would reduce five-year cumulative impact to approximately £30m — meaningful, but still a material commitment. Price negotiation alone is rarely sufficient when eligible population or uptake is high.</p>
+      <p>The comparator displacement assumption is equally important. It represents the share of Drug B patients who were previously on the comparator — meaning the NHS was already spending money on those patients. At 80%, that existing spend is offset against Drug B's cost, reducing the net addition to the budget. A payer who argues fewer patients are genuine switches — say 60% rather than 80% — would see the net impact rise materially. This is a standard challenge at formulary committees, where payers question whether a new therapy truly replaces existing spend or simply adds to it.</p>
+    </div>
+
+    <div class="bia-perspective-card">
+      <div class="bia-perspective-label">Perspective 3</div>
+      <h4 class="bia-perspective-title anchored">Phased Access as a Commercial Resolution</h4>
+      <div class="bia-perspective-stat">
+        <span class="bia-perspective-stat-value">£8.40m</span>
+        <span class="bia-perspective-stat-note">cumulative impact across Years 1–2</span>
+      </div>
+      <p>Years 1–2 represent a relatively low-cost entry point during which real-world outcomes data could be collected. This creates a natural renegotiation point before annual impact escalates toward Year 4–5 levels — a profile well-suited to a Managed Access Agreement under NHS England or a commercial access agreement with ICBs.</p>
+      <p>The model structure supports this narrative directly: separating gross acquisition cost from net budget impact makes comparator displacement visible, which is precisely the argument a market access team would need to make at a formulary committee.</p>
+    </div>
+
+  </div>
+</div>
+</section>
+<section id="technical-audit-notes" class="level2">
+<h2 class="anchored" data-anchor-id="technical-audit-notes">Technical Audit Notes</h2>
 <ul>
-<li><strong>Persistent Synthesis</strong>: Every new NICE case ingested doesn’t just add a file; it updates and refines existing “Atomic Nodes” (Drugs, Methods, HTA Concepts).</li>
-<li><strong>The LLM as Maintainer</strong>: Following a rigorous <strong>Source Fidelity Protocol</strong>, the LLM acts as a “compression and cross-referencing engine,” ensuring every claim is traceable back to official NICE/ERG documentation.</li>
-<li><strong>Obsidian as IDE</strong>: The folder structure serves as the codebase, while markdown provides the transparency needed for forensic HEOR auditing.</li>
-</ul>
-<hr>
-</section>
-<section id="system-architecture-atomic-node-design" class="level2">
-<h2 class="anchored" data-anchor-id="system-architecture-atomic-node-design">📂 System Architecture: Atomic Node Design</h2>
-<p>The Wiki is built on the principle of <strong>“One Concept = One Node”</strong>. This prevents information silos and enables cross-case pattern recognition.</p>
-<section id="case-audit-storyboards" class="level3">
-<h3 class="anchored" data-anchor-id="case-audit-storyboards">1. <a href="./Case_Audit_Storyboards/">Case Audit Storyboards</a></h3>
-<p><strong>Forensic Reconstruction</strong>: Detailed 3-way reconciliation tables comparing <strong>Company Submissions</strong> vs.&nbsp;<strong>ERG/EAG Critiques</strong> vs.&nbsp;<strong>Final Committee Resolutions</strong>.</p>
-<p><img src="./visuals/case_tracker.png" class="img-fluid" alt="Case Tracker"> <em>Figure 2: Automated case tracker showing the breadth of appraisals ingested (Oncology, Rare Diseases, and Medical Technologies).</em></p>
-<ul>
-<li><em>Strategic Value:</em> Identifies the specific “breaking points” where committees override manufacturer assumptions.</li>
+<li>The prototype is static and browser-based.</li>
+<li>No Shiny server, Python backend, database, or authentication is required.</li>
+<li>All calculations are performed in visible client-side JavaScript.</li>
+<li>All input assumptions are displayed through the interface.</li>
+<li>The model is designed for transparency and scenario exploration, not production validation.</li>
+<li>The page is deployable as static HTML and is compatible with GitHub Pages.</li>
 </ul>
 </section>
-<section id="technical-method-cards" class="level3">
-<h3 class="anchored" data-anchor-id="technical-method-cards">2. <a href="./Technical_Method_Cards/">Technical Method Cards</a></h3>
-<p><strong>Statistical Rigor</strong>: Atomic nodes for methods like <strong>IPTW, TMLE, and Recursive Hazard Chaining</strong>.</p>
-<ul>
-<li><em>Innovation:</em> These aren’t just definitions; they record <strong>“EAG Challenge Patterns”</strong>—the recurring technical objections raised by NICE assessors across different therapeutic areas.</li>
-</ul>
-</section>
-<section id="knowledge-automation-devops" class="level3">
-<h3 class="anchored" data-anchor-id="knowledge-automation-devops">3. <a href="./Knowledge_Automation/">Knowledge Automation (DevOps)</a></h3>
-<p><strong>Professional Workflow</strong>: Maintaining a production-grade knowledge graph requires more than just notes; it requires code.</p>
-<ul>
-<li><strong><code>compile_wiki.py</code></strong>: The core automation engine of the hub. It performs three critical functions:
-<ol type="1">
-<li><strong>Incremental Metadata Management</strong>: Automatically parses and updates the master HTA mapping table (<code>notebook_map.md</code>) to track the processing status of every NICE Technology Appraisal.</li>
-<li><strong>Change Detection</strong>: Scans the <code>/raw</code> directory for source document updates, flagging “Incremental Update Tasks” to ensure the Wiki nodes remain aligned with the latest evidence.</li>
-<li><strong>Source Integrity</strong>: Ensures every markdown node is properly indexed and traceable to its original TA source, maintaining an audit trail required for HTA submissions.</li>
-</ol></li>
-</ul>
-<hr>
-</section>
-</section>
-<section id="strategic-utility-anticipatory-intelligence" class="level2">
-<h2 class="anchored" data-anchor-id="strategic-utility-anticipatory-intelligence">🎯 Strategic Utility: Anticipatory Intelligence</h2>
-<p>The ultimate goal of this Wiki is to provide <strong>Preventive Modelling Guidance</strong>. By synthesising the “Committee Judgment Tendencies” across 20+ oncology cases, the system generates pre-submission checklists:</p>
-<ul>
-<li><strong>Pre-empting EAG Challenges</strong>: Before a model is built, the Wiki identifies which assumptions (e.g., cure fractions, treatment waning) are most likely to be attacked, based on historical precedents.</li>
-<li><strong>Case-to-Model Bridge</strong>: This Wiki provided the methodological foundation for the <strong><a href="../01_Oncology_PartSM_Audit/">RRMM Forensic Audit Project</a></strong>, specifically the implementation of the <em>Hazard Chaining</em> algorithm.</li>
-</ul>
-<hr>
-</section>
-<section id="operational-standards" class="level2">
-<h2 class="anchored" data-anchor-id="operational-standards">🛡️ Operational Standards</h2>
-<ul>
-<li><strong>Source Fidelity</strong>: Zero-tolerance for AI hallucinations. Every entry includes a <code>Source Anchor</code> linking to the raw source text.</li>
-<li><strong>NICE Alignment</strong>: Fully mapped to <strong>DSU TSDs</strong> and the <strong>2022 RWE Framework</strong>.</li>
-</ul>
-<hr>
-<p><strong>Lead Architect:</strong> Xiaoge Zhang, PhD (York)<br>
-<strong>Methodology:</strong> LLM-augmented Forensic Auditing<br>
-<strong>Portfolio Hub:</strong> <a href="http://xgzhang.com">xgzhang.com</a></p>
+<section id="limitations-and-extensions" class="level2">
+<h2 class="anchored" data-anchor-id="limitations-and-extensions">Limitations and Extensions</h2>
+<p>Version 1 excludes QALYs, ICERs, probabilistic sensitivity analysis, detailed treatment sequencing, capacity modelling, and regional heterogeneity. These exclusions are intentional: the first version prioritises clarity, payer-facing interpretation, and static deployment.</p>
+<p>Future extensions could include scenario presets, one-way sensitivity analysis, local NHS population scaling, per-member-per-month outputs, logistic diffusion uptake curves, threshold discount analysis, and a downloadable scenario summary.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

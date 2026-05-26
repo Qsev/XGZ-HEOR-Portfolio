@@ -70,6 +70,25 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 
 ---
 
+## 💊 Market Access Decision Tools
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+<h3 class="card-title">Interactive Budget Impact Model</h3>
+<h6 class="card-subtitle text-muted mb-2">Market Access Decision Tool — Simulated Oncology Therapy</h6>
+<p class="card-text">A browser-based budget impact simulator demonstrating how a conventional BIA structure translates into a payer-facing decision-support tool. Covers population funnel, 5-year uptake, PAS discount scenarios, comparator displacement, one-way sensitivity analysis, and cumulative affordability planning — all with live interactive inputs.</p>
+<a href="./06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.qmd" class="stretched-link">Open Simulator &rarr;</a>
+:::
+:::
+:::
+
+:::
+
+---
+
 ## 📚 The Technical Library
 
 ### NMA & Evidence Synthesis Library

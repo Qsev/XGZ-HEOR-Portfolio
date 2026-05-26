@@ -26,6 +26,7 @@ project:
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.qmd
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/03_TMLE_and_Sensitivity.qmd
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/04_Time_to_Event_and_Immortal_Time.qmd
+    - 06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.qmd
 
 
 website:
@@ -80,6 +81,10 @@ website:
             text: "TMLE & Sensitivity Analysis"
           - href: 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/04_Time_to_Event_and_Immortal_Time.qmd
             text: "Survival & Immortal Time"
+      - text: "Market Access Tools"
+        menu:
+          - href: 06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.qmd
+            text: "Interactive Budget Impact Model"
       - text: "Methodology Wiki"
         href: 00_HTA_LLM_Wiki/README.md
     right:
