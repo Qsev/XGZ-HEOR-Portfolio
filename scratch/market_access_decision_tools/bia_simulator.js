@@ -33,6 +33,33 @@
         </div>
       </section>
 
+      <details class="bia-panel bia-calculation-panel" aria-label="Headline calculation notes">
+        <summary class="bia-calculation-summary">
+          <span>
+            <span class="bia-chart-title">How the Headline Numbers Are Calculated</span>
+            <span class="bia-chart-subtitle">These notes translate the headline cards back into the model arithmetic.</span>
+          </span>
+        </summary>
+        <div class="bia-calculation-grid">
+          <div class="bia-calculation-item">
+            <h4>Eligible patients</h4>
+            <p id="calc-eligible"></p>
+          </div>
+          <div class="bia-calculation-item">
+            <h4>Net annual price</h4>
+            <p id="calc-net-price"></p>
+          </div>
+          <div class="bia-calculation-item">
+            <h4>Year 1 net budget impact</h4>
+            <p id="calc-y1-impact"></p>
+          </div>
+          <div class="bia-calculation-item">
+            <h4>5-year cumulative impact</h4>
+            <p id="calc-cumulative"></p>
+          </div>
+        </div>
+      </details>
+
       <section class="bia-panel bia-scenario-panel" aria-label="Scenario presets">
         <div class="bia-scenario-header">
           <div>
@@ -155,7 +182,7 @@
       </aside>
 
 
-      <section class="bia-panel" style="margin-top: 1rem;">
+      <section class="bia-panel">
         <div class="bia-chart-title">Year-by-Year Results</div>
         <div class="bia-table-wrap">
           <table class="bia-table">
@@ -198,10 +225,34 @@
           <svg class="bia-svg" id="cumulative-chart" viewBox="0 0 640 260" role="img" aria-label="Cumulative budget impact chart"></svg>
         </div>
       </section>
+
+      <section class="bia-panel" aria-label="One-way sensitivity analysis">
+        <div class="bia-chart-title">One-Way Sensitivity: Key Budget Impact Drivers</div>
+        <div class="bia-chart-subtitle">Each driver is varied one at a time while all other current assumptions are held constant. The output is the 5-year cumulative budget impact range.</div>
+        <div class="bia-sensitivity-layout">
+          <div>
+            <svg class="bia-svg" id="tornado-chart" viewBox="0 0 700 360" role="img" aria-label="One-way sensitivity tornado chart"></svg>
+            <p class="bia-sensitivity-summary" id="sensitivity-summary"></p>
+          </div>
+          <div class="bia-table-wrap">
+            <table class="bia-table">
+              <thead>
+                <tr>
+                  <th>Driver</th>
+                  <th>Low</th>
+                  <th>High</th>
+                  <th>Range</th>
+                </tr>
+              </thead>
+              <tbody id="sensitivity-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
-  <section class="bia-interpretation" style="margin-top: 1rem;">
+  <section class="bia-interpretation">
     <div class="bia-note">
       <h4>Affordability signal</h4>
       <p id="interpret-affordability"></p>
@@ -418,6 +469,93 @@
     };
   };
 
+  const cumulativeImpact = (rawValues) => {
+    const result = calculate(valuesToInputs(rawValues));
+    return result.years[result.years.length - 1].cumulative;
+  };
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const scaleUptake = (raw, factor) => {
+    const next = { ...raw };
+    ["uptake1", "uptake2", "uptake3", "uptake4", "uptake5"].forEach((id) => {
+      next[id] = clamp(raw[id] * factor, 0, 100);
+    });
+    return next;
+  };
+
+  const sensitivityDrivers = [
+    {
+      label: "Eligible population",
+      lowNote: "-20%",
+      highNote: "+20%",
+      low: (raw) => ({ ...raw, incident: raw.incident * 0.8 }),
+      high: (raw) => ({ ...raw, incident: raw.incident * 1.2 }),
+      interpretation: "patient volume and epidemiology assumptions"
+    },
+    {
+      label: "Uptake curve",
+      lowNote: "-20%",
+      highNote: "+20%",
+      low: (raw) => scaleUptake(raw, 0.8),
+      high: (raw) => scaleUptake(raw, 1.2),
+      interpretation: "adoption speed and pathway implementation"
+    },
+    {
+      label: "Net price",
+      lowNote: "-20%",
+      highNote: "+20%",
+      low: (raw) => ({ ...raw, listPrice: raw.listPrice * 0.8 }),
+      high: (raw) => ({ ...raw, listPrice: raw.listPrice * 1.2 }),
+      interpretation: "price, discount, and commercial access agreement"
+    },
+    {
+      label: "Treatment duration",
+      lowNote: "-20%",
+      highNote: "+20%",
+      low: (raw) => ({ ...raw, duration: clamp(raw.duration * 0.8, 0.1, 1.5) }),
+      high: (raw) => ({ ...raw, duration: clamp(raw.duration * 1.2, 0.1, 1.5) }),
+      interpretation: "how long patients remain on therapy"
+    },
+    {
+      label: "Comparator annual cost",
+      lowNote: "-20%",
+      highNote: "+20%",
+      low: (raw) => ({ ...raw, comparator: raw.comparator * 0.8 }),
+      high: (raw) => ({ ...raw, comparator: raw.comparator * 1.2 }),
+      interpretation: "size of displaced comparator cost offsets"
+    },
+    {
+      label: "Comparator displacement",
+      lowNote: "-20 pp",
+      highNote: "+20 pp",
+      low: (raw) => ({ ...raw, displacement: clamp(raw.displacement - 20, 0, 100) }),
+      high: (raw) => ({ ...raw, displacement: clamp(raw.displacement + 20, 0, 100) }),
+      interpretation: "whether Drug B actually replaces existing comparator use"
+    }
+  ];
+
+  const getSensitivityRows = (raw) => {
+    const base = cumulativeImpact(raw);
+    return sensitivityDrivers
+      .map((driver) => {
+        const lowImpact = cumulativeImpact(driver.low(raw));
+        const highImpact = cumulativeImpact(driver.high(raw));
+        const minImpact = Math.min(lowImpact, highImpact);
+        const maxImpact = Math.max(lowImpact, highImpact);
+        return {
+          ...driver,
+          base,
+          lowImpact,
+          highImpact,
+          minImpact,
+          maxImpact,
+          range: maxImpact - minImpact
+        };
+      })
+      .sort((a, b) => b.range - a.range);
+  };
+
   const formatDisplay = (id, value) => {
     if (percentIds.has(id)) return `${value}%`;
     if (gbpIds.has(id)) return fmtCurrency.format(value);
@@ -566,6 +704,77 @@
     });
   };
 
+  const drawTornado = (rows) => {
+    const svg = app.querySelector("#tornado-chart");
+    clearSvg(svg);
+    const width = 700;
+    const margin = { top: 28, right: 80, bottom: 32, left: 190 };
+    const rowH = 42;
+    const lastContentBottom = margin.top + (rows.length - 1) * rowH + 24;
+    const height = lastContentBottom + margin.bottom;
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    const chartW = width - margin.left - margin.right;
+    const base = rows[0]?.base || 0;
+    const min = Math.min(...rows.map((row) => row.minImpact), base);
+    const max = Math.max(...rows.map((row) => row.maxImpact), base);
+    const span = Math.max(1, max - min);
+    const x = (value) => margin.left + ((value - min) / span) * chartW;
+    const baseX = x(base);
+
+    add(svg, "line", {
+      x1: baseX,
+      y1: margin.top - 8,
+      x2: baseX,
+      y2: lastContentBottom,
+      stroke: "#172033",
+      "stroke-width": 1.4,
+      "stroke-dasharray": "4 4"
+    });
+    add(svg, "text", {
+      x: baseX,
+      y: 18,
+      "font-size": 12,
+      fill: "#172033",
+      "text-anchor": "middle"
+    }, `Base ${formatMillions(base)}`);
+
+    rows.forEach((row, i) => {
+      const y = margin.top + i * rowH + 14;
+      const lowX = x(row.lowImpact);
+      const highX = x(row.highImpact);
+      const left = Math.min(lowX, highX);
+      const right = Math.max(lowX, highX);
+      add(svg, "text", {
+        x: 12,
+        y: y + 6,
+        "font-size": 13,
+        fill: "#172033"
+      }, row.label);
+      add(svg, "rect", {
+        x: left,
+        y: y - 10,
+        width: Math.max(2, right - left),
+        height: 20,
+        rx: 4,
+        fill: "#2f6fbd",
+        opacity: 0.82
+      });
+      add(svg, "text", {
+        x: left - 8,
+        y: y + 5,
+        "font-size": 11,
+        fill: "#5f6b7a",
+        "text-anchor": "end"
+      }, formatMillions(row.minImpact));
+      add(svg, "text", {
+        x: right + 8,
+        y: y + 5,
+        "font-size": 11,
+        fill: "#5f6b7a"
+      }, formatMillions(row.maxImpact));
+    });
+  };
+
   const updateTable = (years) => {
     const body = app.querySelector("#results-body");
     body.innerHTML = "";
@@ -588,6 +797,72 @@
       });
       body.appendChild(row);
     });
+  };
+
+  const updateSensitivity = (raw) => {
+    const rows = getSensitivityRows(raw);
+    drawTornado(rows);
+
+    const body = app.querySelector("#sensitivity-body");
+    if (body) {
+      body.innerHTML = "";
+      rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        [
+          `${row.label} (${row.lowNote}/${row.highNote})`,
+          formatMillions(row.minImpact),
+          formatMillions(row.maxImpact),
+          formatMillions(row.range)
+        ].forEach((value) => {
+          const td = document.createElement("td");
+          td.textContent = value;
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+    }
+
+    const summary = app.querySelector("#sensitivity-summary");
+    const top = rows[0];
+    if (summary && top) {
+      summary.textContent =
+        `Largest driver: ${top.label}. In this one-way sensitivity check, ${top.interpretation} creates the widest 5-year cumulative impact range (${formatMillions(top.range)}). This is the assumption a payer or commissioner would most likely scrutinise first.`;
+    }
+  };
+
+  const updateCalculationNotes = (p, result) => {
+    const y1 = result.years[0];
+    const cumulative = result.years[result.years.length - 1].cumulative;
+    const eligibleEl = app.querySelector("#calc-eligible");
+    const netPriceEl = app.querySelector("#calc-net-price");
+    const y1El = app.querySelector("#calc-y1-impact");
+    const cumulativeEl = app.querySelector("#calc-cumulative");
+
+    if (eligibleEl) {
+      eligibleEl.innerHTML =
+        `<strong>${fmtInt.format(result.eligible)}</strong> = ${fmtInt.format(p.incident)} incident patients x ` +
+        `${Math.round(p.diagnosis * 100)}% diagnosed x ${Math.round(p.biomarker * 100)}% biomarker-positive x ` +
+        `${Math.round(p.line * 100)}% treatment-line eligible x ${Math.round(p.suitability * 100)}% clinically suitable.`;
+    }
+
+    if (netPriceEl) {
+      netPriceEl.innerHTML =
+        `<strong>${fmtCurrency.format(result.netPrice)}</strong> = ${fmtCurrency.format(p.listPrice)} list price x ` +
+        `(1 - ${Math.round(p.discount * 100)}% PAS discount). This is the net annual price after discount, not list price multiplied by the discount itself.`;
+    }
+
+    if (y1El) {
+      y1El.innerHTML =
+        `<strong>${formatMillions(y1.netImpact)}</strong> = ${formatMillions(y1.drugCost)} Drug B cost + ` +
+        `${formatMillions(y1.otherCosts)} administration/monitoring/adverse event costs - ` +
+        `${formatMillions(y1.displaced)} displaced comparator cost.`;
+    }
+
+    if (cumulativeEl) {
+      cumulativeEl.innerHTML =
+        `<strong>${formatMillions(cumulative)}</strong> = sum of annual net budget impacts across Years 1-5. ` +
+        `It accumulates the yearly values shown in the Year-by-Year Results table.`;
+    }
   };
 
   const updateInterpretation = (p, result) => {
@@ -655,6 +930,8 @@
     drawBars(result.years);
     drawCumulative(result.years);
     updateTable(result.years);
+    updateCalculationNotes(p, result);
+    updateSensitivity(p.raw);
     updateInterpretation(p, result);
     updateScenarioComparison(result);
   };
