@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bia-preview",
+      "runtimeExecutable": "quarto",
+      "runtimeArgs": ["preview", "scratch/market_access_decision_tools/01_Interactive_Budget_Impact_Model_DRAFT.qmd", "--port", "4747", "--no-browser"],
+      "port": 4747
+    },
+    {
+      "name": "homepage-preview",
+      "runtimeExecutable": "quarto",
+      "runtimeArgs": ["preview", "index.qmd", "--port", "4748", "--no-browser"],
+      "port": 4748
+    }
+  ]
+}
