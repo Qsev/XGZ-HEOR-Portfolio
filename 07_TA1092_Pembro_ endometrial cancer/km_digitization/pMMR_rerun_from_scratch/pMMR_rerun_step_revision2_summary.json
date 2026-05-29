@@ -1,0 +1,14 @@
+{
+  "changes": [
+    "pembro early 0-6.5 month section lifted to match user yellow correction",
+    "pembro 6-month drop split into three small segments instead of one long low plateau",
+    "pembro 7.9-9.1 month descent locally aligned to yellow trace",
+    "pembro 18-21 month plateau/drop lowered to marked trajectory",
+    "pembro 27-28 month tail plateau set to 0.3045; placebo unchanged from revised version"
+  ],
+  "outputs": [
+    "pMMR_rerun_pembro_step_segments_revised2.csv",
+    "pMMR_rerun_placebo_step_segments_revised2.csv",
+    "pMMR_rerun_step_coordinate_validation_revised2.png"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "arm": "placebo_chemo",
+  "segments": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_placebo_step_segments_revised2.csv",
+  "nar_json": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_nar.json",
+  "min_drop": 0.002,
+  "iterations": 160000,
+  "max_events_per_drop": 8,
+  "seed": 109202,
+  "rmse_vs_raw_digitised_step": 0.007048857417974946,
+  "n": 292,
+  "events": 133,
+  "target_events": 133,
+  "nar_validation": [
+    {
+      "time_months": 0.0,
+      "published_nar": 292,
+      "reconstructed_nar": 292,
+      "difference": 0
+    },
+    {
+      "time_months": 6.0,
+      "published_nar": 129,
+      "reconstructed_nar": 129,
+      "difference": 0
+    },
+    {
+      "time_months": 12.0,
+      "published_nar": 33,
+      "reconstructed_nar": 33,
+      "difference": 0
+    },
+    {
+      "time_months": 18.0,
+      "published_nar": 10,
+      "reconstructed_nar": 10,
+      "difference": 0
+    },
+    {
+      "time_months": 24.0,
+      "published_nar": 2,
+      "reconstructed_nar": 2,
+      "difference": 0
+    },
+    {
+      "time_months": 30.0,
+      "published_nar": 1,
+      "reconstructed_nar": 1,
+      "difference": 0
+    },
+    {
+      "time_months": 36.0,
+      "published_nar": 0,
+      "reconstructed_nar": 0,
+      "difference": 0
+    }
+  ],
+  "events_by_interval": {
+    "1": 59,
+    "2": 58,
+    "3": 11,
+    "4": 5,
+    "5": 0,
+    "6": 0
+  },
+  "raw_drops": 69,
+  "cleaned_event_drops": 50,
+  "outputs": {
+    "pseudo_ipd": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_placebo_clean_pseudo_ipd.csv",
+    "event_drop_cleaning": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_placebo_clean_event_drop_cleaning.csv",
+    "report": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_placebo_clean_report.json",
+    "overlay": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_placebo_clean_overlay.png"
+  }
+}

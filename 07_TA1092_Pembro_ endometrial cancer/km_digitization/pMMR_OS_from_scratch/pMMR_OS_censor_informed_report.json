@@ -1,0 +1,269 @@
+{
+  "source_constraints": {
+    "source": "NEJM KEYNOTE-868/NRG-GY018 Figure S1B left plot, pMMR interim OS, risk table with cumulative number censored",
+    "time_months": [
+      0,
+      6,
+      12,
+      18,
+      24,
+      30,
+      36,
+      42
+    ],
+    "arms": {
+      "pembro_chemo_os": {
+        "label": "Active / Pembro + PC",
+        "nar": [
+          293,
+          167,
+          85,
+          42,
+          16,
+          8,
+          1,
+          0
+        ],
+        "cumulative_censored": [
+          11,
+          113,
+          183,
+          215,
+          238,
+          243,
+          250,
+          251
+        ],
+        "interval_censored": [
+          102,
+          70,
+          32,
+          23,
+          5,
+          7,
+          1
+        ],
+        "interval_events": [
+          24,
+          12,
+          11,
+          3,
+          3,
+          0,
+          0
+        ],
+        "events_reported_derived": 53
+      },
+      "placebo_chemo_os": {
+        "label": "Placebo + PC",
+        "nar": [
+          295,
+          160,
+          86,
+          38,
+          11,
+          5,
+          0,
+          0
+        ],
+        "cumulative_censored": [
+          14,
+          121,
+          185,
+          218,
+          240,
+          244,
+          248,
+          248
+        ],
+        "interval_censored": [
+          107,
+          64,
+          33,
+          22,
+          4,
+          4,
+          0
+        ],
+        "interval_events": [
+          28,
+          10,
+          15,
+          5,
+          2,
+          1,
+          0
+        ],
+        "events_reported_derived": 61
+      }
+    },
+    "derivation": "For each interval, events = NAR_i - NAR_{i+1} - (cumulative_censored_{i+1} - cumulative_censored_i). Baseline cumulative censored at time 0 is treated as already accumulated by the first displayed risk-table time and is not subtracted from N at time 0.",
+    "published_hr_note": "This Figure S1B appears to be an interim OS supplement plot; HR may differ from later NICE August 2023 OS estimates."
+  },
+  "arm_reports": {
+    "pembro_chemo_os": {
+      "rmse_vs_digitised_step": 0.005039494982712438,
+      "n": 293,
+      "events": 53,
+      "derived_interval_events": [
+        24,
+        12,
+        11,
+        3,
+        3,
+        0,
+        0
+      ],
+      "derived_interval_censored": [
+        102,
+        70,
+        32,
+        23,
+        5,
+        7,
+        1
+      ],
+      "events_by_interval": {
+        "1": 24,
+        "2": 12,
+        "3": 11,
+        "4": 3,
+        "5": 3,
+        "6": 0,
+        "7": 0
+      },
+      "nar_validation": [
+        {
+          "time_months": 0,
+          "published_nar": 293,
+          "reconstructed_nar": 293,
+          "difference": 0
+        },
+        {
+          "time_months": 6,
+          "published_nar": 167,
+          "reconstructed_nar": 167,
+          "difference": 0
+        },
+        {
+          "time_months": 12,
+          "published_nar": 85,
+          "reconstructed_nar": 85,
+          "difference": 0
+        },
+        {
+          "time_months": 18,
+          "published_nar": 42,
+          "reconstructed_nar": 42,
+          "difference": 0
+        },
+        {
+          "time_months": 24,
+          "published_nar": 16,
+          "reconstructed_nar": 16,
+          "difference": 0
+        },
+        {
+          "time_months": 30,
+          "published_nar": 8,
+          "reconstructed_nar": 8,
+          "difference": 0
+        },
+        {
+          "time_months": 36,
+          "published_nar": 1,
+          "reconstructed_nar": 1,
+          "difference": 0
+        },
+        {
+          "time_months": 42,
+          "published_nar": 0,
+          "reconstructed_nar": 0,
+          "difference": 0
+        }
+      ]
+    },
+    "placebo_chemo_os": {
+      "rmse_vs_digitised_step": 0.008330174929720935,
+      "n": 295,
+      "events": 61,
+      "derived_interval_events": [
+        28,
+        10,
+        15,
+        5,
+        2,
+        1,
+        0
+      ],
+      "derived_interval_censored": [
+        107,
+        64,
+        33,
+        22,
+        4,
+        4,
+        0
+      ],
+      "events_by_interval": {
+        "1": 28,
+        "2": 10,
+        "3": 15,
+        "4": 5,
+        "5": 2,
+        "6": 1,
+        "7": 0
+      },
+      "nar_validation": [
+        {
+          "time_months": 0,
+          "published_nar": 295,
+          "reconstructed_nar": 295,
+          "difference": 0
+        },
+        {
+          "time_months": 6,
+          "published_nar": 160,
+          "reconstructed_nar": 160,
+          "difference": 0
+        },
+        {
+          "time_months": 12,
+          "published_nar": 86,
+          "reconstructed_nar": 86,
+          "difference": 0
+        },
+        {
+          "time_months": 18,
+          "published_nar": 38,
+          "reconstructed_nar": 38,
+          "difference": 0
+        },
+        {
+          "time_months": 24,
+          "published_nar": 11,
+          "reconstructed_nar": 11,
+          "difference": 0
+        },
+        {
+          "time_months": 30,
+          "published_nar": 5,
+          "reconstructed_nar": 5,
+          "difference": 0
+        },
+        {
+          "time_months": 36,
+          "published_nar": 0,
+          "reconstructed_nar": 0,
+          "difference": 0
+        },
+        {
+          "time_months": 42,
+          "published_nar": 0,
+          "reconstructed_nar": 0,
+          "difference": 0
+        }
+      ]
+    }
+  }
+}

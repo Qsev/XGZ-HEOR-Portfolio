@@ -1,0 +1,14 @@
+{
+  "image_width": 1583,
+  "image_height": 979,
+  "plot_area": {
+    "x0": 103,
+    "x1": 1572,
+    "y0": 24,
+    "y1": 893
+  },
+  "orange_mask_pixels": 9135,
+  "blue_mask_pixels": 11443,
+  "red_anchor_pixels": 266,
+  "blue_anchor_pixels": 0
+}

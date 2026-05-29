@@ -1,0 +1,106 @@
+{
+  "pembro_chemo": {
+    "n": 290,
+    "events": 89,
+    "target_events": 89,
+    "event_difference": 0,
+    "median_months": 13.0125,
+    "censor_window_fraction": 0.8,
+    "nar_validation": [
+      {
+        "time_months": 0,
+        "published_nar": 290,
+        "reconstructed_nar": 290,
+        "difference": 0
+      },
+      {
+        "time_months": 6,
+        "published_nar": 150,
+        "reconstructed_nar": 150,
+        "difference": 0
+      },
+      {
+        "time_months": 12,
+        "published_nar": 45,
+        "reconstructed_nar": 45,
+        "difference": 0
+      },
+      {
+        "time_months": 18,
+        "published_nar": 20,
+        "reconstructed_nar": 20,
+        "difference": 0
+      },
+      {
+        "time_months": 24,
+        "published_nar": 7,
+        "reconstructed_nar": 7,
+        "difference": 0
+      },
+      {
+        "time_months": 30,
+        "published_nar": 3,
+        "reconstructed_nar": 3,
+        "difference": 0
+      },
+      {
+        "time_months": 36,
+        "published_nar": 0,
+        "reconstructed_nar": 0,
+        "difference": 0
+      }
+    ]
+  },
+  "placebo_chemo": {
+    "n": 292,
+    "events": 133,
+    "target_events": 133,
+    "event_difference": 0,
+    "median_months": 8.4097,
+    "censor_window_fraction": 0.55,
+    "nar_validation": [
+      {
+        "time_months": 0,
+        "published_nar": 292,
+        "reconstructed_nar": 292,
+        "difference": 0
+      },
+      {
+        "time_months": 6,
+        "published_nar": 129,
+        "reconstructed_nar": 129,
+        "difference": 0
+      },
+      {
+        "time_months": 12,
+        "published_nar": 33,
+        "reconstructed_nar": 33,
+        "difference": 0
+      },
+      {
+        "time_months": 18,
+        "published_nar": 10,
+        "reconstructed_nar": 10,
+        "difference": 0
+      },
+      {
+        "time_months": 24,
+        "published_nar": 2,
+        "reconstructed_nar": 2,
+        "difference": 0
+      },
+      {
+        "time_months": 30,
+        "published_nar": 1,
+        "reconstructed_nar": 1,
+        "difference": 0
+      },
+      {
+        "time_months": 36,
+        "published_nar": 0,
+        "reconstructed_nar": 0,
+        "difference": 0
+      }
+    ]
+  }
+}

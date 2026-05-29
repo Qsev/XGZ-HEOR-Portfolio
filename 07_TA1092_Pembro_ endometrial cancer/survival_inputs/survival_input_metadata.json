@@ -1,0 +1,145 @@
+{
+  "description": "Analysis-ready pseudo-IPD survival inputs for TA1092 pembrolizumab + chemotherapy endometrial cancer case study.",
+  "created_from": "Digitised published KEYNOTE-868/NRG-GY018 subgroup KM curves; PFS from NEJM Figure 2, OS from supplementary Figure S1 left plots.",
+  "main_dataset": "survival_ipd_long.csv",
+  "endpoint_specific_files": [
+    "dMMR_PFS_pseudo_ipd.csv",
+    "pMMR_PFS_pseudo_ipd.csv",
+    "dMMR_OS_pseudo_ipd.csv",
+    "pMMR_OS_pseudo_ipd.csv"
+  ],
+  "excluded_from_main_dataset": [
+    {
+      "file": "km_digitization/pMMR_OS_from_scratch/pMMR_OS_pseudo_ipd_combined_clean_proxy.csv",
+      "reason": "Exploratory HR-calibrated pMMR OS proxy replaced by censor-informed reconstruction once the left Figure S1B risk table with cumulative censored values was identified."
+    }
+  ],
+  "field_notes": {
+    "status": "1 = event (progression/death for PFS, death for OS); 0 = censored",
+    "time_months": "Reconstructed follow-up/event/censor time in months",
+    "treatment": "Standardised arm code used for R modelling",
+    "arm_role": "intervention or comparator",
+    "source_arm": "Original arm code in the reconstruction CSV",
+    "reconstruction_method": "event_drop_cleaned_pseudo_ipd for PFS; censor_informed_pseudo_ipd for OS when cumulative censored risk tables are available"
+  },
+  "caveats": [
+    "These are reconstructed pseudo-IPD, not trial IPD.",
+    "Subgroup OS curves are interim supplementary OS estimates and may not match the later NICE economic model OS data cut.",
+    "PFS event counts are taken from published Figure 2 constraints; OS event counts are derived from number-at-risk plus displayed cumulative censored values.",
+    "Use these inputs for transparent technical replication and sensitivity analysis, not as exact company model inputs."
+  ],
+  "summary_rows": [
+    {
+      "subgroup": "dMMR",
+      "endpoint": "PFS",
+      "treatment": "pembro_chemo",
+      "n": 112,
+      "events": 26,
+      "censored": 86,
+      "max_followup_months": "37.8500",
+      "method": "event_drop_cleaned_pseudo_ipd",
+      "version": "tuned_final",
+      "source_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pseudo_ipd_combined_clean_pembro_tuned.csv",
+      "validation_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_statistical_validation_clean_pembro_tuned_R.csv",
+      "report_file": ""
+    },
+    {
+      "subgroup": "dMMR",
+      "endpoint": "PFS",
+      "treatment": "placebo_chemo",
+      "n": 113,
+      "events": 59,
+      "censored": 54,
+      "max_followup_months": "33.0000",
+      "method": "event_drop_cleaned_pseudo_ipd",
+      "version": "tuned_final",
+      "source_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pseudo_ipd_combined_clean_pembro_tuned.csv",
+      "validation_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_statistical_validation_clean_pembro_tuned_R.csv",
+      "report_file": ""
+    },
+    {
+      "subgroup": "pMMR",
+      "endpoint": "PFS",
+      "treatment": "pembro_chemo",
+      "n": 290,
+      "events": 89,
+      "censored": 201,
+      "max_followup_months": "33.0000",
+      "method": "event_drop_cleaned_pseudo_ipd",
+      "version": "clean_final",
+      "source_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_pseudo_ipd_combined_clean.csv",
+      "validation_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_statistical_validation_clean_R.csv",
+      "report_file": ""
+    },
+    {
+      "subgroup": "pMMR",
+      "endpoint": "PFS",
+      "treatment": "placebo_chemo",
+      "n": 292,
+      "events": 133,
+      "censored": 159,
+      "max_followup_months": "33.0000",
+      "method": "event_drop_cleaned_pseudo_ipd",
+      "version": "clean_final",
+      "source_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_pseudo_ipd_combined_clean.csv",
+      "validation_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_rerun_from_scratch/pMMR_rerun_statistical_validation_clean_R.csv",
+      "report_file": ""
+    },
+    {
+      "subgroup": "dMMR",
+      "endpoint": "OS",
+      "treatment": "pembro_chemo",
+      "n": 112,
+      "events": 8,
+      "censored": 104,
+      "max_followup_months": "39.0000",
+      "method": "censor_informed_pseudo_ipd",
+      "version": "censor_informed_final",
+      "source_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_OS_from_scratch/dMMR_OS_pseudo_ipd_combined_censor_informed.csv",
+      "validation_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_OS_from_scratch/dMMR_OS_statistical_validation_censor_informed_R.csv",
+      "report_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_OS_from_scratch/dMMR_OS_censor_informed_report.json"
+    },
+    {
+      "subgroup": "dMMR",
+      "endpoint": "OS",
+      "treatment": "placebo_chemo",
+      "n": 113,
+      "events": 18,
+      "censored": 95,
+      "max_followup_months": "33.0000",
+      "method": "censor_informed_pseudo_ipd",
+      "version": "censor_informed_final",
+      "source_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_OS_from_scratch/dMMR_OS_pseudo_ipd_combined_censor_informed.csv",
+      "validation_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_OS_from_scratch/dMMR_OS_statistical_validation_censor_informed_R.csv",
+      "report_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_OS_from_scratch/dMMR_OS_censor_informed_report.json"
+    },
+    {
+      "subgroup": "pMMR",
+      "endpoint": "OS",
+      "treatment": "pembro_chemo",
+      "n": 293,
+      "events": 53,
+      "censored": 240,
+      "max_followup_months": "39.0000",
+      "method": "censor_informed_pseudo_ipd",
+      "version": "censor_informed_final",
+      "source_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/pMMR_OS_pseudo_ipd_combined_censor_informed.csv",
+      "validation_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/pMMR_OS_statistical_validation_censor_informed_R.csv",
+      "report_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/pMMR_OS_censor_informed_report.json"
+    },
+    {
+      "subgroup": "pMMR",
+      "endpoint": "OS",
+      "treatment": "placebo_chemo",
+      "n": 295,
+      "events": 61,
+      "censored": 234,
+      "max_followup_months": "32.1415",
+      "method": "censor_informed_pseudo_ipd",
+      "version": "censor_informed_final",
+      "source_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/pMMR_OS_pseudo_ipd_combined_censor_informed.csv",
+      "validation_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/pMMR_OS_statistical_validation_censor_informed_R.csv",
+      "report_file": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/pMMR_OS_censor_informed_report.json"
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "source_image": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMRleft_crop.png",
+  "risk_table_image": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMROSleft.png",
+  "axis_calibration": {
+    "x_ticks_pixels": [
+      194.0,
+      421.5,
+      647.5,
+      873.5,
+      1100.0,
+      1327.5,
+      1554.0,
+      1779.5
+    ],
+    "x_ticks_months": [
+      0,
+      6,
+      12,
+      18,
+      24,
+      30,
+      36,
+      42
+    ],
+    "x_months_per_pixel": 0.026487956965799482,
+    "x_intercept_months": -5.1485800171751785,
+    "y_ticks_pixels": [
+      34.0,
+      127.5,
+      220.0,
+      313.5,
+      407.5,
+      500.5,
+      592.0,
+      685.5,
+      778.5,
+      871.5,
+      965.0
+    ],
+    "y_ticks_percent": [
+      100,
+      90,
+      80,
+      70,
+      60,
+      50,
+      40,
+      30,
+      20,
+      10,
+      0
+    ],
+    "y_percent_per_pixel": -0.10747405005483242,
+    "y_intercept_percent": 103.69305837057556
+  },
+  "manual_points": {
+    "pembro_magenta": 16,
+    "placebo_yellow": 33
+  },
+  "risk_table_raw": {
+    "time_months": [
+      0,
+      6,
+      12,
+      18,
+      24,
+      30,
+      36,
+      42
+    ],
+    "pembro_nar": [
+      112,
+      83,
+      54,
+      26,
+      12,
+      11,
+      2,
+      0
+    ],
+    "pembro_cumulative_censored": [
+      1,
+      26,
+      53,
+      79,
+      93,
+      94,
+      103,
+      105
+    ],
+    "placebo_time_months": [
+      0,
+      6,
+      12,
+      18,
+      24,
+      30,
+      36
+    ],
+    "placebo_nar": [
+      113,
+      79,
+      48,
+      15,
+      8,
+      5,
+      0
+    ],
+    "placebo_cumulative_censored": [
+      2,
+      28,
+      52,
+      82,
+      89,
+      92,
+      97
+    ]
+  }
+}

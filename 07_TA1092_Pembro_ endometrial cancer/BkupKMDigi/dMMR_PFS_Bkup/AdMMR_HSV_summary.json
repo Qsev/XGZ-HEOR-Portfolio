@@ -1,0 +1,12 @@
+{
+  "image_width": 1704,
+  "image_height": 985,
+  "plot_area": {
+    "x0": 226,
+    "x1": 1694,
+    "y0": 30,
+    "y1": 891
+  },
+  "orange_mask_pixels": 12832,
+  "blue_mask_pixels": 15583
+}

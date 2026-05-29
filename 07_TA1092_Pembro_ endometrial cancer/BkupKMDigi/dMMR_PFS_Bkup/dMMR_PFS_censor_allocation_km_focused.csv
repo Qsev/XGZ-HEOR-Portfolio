@@ -1,0 +1,13 @@
+arm,interval,censors
+pembro_chemo,1,21
+pembro_chemo,2,20
+pembro_chemo,3,19
+pembro_chemo,4,13
+pembro_chemo,5,1
+pembro_chemo,6,3
+placebo_chemo,1,18
+placebo_chemo,2,5
+placebo_chemo,3,9
+placebo_chemo,4,3
+placebo_chemo,5,0
+placebo_chemo,6,2

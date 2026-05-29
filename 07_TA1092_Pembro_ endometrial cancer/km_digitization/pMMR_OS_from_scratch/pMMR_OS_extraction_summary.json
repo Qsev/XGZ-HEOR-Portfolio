@@ -1,0 +1,66 @@
+{
+  "source_image": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_crop.png",
+  "axis_calibration": {
+    "x_ticks_pixels": [
+      152.0,
+      492.0,
+      832.0,
+      1172.0,
+      1512.0
+    ],
+    "x_ticks_months": [
+      0.0,
+      10.0,
+      20.0,
+      30.0,
+      40.0
+    ],
+    "x_months_per_pixel": 0.02941176470588234,
+    "x_intercept_months": -4.470588235294097,
+    "y_surv1_pixel": 28.0,
+    "y_surv0_pixel": 709.5,
+    "y_ticks_pixels": [
+      28.0,
+      164.5,
+      300.5,
+      437.0,
+      573.5,
+      709.5
+    ],
+    "y_ticks_survival": [
+      1.0,
+      0.8,
+      0.6,
+      0.4,
+      0.2,
+      0.0
+    ]
+  },
+  "manual_points": {
+    "pembro_green": 56,
+    "placebo_yellow": 59
+  },
+  "nar": {
+    "time_months": [
+      0,
+      10,
+      20,
+      30,
+      40
+    ],
+    "pembro_chemo": [
+      293,
+      115,
+      25,
+      8,
+      0
+    ],
+    "placebo_chemo": [
+      295,
+      106,
+      19,
+      5,
+      0
+    ]
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "pembro": {
+    "arm": "pembro_chemo",
+    "segments": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pembro_step_segments_revised.csv",
+    "nar_json": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_nar.json",
+    "min_drop": 0.002,
+    "iterations": 160000,
+    "max_events_per_drop": 7,
+    "seed": 109226,
+    "rmse_vs_raw_digitised_step": 0.008798222478399266,
+    "n": 112,
+    "events": 26,
+    "target_events": 26,
+    "nar_validation": [
+      {
+        "time_months": 0.0,
+        "published_nar": 112,
+        "reconstructed_nar": 112,
+        "difference": 0
+      },
+      {
+        "time_months": 6.0,
+        "published_nar": 80,
+        "reconstructed_nar": 80,
+        "difference": 0
+      },
+      {
+        "time_months": 12.0,
+        "published_nar": 44,
+        "reconstructed_nar": 44,
+        "difference": 0
+      },
+      {
+        "time_months": 18.0,
+        "published_nar": 22,
+        "reconstructed_nar": 22,
+        "difference": 0
+      },
+      {
+        "time_months": 24.0,
+        "published_nar": 9,
+        "reconstructed_nar": 9,
+        "difference": 0
+      },
+      {
+        "time_months": 30.0,
+        "published_nar": 8,
+        "reconstructed_nar": 8,
+        "difference": 0
+      },
+      {
+        "time_months": 36.0,
+        "published_nar": 2,
+        "reconstructed_nar": 2,
+        "difference": 0
+      }
+    ],
+    "events_by_interval": {
+      "1": 10,
+      "2": 10,
+      "3": 5,
+      "4": 0,
+      "5": 0,
+      "6": 1
+    },
+    "raw_drops": 36,
+    "cleaned_event_drops": 21,
+    "outputs": {
+      "pseudo_ipd": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pembro_clean_pseudo_ipd.csv",
+      "event_drop_cleaning": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pembro_clean_event_drop_cleaning.csv",
+      "report": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pembro_clean_report.json",
+      "overlay": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pembro_clean_overlay.png"
+    }
+  },
+  "placebo": {
+    "arm": "placebo_chemo",
+    "segments": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_placebo_step_segments_revised.csv",
+    "nar_json": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_nar.json",
+    "min_drop": 0.002,
+    "iterations": 160000,
+    "max_events_per_drop": 7,
+    "seed": 109259,
+    "rmse_vs_raw_digitised_step": 0.007311659951118085,
+    "n": 113,
+    "events": 59,
+    "target_events": 59,
+    "nar_validation": [
+      {
+        "time_months": 0.0,
+        "published_nar": 113,
+        "reconstructed_nar": 113,
+        "difference": 0
+      },
+      {
+        "time_months": 6.0,
+        "published_nar": 62,
+        "reconstructed_nar": 62,
+        "difference": 0
+      },
+      {
+        "time_months": 12.0,
+        "published_nar": 24,
+        "reconstructed_nar": 24,
+        "difference": 0
+      },
+      {
+        "time_months": 18.0,
+        "published_nar": 8,
+        "reconstructed_nar": 8,
+        "difference": 0
+      },
+      {
+        "time_months": 24.0,
+        "published_nar": 4,
+        "reconstructed_nar": 4,
+        "difference": 0
+      },
+      {
+        "time_months": 30.0,
+        "published_nar": 2,
+        "reconstructed_nar": 2,
+        "difference": 0
+      },
+      {
+        "time_months": 36.0,
+        "published_nar": 0,
+        "reconstructed_nar": 0,
+        "difference": 0
+      }
+    ],
+    "events_by_interval": {
+      "1": 30,
+      "2": 23,
+      "3": 5,
+      "4": 0,
+      "5": 1,
+      "6": 0
+    },
+    "raw_drops": 56,
+    "cleaned_event_drops": 36,
+    "outputs": {
+      "pseudo_ipd": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_placebo_clean_pseudo_ipd.csv",
+      "event_drop_cleaning": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_placebo_clean_event_drop_cleaning.csv",
+      "report": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_placebo_clean_report.json",
+      "overlay": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_placebo_clean_overlay.png"
+    }
+  },
+  "combined_pseudo_ipd": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pseudo_ipd_combined_clean.csv",
+  "combined_overlay": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_reconstructed_KM_validation_clean.png"
+}

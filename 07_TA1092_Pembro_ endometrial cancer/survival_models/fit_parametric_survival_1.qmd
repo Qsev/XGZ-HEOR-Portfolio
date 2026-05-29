@@ -1,0 +1,662 @@
+---
+title: "Learning Note: Parametric Survival Fitting for TA1092"
+subtitle: "Step-by-step R workflow using reconstructed pseudo-IPD"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show R code"
+    css: fit_parametric_survival_1.css
+execute:
+  warning: false
+  message: false
+---
+
+## Purpose
+
+This note turns the batch script `fit_parametric_survival.R` into a step-by-step learning document.
+
+The goal is not just to run code. The goal is to understand:
+
+- what the pseudo-IPD contains;
+- how `Surv()` represents survival data;
+- what `flexsurvreg()` estimates;
+- how AIC/BIC are used for first-pass model comparison;
+- why AIC-selected survival curves still need clinical and EAG-style critique.
+
+## 1. Load Packages
+
+This block loads the R packages used in this workflow.
+
+```{r load-packages}
+library(survival)
+library(flexsurv)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(readr)
+library(ggplot2)
+library(knitr)
+
+tibble(
+  package = c("survival", "flexsurv", "dplyr", "tidyr", "purrr", "readr", "ggplot2", "knitr"),
+  role = c(
+    "Create survival objects and Kaplan-Meier estimates",
+    "Fit parametric survival models",
+    "Data manipulation",
+    "Unnest list-columns",
+    "Loop over curves and distributions",
+    "Read and write CSV files",
+    "Plot KM curves and extrapolations",
+    "Display readable tables"
+  )
+) |>
+  kable()
+```
+
+## 2. Define File Paths
+
+The main input is the combined long-format pseudo-IPD file.
+
+```{r define-paths}
+base_dir <- normalizePath("..", mustWork = TRUE)
+input_path <- file.path(base_dir, "survival_inputs", "survival_ipd_long.csv")
+output_dir <- file.path(base_dir, "survival_models")
+plot_dir <- file.path(output_dir, "plots")
+
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+dir.create(plot_dir, showWarnings = FALSE, recursive = TRUE)
+
+tibble(
+  object = c("base_dir", "input_path", "output_dir", "plot_dir"),
+  path = c(base_dir, input_path, output_dir, plot_dir),
+  exists = c(dir.exists(base_dir), file.exists(input_path), dir.exists(output_dir), dir.exists(plot_dir))
+) |>
+  kable()
+```
+
+## 3. Read the Survival Input Dataset
+
+The dataset is reconstructed pseudo-IPD. Each row is one pseudo-patient.
+
+`status = 1` means the event happened. For PFS this means progression/death; for OS this means death.
+
+```{r read-input-data}
+ipd <- read_csv(input_path, show_col_types = FALSE)
+
+ipd |>
+  head(3) |>
+  knitr::kable()
+```
+
+```{r transform-input-data}
+ipd <- ipd |>
+  mutate(
+    subgroup = factor(subgroup, levels = c("dMMR", "pMMR")),
+    endpoint = factor(endpoint, levels = c("PFS", "OS")),
+    treatment = factor(treatment, levels = c("placebo_chemo", "pembro_chemo")),
+    status = as.integer(status),
+    time_months = as.numeric(time_months),
+    curve_id = paste(subgroup, endpoint, treatment, sep = "_")
+  )
+
+ipd |>
+  count(subgroup, endpoint, treatment, status_label) |>
+  arrange(subgroup, endpoint, treatment, status_label) |>
+  kable()
+```
+
+## 4. Inspect One Curve
+
+Before fitting every curve, inspect one explicitly named curve: **pMMR PFS, pembro arm**.
+
+```{r inspect-pmmr-pfs-pembro-ipd}
+pmmr_pfs_pembro_ipd <- ipd |>
+  filter(subgroup == "pMMR", endpoint == "PFS", treatment == "pembro_chemo")
+
+pmmr_pfs_pembro_ipd |>
+  head(3) |>
+  knitr::kable()
+
+tibble(
+  curve = "pMMR PFS pembrolizumab + chemotherapy",
+  n = nrow(pmmr_pfs_pembro_ipd),
+  events = sum(pmmr_pfs_pembro_ipd$status),
+  censored = sum(pmmr_pfs_pembro_ipd$status == 0),
+  max_follow_up_months = max(pmmr_pfs_pembro_ipd$time_months)
+) |>
+  kable()
+```
+
+## 5. Create a Survival Object
+
+`Surv(time, status)` is the standard R representation of right-censored survival data.
+
+```{r create-surv-object}
+pmmr_pfs_pembro_surv <- Surv(pmmr_pfs_pembro_ipd$time_months, pmmr_pfs_pembro_ipd$status)
+
+tibble(
+  raw_time = pmmr_pfs_pembro_ipd$time_months[1:5],
+  raw_status = pmmr_pfs_pembro_ipd$status[1:5],
+  surv_object = as.character(pmmr_pfs_pembro_surv[1:5])
+) |>
+  kable()
+```
+
+## 6. Plot the Reconstructed KM Curve
+
+This is the Kaplan-Meier curve reconstructed from pseudo-IPD.
+
+```{r plot-pmmr-pfs-pembro-km}
+pmmr_pfs_pembro_km <- survfit(Surv(time_months, status) ~ 1, data = pmmr_pfs_pembro_ipd)
+
+pmmr_pfs_pembro_km_df <- tibble(
+  time_months = c(0, pmmr_pfs_pembro_km$time),
+  survival = c(1, pmmr_pfs_pembro_km$surv)
+)
+
+ggplot(pmmr_pfs_pembro_km_df, aes(time_months, survival)) +
+  geom_step(linewidth = 0.8, colour = "#008B8B") +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(
+    title = "Reconstructed KM: pMMR PFS, pembro arm",
+    x = "Months",
+    y = "Survival probability"
+  ) +
+  theme_minimal()
+```
+
+## 7. Candidate Parametric Distributions
+
+These are common survival distributions used in oncology HTA submissions and EAG critiques.
+
+```{r candidate-distributions}
+candidate_dists <- c(
+  "exponential" = "exp",
+  "weibull" = "weibull",
+  "gompertz" = "gompertz",
+  "lognormal" = "lnorm",
+  "loglogistic" = "llogis",
+  "gamma" = "gamma",
+  "generalized_gamma" = "gengamma"
+)
+
+tibble(
+  display_name = names(candidate_dists),
+  flexsurv_name = unname(candidate_dists)
+) |>
+  kable()
+```
+
+## 8. Fit One Distribution
+
+This block fits a Weibull model to the pMMR PFS pembro curve.
+
+```{r fit-one-weibull}
+pmmr_pfs_pembro_weibull <- flexsurvreg(
+  Surv(time_months, status) ~ 1,
+  data = pmmr_pfs_pembro_ipd,
+  dist = "weibull"
+)
+
+as.data.frame(pmmr_pfs_pembro_weibull$res) |>
+  tibble::rownames_to_column("parameter") |>
+  as_tibble() |>
+  select(parameter, estimate = est, lower_95 = `L95%`, upper_95 = `U95%`, se) |>
+  kable(digits = 4)
+```
+
+## 9. Define a Safe Fitting Function
+
+Some distributions can fail for sparse or immature OS data. This function catches failures and returns a row explaining what happened.
+
+```{r define-fitting-function}
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
+fit_one_distribution <- function(dat, dist_label, dist_name) {
+  tryCatch(
+    {
+      fit <- flexsurvreg(Surv(time_months, status) ~ 1, data = dat, dist = dist_name)
+      n_par <- nrow(fit$res)
+      fit_aic <- as.numeric(fit$AIC %||% NA_real_)
+      fit_loglik <- as.numeric(fit$loglik %||% NA_real_)
+
+      tibble(
+        dist_label = dist_label,
+        dist_name = dist_name,
+        fit = list(fit),
+        converged = TRUE,
+        error = NA_character_,
+        aic = fit_aic,
+        bic = -2 * fit_loglik + log(nrow(dat)) * n_par,
+        loglik = fit_loglik,
+        n = nrow(dat),
+        events = sum(dat$status)
+      )
+    },
+    error = function(e) {
+      tibble(
+        dist_label = dist_label,
+        dist_name = dist_name,
+        fit = list(NULL),
+        converged = FALSE,
+        error = conditionMessage(e),
+        aic = NA_real_,
+        bic = NA_real_,
+        loglik = NA_real_,
+        n = nrow(dat),
+        events = sum(dat$status)
+      )
+    }
+  )
+}
+
+tibble(function_created = "fit_one_distribution()", purpose = "Fit one distribution and return diagnostics") |>
+  kable()
+```
+
+### What this function is doing
+
+This function is a small wrapper around `flexsurvreg()`. The reason to write a wrapper is that we want to fit many distributions across many curves. Some fits may fail, especially for immature OS curves with few events. If one fit fails, we do not want the whole document to stop.
+
+The function has three inputs:
+
+```r
+fit_one_distribution(dat, dist_label, dist_name)
+```
+
+- `dat`: the pseudo-IPD for one curve, for example `pmmr_pfs_pembro_ipd`.
+- `dist_label`: the readable name used in output tables, for example `"weibull"`.
+- `dist_name`: the name required by `flexsurvreg()`, for example `"weibull"` or `"llogis"`.
+
+The helper:
+
+```r
+`%||%` <- function(x, y) if (is.null(x)) y else x
+```
+
+means: if `x` is missing or `NULL`, use `y` instead. Here it prevents the code from breaking if a fitted object does not contain `AIC` or `loglik`.
+
+The core model fit is:
+
+```r
+fit <- flexsurvreg(Surv(time_months, status) ~ 1, data = dat, dist = dist_name)
+```
+
+This means:
+
+- use `time_months` and `status` from `dat`;
+- fit one survival curve, because the right-hand side is `~ 1`;
+- use the parametric distribution named in `dist_name`.
+
+The object `fit` is a fitted survival model. It contains parameter estimates, log-likelihood, AIC, and other information. We store it inside a tibble using:
+
+```r
+fit = list(fit)
+```
+
+This creates a **list-column**. Without `list()`, a complex model object cannot fit cleanly inside one table cell.
+
+The successful-output part returns one row:
+
+```r
+tibble(
+  dist_label = dist_label,
+  dist_name = dist_name,
+  fit = list(fit),
+  converged = TRUE,
+  error = NA_character_,
+  aic = fit_aic,
+  bic = -2 * fit_loglik + log(nrow(dat)) * n_par,
+  loglik = fit_loglik,
+  n = nrow(dat),
+  events = sum(dat$status)
+)
+```
+
+Key fields:
+
+- `converged = TRUE`: the model fitted successfully.
+- `error = NA_character_`: there was no error message.
+- `aic`: model fit criterion reported by `flexsurv`.
+- `bic`: calculated manually using `-2 * logLik + log(n) * number_of_parameters`.
+- `n`: number of pseudo-patients in this curve.
+- `events`: number of observed events.
+
+The `tryCatch()` part is the safety mechanism:
+
+```r
+tryCatch(
+  { successful fitting code },
+  error = function(e) { failure output }
+)
+```
+
+If `flexsurvreg()` fails, the function still returns a row. That row has:
+
+- `fit = list(NULL)`
+- `converged = FALSE`
+- `error = conditionMessage(e)`
+- `aic`, `bic`, `loglik` as `NA`
+
+This is useful for modelling workflow QA. Instead of silently losing failed fits, the output table records exactly which distribution failed and why.
+
+In HEOR work, this matters because sparse OS data can make complex models unstable. A reviewer or EAG would want to know not only which model had the best AIC, but also whether some candidate models failed, behaved oddly, or were unsuitable for extrapolation.
+
+## 10. Compare Candidate Fits for One Curve
+
+For the pMMR PFS pembro curve, fit all candidate distributions and rank by AIC.
+
+```{r compare-pmmr-pfs-pembro-fits}
+pmmr_pfs_pembro_fit_comparison <- map2_dfr(
+  names(candidate_dists),
+  candidate_dists,
+  ~fit_one_distribution(pmmr_pfs_pembro_ipd, .x, .y)
+)
+
+pmmr_pfs_pembro_fit_comparison |>
+  select(dist_label, converged, n, events, loglik, aic, bic, error) |>
+  arrange(aic) |>
+  kable(digits = 3)
+```
+
+## 11. Fit Every Curve
+
+Now repeat the same process for all subgroup-endpoint-treatment curves.
+
+```{r fit-all-curves}
+curve_groups <- ipd |>
+  group_by(subgroup, endpoint, treatment, arm_role, treatment_label, curve_id) |>
+  group_split()
+
+fit_tbl <- map_dfr(curve_groups, function(dat) {
+  meta <- dat |>
+    slice(1) |>
+    select(subgroup, endpoint, treatment, arm_role, treatment_label, curve_id)
+
+  res <- map2_dfr(
+    names(candidate_dists),
+    candidate_dists,
+    ~fit_one_distribution(dat, .x, .y)
+  )
+
+  bind_cols(res, meta[rep(1, nrow(res)), ])
+})
+
+fit_tbl |>
+  count(subgroup, endpoint, treatment, converged, name = "number_of_candidate_distributions") |>
+  kable()
+```
+
+## 12. Create the Fit Summary Table
+
+AIC is useful for first-pass comparison, but not sufficient for final HTA model choice.
+
+```{r fit-summary}
+fit_summary <- fit_tbl |>
+  select(
+    subgroup, endpoint, treatment, arm_role, treatment_label, curve_id,
+    dist_label, dist_name, converged, error, n, events, loglik, aic, bic
+  ) |>
+  arrange(subgroup, endpoint, treatment, aic)
+
+top3_fit_summary <- fit_summary |>
+  filter(converged) |>
+  group_by(subgroup, endpoint, treatment) |>
+  arrange(aic, .by_group = TRUE) |>
+  slice_head(n = 3) |>
+  ungroup() |>
+  select(subgroup, endpoint, treatment, dist_label, n, events, aic, bic)
+
+top3_fit_summary |>
+  kable(digits = 2)
+```
+
+## 13. Extract Model Parameters
+
+The object `parameter_tbl` stores parameter estimates from **every converged model** across all subgroups, endpoints, treatment arms, and distributions.
+
+The table displayed below is only an example: it filters `parameter_tbl` to show **pMMR PFS, pembro arm** parameters.
+
+```{r extract-parameters}
+extract_parameters <- function(fit) {
+  if (is.null(fit)) {
+    return(tibble(parameter = character(), estimate = numeric(), se = numeric()))
+  }
+
+  as.data.frame(fit$res) |>
+    tibble::rownames_to_column("parameter") |>
+    as_tibble() |>
+    transmute(parameter, estimate = est, se = se)
+}
+
+parameter_tbl <- fit_tbl |>
+  filter(converged) |>
+  mutate(parameters = map(fit, extract_parameters)) |>
+  select(subgroup, endpoint, treatment, curve_id, dist_label, parameters) |>
+  unnest(parameters)
+
+parameter_tbl |>
+  filter(subgroup == "pMMR", endpoint == "PFS", treatment == "pembro_chemo") |>
+  arrange(dist_label, parameter) |>
+  transmute(
+    distribution = dist_label,
+    parameter,
+    estimate = round(estimate, 4),
+    std_error = round(se, 4)
+  ) |>
+  kable(caption = "Example display: parameter estimates for pMMR PFS, pembro arm")
+```
+
+## 14. Select the Best Fit by AIC
+
+This is a mechanical first-pass choice. Later we will critique the tails.
+
+```{r select-best-fit}
+best_fits <- fit_tbl |>
+  filter(converged, !is.na(aic)) |>
+  group_by(subgroup, endpoint, treatment) |>
+  slice_min(aic, n = 1, with_ties = FALSE) |>
+  ungroup()
+
+best_fits |>
+  select(subgroup, endpoint, treatment, best_dist = dist_label, n, events, aic, bic) |>
+  arrange(subgroup, endpoint, treatment) |>
+  kable(digits = 2)
+```
+
+## 15. Predict Survival Over a Long Horizon
+
+The extrapolation horizon is 360 months, or 30 years.
+
+The object `extrapolated` still stores every best-fit curve over the full monthly time grid. To keep the document readable, the displayed output below is only a small sanity check for **pMMR PFS, pembro arm**.
+
+```{r extrapolate-best-fit}
+time_grid <- tibble(time_months = seq(0, 360, by = 1))
+
+predict_survival <- function(fit, times) {
+  s <- summary(fit, t = times, type = "survival")
+
+  if (is.data.frame(s)) {
+    return(as.numeric(s$est))
+  }
+
+  if (is.list(s) && length(s) == 1 && is.data.frame(s[[1]])) {
+    return(as.numeric(s[[1]]$est))
+  }
+
+  map_dbl(s, ~.x$est)
+}
+
+extrapolated <- best_fits |>
+  mutate(
+    pred = map(
+      fit,
+      ~tibble(
+        time_months = time_grid$time_months,
+        survival = predict_survival(.x, time_grid$time_months)
+      )
+    )
+  ) |>
+  select(
+    subgroup, endpoint, treatment, arm_role, treatment_label, curve_id,
+    best_dist = dist_label, aic, bic, pred
+  ) |>
+  unnest(cols = c(pred))
+
+extrapolated |>
+  filter(
+    subgroup == "pMMR",
+    endpoint == "PFS",
+    treatment == "pembro_chemo",
+    time_months %in% c(12, 24, 60, 120)
+  ) |>
+  arrange(subgroup, endpoint, treatment, time_months) |>
+  select(subgroup, endpoint, treatment, best_dist, time_months, survival) |>
+  kable(digits = 4, caption = "Sanity-check display: pMMR PFS pembro extrapolated survival")
+```
+
+## 16. Visualise Selected Long-Run Extrapolations
+
+Tables are not the best way to inspect extrapolated survival. For HTA work, the curve shape is more informative. Here we show two examples:
+
+- pMMR PFS, because it is technically important for the partitioned survival model.
+- dMMR OS, because it is immature and therefore useful for thinking about EAG-style tail critique.
+
+```{r plot-selected-long-run-extrapolations}
+selected_long_run <- extrapolated |>
+  filter(
+    (subgroup == "pMMR" & endpoint == "PFS") |
+      (subgroup == "dMMR" & endpoint == "OS"),
+    time_months <= 120
+  ) |>
+  mutate(
+    curve = paste(subgroup, endpoint),
+    treatment_short = if_else(treatment == "pembro_chemo", "Pembro", "Placebo"),
+    line_label = paste0(treatment_short, " (", best_dist, ")")
+  )
+
+ggplot(selected_long_run, aes(time_months, survival, colour = line_label)) +
+  geom_line(linewidth = 0.9) +
+  facet_wrap(~curve) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 120), breaks = seq(0, 120, 24)) +
+  labs(
+    title = "Selected AIC-best long-run extrapolations",
+    subtitle = "Legend shows treatment arm and AIC-selected distribution",
+    x = "Months",
+    y = "Survival probability",
+    colour = "Arm (distribution)"
+  ) +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 9),
+    legend.key.width = unit(1.2, "lines")
+  )
+```
+
+## 17. Compare Reconstructed KM With the Best Fit
+
+This plot is where HTA judgement begins. In this specific pMMR PFS example, the AIC-selected curves do not show an obvious visual problem. The point of the plot is more modest: it lets us check whether the fitted curve tracks the reconstructed KM reasonably before we start interpreting the long-term extrapolation.
+
+The broader EAG-style warning is that a curve can have the best AIC and still become implausible later. Examples would include:
+
+- a PFS curve that remains high for decades despite advanced cancer;
+- an OS curve that falls below PFS, which is structurally impossible in a partitioned survival model;
+- a treatment curve with an indefinitely widening benefit when clinical experts expect treatment effect waning;
+- a curve tail that implies long-term survival far above age- and disease-plausible expectations.
+
+Those problems are not necessarily visible in this pMMR PFS plot; they are the kinds of issues we will check in later model critique.
+
+```{r plot-pmmr-pfs-best-fit}
+km_points <- ipd |>
+  group_by(subgroup, endpoint, treatment, arm_role, treatment_label, curve_id) |>
+  group_modify(~{
+    km <- survfit(Surv(time_months, status) ~ 1, data = .x)
+    tibble(time_months = c(0, km$time), survival = c(1, km$surv))
+  }) |>
+  ungroup()
+
+plot_data <- extrapolated |>
+  filter(subgroup == "pMMR", endpoint == "PFS", time_months <= 120) |>
+  mutate(
+    source = "Parametric best fit",
+    treatment_short = if_else(treatment == "pembro_chemo", "Pembro", "Placebo"),
+    curve_label = paste0(treatment_short, " (", best_dist, ")")
+  ) |>
+  select(subgroup, endpoint, treatment, treatment_short, curve_label, time_months, survival, source) |>
+  bind_rows(
+    km_points |>
+      filter(subgroup == "pMMR", endpoint == "PFS") |>
+      mutate(
+        source = "Reconstructed KM",
+        treatment_short = if_else(treatment == "pembro_chemo", "Pembro", "Placebo"),
+        curve_label = treatment_short
+      ) |>
+      select(subgroup, endpoint, treatment, treatment_short, curve_label, time_months, survival, source)
+  )
+
+ggplot(plot_data, aes(time_months, survival, colour = curve_label)) +
+  geom_step(
+    data = filter(plot_data, source == "Reconstructed KM"),
+    linewidth = 0.85,
+    alpha = 0.55
+  ) +
+  geom_line(
+    data = filter(plot_data, source == "Parametric best fit"),
+    linewidth = 1.15
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 120), breaks = seq(0, 120, 12)) +
+  labs(
+    title = "pMMR PFS: reconstructed KM vs AIC-selected extrapolation",
+    subtitle = "Step curves are reconstructed KM; solid smooth curves are parametric best fits",
+    x = "Months",
+    y = "Survival probability",
+    colour = "Curve"
+  ) +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 9),
+    legend.key.width = unit(1.2, "lines")
+  )
+```
+
+## 18. Save Outputs
+
+This final block writes the same output files as the batch script.
+
+```{r save-outputs}
+write_csv(fit_summary, file.path(output_dir, "parametric_fit_summary.csv"))
+write_csv(parameter_tbl, file.path(output_dir, "parametric_fit_parameters.csv"))
+write_csv(extrapolated, file.path(output_dir, "best_fit_extrapolated_survival.csv"))
+write_csv(top3_fit_summary, file.path(output_dir, "top3_fit_summary_by_curve.csv"))
+
+tibble(
+  output_file = c(
+    "parametric_fit_summary.csv",
+    "parametric_fit_parameters.csv",
+    "best_fit_extrapolated_survival.csv",
+    "top3_fit_summary_by_curve.csv"
+  ),
+  exists = file.exists(file.path(output_dir, output_file))
+) |>
+  kable()
+```
+
+## What to Critique Next
+
+The next analytical step is not more code. It is interpretation:
+
+- Which best-fit curves produce clinically plausible tails?
+- Are OS curves mature enough for long-term extrapolation?
+- Does PFS ever exceed OS?
+- Do fitted curves align with company, EAG, and committee preferred assumptions?
+- Where would an EAG challenge a purely AIC-driven model choice?

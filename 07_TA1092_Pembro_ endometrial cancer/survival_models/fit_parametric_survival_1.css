@@ -1,0 +1,22 @@
+details.code-fold > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0.35rem 0;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #7aa7c7;
+  border-radius: 6px;
+  background: #eef7fc;
+  color: #17496b;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+details.code-fold > summary:hover {
+  background: #dff0fa;
+  border-color: #4d8dbb;
+}
+
+details.code-fold[open] > summary {
+  background: #d7ebf8;
+}

@@ -1,0 +1,9 @@
+{
+  "placebo_segments_revised": 62,
+  "placebo_vertices_revised": 185,
+  "outputs": [
+    "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_PFS/dMMR_PFS_placebo_step_segments_revised.csv",
+    "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_PFS/dMMR_PFS_placebo_step_vertices_revised.csv",
+    "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_PFS/AdMMR_step_coordinate_validation_revised.png"
+  ]
+}

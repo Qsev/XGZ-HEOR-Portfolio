@@ -1,0 +1,35 @@
+{
+  "axis_calibration": {
+    "x_ticks_pixels": [
+      226.0,
+      456.0,
+      687.0,
+      914.0,
+      1144.0,
+      1373.0,
+      1602.0
+    ],
+    "x_ticks_months": [
+      0.0,
+      6.0,
+      12.0,
+      18.0,
+      24.0,
+      30.0,
+      36.0
+    ],
+    "x_months_per_pixel": 0.026172230474992626,
+    "x_intercept_months": -5.936374214414697,
+    "y_surv1_pixel": 31.0,
+    "y_surv0_pixel": 889.0
+  },
+  "raw_points": {
+    "pembro_chemo": 1261,
+    "placebo_chemo": 1248
+  },
+  "outputs": [
+    "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_PFS/dMMR_PFS_pembro_raw_curve_points.csv",
+    "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_PFS/dMMR_PFS_placebo_raw_curve_points.csv",
+    "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_PFS/AdMMR_curve_points_validation.png"
+  ]
+}

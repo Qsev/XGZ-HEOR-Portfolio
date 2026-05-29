@@ -1,0 +1,9 @@
+{
+  "changes": [
+    "pembro early 5.65-7.59 month platform lowered to match user black annotation; placebo unchanged"
+  ],
+  "outputs": [
+    "pMMR_OS_pembro_step_segments_revised.csv",
+    "pMMR_OS_step_coordinate_validation_revised.png"
+  ]
+}

@@ -1,0 +1,9 @@
+arm,start_time_months,end_time_months,survival
+pembro_chemo_os_dmmr,0.0000,0.5150,1.00000
+pembro_chemo_os_dmmr,0.5150,3.6351,0.98914
+pembro_chemo_os_dmmr,3.6351,4.1337,0.98051
+pembro_chemo_os_dmmr,4.1337,9.9286,0.97001
+pembro_chemo_os_dmmr,9.9286,10.6477,0.95559
+pembro_chemo_os_dmmr,10.6477,12.0951,0.93859
+pembro_chemo_os_dmmr,12.0951,15.5956,0.92247
+pembro_chemo_os_dmmr,15.5956,37.8016,0.89560

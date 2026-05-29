@@ -1,0 +1,52 @@
+{
+  "source": "NEJM KEYNOTE-868/NRG-GY018 Figure 2B pMMR cohort PFS",
+  "time_months": [
+    0,
+    6,
+    12,
+    18,
+    24,
+    30,
+    36
+  ],
+  "arms": {
+    "pembro_chemo": {
+      "label": "Paclitaxel-carboplatin+pembrolizumab",
+      "nar": [
+        290,
+        150,
+        45,
+        20,
+        7,
+        3,
+        0
+      ],
+      "events_reported": 89,
+      "median_pfs_months": "13.1",
+      "median_pfs_ci": "10.5-18.8"
+    },
+    "placebo_chemo": {
+      "label": "Paclitaxel-carboplatin+placebo",
+      "nar": [
+        292,
+        129,
+        33,
+        10,
+        2,
+        1,
+        0
+      ],
+      "events_reported": 133,
+      "median_pfs_months": "8.7",
+      "median_pfs_ci": "8.4-10.7"
+    }
+  },
+  "hazard_ratio": {
+    "value": 0.54,
+    "ci": [
+      0.41,
+      0.71
+    ],
+    "endpoint": "disease progression or death"
+  }
+}

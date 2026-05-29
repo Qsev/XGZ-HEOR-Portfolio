@@ -1,0 +1,15 @@
+{
+  "notes": [
+    "y-axis shown as 0-100 proportion alive; converted to 0-1 survival internally",
+    "time=0 survival=1 inserted for both arms"
+  ],
+  "segments": {
+    "pembro": 8,
+    "placebo": 17
+  },
+  "outputs": [
+    "dMMR_OS_pembro_step_segments.csv",
+    "dMMR_OS_placebo_step_segments.csv",
+    "dMMR_OS_step_coordinate_validation.png"
+  ]
+}

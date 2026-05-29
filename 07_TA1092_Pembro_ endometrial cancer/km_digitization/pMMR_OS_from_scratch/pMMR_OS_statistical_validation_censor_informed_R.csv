@@ -1,0 +1,11 @@
+"metric","reconstructed","comparator"
+"n_pembro",293,293
+"events_pembro_derived",53,53
+"median_pembro",27.9414,NA
+"n_placebo",295,295
+"events_placebo_derived",61,61
+"median_placebo",27.4853,NA
+"cox_hr_pembro_vs_placebo",0.871282174329822,0.8
+"cox_hr_lower95",0.6015130223373,0.59
+"cox_hr_upper95",1.26203855796029,1.08
+"cox_p",0.466076235241833,NA

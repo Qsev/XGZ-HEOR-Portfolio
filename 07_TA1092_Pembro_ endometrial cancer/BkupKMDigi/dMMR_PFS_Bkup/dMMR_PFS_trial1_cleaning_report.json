@@ -1,0 +1,34 @@
+{
+  "pembro_chemo": {
+    "best_censor_fraction_before_first_event": 0.05,
+    "rmse_vs_digitised_step": 0.05144007988231935,
+    "n": 112,
+    "events": 26,
+    "target_events": 26,
+    "nar": [
+      112,
+      80,
+      44,
+      22,
+      9,
+      8,
+      2
+    ]
+  },
+  "placebo_chemo": {
+    "best_censor_fraction_before_first_event": 0.05,
+    "rmse_vs_digitised_step": 0.04243597890055366,
+    "n": 113,
+    "events": 59,
+    "target_events": 59,
+    "nar": [
+      113,
+      62,
+      24,
+      8,
+      4,
+      2,
+      0
+    ]
+  }
+}

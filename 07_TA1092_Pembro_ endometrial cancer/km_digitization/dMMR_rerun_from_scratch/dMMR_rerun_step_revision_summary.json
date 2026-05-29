@@ -1,0 +1,11 @@
+{
+  "changes": [
+    "extended pembro terminal plateau to visible endpoint around 37.85 months",
+    "raised/flattened placebo terminal plateau after 24.5 months to survival 0.23001 and extended endpoint to 35.2 months"
+  ],
+  "outputs": [
+    "dMMR_rerun_pembro_step_segments_revised.csv",
+    "dMMR_rerun_placebo_step_segments_revised.csv",
+    "dMMR_rerun_step_coordinate_validation_revised.png"
+  ]
+}

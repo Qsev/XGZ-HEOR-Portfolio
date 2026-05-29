@@ -1,0 +1,438 @@
+---
+title: "TA1092 EAG Appraisal Case: Pembrolizumab + Chemotherapy in Endometrial Cancer"
+subtitle: "Survival Extrapolation, Subgroup Uncertainty, and the EAG Review Lens"
+author: "Xiaoge Zhang, PhD"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true
+    code-annotations: below
+execute:
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+set.seed(2026)
+```
+
+::: {.callout-important icon=false}
+## Case Study Status
+
+This is a working Quarto template for a NICE TA1092 case study. The R code uses synthetic placeholder parameters until the public NICE committee papers and appraisal tables are manually abstracted. The final version should replace the placeholder inputs with values traceable to the NICE guidance, company submission, and EAG report.
+:::
+
+## Project Scope Statement
+
+**In scope:**
+
+- Reconstruct a simplified three-state Partitioned Survival Model (PSM): progression-free, progressed disease, death.
+- Implement a technical R replication of survival extrapolation and state occupancy.
+- Compare a company-style base case with EAG-style alternative assumptions.
+- Add an explicit **EAG critique lens**: what the EAG challenged, why it mattered, and how it affected the committee's preferred assumptions.
+- Translate appraisal disagreements into practical HEOR modelling lessons.
+
+**Out of scope:**
+
+- Full confidential ICER replication.
+- Patient-level reconstruction from Kaplan-Meier curves unless digitised data are later added.
+- Full probabilistic sensitivity analysis (PSA).
+- Commercial arrangement or confidential discount reconstruction.
+- Recreating the exact manufacturer model workbook.
+
+**Time budget:** ~12-15 hours total
+
+| Task | Allocated time |
+|---|---:|
+| NICE document abstraction | 2.0 h |
+| Decision problem and evidence summary | 1.5 h |
+| EAG critique extraction | 3.0 h |
+| R technical replication | 5.0 h |
+| Interpretation and portfolio write-up | 3.0 h |
+
+**Deliberate trade-off:** The goal is not to reproduce NICE's confidential base-case ICER. The goal is to demonstrate how an EAG interrogates survival modelling, subgroup evidence, and economic assumptions under uncertainty.
+
+## Background
+
+### Clinical Context
+
+**Disease area:** untreated primary advanced or recurrent endometrial cancer.
+
+**Intervention:** pembrolizumab with carboplatin and paclitaxel, followed by pembrolizumab maintenance.
+
+**Comparator:** carboplatin with paclitaxel.
+
+**Key clinical trial:** KEYNOTE-868 / NRG-GY018.
+
+**Main modelling issue:** the intervention combines immunotherapy with platinum-taxane chemotherapy. The health economic question is whether the additional cost of pembrolizumab is justified by improved progression-free survival (PFS), overall survival (OS), and quality-adjusted life years (QALYs), especially when long-term OS data are immature.
+
+### Decision Problem
+
+| Element | Working abstraction |
+|---|---|
+| Population | Adults with untreated primary advanced or recurrent endometrial cancer |
+| Subgroups | dMMR/MSI-H and pMMR/MSS populations |
+| Intervention | Pembrolizumab + carboplatin + paclitaxel, then pembrolizumab maintenance |
+| Comparator | Carboplatin + paclitaxel |
+| Outcomes | PFS, OS, adverse events, health-related quality of life, costs, QALYs |
+| Model type | Three-state PSM |
+| NICE decision tension | Whether extrapolated survival benefit is clinically plausible and cost-effective across molecular subgroups |
+
+### Documents to Abstract
+
+| Source | Status | Notes to extract |
+|---|---|---|
+| NICE guidance | TODO | Final recommendation, stopping rule, subgroup restrictions |
+| Committee discussion | TODO | Committee reasoning and preferred assumptions |
+| Committee papers | TODO | Company base case, EAG critique, scenario analyses |
+| Company submission | TODO | Survival models, utilities, costs, treatment duration |
+| EAG report | TODO | Concerns, alternative assumptions, exploratory ICERs |
+
+## My Independent Assessment
+
+> Written before reading the full EAG report in detail.
+
+### What I Would Check First
+
+From a reviewer perspective, this appraisal raises four immediate questions:
+
+1. **Survival maturity:** Is OS mature enough to support a lifetime extrapolation?
+2. **Subgroup credibility:** Are dMMR/MSI-H and pMMR/MSS results stable enough for separate modelling?
+3. **Curve behaviour:** Do the selected PFS and OS curves produce clinically plausible long-term survival?
+4. **Treatment effect duration:** Does the pembrolizumab benefit persist indefinitely, wane over time, or stop after treatment discontinuation?
+
+### Initial Model Risk Map
+
+| Model domain | Why it matters | Initial risk level | What I need to verify |
+|---|---|---:|---|
+| OS extrapolation | Usually a major ICER driver in oncology PSMs | High | Chosen distribution, clinical validation, tail behaviour |
+| PFS extrapolation | Determines time on progression-free utility and treatment costs | High | Curve crossing and subgroup fit |
+| Treatment duration | Pembrolizumab has a capped treatment duration | Medium | Whether cost stopping and effect stopping are handled separately |
+| Treatment effect waning | EAGs often challenge indefinite immunotherapy benefit | High | Waning start/end and effect on ICER |
+| Utilities | Utility source may not match modelled population | Medium | Trial EQ-5D vs external utility values |
+| Subsequent treatments | Can change OS and post-progression costs | Medium | Mix, duration, and consistency with NHS practice |
+
+### Early View
+
+My prior expectation is that the EAG critique will focus less on the PSM structure itself and more on the **credibility of extrapolated survival benefit**. In a NICE appraisal, the PSM is usually acceptable as a structure; the disputed part is whether the survival curves and treatment-effect assumptions produce a clinically plausible long-term trajectory.
+
+## EAG Critique Lens
+
+### How the EAG Reviews This Type of Case
+
+The EAG is not only checking whether the model runs. It is asking whether the company's assumptions are:
+
+- internally consistent with trial evidence;
+- externally plausible against clinical knowledge;
+- aligned with NHS treatment pathways;
+- transparent enough for committee decision-making;
+- conservative enough when evidence is immature.
+
+This distinction is important for the portfolio: a health economist in consulting must be able to understand both the company logic and the EAG logic.
+
+### EAG Challenge Log
+
+| Issue | Company position | EAG concern | Why the EAG cares | Potential ICER direction |
+|---|---|---|---|---|
+| OS extrapolation | TODO | TODO | Long-term OS tail often drives QALY gain | TODO |
+| PFS extrapolation | TODO | TODO | Affects time in PF state and treatment exposure | TODO |
+| Curve crossing | TODO | TODO | OS should remain above PFS; implausible crossing signals model failure | TODO |
+| Subgroup modelling | TODO | TODO | dMMR and pMMR may have different baseline risks and treatment effects | TODO |
+| Treatment effect waning | TODO | TODO | Indefinite immunotherapy benefit may overstate long-term gain | TODO |
+| Utility values | TODO | TODO | Utility source can materially affect incremental QALYs | TODO |
+| Starting age | TODO | TODO | Affects background mortality and lifetime QALY potential | TODO |
+| Subsequent therapy | TODO | TODO | Can confound OS and influence post-progression costs | TODO |
+
+### Committee Preferred Assumptions
+
+| Assumption | Company base case | EAG preferred | Committee preferred | My comment |
+|---|---|---|---|---|
+| dMMR OS curve | TODO | TODO | TODO | TODO |
+| pMMR OS curve | TODO | TODO | TODO | TODO |
+| dMMR PFS curve | TODO | TODO | TODO | TODO |
+| pMMR PFS curve | TODO | TODO | TODO | TODO |
+| Waning assumption | TODO | TODO | TODO | TODO |
+| Utility source | TODO | TODO | TODO | TODO |
+| Starting age | TODO | TODO | TODO | TODO |
+
+## Technical Replication in R
+
+This section starts with synthetic parameters. Replace `model_inputs` once the NICE committee papers have been abstracted.
+
+### Placeholder Model Inputs
+
+```{r model-inputs}
+model_inputs <- list(
+  horizon_months = 360,
+  cycle_length_months = 1,
+  annual_discount = 0.035,
+  utility_pf = 0.76,
+  utility_pd = 0.62,
+  monthly_cost_pf_soc = 850,
+  monthly_cost_pf_pembro = 6200,
+  monthly_cost_pd = 1250,
+  one_off_ae_cost_soc = 450,
+  one_off_ae_cost_pembro = 900,
+  max_pembro_months = 24,
+  waning_start_month = 60,
+  waning_end_month = 84
+)
+
+survival_params <- tibble::tribble(
+  ~Arm, ~Endpoint, ~Shape, ~Scale,
+  "Comparator", "PFS", 1.18, 15.5,
+  "Comparator", "OS",  1.08, 43.0,
+  "Pembrolizumab", "PFS", 1.06, 26.0,
+  "Pembrolizumab", "OS",  1.02, 60.0
+)
+
+kable(survival_params, caption = "Synthetic survival inputs for template testing")
+```
+
+### Survival Functions
+
+```{r survival-functions}
+weibull_surv <- function(t, shape, scale) {
+  exp(-((t / scale) ^ shape))
+}
+
+get_surv <- function(arm, endpoint, t) {
+  pars <- survival_params |>
+    filter(Arm == arm, Endpoint == endpoint)
+
+  weibull_surv(t, shape = pars$Shape, scale = pars$Scale)
+}
+
+surv_df <- tibble(Month = 0:model_inputs$horizon_months) |>
+  mutate(
+    Comparator_PFS = get_surv("Comparator", "PFS", Month),
+    Comparator_OS = get_surv("Comparator", "OS", Month),
+    Pembro_PFS_base = get_surv("Pembrolizumab", "PFS", Month),
+    Pembro_OS_base = get_surv("Pembrolizumab", "OS", Month)
+  )
+
+surv_long <- surv_df |>
+  pivot_longer(-Month, names_to = "Curve", values_to = "Survival")
+
+ggplot(surv_long, aes(Month, Survival, colour = Curve)) +
+  geom_line(linewidth = 0.9) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(
+    title = "Base-case survival extrapolation",
+    subtitle = "Synthetic curves pending NICE parameter abstraction",
+    x = "Month",
+    y = "Survival probability",
+    colour = NULL
+  ) +
+  theme_minimal()
+```
+
+### Curve Crossing Diagnostic
+
+```{r curve-crossing}
+crossing_check <- surv_df |>
+  transmute(
+    Month,
+    Comparator_OS_below_PFS = Comparator_OS < Comparator_PFS,
+    Pembro_OS_below_PFS = Pembro_OS_base < Pembro_PFS_base
+  ) |>
+  summarise(
+    Comparator_first_crossing = ifelse(any(Comparator_OS_below_PFS), min(Month[Comparator_OS_below_PFS]), NA),
+    Pembro_first_crossing = ifelse(any(Pembro_OS_below_PFS), min(Month[Pembro_OS_below_PFS]), NA)
+  )
+
+kable(crossing_check, caption = "OS/PFS curve crossing diagnostic")
+```
+
+### EAG-Style Treatment Effect Waning Scenario
+
+```{r treatment-effect-waning}
+apply_waning <- function(trt_surv, comp_surv, month, start, end) {
+  if (month <= start) return(trt_surv)
+
+  progress <- min(1, (month - start) / (end - start))
+  weight <- 1 - progress
+
+  (trt_surv ^ weight) * (comp_surv ^ (1 - weight))
+}
+
+surv_df <- surv_df |>
+  rowwise() |>
+  mutate(
+    Pembro_PFS_waning = apply_waning(
+      Pembro_PFS_base, Comparator_PFS, Month,
+      model_inputs$waning_start_month, model_inputs$waning_end_month
+    ),
+    Pembro_OS_waning = apply_waning(
+      Pembro_OS_base, Comparator_OS, Month,
+      model_inputs$waning_start_month, model_inputs$waning_end_month
+    )
+  ) |>
+  ungroup()
+
+waning_long <- surv_df |>
+  select(Month, Pembro_OS_base, Pembro_OS_waning, Comparator_OS) |>
+  pivot_longer(-Month, names_to = "Curve", values_to = "Survival")
+
+ggplot(waning_long, aes(Month, Survival, colour = Curve)) +
+  geom_line(linewidth = 0.9) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(
+    title = "OS extrapolation under treatment-effect waning",
+    subtitle = "Illustrative EAG-style scenario analysis",
+    x = "Month",
+    y = "Survival probability",
+    colour = NULL
+  ) +
+  theme_minimal()
+```
+
+### Partitioned Survival Model Engine
+
+```{r psm-engine}
+make_trace <- function(df, pfs_col, os_col, label) {
+  df |>
+    transmute(
+      Arm = label,
+      Month,
+      PF = pmax(.data[[pfs_col]], 0),
+      PD = pmax(.data[[os_col]] - .data[[pfs_col]], 0),
+      Dead = pmax(1 - .data[[os_col]], 0)
+    ) |>
+    mutate(
+      Total = PF + PD + Dead,
+      PF = PF / Total,
+      PD = PD / Total,
+      Dead = Dead / Total
+    ) |>
+    select(-Total)
+}
+
+trace_soc <- make_trace(surv_df, "Comparator_PFS", "Comparator_OS", "Comparator")
+trace_pembro_base <- make_trace(surv_df, "Pembro_PFS_base", "Pembro_OS_base", "Pembrolizumab base case")
+trace_pembro_waning <- make_trace(surv_df, "Pembro_PFS_waning", "Pembro_OS_waning", "Pembrolizumab waning scenario")
+
+trace_all <- bind_rows(trace_soc, trace_pembro_base, trace_pembro_waning)
+
+trace_all |>
+  filter(Month <= 120) |>
+  pivot_longer(c(PF, PD, Dead), names_to = "State", values_to = "Occupancy") |>
+  ggplot(aes(Month, Occupancy, fill = State)) +
+  geom_area(alpha = 0.85) +
+  facet_wrap(~Arm, ncol = 1) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(
+    title = "Partitioned survival state occupancy",
+    subtitle = "First 10 years shown",
+    x = "Month",
+    y = "Cohort proportion",
+    fill = NULL
+  ) +
+  theme_minimal()
+```
+
+### Cost-Utility Calculation
+
+```{r cost-utility}
+discount_factor <- function(month, annual_rate) {
+  (1 + annual_rate) ^ (-month / 12)
+}
+
+evaluate_trace <- function(trace, scenario_name) {
+  trace |>
+    mutate(
+      discount = discount_factor(Month, model_inputs$annual_discount),
+      on_pembro_treatment = Arm != "Comparator" & Month <= model_inputs$max_pembro_months,
+      qaly = (PF * model_inputs$utility_pf + PD * model_inputs$utility_pd) * discount / 12,
+      cost = case_when(
+        Arm == "Comparator" ~
+          PF * model_inputs$monthly_cost_pf_soc + PD * model_inputs$monthly_cost_pd,
+        on_pembro_treatment ~
+          PF * model_inputs$monthly_cost_pf_pembro + PD * model_inputs$monthly_cost_pd,
+        TRUE ~
+          PF * model_inputs$monthly_cost_pf_soc + PD * model_inputs$monthly_cost_pd
+      ) * discount
+    ) |>
+    summarise(
+      Scenario = scenario_name,
+      Total_QALY = sum(qaly),
+      Total_Cost = sum(cost),
+      .groups = "drop"
+    )
+}
+
+econ_results <- bind_rows(
+  evaluate_trace(trace_soc, "Comparator"),
+  evaluate_trace(trace_pembro_base, "Pembrolizumab base case"),
+  evaluate_trace(trace_pembro_waning, "Pembrolizumab waning scenario")
+)
+
+incremental_results <- econ_results |>
+  filter(Scenario != "Comparator") |>
+  mutate(
+    Comparator_QALY = econ_results$Total_QALY[econ_results$Scenario == "Comparator"],
+    Comparator_Cost = econ_results$Total_Cost[econ_results$Scenario == "Comparator"],
+    Incremental_QALY = Total_QALY - Comparator_QALY,
+    Incremental_Cost = Total_Cost - Comparator_Cost,
+    ICER = Incremental_Cost / Incremental_QALY
+  ) |>
+  select(Scenario, Total_QALY, Total_Cost, Incremental_QALY, Incremental_Cost, ICER)
+
+kable(
+  incremental_results,
+  digits = 2,
+  caption = "Illustrative cost-effectiveness results using synthetic inputs"
+)
+```
+
+## What I Could and Could Not Replicate
+
+### Replicable with Public Information
+
+- Overall PSM structure.
+- Survival curve logic and long-term extrapolation diagnostics.
+- Scenario analysis for treatment-effect waning.
+- Directional effect of EAG-preferred assumptions.
+- Transparent critique table linking assumption changes to ICER pressure.
+
+### Not Replicable without Confidential Inputs
+
+- Exact company base-case ICER.
+- Confidential drug acquisition costs and patient access scheme effects.
+- Full company model workbook logic.
+- Exact PSA distributional assumptions.
+- Patient-level trial data and all subgroup covariance structures.
+
+## My Appraisal Conclusion
+
+### Where I Agree with the EAG
+
+TODO: Summarise the EAG concerns that are methodologically strongest.
+
+### Where the Company Case Is Still Plausible
+
+TODO: Identify where the company assumptions are defensible, especially if supported by trial follow-up, biological rationale, or clinical expert validation.
+
+### What This Case Teaches for HEOR Consulting
+
+This case is useful for consulting practice because it shows that technical modelling is only one layer of a NICE submission. The more important skill is understanding how evidence uncertainty becomes an appraisal risk. A model can be internally coherent and still be challenged if its long-term assumptions are not clinically credible or decision-relevant.
+
+## Next Steps
+
+1. Abstract the NICE guidance and committee discussion into the tables above.
+2. Extract the EAG's preferred assumptions and scenario ICERs from committee papers.
+3. Replace synthetic survival inputs with published or digitised estimates.
+4. Decide whether to add a small pseudo-KM digitisation exercise.
+5. Finalise the EAG critique narrative after comparing company, EAG, and committee positions.
+
+---
+
+*Disclaimer: This is an independent educational case study based on publicly available NICE documents. It is not an official appraisal and does not reproduce confidential company material.*

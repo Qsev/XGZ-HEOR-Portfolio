@@ -1,0 +1,30 @@
+{
+  "adjustment": "Moved one pembro event from drop 32 at 13.5953 months to drop 13 in interval 2; placebo unchanged. This raises the 13-30 month pembro plateau while preserving NAR, total events and median NR.",
+  "rmse_vs_raw_digitised_step": 0.00909627743232499,
+  "pembro_events": 26,
+  "pembro_nar": [
+    112,
+    80,
+    44,
+    22,
+    9,
+    8,
+    2
+  ],
+  "events_by_interval": {
+    "1": 10,
+    "2": 11,
+    "3": 4,
+    "4": 0,
+    "5": 0,
+    "6": 1
+  },
+  "pembro_survival_at_14": 0.6605432870822745,
+  "pembro_survival_at_31": 0.5661799603562353,
+  "outputs": {
+    "pembro_tuned_ipd": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pembro_clean_tuned_pseudo_ipd.csv",
+    "pembro_tuned_cleaning": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pembro_clean_tuned_event_drop_cleaning.csv",
+    "combined_ipd": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_pseudo_ipd_combined_clean_pembro_tuned.csv",
+    "overlay": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR_rerun_from_scratch/dMMR_rerun_reconstructed_KM_validation_clean_pembro_tuned.png"
+  }
+}

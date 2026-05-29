@@ -1,0 +1,45 @@
+{
+  "source": "NEJM KEYNOTE-868/NRG-GY018 Supplementary Figure S1B pMMR interim OS; deaths assumed from HR CI because arm-level event counts are not printed on the figure",
+  "time_months": [
+    0,
+    10,
+    20,
+    30,
+    40
+  ],
+  "arms": {
+    "pembro_chemo_os": {
+      "label": "Pembro + PC",
+      "nar": [
+        293,
+        115,
+        25,
+        8,
+        0
+      ],
+      "events_reported": 72,
+      "event_count_status": "assumed_proxy"
+    },
+    "placebo_chemo_os": {
+      "label": "Placebo + PC",
+      "nar": [
+        295,
+        106,
+        19,
+        5,
+        0
+      ],
+      "events_reported": 96,
+      "event_count_status": "assumed_proxy"
+    }
+  },
+  "hazard_ratio": {
+    "value": 0.8,
+    "ci": [
+      0.59,
+      1.08
+    ],
+    "endpoint": "overall survival"
+  },
+  "event_count_assumption": "Total deaths approximated from log-HR CI: SE=(log(1.08)-log(0.59))/(2*1.96)=0.154; balanced-information approximation gives total events about 168."
+}

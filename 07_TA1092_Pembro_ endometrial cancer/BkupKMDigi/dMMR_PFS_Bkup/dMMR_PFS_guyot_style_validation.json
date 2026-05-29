@@ -1,0 +1,106 @@
+{
+  "pembro_chemo": {
+    "n": 112,
+    "events": 26,
+    "target_events": 26,
+    "event_difference": 0,
+    "nar_validation": [
+      {
+        "time_months": 0,
+        "published_nar": 112,
+        "reconstructed_nar": 112,
+        "difference": 0
+      },
+      {
+        "time_months": 6,
+        "published_nar": 80,
+        "reconstructed_nar": 80,
+        "difference": 0
+      },
+      {
+        "time_months": 12,
+        "published_nar": 44,
+        "reconstructed_nar": 44,
+        "difference": 0
+      },
+      {
+        "time_months": 18,
+        "published_nar": 22,
+        "reconstructed_nar": 22,
+        "difference": 0
+      },
+      {
+        "time_months": 24,
+        "published_nar": 9,
+        "reconstructed_nar": 9,
+        "difference": 0
+      },
+      {
+        "time_months": 30,
+        "published_nar": 8,
+        "reconstructed_nar": 8,
+        "difference": 0
+      },
+      {
+        "time_months": 36,
+        "published_nar": 2,
+        "reconstructed_nar": 2,
+        "difference": 0
+      }
+    ],
+    "median_months": null,
+    "estimated_events_before_event_count_adjustment": 26
+  },
+  "placebo_chemo": {
+    "n": 113,
+    "events": 59,
+    "target_events": 59,
+    "event_difference": 0,
+    "nar_validation": [
+      {
+        "time_months": 0,
+        "published_nar": 113,
+        "reconstructed_nar": 113,
+        "difference": 0
+      },
+      {
+        "time_months": 6,
+        "published_nar": 62,
+        "reconstructed_nar": 62,
+        "difference": 0
+      },
+      {
+        "time_months": 12,
+        "published_nar": 24,
+        "reconstructed_nar": 24,
+        "difference": 0
+      },
+      {
+        "time_months": 18,
+        "published_nar": 8,
+        "reconstructed_nar": 8,
+        "difference": 0
+      },
+      {
+        "time_months": 24,
+        "published_nar": 4,
+        "reconstructed_nar": 4,
+        "difference": 0
+      },
+      {
+        "time_months": 30,
+        "published_nar": 2,
+        "reconstructed_nar": 2,
+        "difference": 0
+      },
+      {
+        "time_months": 36,
+        "published_nar": 0,
+        "reconstructed_nar": 0,
+        "difference": 0
+      }
+    ],
+    "median_months": 8.5369,
+    "estimated_events_before_event_count_adjustment": 59
+  }
+}

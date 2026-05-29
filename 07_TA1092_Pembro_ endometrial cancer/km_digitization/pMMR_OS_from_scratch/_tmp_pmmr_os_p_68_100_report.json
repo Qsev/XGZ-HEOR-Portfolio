@@ -1,0 +1,58 @@
+{
+  "arm": "pembro_chemo_os",
+  "segments": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/pMMR_OS_pembro_step_segments_revised.csv",
+  "nar_json": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/_tmp_os_nar_68_100.json",
+  "min_drop": 0.002,
+  "iterations": 30000,
+  "max_events_per_drop": 10,
+  "seed": 2068,
+  "rmse_vs_raw_digitised_step": 0.010431171882206693,
+  "n": 293,
+  "events": 68,
+  "target_events": 68,
+  "nar_validation": [
+    {
+      "time_months": 0.0,
+      "published_nar": 293,
+      "reconstructed_nar": 293,
+      "difference": 0
+    },
+    {
+      "time_months": 10.0,
+      "published_nar": 115,
+      "reconstructed_nar": 115,
+      "difference": 0
+    },
+    {
+      "time_months": 20.0,
+      "published_nar": 25,
+      "reconstructed_nar": 25,
+      "difference": 0
+    },
+    {
+      "time_months": 30.0,
+      "published_nar": 8,
+      "reconstructed_nar": 8,
+      "difference": 0
+    },
+    {
+      "time_months": 40.0,
+      "published_nar": 0,
+      "reconstructed_nar": 0,
+      "difference": 0
+    }
+  ],
+  "events_by_interval": {
+    "1": 36,
+    "2": 26,
+    "3": 6,
+    "4": 0
+  },
+  "raw_drops": 29,
+  "cleaned_event_drops": 21,
+  "outputs": {
+    "pseudo_ipd": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/_tmp_pmmr_os_p_68_100_pseudo_ipd.csv",
+    "event_drop_cleaning": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/_tmp_pmmr_os_p_68_100_event_drop_cleaning.csv",
+    "report": "07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR_OS_from_scratch/_tmp_pmmr_os_p_68_100_report.json"
+  }
+}

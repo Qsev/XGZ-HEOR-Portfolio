@@ -1,0 +1,15 @@
+{
+  "notes": [
+    "x=0 calibrated from tick mark, not plot-frame left corner",
+    "manual initial KM point inserted at time=0 survival=1 for both arms"
+  ],
+  "segments": {
+    "pembro": 35,
+    "placebo": 38
+  },
+  "outputs": [
+    "pMMR_OS_pembro_step_segments.csv",
+    "pMMR_OS_placebo_step_segments.csv",
+    "pMMR_OS_step_coordinate_validation.png"
+  ]
+}

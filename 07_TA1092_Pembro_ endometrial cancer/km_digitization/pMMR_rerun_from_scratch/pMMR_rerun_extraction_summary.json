@@ -1,0 +1,52 @@
+{
+  "source_image": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/pMMR.png",
+  "axis_calibration": {
+    "x_ticks_pixels": [
+      102.0,
+      332.0,
+      562.0,
+      791.0,
+      1020.0,
+      1251.0,
+      1480.0
+    ],
+    "x_ticks_months": [
+      0.0,
+      6.0,
+      12.0,
+      18.0,
+      24.0,
+      30.0,
+      36.0
+    ],
+    "x_months_per_pixel": 0.026127504466326903,
+    "x_intercept_months": -2.670588533502622,
+    "y_surv1_pixel": 25.0,
+    "y_surv0_pixel": 889.0
+  },
+  "raw_points": {
+    "pembro_chemo": 763,
+    "placebo_chemo": 1088
+  },
+  "mask_counts": {
+    "pembro_orange": 4432,
+    "pembro_red": 868,
+    "green": 677,
+    "placebo_blue": 12869,
+    "placebo_purple": 1852
+  },
+  "outlier_filtering": {
+    "method": "rolling local median plus monotone envelope",
+    "pembro_removed": 6,
+    "placebo_removed": 11,
+    "pembro_remaining": 757,
+    "placebo_remaining": 1077,
+    "outputs": [
+      "pMMR_rerun_pembro_raw_curve_points_filtered.csv",
+      "pMMR_rerun_placebo_raw_curve_points_filtered.csv",
+      "pMMR_rerun_raw_point_outliers.csv",
+      "pMMR_rerun_curve_points_validation_filtered.png",
+      "pMMR_rerun_curve_points_outlier_diagnostic.png"
+    ]
+  }
+}

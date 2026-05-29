@@ -1,0 +1,6 @@
+"metric","value","target"
+"Cox HR pembro vs placebo",0.333160156249367,0.3
+"HR CI lower",0.208910897649544,0.19
+"HR CI upper",0.531306365349605,0.48
+"Median placebo",7.6849,7.6
+"Median pembro",NA,NA

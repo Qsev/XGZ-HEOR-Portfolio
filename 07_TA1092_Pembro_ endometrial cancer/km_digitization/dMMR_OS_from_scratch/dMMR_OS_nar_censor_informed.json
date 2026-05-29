@@ -1,0 +1,101 @@
+{
+  "source": "NEJM KEYNOTE-868/NRG-GY018 Figure S1A left plot, dMMR interim OS, risk table with displayed cumulative number censored",
+  "time_months": [
+    0,
+    6,
+    12,
+    18,
+    24,
+    30,
+    36,
+    42
+  ],
+  "arms": {
+    "pembro_chemo_os_dmmr": {
+      "label": "Active / Pembro + PC",
+      "nar": [
+        112,
+        83,
+        54,
+        26,
+        12,
+        11,
+        2,
+        0
+      ],
+      "cumulative_censored_displayed": [
+        1,
+        26,
+        53,
+        79,
+        93,
+        94,
+        103,
+        105
+      ],
+      "interval_censored": [
+        25,
+        27,
+        26,
+        14,
+        1,
+        9,
+        2
+      ],
+      "interval_events": [
+        4,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "events_reported_derived": 8
+    },
+    "placebo_chemo_os_dmmr": {
+      "label": "Placebo + PC",
+      "nar": [
+        113,
+        79,
+        48,
+        15,
+        8,
+        5,
+        0,
+        0
+      ],
+      "cumulative_censored_displayed": [
+        2,
+        28,
+        52,
+        82,
+        89,
+        92,
+        97,
+        97
+      ],
+      "interval_censored": [
+        26,
+        24,
+        30,
+        7,
+        3,
+        5,
+        0
+      ],
+      "interval_events": [
+        8,
+        7,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      "events_reported_derived": 18
+    }
+  },
+  "derivation": "Interval censors are adjacent differences in displayed cumulative censored values. Time-0 nonzero displayed values are treated as baseline offsets. Interval events are NAR_i - NAR_{i+1} - interval_censors_i.",
+  "caveat": "The displayed cumulative censored value at time 0 is not zero, so event counts are reconstructed from adjacent displayed differences rather than from absolute cumulative totals."
+}

@@ -1,0 +1,60 @@
+{
+  "rmse_vs_raw_digitised_step": 0.010004069899807308,
+  "n": 112,
+  "events": 26,
+  "target_events": 26,
+  "nar_validation": [
+    {
+      "time_months": 0,
+      "published_nar": 112,
+      "reconstructed_nar": 112,
+      "difference": 0
+    },
+    {
+      "time_months": 6,
+      "published_nar": 80,
+      "reconstructed_nar": 80,
+      "difference": 0
+    },
+    {
+      "time_months": 12,
+      "published_nar": 44,
+      "reconstructed_nar": 44,
+      "difference": 0
+    },
+    {
+      "time_months": 18,
+      "published_nar": 22,
+      "reconstructed_nar": 22,
+      "difference": 0
+    },
+    {
+      "time_months": 24,
+      "published_nar": 9,
+      "reconstructed_nar": 9,
+      "difference": 0
+    },
+    {
+      "time_months": 30,
+      "published_nar": 8,
+      "reconstructed_nar": 8,
+      "difference": 0
+    },
+    {
+      "time_months": 36,
+      "published_nar": 2,
+      "reconstructed_nar": 2,
+      "difference": 0
+    }
+  ],
+  "events_by_interval": {
+    "1": 9,
+    "2": 14,
+    "3": 2,
+    "4": 0,
+    "5": 0,
+    "6": 1
+  },
+  "raw_drops": 28,
+  "cleaned_event_drops": 18
+}

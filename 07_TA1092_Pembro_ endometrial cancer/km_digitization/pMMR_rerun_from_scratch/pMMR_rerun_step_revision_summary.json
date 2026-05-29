@@ -1,0 +1,13 @@
+{
+  "changes": [
+    "pembro 5.0-5.9 month premature drop delayed by holding survival near 0.876",
+    "pembro 2.1-3.6 month early trajectory lifted where compressed line drifted low",
+    "pembro 10.25-11.0 month descent lightly smoothed to marked trajectory",
+    "placebo 16-19.25 month low plateau lifted to marked trajectory"
+  ],
+  "outputs": [
+    "pMMR_rerun_pembro_step_segments_revised.csv",
+    "pMMR_rerun_placebo_step_segments_revised.csv",
+    "pMMR_rerun_step_coordinate_validation_revised.png"
+  ]
+}

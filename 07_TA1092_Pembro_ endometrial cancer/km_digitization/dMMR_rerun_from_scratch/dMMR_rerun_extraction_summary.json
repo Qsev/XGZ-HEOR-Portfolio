@@ -1,0 +1,42 @@
+{
+  "source_image": "/Users/xiaogezhang/AntigravityLocal/CareerShowcaseGithub/HEOR-Technical-Portfolio/07_TA1092_Pembro_ endometrial cancer/km_digitization/dMMR.png",
+  "axis_calibration": {
+    "x_ticks_pixels": [
+      101.0,
+      331.0,
+      560.0,
+      789.0,
+      1019.0,
+      1248.0,
+      1478.0
+    ],
+    "x_ticks_months": [
+      0.0,
+      6.0,
+      12.0,
+      18.0,
+      24.0,
+      30.0,
+      36.0
+    ],
+    "x_months_per_pixel": 0.02615192012211363,
+    "x_intercept_months": -2.6450729421142642,
+    "y_surv1_pixel": 24.0,
+    "y_surv0_pixel": 887.0
+  },
+  "raw_points": {
+    "pembro_chemo": 1108,
+    "placebo_chemo": 1283
+  },
+  "mask_pixel_counts": {
+    "pembro_orange": 7541,
+    "pembro_green": 508,
+    "placebo_blue": 17243,
+    "placebo_red": 349
+  },
+  "raw_points_refined": {
+    "pembro_chemo": 1108,
+    "placebo_chemo": 1264
+  },
+  "placebo_refinement": "time-survival gate added to remove blue text/label contamination"
+}

@@ -1,0 +1,12 @@
+{
+  "pembro_segments": 69,
+  "placebo_segments": 65,
+  "pembro_vertices": 274,
+  "placebo_vertices": 258,
+  "compression": {
+    "tol_survival": 0.0045,
+    "max_gap_months": 0.12,
+    "min_pts": 2,
+    "min_duration_months": 0.02
+  }
+}

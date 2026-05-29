@@ -1,0 +1,24 @@
+{
+  "endpoint": "PFS",
+  "subgroup": "dMMR",
+  "source": "KEYNOTE-868 / NRG-GY018 NEJM Figure 2A dMMR PFS",
+  "time_months": [0, 6, 12, 18, 24, 30, 36],
+  "arms": {
+    "pembro_chemo": {
+      "label": "Paclitaxel-carboplatin + pembrolizumab",
+      "n": 112,
+      "events_reported": 26,
+      "median_reported_months": null,
+      "nar": [112, 80, 44, 22, 9, 8, 2]
+    },
+    "placebo_chemo": {
+      "label": "Paclitaxel-carboplatin + placebo",
+      "n": 113,
+      "events_reported": 59,
+      "median_reported_months": 7.6,
+      "nar": [113, 62, 24, 8, 4, 2, 0]
+    }
+  },
+  "target_hr_pembro_vs_placebo": 0.30,
+  "target_hr_ci": [0.19, 0.48]
+}
