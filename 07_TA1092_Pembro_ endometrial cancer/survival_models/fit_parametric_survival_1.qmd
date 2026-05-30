@@ -629,7 +629,803 @@ ggplot(plot_data, aes(time_months, survival, colour = curve_label)) +
   )
 ```
 
-## 18. Save Outputs
+## 18. Issue 3 Demonstration: Short Follow-up and Extrapolation Risk
+
+The EAG's Issue 3 is not just saying that longer follow-up would be preferable. The practical concern is that KEYNOTE-868 provides relatively early survival evidence, while the economic model requires long-term PFS and OS predictions.
+
+In the EAG report, several values are redacted in the Issue 3 table. Later consultation comments in the same committee papers refer to the median follow-up as **16.3 months**. I use that value below as a working interpretation, while noting that the value is redacted in the Issue 3 table itself.
+
+This section uses **pMMR OS, pembro arm** as the worked example. OS is usually one of the most important drivers of life years and QALYs in oncology models, and short follow-up is especially important when OS benefit is immature.
+
+### 18.1 EAG Logic Behind Issue 3
+
+Before plotting anything, it is useful to translate the EAG's concern into modelling terms.
+
+```{r issue3-eag-logic-table}
+issue3_eag_logic <- tibble::tribble(
+  ~`EAG point`, ~`Meaning for modelling`,
+  "Median follow-up was about 16.3 months", "Most direct trial evidence covers early survival only",
+  "Survival estimates for 2 years or more rely on extrapolation", "Beyond roughly 24 months, estimates are increasingly model-driven",
+  "PFS and OS estimates extend out to 20 years", "The model must predict far beyond observed follow-up",
+  "Median OS was not reached in the pembrolizumab arm", "The OS benefit is immature and long-term benefit is uncertain",
+  "Active treatment lasts up to about 2.2 years", "Follow-up is short relative to the full treatment and post-treatment period"
+)
+
+issue3_eag_logic |>
+  kable(
+    caption = "Issue 3 translated into modelling questions",
+    align = "l"
+  )
+```
+
+The important point is that the EAG did not apply a simple universal rule such as "follow-up below X months is unacceptable". The concern comes from the combination of short follow-up, immature OS, and a model that needs to estimate survival far beyond the observed trial period.
+
+Two judgement points are especially important here.
+
+First, **median survival** is a maturity signal. If median OS has not been reached in the intervention arm, then fewer than half of patients in that arm have died by the data cut. That is clinically encouraging, but it also means the long-term OS curve is not well observed. The model must infer the later part of OS from limited event data.
+
+Second, **median follow-up should be interpreted against treatment duration**. Pembrolizumab treatment in this regimen can last for around 2.2 years, but the median follow-up referred to in the committee papers is around 16.3 months. This means the median patient had not yet been followed for as long as the maximum planned active treatment period. From an EAG perspective, that creates uncertainty not only about survival during treatment, but also about what happens after treatment stops.
+
+```{r issue3-maturity-checks}
+issue3_maturity_checks <- tibble::tribble(
+  ~`Maturity check`, ~`What it asks`, ~`Why it matters for Issue 3`,
+  "Median OS reached?", "Has at least half the arm experienced the OS event?", "If median OS is not reached, long-term OS benefit is inferred rather than directly observed.",
+  "Median follow-up vs active treatment duration", "Has the median patient been observed through the full planned treatment period and beyond?", "If median follow-up is shorter than maximum treatment duration, there is limited evidence on post-treatment survival and treatment-effect durability.",
+  "2-year boundary", "Are estimates beyond roughly 24 months still supported by enough observed data?", "The EAG considered 2 years+ estimates highly susceptible to extrapolation error.",
+  "20-year projection", "How far beyond trial follow-up does the economic model project?", "The longer the projection, the more long-term QALYs depend on model structure and tail assumptions."
+)
+
+issue3_maturity_checks |>
+  kable(
+    caption = "Issue 3 maturity checks used to interpret short follow-up",
+    align = "l"
+  )
+```
+
+### 18.2 Observed Evidence Versus the 20-Year Projection
+
+The first technical check is descriptive: how much reconstructed follow-up do we have, and how does it compare with the 20-year projection horizon discussed by the EAG?
+
+```{r issue3-observed-vs-modelled-horizon}
+issue3_projection_horizon_months <- 240
+issue3_median_follow_up_months <- 16.3
+issue3_eag_two_year_boundary <- 24
+issue3_active_treatment_months <- (30 + 84) * 7 / 30.4375
+
+issue3_horizon_summary <- ipd |>
+  group_by(subgroup, endpoint, treatment, treatment_label) |>
+  summarise(
+    n = n(),
+    events = sum(status),
+    censored = sum(status == 0),
+    max_reconstructed_follow_up_months = max(time_months),
+    model_horizon_months = issue3_projection_horizon_months,
+    extrapolation_ratio = model_horizon_months / max_reconstructed_follow_up_months,
+    .groups = "drop"
+  ) |>
+  arrange(endpoint, subgroup, treatment)
+
+issue3_horizon_summary |>
+  transmute(
+    curve = paste(
+      subgroup,
+      endpoint,
+      if_else(treatment == "pembro_chemo", "Pembro", "Placebo")
+    ),
+    events = paste0(events, "/", n),
+    `max FU, mo` = round(max_reconstructed_follow_up_months, 1),
+    `20-year horizon, mo` = model_horizon_months,
+    `observed share of 20y` = paste0(round(100 * max_reconstructed_follow_up_months / model_horizon_months, 1), "%"),
+    `20y / max FU` = paste0(round(extrapolation_ratio, 1), "x")
+  ) |>
+  kable(
+    caption = "Observed reconstructed follow-up versus 20-year projection horizon",
+    align = "l"
+  )
+```
+
+This table is not a threshold test. It only shows scale. The more important question is not whether the ratio is "too high" in isolation, but whether the economic conclusion depends on the extrapolated part of the curve.
+
+For this portfolio, the table sets up the next two checks:
+
+- where the observed evidence ends and the modelled tail begins;
+- whether different plausible parametric curves produce different long-term survival.
+
+### 18.3 Extrapolation-Zone Plot
+
+The next plot turns Issue 3 into a visual modelling problem. It marks:
+
+- **16.3 months**: median follow-up referred to in the committee papers;
+- **24 months**: the EAG's practical boundary for "2 years+" estimates;
+- **26.2 months**: approximate maximum active treatment duration based on 30 weeks plus 84 weeks;
+- **24 months onward**: the region where estimates are increasingly driven by extrapolation.
+
+```{r issue3-extrapolation-zone-plot}
+issue3_curve_id <- "pMMR_OS_pembro_chemo"
+
+issue3_km <- km_points |>
+  filter(curve_id == issue3_curve_id)
+
+issue3_best_fit <- extrapolated |>
+  filter(curve_id == issue3_curve_id, time_months <= 240)
+
+issue3_observed_boundary <- max(
+  ipd |>
+    filter(curve_id == issue3_curve_id) |>
+    pull(time_months)
+)
+
+issue3_best_dist <- issue3_best_fit |>
+  distinct(best_dist) |>
+  pull(best_dist)
+
+ggplot() +
+  annotate(
+    "rect",
+    xmin = issue3_eag_two_year_boundary,
+    xmax = 240,
+    ymin = 0,
+    ymax = 1,
+    fill = "#F2C94C",
+    alpha = 0.18
+  ) +
+  geom_step(
+    data = issue3_km,
+    aes(time_months, survival),
+    colour = "#008B8B",
+    linewidth = 0.9,
+    alpha = 0.8
+  ) +
+  geom_line(
+    data = issue3_best_fit,
+    aes(time_months, survival),
+    colour = "#B22222",
+    linewidth = 1.1
+  ) +
+  geom_vline(
+    xintercept = issue3_median_follow_up_months,
+    linetype = "dashed",
+    colour = "#2F80ED"
+  ) +
+  geom_vline(
+    xintercept = issue3_eag_two_year_boundary,
+    linetype = "dashed",
+    colour = "#B22222"
+  ) +
+  geom_vline(
+    xintercept = issue3_active_treatment_months,
+    linetype = "dotted",
+    colour = "grey30"
+  ) +
+  annotate(
+    "text",
+    x = issue3_median_follow_up_months + 2,
+    y = 0.98,
+    label = "Median FU\n16.3 mo",
+    hjust = 0,
+    size = 3.0,
+    colour = "#2F80ED"
+  ) +
+  annotate(
+    "text",
+    x = issue3_eag_two_year_boundary + 2,
+    y = 0.86,
+    label = "2 years+\nmodel-driven",
+    hjust = 0,
+    size = 3.0,
+    colour = "#B22222"
+  ) +
+  annotate(
+    "text",
+    x = issue3_active_treatment_months + 2,
+    y = 0.74,
+    label = "Approx max\nactive treatment",
+    hjust = 0,
+    size = 3.0,
+    colour = "grey30"
+  ) +
+  annotate(
+    "text",
+    x = 85,
+    y = 0.95,
+    label = "EAG concern: long-term extrapolated region",
+    hjust = 0,
+    size = 3.5,
+    colour = "#7A5A00"
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 240), breaks = seq(0, 240, 24)) +
+  labs(
+    title = "Issue 3 demonstration: observed pMMR OS evidence versus extrapolated model tail",
+    subtitle = paste0("AIC-selected distribution: ", issue3_best_dist),
+    x = "Months",
+    y = "Overall survival probability",
+    caption = "Teal step curve = reconstructed KM; red smooth curve = AIC-selected parametric extrapolation."
+  ) +
+  theme_minimal()
+```
+
+The point of this plot is not that the red curve is necessarily wrong. The point is that the area most relevant to 5-, 10-, and 20-year survival is not directly observed in the trial. It is a modelled continuation from early evidence.
+
+### 18.4 Distribution Fan Plot
+
+A second EAG-style check is to ask whether several distributions fit the observed period reasonably but imply different long-term tails.
+
+```{r issue3-distribution-fan-plot}
+issue3_all_distribution_predictions <- fit_tbl |>
+  filter(curve_id == issue3_curve_id, converged) |>
+  mutate(
+    pred = map(
+      fit,
+      ~tibble(
+        time_months = seq(0, 240, by = 1),
+        survival = predict_survival(.x, seq(0, 240, by = 1))
+      )
+    )
+  ) |>
+  select(dist_label, aic, bic, pred) |>
+  unnest(pred)
+
+ggplot() +
+  annotate(
+    "rect",
+    xmin = issue3_eag_two_year_boundary,
+    xmax = 240,
+    ymin = 0,
+    ymax = 1,
+    fill = "#F2C94C",
+    alpha = 0.14
+  ) +
+  geom_step(
+    data = issue3_km,
+    aes(time_months, survival),
+    colour = "black",
+    linewidth = 0.9,
+    alpha = 0.55
+  ) +
+  geom_line(
+    data = issue3_all_distribution_predictions,
+    aes(time_months, survival, colour = dist_label),
+    linewidth = 0.9
+  ) +
+  geom_vline(
+    xintercept = issue3_eag_two_year_boundary,
+    linetype = "dashed",
+    colour = "#B22222"
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 240), breaks = seq(0, 240, 24)) +
+  labs(
+    title = "Issue 3 demonstration: plausible distributions can diverge after follow-up ends",
+    subtitle = "The 2-year boundary is marked because the EAG considered 2 years+ estimates highly extrapolation-dependent",
+    x = "Months",
+    y = "Overall survival probability",
+    colour = "Distribution"
+  ) +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 9)
+  )
+```
+
+This is the visual reason why short follow-up matters. The observed KM can look compatible with several parametric shapes, but the long-term tail can differ materially once the model moves beyond the trial data.
+
+### 18.5 Landmark Survival Table
+
+The same point can be expressed numerically. This table compares predicted survival at landmark time points that are far beyond the observed follow-up.
+
+```{r issue3-landmark-survival-table}
+issue3_landmarks <- c(24, 36, 60, 120, 240)
+
+issue3_landmark_table <- issue3_all_distribution_predictions |>
+  filter(time_months %in% issue3_landmarks) |>
+  mutate(
+    survival_percent = round(100 * survival, 1),
+    aic = round(aic, 1)
+  ) |>
+  select(distribution = dist_label, aic, time_months, survival_percent) |>
+  tidyr::pivot_wider(
+    names_from = time_months,
+    values_from = survival_percent,
+    names_prefix = "month_"
+  ) |>
+  arrange(aic)
+
+issue3_landmark_table |>
+  kable(
+    caption = "pMMR OS pembro arm: landmark survival predictions by distribution (%)",
+    align = "l"
+  )
+```
+
+If the 10-year or 20-year predictions differ meaningfully across distributions, then the model has structural uncertainty. This is not solved by choosing the lowest AIC alone, because AIC mainly assesses fit to the available observed data. It does not prove that the extrapolated tail is clinically plausible.
+
+### 18.6 Appraisal Interpretation
+
+This section turns the EAG's Issue 3 into a reproducible modelling demonstration:
+
+- the EAG's concern is translated into concrete modelling checks;
+- the observed follow-up, 2-year boundary, and 20-year horizon are shown on the same scale;
+- alternative distributions show the range of plausible long-term tails;
+- landmark predictions quantify how much the tails differ;
+- the interpretation links directly to NICE/EAG judgement about survival extrapolation uncertainty.
+
+The key portfolio message is: short follow-up matters when the cost-effectiveness result depends on survival benefits generated beyond the observed trial period. The issue is not that extrapolation is avoidable; oncology economic models often require extrapolation. The EAG concern is that, with immature OS and limited follow-up, the long-term survival benefit may be driven more by modelling assumptions than by observed trial evidence.
+
+## 19. Starter Cost-Effectiveness Module
+
+The previous sections focus on survival modelling. To connect Issue 5 to the economic model, we need to show how PFS and OS extrapolations feed into cost-effectiveness.
+
+This is not yet a NICE base-case replication. It is a transparent, simplified partitioned survival model (PSM) that uses extracted public parameters where I can currently verify them, and clearly labels remaining illustrative or unverified inputs. The purpose is to move from a pure survival-fitting exercise toward a mock cost-effectiveness case.
+
+- PFS and OS curves determine health-state occupancy.
+- Health-state occupancy determines QALYs and costs.
+- OS tail assumptions can materially change incremental QALYs and the ICER.
+
+### 19.1 Economic Inputs: Extracted Versus Still Illustrative
+
+The table below separates the inputs into three groups:
+
+- **Extracted:** taken from the NotebookLM extraction output and plausible to use in this mock case.
+- **Needs source verification:** extracted or implied, but should be checked against the original PDF before being treated as final.
+- **Illustrative:** used only to keep the model runnable until a verified parameter is abstracted.
+
+```{r starter-ce-inputs}
+ce_inputs <- tibble::tribble(
+  ~Input, ~Value, ~Status, ~Note,
+  "Time horizon", "35 years", "Extracted", "Lifetime horizon in the economic model",
+  "Cycle length", "1 week", "Extracted", "Consistent with weekly cost and utility calculations",
+  "Annual discount rate", "3.5%", "Extracted", "Costs and health effects",
+  "Perspective", "UK NHS and Personal Social Services", "Extracted", "Not directly used in this simplified calculation",
+  "Model structure", "3-state PSM", "Extracted", "Progression-free, progressed disease, death",
+  "Pembro treatment duration", "20 cycles; 6 Q3W combination + 14 Q6W maintenance", "Extracted", "Simplified as 18 weeks + 84 weeks of active pembro cost",
+  "Pembro stopping rule", "24 months / 2 years", "Extracted", "Approximated by the 102-week active dosing schedule in this mock model",
+  "Chemotherapy duration", "6 cycles Q3W", "Extracted", "Applied as 18 weeks of active chemotherapy cost in this mock model",
+  "Pembrolizumab list price", "GBP 2,630 per 100 mg vial", "Extracted", "List price; confidential commercial arrangement not available",
+  "Pembrolizumab combination cost", "GBP 5,260 pembro drug + GBP 106 chemotherapy drug + GBP 277 admin per Q3W cycle", "Extracted and inferred", "Before confidential discount; chemotherapy drug cost is added using the comparator RDI-adjusted value",
+  "Pembrolizumab maintenance cost", "GBP 10,520 drug + GBP 217 admin per Q6W cycle", "Extracted", "Before confidential discount; smoothed to weekly cost in this mock model",
+  "Comparator chemotherapy cost", "GBP 106 drug + GBP 277 admin per Q3W cycle", "Extracted", "RDI-adjusted drug cost plus complex chemotherapy administration",
+  "Terminal care cost", "GBP 8,829.07 one-off at death", "Extracted", "Added in this mock model through weekly death increments",
+  "PF utility", "0.814", "Extracted", "Updated base-case PF utility in the NotebookLM extraction",
+  "PD utility", "0.720", "Extracted", "Updated base-case PD utility in the NotebookLM extraction",
+  "PF resource-use cost", "GBP 73.59 initial treatment; GBP 44.15 maintenance/off-treatment", "Inferred from extracted inputs", "Computed from extracted unit costs and weekly resource frequencies",
+  "PD resource-use cost", "GBP 26.67 per week", "Inferred from extracted inputs", "Computed from extracted unit costs and weekly resource frequencies",
+  "AE cost", "One-off Grade 3+ anaemia and hypertension cost", "Inferred from extracted inputs", "Duration for AE QALY decrement remains redacted, so only one-off AE costs are included here",
+  "Confidential pembrolizumab discount", "Scenario parameter", "Unavailable", "Handled through pembro_discount sensitivity rather than assumed in the base case"
+)
+
+ce_inputs |>
+  kable(caption = "Economic inputs used in the mock PSM", align = "l")
+```
+
+```{r starter-ce-parameters}
+ce_params <- list(
+  horizon_weeks = 35 * 52,
+  cycle_length_years = 1 / 52,
+  annual_discount_rate = 0.035,
+  utility_pf = 0.814,
+  utility_pd = 0.720,
+  weekly_cost_pf_initial = 0.08 * 160.83 + 0.33 * 179 + 0.33 * 5,
+  weekly_cost_pf_maintenance = 0.08 * 160.83 + 0.17 * 179 + 0.17 * 5,
+  weekly_cost_pd = 0.04 * 160.83 + 0.11 * 179 + 0.11 * 5,
+  weekly_cost_pembro_combination = (5260 + 106 + 277) / 3,
+  weekly_cost_pembro_maintenance = (10520 + 217) / 6,
+  weekly_cost_comparator_chemo = (106 + 277) / 3,
+  pembro_discount = 0,
+  pembro_combination_weeks = 18,
+  pembro_maintenance_weeks = 84,
+  pembro_treatment_cap_weeks = 18 + 84,
+  comparator_treatment_cap_weeks = 18,
+  terminal_care_cost = 8829.07,
+  one_off_ae_cost_pembro = 0.169 * 565.40 + 0.056 * 735.07,
+  one_off_ae_cost_comparator = 0.116 * 565.40 + 0.052 * 735.07
+)
+
+tibble(
+  Parameter = c(
+    "horizon_weeks",
+    "cycle_length_years",
+    "annual_discount_rate",
+    "utility_pf",
+    "utility_pd",
+    "weekly_cost_pf_initial",
+    "weekly_cost_pf_maintenance",
+    "weekly_cost_pd",
+    "weekly_cost_pembro_combination",
+    "weekly_cost_pembro_maintenance",
+    "weekly_cost_comparator_chemo",
+    "pembro_discount",
+    "pembro_combination_weeks",
+    "pembro_maintenance_weeks",
+    "pembro_treatment_cap_weeks",
+    "comparator_treatment_cap_weeks",
+    "terminal_care_cost",
+    "one_off_ae_cost_pembro",
+    "one_off_ae_cost_comparator"
+  ),
+  Value = c(
+    "1,820 weeks",
+    "1/52 year per cycle",
+    "3.5% per year",
+    "0.814",
+    "0.720",
+    scales::dollar(ce_params$weekly_cost_pf_initial, prefix = "GBP "),
+    scales::dollar(ce_params$weekly_cost_pf_maintenance, prefix = "GBP "),
+    scales::dollar(ce_params$weekly_cost_pd, prefix = "GBP "),
+    scales::dollar(ce_params$weekly_cost_pembro_combination, prefix = "GBP "),
+    scales::dollar(ce_params$weekly_cost_pembro_maintenance, prefix = "GBP "),
+    scales::dollar(ce_params$weekly_cost_comparator_chemo, prefix = "GBP "),
+    "0% in base case",
+    "18 weeks",
+    "84 weeks",
+    "102 weeks",
+    "18 weeks",
+    "GBP 8,829.07",
+    scales::dollar(ce_params$one_off_ae_cost_pembro, prefix = "GBP "),
+    scales::dollar(ce_params$one_off_ae_cost_comparator, prefix = "GBP ")
+  )
+) |>
+  kable(caption = "Parameter object used by the simplified PSM", align = "l")
+```
+
+### 19.2 Convert PFS and OS Curves Into Health-State Occupancy
+
+In a three-state PSM:
+
+- progression-free = PFS;
+- progressed disease = OS - PFS;
+- dead = 1 - OS.
+
+This is why survival extrapolation matters for cost-effectiveness. If OS is optimistic, patients remain alive longer and generate more life years and QALYs.
+
+There is one structural rule in a PSM: **PFS should not exceed OS**. PFS is the proportion alive and progression-free. OS is the proportion alive. Since every progression-free patient must also be alive, PFS should always be less than or equal to OS.
+
+The source materials indicate that the company model included a limit to ensure that PFS could not exceed OS, applied at the per-cycle hazard level. This matters because independently fitted PFS and OS curves can otherwise cross in long-term extrapolation. I cannot reproduce the exact hazard-level implementation without the company workbook, so this public-data teaching model uses a transparent probability-level approximation:
+
+```r
+PFS_constrained = min(PFS, OS)
+```
+
+This keeps the simplified PSM structurally coherent. It is not intended to replace full curve-pair selection in a formal submission.
+
+```{r starter-ce-state-occupancy}
+ce_time_grid <- tibble(
+  time_weeks = 0:ce_params$horizon_weeks,
+  time_months = time_weeks * 12 / 52
+)
+
+psm_survival <- best_fits |>
+  filter(subgroup == "pMMR", endpoint %in% c("PFS", "OS")) |>
+  mutate(
+    arm = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
+    pred = map(
+      fit,
+      ~tibble(
+        time_weeks = ce_time_grid$time_weeks,
+        time_months = ce_time_grid$time_months,
+        survival = predict_survival(.x, ce_time_grid$time_months)
+      )
+    )
+  ) |>
+  select(arm, endpoint, pred) |>
+  unnest(pred) |>
+  tidyr::pivot_wider(names_from = endpoint, values_from = survival) |>
+  mutate(
+    PFS = pmin(PFS, OS),  # Approximation of the company model's PFS <= OS constraint.
+    PF = PFS,
+    PD = pmax(OS - PFS, 0),
+    Dead = pmax(1 - OS, 0)
+  )
+```
+
+```{r starter-ce-state-occupancy-plot}
+psm_survival |>
+  select(arm, time_weeks, PF, PD, Dead) |>
+  pivot_longer(cols = c(PF, PD, Dead), names_to = "state", values_to = "proportion") |>
+  mutate(time_years = time_weeks / 52) |>
+  ggplot(aes(time_years, proportion, fill = state)) +
+  geom_area(alpha = 0.85) +
+  facet_wrap(~arm) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 35), breaks = seq(0, 35, 5)) +
+  labs(
+    title = "Simplified pMMR partitioned survival model",
+    subtitle = "Weekly PSM with a PFS <= OS structural constraint",
+    x = "Years",
+    y = "Proportion of cohort",
+    fill = "Health state"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+### 19.3 Calculate Discounted Costs and QALYs
+
+This chunk turns health-state occupancy into QALYs and costs. The model is intentionally simple, so each step is visible.
+
+```{r starter-ce-results}
+discount_factor <- function(week, annual_rate) {
+  1 / ((1 + annual_rate) ^ (week / 52))
+}
+
+ce_trace <- psm_survival |>
+  group_by(arm) |>
+  arrange(time_weeks, .by_group = TRUE) |>
+  mutate(
+    discount = discount_factor(time_weeks, ce_params$annual_discount_rate),
+    death_increment = pmax(Dead - lag(Dead, default = 0), 0),
+    pf_resource_cost = case_when(
+      time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_initial,
+      TRUE ~ ce_params$weekly_cost_pf_maintenance
+    ),
+    qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
+      ce_params$cycle_length_years * discount,
+    disease_management_cost = (
+      PF * pf_resource_cost +
+        PD * ce_params$weekly_cost_pd
+    ) * discount,
+    treatment_cost = case_when(
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
+        PF * ce_params$weekly_cost_pembro_combination *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_pembro_maintenance *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Placebo + chemo" & time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_comparator_chemo * discount,
+      TRUE ~ 0
+    ),
+    ae_cost = case_when(
+      arm == "Pembro + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
+      arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
+      TRUE ~ 0
+    ),
+    terminal_care_cost = death_increment * ce_params$terminal_care_cost * discount,
+    total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
+  ) |>
+  ungroup()
+
+ce_results <- ce_trace |>
+  group_by(arm) |>
+  summarise(
+    discounted_qalys = sum(qaly),
+    discounted_costs = sum(total_cost),
+    .groups = "drop"
+  )
+
+ce_incremental <- ce_results |>
+  summarise(
+    incremental_qalys = discounted_qalys[arm == "Pembro + chemo"] -
+      discounted_qalys[arm == "Placebo + chemo"],
+    incremental_costs = discounted_costs[arm == "Pembro + chemo"] -
+      discounted_costs[arm == "Placebo + chemo"],
+    icer = incremental_costs / incremental_qalys
+  )
+
+ce_results |>
+  mutate(
+    discounted_qalys = round(discounted_qalys, 3),
+    discounted_costs = round(discounted_costs, 0)
+  ) |>
+  transmute(
+    Arm = arm,
+    `Discounted QALYs` = discounted_qalys,
+    `Discounted costs` = discounted_costs
+  ) |>
+  kable(caption = "Mock-case discounted results by arm", align = "l")
+
+ce_incremental |>
+  mutate(
+    incremental_qalys = round(incremental_qalys, 3),
+    incremental_costs = round(incremental_costs, 0),
+    icer = round(icer, 0)
+  ) |>
+  transmute(
+    `Incremental QALYs` = incremental_qalys,
+    `Incremental costs` = incremental_costs,
+    ICER = icer
+  ) |>
+  kable(caption = "Mock-case incremental cost-effectiveness result", align = "l")
+```
+
+The absolute ICER should still not be interpreted as a TA1092 result. The model now uses more extracted public inputs, including utility values, resource-use unit costs, treatment costs, administration costs, terminal care cost, and one-off AE costs. However, confidential pembrolizumab discounts, exact commercial-in-confidence implementation details, and some AE duration assumptions remain unavailable. The useful point is structural: survival assumptions now flow through to QALYs and costs.
+
+### 19.4 Confidential Discount Sensitivity
+
+The pembrolizumab commercial arrangement is confidential. Instead of guessing it, the mock model treats the discount as a scenario parameter. This makes the limitation explicit and lets us ask a practical question: how sensitive is the ICER to the assumed pembrolizumab acquisition discount?
+
+```{r starter-ce-discount-sensitivity}
+calculate_incremental_ce <- function(trace) {
+  trace |>
+    group_by(arm) |>
+    summarise(
+      discounted_qalys = sum(qaly),
+      discounted_costs = sum(total_cost),
+      .groups = "drop"
+    ) |>
+    summarise(
+      incremental_qalys = discounted_qalys[arm == "Pembro + chemo"] -
+        discounted_qalys[arm == "Placebo + chemo"],
+      incremental_costs = discounted_costs[arm == "Pembro + chemo"] -
+        discounted_costs[arm == "Placebo + chemo"],
+      icer = incremental_costs / incremental_qalys
+    )
+}
+
+run_discount_sensitivity <- function(discount_value) {
+  psm_survival |>
+    group_by(arm) |>
+    arrange(time_weeks, .by_group = TRUE) |>
+    mutate(
+      discount = discount_factor(time_weeks, ce_params$annual_discount_rate),
+      death_increment = pmax(Dead - lag(Dead, default = 0), 0),
+      pf_resource_cost = case_when(
+        time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+          ce_params$weekly_cost_pf_initial,
+        TRUE ~ ce_params$weekly_cost_pf_maintenance
+      ),
+      qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
+        ce_params$cycle_length_years * discount,
+      disease_management_cost = (
+        PF * pf_resource_cost +
+          PD * ce_params$weekly_cost_pd
+      ) * discount,
+      treatment_cost = case_when(
+        arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
+          PF * ce_params$weekly_cost_pembro_combination *
+            (1 - discount_value) * discount,
+        arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+          PF * ce_params$weekly_cost_pembro_maintenance *
+            (1 - discount_value) * discount,
+        arm == "Placebo + chemo" & time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+          PF * ce_params$weekly_cost_comparator_chemo * discount,
+        TRUE ~ 0
+      ),
+      ae_cost = case_when(
+        arm == "Pembro + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
+        arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
+        TRUE ~ 0
+      ),
+      terminal_care_cost = death_increment * ce_params$terminal_care_cost * discount,
+      total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
+    ) |>
+    ungroup() |>
+    calculate_incremental_ce() |>
+    mutate(pembro_discount = discount_value)
+}
+
+map_dfr(c(0, 0.25, 0.50, 0.75), run_discount_sensitivity) |>
+  mutate(
+    pembro_discount = scales::percent(pembro_discount, accuracy = 1),
+    incremental_qalys = round(incremental_qalys, 3),
+    incremental_costs = round(incremental_costs, 0),
+    icer = round(icer, 0)
+  ) |>
+  transmute(
+    `Pembro discount` = pembro_discount,
+    `Incremental QALYs` = incremental_qalys,
+    `Incremental costs` = incremental_costs,
+    ICER = icer
+  ) |>
+  kable(caption = "Illustrative confidential-discount sensitivity", align = "l")
+```
+
+### 19.5 OS Tail Sensitivity
+
+Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate this is to reduce the long-term OS separation between arms after the EAG's 2-year boundary.
+
+This scenario is not an EAG preferred model. It is a teaching sensitivity: after 104 weeks, the pembro OS benefit is gradually reduced so that only 50% of the modelled OS separation remains by 10 years.
+
+```{r starter-ce-os-tail-sensitivity}
+apply_os_tail_reduction <- function(dat, start_week = 104, end_week = 520, final_fraction = 0.5) {
+  dat |>
+    select(arm, time_weeks, time_months, PFS, OS) |>
+    tidyr::pivot_wider(names_from = arm, values_from = c(PFS, OS)) |>
+    mutate(
+      reduction_fraction = case_when(
+        time_weeks <= start_week ~ 1,
+        time_weeks >= end_week ~ final_fraction,
+        TRUE ~ 1 - (1 - final_fraction) * (time_weeks - start_week) / (end_week - start_week)
+      ),
+      `OS_Pembro + chemo` = `OS_Placebo + chemo` +
+        (`OS_Pembro + chemo` - `OS_Placebo + chemo`) * reduction_fraction
+    ) |>
+    select(time_weeks, time_months, starts_with("PFS_"), starts_with("OS_")) |>
+    pivot_longer(
+      cols = -c(time_weeks, time_months),
+      names_to = c("endpoint", "arm"),
+      names_sep = "_",
+      values_to = "survival"
+    ) |>
+    pivot_wider(names_from = endpoint, values_from = survival) |>
+    mutate(
+      PF = pmin(PFS, OS),
+      PD = pmax(OS - PFS, 0),
+      Dead = pmax(1 - OS, 0)
+    )
+}
+
+psm_survival_os_sensitivity <- apply_os_tail_reduction(psm_survival)
+
+ce_trace_os_sensitivity <- psm_survival_os_sensitivity |>
+  group_by(arm) |>
+  arrange(time_weeks, .by_group = TRUE) |>
+  mutate(
+    discount = discount_factor(time_weeks, ce_params$annual_discount_rate),
+    death_increment = pmax(Dead - lag(Dead, default = 0), 0),
+    pf_resource_cost = case_when(
+      time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_initial,
+      TRUE ~ ce_params$weekly_cost_pf_maintenance
+    ),
+    qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
+      ce_params$cycle_length_years * discount,
+    disease_management_cost = (
+      PF * pf_resource_cost +
+        PD * ce_params$weekly_cost_pd
+    ) * discount,
+    treatment_cost = case_when(
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
+        PF * ce_params$weekly_cost_pembro_combination *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_pembro_maintenance *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Placebo + chemo" & time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_comparator_chemo * discount,
+      TRUE ~ 0
+    ),
+    ae_cost = case_when(
+      arm == "Pembro + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
+      arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
+      TRUE ~ 0
+    ),
+    terminal_care_cost = death_increment * ce_params$terminal_care_cost * discount,
+    total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
+  ) |>
+  ungroup()
+
+ce_scenario_results <- ce_trace_os_sensitivity |>
+  group_by(arm) |>
+  summarise(
+    discounted_qalys = sum(qaly),
+    discounted_costs = sum(total_cost),
+    .groups = "drop"
+  ) |>
+  summarise(
+    incremental_qalys = discounted_qalys[arm == "Pembro + chemo"] -
+      discounted_qalys[arm == "Placebo + chemo"],
+    incremental_costs = discounted_costs[arm == "Pembro + chemo"] -
+      discounted_costs[arm == "Placebo + chemo"],
+    icer = incremental_costs / incremental_qalys
+  )
+
+bind_rows(
+  ce_incremental |> mutate(scenario = "AIC-selected OS tail"),
+  ce_scenario_results |> mutate(scenario = "Reduced long-term OS separation")
+) |>
+  select(scenario, incremental_qalys, incremental_costs, icer) |>
+  mutate(
+    incremental_qalys = round(incremental_qalys, 3),
+    incremental_costs = round(incremental_costs, 0),
+    icer = round(icer, 0)
+  ) |>
+  transmute(
+    Scenario = scenario,
+    `Incremental QALYs` = incremental_qalys,
+    `Incremental costs` = incremental_costs,
+    ICER = icer
+  ) |>
+  kable(caption = "Illustrative sensitivity to long-term OS benefit", align = "l")
+```
+
+This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company's long-term OS benefit is clinically plausible.
+
+## 20. Save Outputs
 
 This final block writes the same output files as the batch script.
 

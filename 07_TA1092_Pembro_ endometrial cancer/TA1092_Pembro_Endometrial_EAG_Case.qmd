@@ -138,6 +138,69 @@ The EAG is not only checking whether the model runs. It is asking whether the co
 
 This distinction is important for the portfolio: a health economist in consulting must be able to understand both the company logic and the EAG logic.
 
+### Working Reflection on Issue 1
+
+Issue 1 is my first example of how the EAG examines the alignment between trial design, trial objectives, trial results, and later interpretation of those results.
+
+My current understanding is that the EAG is concerned about **target consistency**. If the trial was originally designed to answer one type of question, for example treatment effects within separate dMMR and pMMR cohorts, but the later economic modelling relies on a different question, for example an all-comer analysis combining those populations, then there is a risk of misalignment between the evidence generation process and the modelled decision problem.
+
+In practical HTA terms, the concern is not simply that all-comer analysis is wrong. The concern is that a post-hoc all-comer analysis may be less reliable if it was not the original basis of the trial design and statistical analysis plan. This can create uncertainty about whether the estimated treatment effect is truly representative of the population used in the economic model.
+
+This issue is therefore mainly an **evidence validity** issue rather than a direct cost-effectiveness parameter issue. It affects confidence in the survival inputs and subgroup assumptions that feed into the model. For this portfolio, I will treat Issue 1 as part of the EAG's broader logic: before challenging model extrapolations, the EAG first checks whether the clinical evidence being extrapolated is aligned with the decision problem.
+
+Issue 2 extends the same evidence-validity concern to more granular subgroups. The EAG notes that some NICE-specified subgroups, such as local versus metastatic recurrence or prior surgery history, were not systematically captured in the pivotal trial. My takeaway is that this is not a main technical replication target, but it reinforces an important appraisal principle: broad modelled indications can become uncertain when the trial evidence does not fully describe clinically relevant heterogeneity.
+
+This type of subgroup limitation is probably common in oncology appraisals because pivotal trials are rarely large enough to support robust analyses across many clinically detailed subgroups. The key point is not that every missing subgroup analysis is equally important. The EAG appears to elevate subgroup limitations when they are **decision-relevant**: when the subgroup was specified in the NICE scope, may have different prognosis or treatment effect, affects the clinical pathway, or could change the cost-effectiveness conclusion.
+
+### Working Reflection on Issue 3
+
+Issue 3 is a stronger candidate for a technical deep dive because it connects directly to survival modelling. The EAG's concern is that KEYNOTE-868 has relatively short follow-up, while the economic model needs to project PFS, OS, costs, and QALYs over a much longer horizon.
+
+My current interpretation is that short follow-up is not a problem simply because "more data would always be better". It becomes decision-relevant when the observed trial period covers only the early part of the survival curves, but a material share of the modelled incremental benefit is generated in the extrapolated tail. In that setting, the model result depends heavily on assumptions about curve selection, long-term tail behaviour, treatment effect duration, and clinical plausibility.
+
+After checking the EAG report and later factual-accuracy material in the committee papers, my more precise working interpretation is that the short-follow-up concern can be condensed into a few case-specific signals rather than a universal threshold. The median follow-up appears to be around 16.3 months, while the planned active treatment period is approximately 2.2 years. This means that the median observation time does not even fully cover the planned treatment duration. In addition, the pembrolizumab arm median OS was not reached, meaning the trial had not yet observed the time point at which 50% of patients had died.
+
+These are not formal NICE cut-offs, but they are useful data-maturity signals. If median OS has not been reached, long-term OS benefit is still not directly observed. If median follow-up is shorter than the intended treatment duration, there is limited evidence about what happens after patients complete or stop pembrolizumab. This makes assumptions about sustained treatment effect, treatment waning, and long-term survival tails especially important.
+
+NotebookLM review of the EAG material suggests that the EAG's concern was broader than these two signals. The EAG also appears to use several related judgement signals when assessing whether the follow-up is sufficient for long-term extrapolation:
+
+| EAG judgement signal | Why it matters for Issue 3 | How I could show it in the portfolio |
+|---|---|---|
+| Few patients at risk in the KM tail | Late KM steps become unstable, so the apparent tail shape may be driven by very small numbers | Add numbers-at-risk context and avoid overinterpreting late KM steps |
+| Median OS not reached | The trial has not directly observed the point at which half of patients have died | Add a horizontal 50% survival line to OS plots and mark whether it is crossed |
+| Models diverge after the observed period | Several models can fit the observed KM but imply different long-term survival | Use a distribution fan plot and landmark survival table |
+| Uncertain treatment-effect duration | Short follow-up gives limited evidence on whether pembrolizumab benefit persists after stopping treatment | Compare sustained benefit versus treatment-effect waning scenarios |
+| External validation is weak or indirect | Evidence from melanoma or dMMR-only studies may not generalise to advanced/recurrent endometrial cancer or pMMR disease | Document external evidence limitations rather than treating them as proof of sustained benefit |
+| Expert landmark estimates are speculative | Advisory-board estimates can guide plausibility but are not empirical trial evidence | Use expert landmarks as plausibility checks, not as observed validation |
+
+This gives a more defensible interpretation than using a simple follow-up-to-horizon ratio. The EAG's concern is cumulative: immature OS, sparse KM tails, divergent extrapolation models, and uncertain post-treatment benefit all point in the same direction. Together, they make the long-term extrapolated survival benefit less secure.
+
+For the portfolio, I should therefore avoid treating Issue 3 as a generic limitation. The useful demonstration is to show the gap between **observed evidence** and **modelled horizon**. A practical way to do this is:
+
+- show the reconstructed KM curve and fitted parametric survival curve on the same plot;
+- mark the approximate observed follow-up boundary with a vertical line;
+- shade the extrapolated region beyond the observed trial data;
+- compare plausible parametric distributions that fit similarly during the observed period but diverge in the long-term tail;
+- report landmark survival predictions, for example 5-year, 10-year, and 20-year PFS/OS.
+
+This also clarifies the role of uncertainty. Short follow-up can widen statistical uncertainty, but the larger HTA concern is often **structural uncertainty**: different plausible extrapolation models may produce meaningfully different long-term survival, even if their in-sample AIC/BIC or visual fit is similar. This is why an EAG may challenge an AIC-selected curve if its long-term behaviour lacks clinical credibility.
+
+Initial technical plan for this issue:
+
+| Demonstration | Purpose | Possible output |
+|---|---|---|
+| Observed vs modelled horizon | Show why follow-up is short in model terms | Table comparing follow-up length with model horizon |
+| Extrapolation-zone plot | Separate observed KM evidence from modelled tail | KM + fitted curve + shaded extrapolation region |
+| Distribution fan plot | Show structural uncertainty across plausible curves | Multiple parametric survival tails |
+| Landmark survival table | Quantify tail differences | 5-, 10-, and 20-year survival by distribution |
+| Simplified scenario impact | Link survival uncertainty to economic outputs | Directional QALY / ICER impact |
+
+### Working Reflection on Issue 4
+
+Issue 4 is a utility evidence limitation. The EAG notes that HRQoL/patient-reported outcomes were assessed in the pMMR cohort only, with no equivalent dMMR HRQoL data available. The company's explanation is that the smaller dMMR sample size created insufficient statistical power, so HRQoL analyses were prespecified for pMMR.
+
+My takeaway is that this is not a main technical replication target at this stage, but it is important for the appraisal logic. In a cost-utility model, HRQoL evidence feeds into health-state utilities and therefore QALYs. If utility evidence comes only from pMMR patients but is applied more broadly, then the representativeness of utility inputs becomes uncertain, especially for subgroup-specific cost-effectiveness.
+
 ### EAG Challenge Log
 
 | Issue | Company position | EAG concern | Why the EAG cares | Potential ICER direction |

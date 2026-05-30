@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Xiaoge Zhang, PhD">
-<meta name="dcterms.date" content="2026-05-29">
+<meta name="dcterms.date" content="2026-05-30">
 
 <title>TA1092 EAG Appraisal Case: Pembrolizumab + Chemotherapy in Endometrial Cancer</title>
 <style>
@@ -102,8 +102,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#eag-critique-lens" id="toc-eag-critique-lens" class="nav-link" data-scroll-target="#eag-critique-lens"><span class="header-section-number">4</span> EAG Critique Lens</a>
   <ul class="collapse">
   <li><a href="#how-the-eag-reviews-this-type-of-case" id="toc-how-the-eag-reviews-this-type-of-case" class="nav-link" data-scroll-target="#how-the-eag-reviews-this-type-of-case"><span class="header-section-number">4.1</span> How the EAG Reviews This Type of Case</a></li>
-  <li><a href="#eag-challenge-log" id="toc-eag-challenge-log" class="nav-link" data-scroll-target="#eag-challenge-log"><span class="header-section-number">4.2</span> EAG Challenge Log</a></li>
-  <li><a href="#committee-preferred-assumptions" id="toc-committee-preferred-assumptions" class="nav-link" data-scroll-target="#committee-preferred-assumptions"><span class="header-section-number">4.3</span> Committee Preferred Assumptions</a></li>
+  <li><a href="#working-reflection-on-issue-1" id="toc-working-reflection-on-issue-1" class="nav-link" data-scroll-target="#working-reflection-on-issue-1"><span class="header-section-number">4.2</span> Working Reflection on Issue 1</a></li>
+  <li><a href="#working-reflection-on-issue-3" id="toc-working-reflection-on-issue-3" class="nav-link" data-scroll-target="#working-reflection-on-issue-3"><span class="header-section-number">4.3</span> Working Reflection on Issue 3</a></li>
+  <li><a href="#eag-challenge-log" id="toc-eag-challenge-log" class="nav-link" data-scroll-target="#eag-challenge-log"><span class="header-section-number">4.4</span> EAG Challenge Log</a></li>
+  <li><a href="#committee-preferred-assumptions" id="toc-committee-preferred-assumptions" class="nav-link" data-scroll-target="#committee-preferred-assumptions"><span class="header-section-number">4.5</span> Committee Preferred Assumptions</a></li>
   </ul></li>
   <li><a href="#technical-replication-in-r" id="toc-technical-replication-in-r" class="nav-link" data-scroll-target="#technical-replication-in-r"><span class="header-section-number">5</span> Technical Replication in R</a>
   <ul class="collapse">
@@ -151,7 +153,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 29, 2026</p>
+      <p class="date">May 30, 2026</p>
     </div>
   </div>
   
@@ -418,8 +420,73 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>This distinction is important for the portfolio: a health economist in consulting must be able to understand both the company logic and the EAG logic.</p>
 </section>
-<section id="eag-challenge-log" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="eag-challenge-log"><span class="header-section-number">4.2</span> EAG Challenge Log</h3>
+<section id="working-reflection-on-issue-1" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="working-reflection-on-issue-1"><span class="header-section-number">4.2</span> Working Reflection on Issue 1</h3>
+<p>Issue 1 is my first example of how the EAG examines the alignment between trial design, trial objectives, trial results, and later interpretation of those results.</p>
+<p>My current understanding is that the EAG is concerned about <strong>target consistency</strong>. If the trial was originally designed to answer one type of question, for example treatment effects within separate dMMR and pMMR cohorts, but the later economic modelling relies on a different question, for example an all-comer analysis combining those populations, then there is a risk of misalignment between the evidence generation process and the modelled decision problem.</p>
+<p>In practical HTA terms, the concern is not simply that all-comer analysis is wrong. The concern is that a post-hoc all-comer analysis may be less reliable if it was not the original basis of the trial design and statistical analysis plan. This can create uncertainty about whether the estimated treatment effect is truly representative of the population used in the economic model.</p>
+<p>This issue is therefore mainly an <strong>evidence validity</strong> issue rather than a direct cost-effectiveness parameter issue. It affects confidence in the survival inputs and subgroup assumptions that feed into the model. For this portfolio, I will treat Issue 1 as part of the EAG’s broader logic: before challenging model extrapolations, the EAG first checks whether the clinical evidence being extrapolated is aligned with the decision problem.</p>
+<p>Issue 2 extends the same evidence-validity concern to more granular subgroups. The EAG notes that some NICE-specified subgroups, such as local versus metastatic recurrence or prior surgery history, were not systematically captured in the pivotal trial. My takeaway is that this is not a main technical replication target, but it reinforces an important appraisal principle: broad modelled indications can become uncertain when the trial evidence does not fully describe clinically relevant heterogeneity.</p>
+<p>This type of subgroup limitation is probably common in oncology appraisals because pivotal trials are rarely large enough to support robust analyses across many clinically detailed subgroups. The key point is not that every missing subgroup analysis is equally important. The EAG appears to elevate subgroup limitations when they are <strong>decision-relevant</strong>: when the subgroup was specified in the NICE scope, may have different prognosis or treatment effect, affects the clinical pathway, or could change the cost-effectiveness conclusion.</p>
+</section>
+<section id="working-reflection-on-issue-3" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="working-reflection-on-issue-3"><span class="header-section-number">4.3</span> Working Reflection on Issue 3</h3>
+<p>Issue 3 is a stronger candidate for a technical deep dive because it connects directly to survival modelling. The EAG’s concern is that KEYNOTE-868 has relatively short follow-up, while the economic model needs to project PFS, OS, costs, and QALYs over a much longer horizon.</p>
+<p>My current interpretation is that short follow-up is not a problem simply because “more data would always be better”. It becomes decision-relevant when the observed trial period covers only the early part of the survival curves, but a material share of the modelled incremental benefit is generated in the extrapolated tail. In that setting, the model result depends heavily on assumptions about curve selection, long-term tail behaviour, treatment effect duration, and clinical plausibility.</p>
+<p>For the portfolio, I should therefore avoid treating Issue 3 as a generic limitation. The useful demonstration is to show the gap between <strong>observed evidence</strong> and <strong>modelled horizon</strong>. A practical way to do this is:</p>
+<ul>
+<li>show the reconstructed KM curve and fitted parametric survival curve on the same plot;</li>
+<li>mark the approximate observed follow-up boundary with a vertical line;</li>
+<li>shade the extrapolated region beyond the observed trial data;</li>
+<li>compare plausible parametric distributions that fit similarly during the observed period but diverge in the long-term tail;</li>
+<li>report landmark survival predictions, for example 5-year, 10-year, and 20-year PFS/OS.</li>
+</ul>
+<p>This also clarifies the role of uncertainty. Short follow-up can widen statistical uncertainty, but the larger HTA concern is often <strong>structural uncertainty</strong>: different plausible extrapolation models may produce meaningfully different long-term survival, even if their in-sample AIC/BIC or visual fit is similar. This is why an EAG may challenge an AIC-selected curve if its long-term behaviour lacks clinical credibility.</p>
+<p>Initial technical plan for this issue:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Demonstration</th>
+<th>Purpose</th>
+<th>Possible output</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Observed vs modelled horizon</td>
+<td>Show why follow-up is short in model terms</td>
+<td>Table comparing follow-up length with model horizon</td>
+</tr>
+<tr class="even">
+<td>Extrapolation-zone plot</td>
+<td>Separate observed KM evidence from modelled tail</td>
+<td>KM + fitted curve + shaded extrapolation region</td>
+</tr>
+<tr class="odd">
+<td>Distribution fan plot</td>
+<td>Show structural uncertainty across plausible curves</td>
+<td>Multiple parametric survival tails</td>
+</tr>
+<tr class="even">
+<td>Landmark survival table</td>
+<td>Quantify tail differences</td>
+<td>5-, 10-, and 20-year survival by distribution</td>
+</tr>
+<tr class="odd">
+<td>Simplified scenario impact</td>
+<td>Link survival uncertainty to economic outputs</td>
+<td>Directional QALY / ICER impact</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="eag-challenge-log" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="eag-challenge-log"><span class="header-section-number">4.4</span> EAG Challenge Log</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 20%">
@@ -497,8 +564,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="committee-preferred-assumptions" class="level3" data-number="4.3">
-<h3 data-number="4.3" class="anchored" data-anchor-id="committee-preferred-assumptions"><span class="header-section-number">4.3</span> Committee Preferred Assumptions</h3>
+<section id="committee-preferred-assumptions" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="committee-preferred-assumptions"><span class="header-section-number">4.5</span> Committee Preferred Assumptions</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 20%">
