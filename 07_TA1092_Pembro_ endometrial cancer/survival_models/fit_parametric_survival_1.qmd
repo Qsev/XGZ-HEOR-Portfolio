@@ -1950,10 +1950,185 @@ bind_rows(
 
 Interpretation notes:
 
-- pMMR curves are AIC-selected standard parametric distributions; EAG preferred spline models for pMMR are not yet implemented in this document.
-- dMMR curves follow EAG Table 2 preferences: generalised gamma (CT PFS), exponential (CT OS), log-logistic (pembro PFS and OS).
+- pMMR uses EAG-preferred spline models (Table 2); dMMR uses EAG-preferred standard parametric models (Table 2).
 - Both subgroups apply pMMR-derived utility values (0.814 / 0.720) because dMMR HRQoL data were not collected in KEYNOTE-868.
 - Pembrolizumab confidential discount is set to 0% in both calculations; the real ICER under PAS pricing would be lower.
+
+### 19.4 Model Selection Sensitivity: AIC-Selected vs EAG-Preferred
+
+This section computes ICERs under AIC-selected standard parametric distributions for both subgroups, then compares them against the EAG-preferred model assumptions in a 2×2 table. The purpose is to quantify how much model selection affects the cost-effectiveness conclusion.
+
+#### 19.4.1 pMMR: AIC-Selected Standard Parametric Models
+
+```{r pmmr-aic-state-occupancy}
+psm_pmmr_aic <- best_fits |>
+  filter(subgroup == "pMMR", endpoint %in% c("PFS", "OS")) |>
+  mutate(
+    arm  = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
+    pred = map(
+      fit,
+      ~tibble(
+        time_weeks  = ce_time_grid$time_weeks,
+        time_months = ce_time_grid$time_months,
+        survival    = predict_survival(.x, ce_time_grid$time_months)
+      )
+    )
+  ) |>
+  select(arm, endpoint, pred) |>
+  unnest(pred) |>
+  tidyr::pivot_wider(names_from = endpoint, values_from = survival) |>
+  mutate(
+    PFS  = pmin(PFS, OS),
+    PF   = PFS,
+    PD   = pmax(OS - PFS, 0),
+    Dead = pmax(1 - OS, 0)
+  )
+
+# AIC-selected distributions for pMMR
+best_fits |>
+  filter(subgroup == "pMMR", endpoint %in% c("PFS", "OS")) |>
+  select(subgroup, endpoint, treatment, best_dist = dist_label, aic) |>
+  arrange(endpoint, treatment) |>
+  kable(digits = 2, caption = "pMMR: AIC-selected distributions", align = "l")
+```
+
+```{r pmmr-aic-ce-results}
+calc_incremental <- function(psm_data) {
+  psm_data |>
+    group_by(arm) |>
+    arrange(time_weeks, .by_group = TRUE) |>
+    mutate(
+      discount         = discount_factor(time_weeks, ce_params$annual_discount_rate),
+      death_increment  = pmax(Dead - lag(Dead, default = 0), 0),
+      pf_resource_cost = case_when(
+        time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+          ce_params$weekly_cost_pf_initial,
+        arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+          ce_params$weekly_cost_pf_pembro_maint,
+        time_weeks <= 104 ~
+          ce_params$weekly_cost_pf_offtreatment,
+        TRUE ~
+          ce_params$weekly_cost_pf_offtreatment_yr3
+      ),
+      qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
+        ce_params$cycle_length_years * discount,
+      disease_management_cost = (
+        PF * pf_resource_cost + PD * ce_params$weekly_cost_pd
+      ) * discount,
+      treatment_cost = case_when(
+        arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
+          PF * ce_params$weekly_cost_pembro_combination *
+            (1 - ce_params$pembro_discount) * discount,
+        arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+          PF * ce_params$weekly_cost_pembro_maintenance *
+            (1 - ce_params$pembro_discount) * discount,
+        arm == "Placebo + chemo" & time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+          PF * ce_params$weekly_cost_comparator_chemo * discount,
+        TRUE ~ 0
+      ),
+      ae_cost = case_when(
+        arm == "Pembro + chemo"  & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
+        arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
+        TRUE ~ 0
+      ),
+      terminal_care_cost = death_increment * ce_params$terminal_care_cost * discount,
+      total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
+    ) |>
+    ungroup() |>
+    group_by(arm) |>
+    summarise(qalys = sum(qaly), costs = sum(total_cost), .groups = "drop") |>
+    summarise(
+      incremental_qalys = qalys[arm == "Pembro + chemo"] - qalys[arm == "Placebo + chemo"],
+      incremental_costs = costs[arm == "Pembro + chemo"] - costs[arm == "Placebo + chemo"],
+      icer = incremental_costs / incremental_qalys
+    )
+}
+
+ce_incremental_pmmr_aic <- calc_incremental(psm_pmmr_aic)
+
+ce_incremental_pmmr_aic |>
+  mutate(across(c(incremental_qalys), ~round(.x, 3)),
+         across(c(incremental_costs, icer), ~round(.x, 0))) |>
+  transmute(`Incremental QALYs` = incremental_qalys,
+            `Incremental costs (&#163;)` = incremental_costs,
+            `ICER (&#163;/QALY)` = icer) |>
+  kable(caption = "pMMR (AIC-selected): incremental cost-effectiveness", align = "l", escape = FALSE)
+```
+
+#### 19.4.2 dMMR: AIC-Selected Standard Parametric Models
+
+```{r dmmr-aic-state-occupancy}
+psm_dmmr_aic <- best_fits |>
+  filter(subgroup == "dMMR", endpoint %in% c("PFS", "OS")) |>
+  mutate(
+    arm  = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
+    pred = map(
+      fit,
+      ~tibble(
+        time_weeks  = ce_time_grid$time_weeks,
+        time_months = ce_time_grid$time_months,
+        survival    = predict_survival(.x, ce_time_grid$time_months)
+      )
+    )
+  ) |>
+  select(arm, endpoint, pred) |>
+  unnest(pred) |>
+  tidyr::pivot_wider(names_from = endpoint, values_from = survival) |>
+  mutate(
+    PFS  = pmin(PFS, OS),
+    PF   = PFS,
+    PD   = pmax(OS - PFS, 0),
+    Dead = pmax(1 - OS, 0)
+  )
+
+best_fits |>
+  filter(subgroup == "dMMR", endpoint %in% c("PFS", "OS")) |>
+  select(subgroup, endpoint, treatment, best_dist = dist_label, aic) |>
+  arrange(endpoint, treatment) |>
+  kable(digits = 2, caption = "dMMR: AIC-selected distributions", align = "l")
+```
+
+```{r dmmr-aic-ce-results}
+ce_incremental_dmmr_aic <- calc_incremental(psm_dmmr_aic)
+
+ce_incremental_dmmr_aic |>
+  mutate(across(c(incremental_qalys), ~round(.x, 3)),
+         across(c(incremental_costs, icer), ~round(.x, 0))) |>
+  transmute(`Incremental QALYs` = incremental_qalys,
+            `Incremental costs (&#163;)` = incremental_costs,
+            `ICER (&#163;/QALY)` = icer) |>
+  kable(caption = "dMMR (AIC-selected): incremental cost-effectiveness", align = "l", escape = FALSE)
+```
+
+#### 19.4.3 2×2 Comparison: AIC-Selected vs EAG-Preferred
+
+```{r model-selection-comparison}
+bind_rows(
+  ce_incremental_pmmr_aic         |> mutate(subgroup = "pMMR", model = "AIC-selected (standard parametric)"),
+  ce_incremental_pmmr_spline      |> mutate(subgroup = "pMMR", model = "EAG-preferred (spline, Table 2)"),
+  ce_incremental_dmmr_aic         |> mutate(subgroup = "dMMR", model = "AIC-selected (standard parametric)"),
+  ce_incremental_dmmr             |> mutate(subgroup = "dMMR", model = "EAG-preferred (standard, Table 2)")
+) |>
+  mutate(
+    incremental_qalys = round(incremental_qalys, 3),
+    incremental_costs = round(incremental_costs, 0),
+    icer              = round(icer, 0)
+  ) |>
+  transmute(
+    Subgroup          = subgroup,
+    `Model selection` = model,
+    `Incremental QALYs`      = incremental_qalys,
+    `Incremental costs (&#163;)` = incremental_costs,
+    `ICER (&#163;/QALY)`         = icer
+  ) |>
+  kable(
+    caption = "2×2 comparison: AIC-selected vs EAG-preferred models, by subgroup",
+    align   = "l",
+    escape  = FALSE
+  )
+```
+
+The key question this table answers: how sensitive is the ICER to the choice of survival model? If AIC-selected and EAG-preferred models produce similar ICERs, the cost-effectiveness conclusion is robust to curve selection. If they diverge substantially, model selection becomes a material source of decision uncertainty.
 
 ## 20. Save Outputs
 
