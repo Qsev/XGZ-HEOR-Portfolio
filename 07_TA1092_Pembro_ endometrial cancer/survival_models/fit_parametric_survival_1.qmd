@@ -984,21 +984,21 @@ ce_inputs <- tibble::tribble(
   "Pembro treatment duration", "20 cycles; 6 Q3W combination + 14 Q6W maintenance", "Extracted", "Simplified as 18 weeks + 84 weeks of active pembro cost",
   "Pembro stopping rule", "24 months / 2 years", "Extracted", "Approximated by the 102-week active dosing schedule in this mock model",
   "Chemotherapy duration", "6 cycles Q3W", "Extracted", "Applied as 18 weeks of active chemotherapy cost in this mock model",
-  "Pembrolizumab list price", "GBP 2,630 per 100 mg vial", "Extracted", "List price; confidential commercial arrangement not available",
-  "Pembrolizumab combination cost", "GBP 5,260 pembro drug + GBP 106 chemotherapy drug + GBP 277 admin per Q3W cycle", "Extracted and inferred", "Before confidential discount; chemotherapy drug cost is added using the comparator RDI-adjusted value",
-  "Pembrolizumab maintenance cost", "GBP 10,520 drug + GBP 217 admin per Q6W cycle", "Extracted", "Before confidential discount; smoothed to weekly cost in this mock model",
-  "Comparator chemotherapy cost", "GBP 106 drug + GBP 277 admin per Q3W cycle", "Extracted", "RDI-adjusted drug cost plus complex chemotherapy administration",
-  "Terminal care cost", "GBP 8,829.07 one-off at death", "Extracted", "Added in this mock model through weekly death increments",
+  "Pembrolizumab list price", "&#163;2,630 per 100 mg vial", "Extracted", "List price; confidential commercial arrangement not available",
+  "Pembrolizumab combination cost", "&#163;5,260 pembro drug + &#163;106 chemotherapy drug + &#163;277 admin per Q3W cycle", "Extracted and inferred", "Before confidential discount; chemotherapy drug cost is added using the comparator RDI-adjusted value",
+  "Pembrolizumab maintenance cost", "&#163;10,520 drug + &#163;217 admin per Q6W cycle", "Extracted", "Before confidential discount; smoothed to weekly cost in this mock model",
+  "Comparator chemotherapy cost", "&#163;106 drug + &#163;277 admin per Q3W cycle", "Extracted", "RDI-adjusted drug cost plus complex chemotherapy administration",
+  "Terminal care cost", "&#163;8,829.07 one-off at death", "Extracted", "Added in this mock model through weekly death increments",
   "PF utility", "0.814", "Extracted", "Updated base-case PF utility in the NotebookLM extraction",
   "PD utility", "0.720", "Extracted", "Updated base-case PD utility in the NotebookLM extraction",
-  "PF resource-use cost", "GBP 73.59 initial treatment; GBP 44.15 maintenance/off-treatment", "Inferred from extracted inputs", "Computed from extracted unit costs and weekly resource frequencies",
-  "PD resource-use cost", "GBP 26.67 per week", "Inferred from extracted inputs", "Computed from extracted unit costs and weekly resource frequencies",
+  "PF resource-use cost", "&#163;73.59 on-treatment Q3W; &#163;44.15 pembro Q6W maintenance (weeks 19-102); &#163;27.59 off-treatment year 1-2; &#163;13.79 off-treatment year 3+", "Corrected from extracted inputs", "NICE updated model frequencies: 0.33 (Q3W on-treatment), 0.17 (Q6W pembro maintenance), 0.08 (off-treatment year 1-2), 0.04 (off-treatment year 3+) for CT scan/outpatient/blood test",
+  "PD resource-use cost", "&#163;26.67 per week", "Inferred from extracted inputs", "Computed from extracted unit costs and weekly resource frequencies",
   "AE cost", "One-off Grade 3+ anaemia and hypertension cost", "Inferred from extracted inputs", "Duration for AE QALY decrement remains redacted, so only one-off AE costs are included here",
   "Confidential pembrolizumab discount", "Scenario parameter", "Unavailable", "Handled through pembro_discount sensitivity rather than assumed in the base case"
 )
 
 ce_inputs |>
-  kable(caption = "Economic inputs used in the mock PSM", align = "l")
+  kable(caption = "Economic inputs used in the mock PSM", align = "l", escape = FALSE)
 ```
 
 ```{r starter-ce-parameters}
@@ -1009,7 +1009,9 @@ ce_params <- list(
   utility_pf = 0.814,
   utility_pd = 0.720,
   weekly_cost_pf_initial = 0.08 * 160.83 + 0.33 * 179 + 0.33 * 5,
-  weekly_cost_pf_maintenance = 0.08 * 160.83 + 0.17 * 179 + 0.17 * 5,
+  weekly_cost_pf_pembro_maint = 0.08 * 160.83 + 0.17 * 179 + 0.17 * 5,
+  weekly_cost_pf_offtreatment = 0.08 * 160.83 + 0.08 * 179 + 0.08 * 5,
+  weekly_cost_pf_offtreatment_yr3 = 0.04 * 160.83 + 0.04 * 179 + 0.04 * 5,
   weekly_cost_pd = 0.04 * 160.83 + 0.11 * 179 + 0.11 * 5,
   weekly_cost_pembro_combination = (5260 + 106 + 277) / 3,
   weekly_cost_pembro_maintenance = (10520 + 217) / 6,
@@ -1024,7 +1026,7 @@ ce_params <- list(
   one_off_ae_cost_comparator = 0.116 * 565.40 + 0.052 * 735.07
 )
 
-tibble(
+param_display <- tibble(
   Parameter = c(
     "horizon_weeks",
     "cycle_length_years",
@@ -1032,7 +1034,9 @@ tibble(
     "utility_pf",
     "utility_pd",
     "weekly_cost_pf_initial",
-    "weekly_cost_pf_maintenance",
+    "weekly_cost_pf_pembro_maint",
+    "weekly_cost_pf_offtreatment",
+    "weekly_cost_pf_offtreatment_yr3",
     "weekly_cost_pd",
     "weekly_cost_pembro_combination",
     "weekly_cost_pembro_maintenance",
@@ -1052,26 +1056,72 @@ tibble(
     "3.5% per year",
     "0.814",
     "0.720",
-    scales::dollar(ce_params$weekly_cost_pf_initial, prefix = "GBP "),
-    scales::dollar(ce_params$weekly_cost_pf_maintenance, prefix = "GBP "),
-    scales::dollar(ce_params$weekly_cost_pd, prefix = "GBP "),
-    scales::dollar(ce_params$weekly_cost_pembro_combination, prefix = "GBP "),
-    scales::dollar(ce_params$weekly_cost_pembro_maintenance, prefix = "GBP "),
-    scales::dollar(ce_params$weekly_cost_comparator_chemo, prefix = "GBP "),
+    scales::dollar(ce_params$weekly_cost_pf_initial, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_pembro_maint, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_offtreatment, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_offtreatment_yr3, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pd, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pembro_combination, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pembro_maintenance, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_comparator_chemo, prefix = "&#163;"),
     "0% in base case",
     "18 weeks",
     "84 weeks",
     "102 weeks",
     "18 weeks",
-    "GBP 8,829.07",
-    scales::dollar(ce_params$one_off_ae_cost_pembro, prefix = "GBP "),
-    scales::dollar(ce_params$one_off_ae_cost_comparator, prefix = "GBP ")
+    "&#163;8,829.07",
+    scales::dollar(ce_params$one_off_ae_cost_pembro, prefix = "&#163;"),
+    scales::dollar(ce_params$one_off_ae_cost_comparator, prefix = "&#163;")
+  )
+)
+
+tibble(
+  Parameter_1 = c(
+    "horizon_weeks", "cycle_length_years", "annual_discount_rate",
+    "utility_pf", "utility_pd", "weekly_cost_pf_initial",
+    "weekly_cost_pf_pembro_maint", "weekly_cost_pf_offtreatment",
+    "weekly_cost_pf_offtreatment_yr3", "weekly_cost_pd",
+    "weekly_cost_pembro_combination"
+  ),
+  Value_1 = c(
+    "1,820 weeks", "1/52 year per cycle", "3.5% per year",
+    "0.814", "0.720",
+    scales::dollar(ce_params$weekly_cost_pf_initial,        prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_pembro_maint,   prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_offtreatment,   prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_offtreatment_yr3, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pd,                prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pembro_combination, prefix = "&#163;")
+  ),
+  Parameter_2 = c(
+    "weekly_cost_pembro_maintenance", "weekly_cost_comparator_chemo",
+    "pembro_discount", "pembro_combination_weeks", "pembro_maintenance_weeks",
+    "pembro_treatment_cap_weeks", "comparator_treatment_cap_weeks",
+    "terminal_care_cost", "one_off_ae_cost_pembro", "one_off_ae_cost_comparator", ""
+  ),
+  Value_2 = c(
+    scales::dollar(ce_params$weekly_cost_pembro_maintenance,  prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_comparator_chemo,    prefix = "&#163;"),
+    "0% in base case", "18 weeks", "84 weeks", "102 weeks", "18 weeks",
+    "&#163;8,829.07",
+    scales::dollar(ce_params$one_off_ae_cost_pembro,          prefix = "&#163;"),
+    scales::dollar(ce_params$one_off_ae_cost_comparator,      prefix = "&#163;"),
+    ""
   )
 ) |>
-  kable(caption = "Parameter object used by the simplified PSM", align = "l")
+  kable(
+    col.names = c("Parameter", "Value", "Parameter", "Value"),
+    caption   = "Parameter object used by the simplified PSM",
+    align     = "l",
+    escape    = FALSE
+  )
 ```
 
-### 19.2 Convert PFS and OS Curves Into Health-State Occupancy
+### 19.2 pMMR Subgroup: AIC-Selected Standard Parametric Models
+
+The pMMR analysis uses the AIC-best standard parametric distribution for each of the four curves (CT PFS, CT OS, pembro PFS, pembro OS), selected from the fitting grid in Section 14. Survival curves, state occupancy, costs, and QALYs are computed over a 35-year horizon.
+
+#### 19.2.1 Survival Curves to Health-State Occupancy
 
 In a three-state PSM:
 
@@ -1142,7 +1192,7 @@ psm_survival |>
   theme(legend.position = "bottom")
 ```
 
-### 19.3 Calculate Discounted Costs and QALYs
+#### 19.2.2 Discounted Costs and QALYs
 
 This chunk turns health-state occupancy into QALYs and costs. The model is intentionally simple, so each step is visible.
 
@@ -1160,7 +1210,12 @@ ce_trace <- psm_survival |>
     pf_resource_cost = case_when(
       time_weeks <= ce_params$comparator_treatment_cap_weeks ~
         ce_params$weekly_cost_pf_initial,
-      TRUE ~ ce_params$weekly_cost_pf_maintenance
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_pembro_maint,
+      time_weeks <= 104 ~
+        ce_params$weekly_cost_pf_offtreatment,
+      TRUE ~
+        ce_params$weekly_cost_pf_offtreatment_yr3
     ),
     qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
       ce_params$cycle_length_years * discount,
@@ -1234,7 +1289,7 @@ ce_incremental |>
 
 The absolute ICER should still not be interpreted as a TA1092 result. The model now uses more extracted public inputs, including utility values, resource-use unit costs, treatment costs, administration costs, terminal care cost, and one-off AE costs. However, confidential pembrolizumab discounts, exact commercial-in-confidence implementation details, and some AE duration assumptions remain unavailable. The useful point is structural: survival assumptions now flow through to QALYs and costs.
 
-### 19.4 Confidential Discount Sensitivity
+#### 19.2.3 Confidential Discount Sensitivity
 
 The pembrolizumab commercial arrangement is confidential. Instead of guessing it, the mock model treats the discount as a scenario parameter. This makes the limitation explicit and lets us ask a practical question: how sensitive is the ICER to the assumed pembrolizumab acquisition discount?
 
@@ -1266,7 +1321,12 @@ run_discount_sensitivity <- function(discount_value) {
       pf_resource_cost = case_when(
         time_weeks <= ce_params$comparator_treatment_cap_weeks ~
           ce_params$weekly_cost_pf_initial,
-        TRUE ~ ce_params$weekly_cost_pf_maintenance
+        arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+          ce_params$weekly_cost_pf_pembro_maint,
+        time_weeks <= 104 ~
+          ce_params$weekly_cost_pf_offtreatment,
+        TRUE ~
+          ce_params$weekly_cost_pf_offtreatment_yr3
       ),
       qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
         ce_params$cycle_length_years * discount,
@@ -1314,7 +1374,7 @@ map_dfr(c(0, 0.25, 0.50, 0.75), run_discount_sensitivity) |>
   kable(caption = "Illustrative confidential-discount sensitivity", align = "l")
 ```
 
-### 19.5 OS Tail Sensitivity
+#### 19.2.4 OS Tail Sensitivity
 
 Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate this is to reduce the long-term OS separation between arms after the EAG's 2-year boundary.
 
@@ -1360,7 +1420,12 @@ ce_trace_os_sensitivity <- psm_survival_os_sensitivity |>
     pf_resource_cost = case_when(
       time_weeks <= ce_params$comparator_treatment_cap_weeks ~
         ce_params$weekly_cost_pf_initial,
-      TRUE ~ ce_params$weekly_cost_pf_maintenance
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_pembro_maint,
+      time_weeks <= 104 ~
+        ce_params$weekly_cost_pf_offtreatment,
+      TRUE ~
+        ce_params$weekly_cost_pf_offtreatment_yr3
     ),
     qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
       ce_params$cycle_length_years * discount,
@@ -1424,6 +1489,202 @@ bind_rows(
 ```
 
 This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company's long-term OS benefit is clinically plausible.
+
+### 19.3 dMMR Subgroup: EAG-Preferred Models (Table 2)
+
+This section computes the dMMR ICER using the EAG's preferred distributions from Table 2 of the EAG supplementary report.
+
+Two structural caveats apply before interpreting the output:
+
+- The EAG's pMMR preferred models are spline-based (1-knot hazards, 2-knot hazards, 1-knot normal), which are outside the current candidate distribution set. The dMMR preferred models are all standard parametric distributions and can be extracted directly from `fit_tbl`.
+- Utility values (PF = 0.814, PD = 0.720) were collected from the pMMR cohort only. KEYNOTE-868 did not collect dMMR HRQoL data due to insufficient power in the smaller dMMR cohort. Applying pMMR utilities to dMMR patients is an approximation with additional uncertainty.
+
+#### 19.3.1 Select EAG-Preferred Distributions
+
+```{r dmmr-eag-model-selection}
+eag_dmmr_selections <- tibble::tribble(
+  ~subgroup, ~endpoint, ~treatment,      ~dist_label,
+  "dMMR",    "PFS",     "placebo_chemo", "generalized_gamma",
+  "dMMR",    "OS",      "placebo_chemo", "exponential",
+  "dMMR",    "PFS",     "pembro_chemo",  "loglogistic",
+  "dMMR",    "OS",      "pembro_chemo",  "loglogistic"
+)
+
+eag_dmmr_fits <- fit_tbl |>
+  inner_join(eag_dmmr_selections, by = c("subgroup", "endpoint", "treatment", "dist_label")) |>
+  filter(converged)
+
+eag_dmmr_fits |>
+  select(subgroup, endpoint, treatment, dist_label, n, events, aic, bic) |>
+  arrange(endpoint, treatment) |>
+  kable(digits = 2, caption = "EAG-preferred distributions for dMMR (Table 2)", align = "l")
+```
+
+#### 19.3.2 State Occupancy
+
+```{r dmmr-state-occupancy}
+psm_dmmr <- eag_dmmr_fits |>
+  mutate(
+    arm = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
+    pred = map(
+      fit,
+      ~tibble(
+        time_weeks = ce_time_grid$time_weeks,
+        time_months = ce_time_grid$time_months,
+        survival = predict_survival(.x, ce_time_grid$time_months)
+      )
+    )
+  ) |>
+  select(arm, endpoint, pred) |>
+  unnest(pred) |>
+  tidyr::pivot_wider(names_from = endpoint, values_from = survival) |>
+  mutate(
+    PFS  = pmin(PFS, OS),
+    PF   = PFS,
+    PD   = pmax(OS - PFS, 0),
+    Dead = pmax(1 - OS, 0)
+  )
+
+psm_dmmr |>
+  select(arm, time_weeks, PF, PD, Dead) |>
+  pivot_longer(cols = c(PF, PD, Dead), names_to = "state", values_to = "proportion") |>
+  mutate(time_years = time_weeks / 52) |>
+  ggplot(aes(time_years, proportion, fill = state)) +
+  geom_area(alpha = 0.85) +
+  facet_wrap(~arm) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 35), breaks = seq(0, 35, 5)) +
+  labs(
+    title = "dMMR partitioned survival model (EAG-preferred distributions)",
+    subtitle = "EAG: generalised gamma / exponential / log-logistic / log-logistic",
+    x = "Years",
+    y = "Proportion of cohort",
+    fill = "Health state"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+#### 19.3.3 Discounted Costs and QALYs
+
+```{r dmmr-ce-results}
+ce_trace_dmmr <- psm_dmmr |>
+  group_by(arm) |>
+  arrange(time_weeks, .by_group = TRUE) |>
+  mutate(
+    discount        = discount_factor(time_weeks, ce_params$annual_discount_rate),
+    death_increment = pmax(Dead - lag(Dead, default = 0), 0),
+    pf_resource_cost = case_when(
+      time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_initial,
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_pembro_maint,
+      time_weeks <= 104 ~
+        ce_params$weekly_cost_pf_offtreatment,
+      TRUE ~
+        ce_params$weekly_cost_pf_offtreatment_yr3
+    ),
+    qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
+      ce_params$cycle_length_years * discount,
+    disease_management_cost = (
+      PF * pf_resource_cost + PD * ce_params$weekly_cost_pd
+    ) * discount,
+    treatment_cost = case_when(
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
+        PF * ce_params$weekly_cost_pembro_combination *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_pembro_maintenance *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Placebo + chemo" & time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_comparator_chemo * discount,
+      TRUE ~ 0
+    ),
+    ae_cost = case_when(
+      arm == "Pembro + chemo"  & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
+      arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
+      TRUE ~ 0
+    ),
+    terminal_care_cost = death_increment * ce_params$terminal_care_cost * discount,
+    total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
+  ) |>
+  ungroup()
+
+ce_results_dmmr <- ce_trace_dmmr |>
+  group_by(arm) |>
+  summarise(
+    discounted_qalys = sum(qaly),
+    discounted_costs = sum(total_cost),
+    .groups = "drop"
+  )
+
+ce_incremental_dmmr <- ce_results_dmmr |>
+  summarise(
+    incremental_qalys = discounted_qalys[arm == "Pembro + chemo"] -
+      discounted_qalys[arm == "Placebo + chemo"],
+    incremental_costs = discounted_costs[arm == "Pembro + chemo"] -
+      discounted_costs[arm == "Placebo + chemo"],
+    icer = incremental_costs / incremental_qalys
+  )
+
+ce_results_dmmr |>
+  mutate(
+    discounted_qalys = round(discounted_qalys, 3),
+    discounted_costs = round(discounted_costs, 0)
+  ) |>
+  transmute(
+    Arm = arm,
+    `Discounted QALYs` = discounted_qalys,
+    `Discounted costs (&#163;)` = discounted_costs
+  ) |>
+  kable(caption = "dMMR: discounted results by arm (EAG-preferred models)", align = "l", escape = FALSE)
+
+ce_incremental_dmmr |>
+  mutate(
+    incremental_qalys = round(incremental_qalys, 3),
+    incremental_costs = round(incremental_costs, 0),
+    icer = round(icer, 0)
+  ) |>
+  transmute(
+    `Incremental QALYs` = incremental_qalys,
+    `Incremental costs (&#163;)` = incremental_costs,
+    `ICER (&#163;/QALY)` = icer
+  ) |>
+  kable(caption = "dMMR: incremental cost-effectiveness (EAG-preferred models)", align = "l", escape = FALSE)
+```
+
+#### 19.3.4 pMMR vs dMMR Summary
+
+```{r pmmr-dmmr-comparison}
+bind_rows(
+  ce_incremental     |> mutate(subgroup = "pMMR", model = "AIC-selected (standard parametric)"),
+  ce_incremental_dmmr |> mutate(subgroup = "dMMR", model = "EAG-preferred (Table 2)")
+) |>
+  mutate(
+    incremental_qalys = round(incremental_qalys, 3),
+    incremental_costs = round(incremental_costs, 0),
+    icer = round(icer, 0)
+  ) |>
+  transmute(
+    Subgroup = subgroup,
+    `Curve selection` = model,
+    `Incremental QALYs` = incremental_qalys,
+    `Incremental costs (&#163;)` = incremental_costs,
+    `ICER (&#163;/QALY)` = icer
+  ) |>
+  kable(
+    caption = "pMMR vs dMMR cost-effectiveness comparison",
+    align = "l",
+    escape = FALSE
+  )
+```
+
+Interpretation notes:
+
+- pMMR curves are AIC-selected standard parametric distributions; EAG preferred spline models for pMMR are not yet implemented in this document.
+- dMMR curves follow EAG Table 2 preferences: generalised gamma (CT PFS), exponential (CT OS), log-logistic (pembro PFS and OS).
+- Both subgroups apply pMMR-derived utility values (0.814 / 0.720) because dMMR HRQoL data were not collected in KEYNOTE-868.
+- Pembrolizumab confidential discount is set to 0% in both calculations; the real ICER under PAS pricing would be lower.
 
 ## 20. Save Outputs
 
