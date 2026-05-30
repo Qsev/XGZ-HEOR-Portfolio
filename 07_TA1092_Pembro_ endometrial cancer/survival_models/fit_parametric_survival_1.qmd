@@ -8,6 +8,43 @@ format:
     code-fold: true
     code-summary: "Show R code"
     css: fit_parametric_survival_1.css
+    include-after-body:
+      - text: |
+          <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            ['level2', 'level3'].forEach(function (lvl) {
+              var tag = lvl === 'level2' ? 'h2' : 'h3';
+              document.querySelectorAll('section.' + lvl).forEach(function (sec) {
+                var hd = sec.querySelector(':scope > ' + tag);
+                if (!hd) return;
+
+                // arrow indicator
+                var arrow = document.createElement('span');
+                arrow.innerHTML = ' &#9660;';
+                arrow.style.cssText = [
+                  'font-size:0.6em', 'color:#bbb', 'vertical-align:middle',
+                  'margin-left:6px', 'display:inline-block'
+                ].join(';');
+                hd.appendChild(arrow);
+                hd.style.cursor = 'pointer';
+                hd.title = 'Click to collapse / expand';
+
+                var body = Array.from(sec.children).filter(function (el) {
+                  return el !== hd;
+                });
+                var open = true;
+
+                hd.addEventListener('click', function () {
+                  open = !open;
+                  body.forEach(function (el) {
+                    el.style.display = open ? '' : 'none';
+                  });
+                  arrow.innerHTML = open ? ' &#9660;' : ' &#9654;';
+                });
+              });
+            });
+          });
+          </script>
 execute:
   warning: false
   message: false
