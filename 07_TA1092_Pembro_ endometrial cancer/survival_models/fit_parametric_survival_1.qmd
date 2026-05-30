@@ -1928,13 +1928,143 @@ bind_rows(
 The key question this table answers: how sensitive is the ICER to the choice of survival model? If AIC-selected and EAG-preferred models produce similar ICERs, the cost-effectiveness conclusion is robust to curve selection. If they diverge substantially, model selection becomes a material source of decision uncertainty.
 
 
-### 6.2 Sensitivity Analysis: Confidential Discounts & OS Tail Reduction
 
-#### 6.2.1 Illustrative Starter Code (pMMR Standard Parametric Models)
+### 6.2 Visual Extrapolation Comparison: AIC vs. EAG
+
+To visually understand why the cost-effectiveness results differ substantially, we plot the reconstructed KM curves alongside the fitted and extrapolated curves for both the AIC-selected standard parametric models and the EAG-preferred spline models. The plots show the first 10 years (120 months) of projection.
+
+```{r visual-extrapolation-comparison}
+#| fig-width: 10
+#| fig-height: 6
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# 1. Combine PFS Plot Data
+plot_data_pfs <- bind_rows(
+  km_points |>
+    filter(subgroup == "pMMR", endpoint == "PFS") |>
+    mutate(
+      arm = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
+      source = "Reconstructed KM",
+      model = "KM"
+    ) |>
+    select(arm, time_months, survival, source, model),
+  psm_pmmr_aic |>
+    mutate(
+      survival = PFS,
+      source = "AIC-selected standard parametric",
+      model = "AIC"
+    ) |>
+    select(arm, time_months, survival, source, model),
+  psm_pmmr_spline |>
+    mutate(
+      survival = PFS,
+      source = "EAG-preferred spline model",
+      model = "EAG"
+    ) |>
+    select(arm, time_months, survival, source, model)
+)
+
+# 2. Combine OS Plot Data
+plot_data_os <- bind_rows(
+  km_points |>
+    filter(subgroup == "pMMR", endpoint == "OS") |>
+    mutate(
+      arm = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
+      source = "Reconstructed KM",
+      model = "KM"
+    ) |>
+    select(arm, time_months, survival, source, model),
+  psm_pmmr_aic |>
+    mutate(
+      survival = PF + PD,
+      source = "AIC-selected standard parametric",
+      model = "AIC"
+    ) |>
+    select(arm, time_months, survival, source, model),
+  psm_pmmr_spline |>
+    mutate(
+      survival = PF + PD,
+      source = "EAG-preferred spline model",
+      model = "EAG"
+    ) |>
+    select(arm, time_months, survival, source, model)
+)
+
+# Colors and Linetypes
+model_cols <- c(
+  "Reconstructed KM" = "#2D3748", 
+  "AIC-selected standard parametric" = "#E53E3E", 
+  "EAG-preferred spline model" = "#3182CE"
+)
+model_lt <- c(
+  "Reconstructed KM" = "solid", 
+  "AIC-selected standard parametric" = "dashed", 
+  "EAG-preferred spline model" = "solid"
+)
+
+# PFS Plot
+p_pfs <- ggplot(plot_data_pfs |> filter(time_months <= 120), aes(time_months, survival, colour = source, linetype = source)) +
+  geom_step(data = ~filter(.x, model == "KM"), linewidth = 0.8, alpha = 0.6) +
+  geom_line(data = ~filter(.x, model != "KM"), linewidth = 1.0) +
+  facet_wrap(~arm, ncol = 2) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 120), breaks = seq(0, 120, 12)) +
+  scale_colour_manual(values = model_cols) +
+  scale_linetype_manual(values = model_lt) +
+  labs(
+    title = "pMMR PFS: Extrapolation Comparison (AIC vs. EAG)",
+    subtitle = "Reconstructed KM vs. AIC standard parametric (dashed, red) vs. EAG spline (solid, blue) up to 10 years",
+    x = "Months",
+    y = "PFS Probability",
+    colour = "Model Selection",
+    linetype = "Model Selection"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(size = 9),
+    legend.title = element_text(size = 10)
+  )
+
+print(p_pfs)
+
+# OS Plot
+p_os <- ggplot(plot_data_os |> filter(time_months <= 120), aes(time_months, survival, colour = source, linetype = source)) +
+  geom_step(data = ~filter(.x, model == "KM"), linewidth = 0.8, alpha = 0.6) +
+  geom_line(data = ~filter(.x, model != "KM"), linewidth = 1.0) +
+  facet_wrap(~arm, ncol = 2) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 120), breaks = seq(0, 120, 12)) +
+  scale_colour_manual(values = model_cols) +
+  scale_linetype_manual(values = model_lt) +
+  labs(
+    title = "pMMR OS: Extrapolation Comparison (AIC vs. EAG)",
+    subtitle = "Reconstructed KM vs. AIC standard parametric (dashed, red) vs. EAG spline (solid, blue) up to 10 years",
+    x = "Months",
+    y = "OS Probability",
+    colour = "Model Selection",
+    linetype = "Model Selection"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(size = 9),
+    legend.title = element_text(size = 10)
+  )
+
+print(p_os)
+```
+
+
+### 6.3 Sensitivity Analysis: Confidential Discounts & OS Tail Reduction
+
+#### 6.3.1 Illustrative Starter Code (pMMR Standard Parametric Models)
 
 For reference, the following blocks show the manual state-occupancy and cost-effectiveness calculations for the pMMR standard parametric model without helper functions.
 
-##### 6.2.1.1 State Occupancy
+##### 6.3.1.1 State Occupancy
 
 In a three-state PSM:
 
@@ -2003,7 +2133,7 @@ psm_survival |>
 ```
 
 
-##### 6.2.1.2 Plotting Occupancy
+##### 6.3.1.2 Plotting Occupancy
 
 This chunk turns health-state occupancy into QALYs and costs. The model is intentionally simple, so each step is visible.
 
@@ -2102,11 +2232,11 @@ ce_incremental |>
 The absolute ICER should still not be interpreted as a TA1092 result. The model now uses more extracted public inputs, including utility values, resource-use unit costs, treatment costs, administration costs, terminal care cost, and one-off AE costs. However, confidential pembrolizumab discounts, exact commercial-in-confidence implementation details, and some AE duration assumptions remain unavailable. The useful point is structural: survival assumptions now flow through to QALYs and costs.
 
 
-#### 6.2.2 Sensitivity Analysis Implementation
+#### 6.3.2 Sensitivity Analysis Implementation
 
 We now implement sensitivity analyses for the confidential discount of pembrolizumab and the OS tail reduction assumption.
 
-##### 6.2.2.1 Confidential Discount Sensitivity
+##### 6.3.2.1 Confidential Discount Sensitivity
 
 The pembrolizumab commercial arrangement is confidential. Instead of guessing it, the mock model treats the discount as a scenario parameter. This makes the limitation explicit and lets us ask a practical question: how sensitive is the ICER to the assumed pembrolizumab acquisition discount?
 
@@ -2193,7 +2323,7 @@ map_dfr(c(0, 0.25, 0.50, 0.75), run_discount_sensitivity) |>
 ```
 
 
-##### 6.2.2.2 OS Tail Sensitivity
+##### 6.3.2.2 OS Tail Sensitivity
 
 Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate this is to reduce the long-term OS separation between arms after the EAG's 2-year boundary.
 
@@ -2311,7 +2441,7 @@ bind_rows(
 This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company's long-term OS benefit is clinically plausible.
 
 
-### 6.3 HTA Decision Interpretation & Consulting Takeaways
+### 6.4 HTA Decision Interpretation & Consulting Takeaways
 
 The next analytical step is not more code. It is interpretation:
 
@@ -2322,7 +2452,7 @@ The next analytical step is not more code. It is interpretation:
 - Where would an EAG challenge a purely AIC-driven model choice?
 
 
-#### 6.3.1 Saving Reconstructed Model Outputs
+#### 6.4.1 Saving Reconstructed Model Outputs
 
 This final block writes the same output files as the batch script.
 
