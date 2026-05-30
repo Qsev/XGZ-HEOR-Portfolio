@@ -1115,6 +1115,15 @@ tibble(
     align     = "l",
     escape    = FALSE
   )
+
+ce_time_grid <- tibble(
+  time_weeks  = 0:ce_params$horizon_weeks,
+  time_months = time_weeks * 12 / 52
+)
+
+discount_factor <- function(week, annual_rate) {
+  1 / ((1 + annual_rate) ^ (week / 52))
+}
 ```
 
 ### 19.2 pMMR Subgroup: AIC-Selected Standard Parametric Models
@@ -1142,11 +1151,7 @@ PFS_constrained = min(PFS, OS)
 This keeps the simplified PSM structurally coherent. It is not intended to replace full curve-pair selection in a formal submission.
 
 ```{r starter-ce-state-occupancy}
-ce_time_grid <- tibble(
-  time_weeks = 0:ce_params$horizon_weeks,
-  time_months = time_weeks * 12 / 52
-)
-
+#| eval: false
 psm_survival <- best_fits |>
   filter(subgroup == "pMMR", endpoint %in% c("PFS", "OS")) |>
   mutate(
@@ -1172,6 +1177,7 @@ psm_survival <- best_fits |>
 ```
 
 ```{r starter-ce-state-occupancy-plot}
+#| eval: false
 psm_survival |>
   select(arm, time_weeks, PF, PD, Dead) |>
   pivot_longer(cols = c(PF, PD, Dead), names_to = "state", values_to = "proportion") |>
@@ -1197,6 +1203,7 @@ psm_survival |>
 This chunk turns health-state occupancy into QALYs and costs. The model is intentionally simple, so each step is visible.
 
 ```{r starter-ce-results}
+#| eval: false
 discount_factor <- function(week, annual_rate) {
   1 / ((1 + annual_rate) ^ (week / 52))
 }
@@ -1294,6 +1301,7 @@ The absolute ICER should still not be interpreted as a TA1092 result. The model 
 The pembrolizumab commercial arrangement is confidential. Instead of guessing it, the mock model treats the discount as a scenario parameter. This makes the limitation explicit and lets us ask a practical question: how sensitive is the ICER to the assumed pembrolizumab acquisition discount?
 
 ```{r starter-ce-discount-sensitivity}
+#| eval: false
 calculate_incremental_ce <- function(trace) {
   trace |>
     group_by(arm) |>
@@ -1381,6 +1389,7 @@ Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate
 This scenario is not an EAG preferred model. It is a teaching sensitivity: after 104 weeks, the pembro OS benefit is gradually reduced so that only 50% of the modelled OS separation remains by 10 years.
 
 ```{r starter-ce-os-tail-sensitivity}
+#| eval: false
 apply_os_tail_reduction <- function(dat, start_week = 104, end_week = 520, final_fraction = 0.5) {
   dat |>
     select(arm, time_weeks, time_months, PFS, OS) |>
@@ -1490,13 +1499,236 @@ bind_rows(
 
 This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company's long-term OS benefit is clinically plausible.
 
+#### 19.2.5 EAG-Preferred Spline Models: Fitting Function
+
+The EAG preferred spline models for pMMR (Table 2) are Royston-Parmar flexible parametric models fitted with `flexsurvspline()`. Unlike standard parametric distributions, spline models can accommodate non-monotonic hazard functions and are more flexible in the observed period.
+
+```{r pmmr-spline-function}
+fit_one_spline <- function(dat, k, scale, label) {
+  tryCatch({
+    fit     <- flexsurvspline(Surv(time_months, status) ~ 1, data = dat, k = k, scale = scale)
+    fit_aic <- as.numeric(AIC(fit) %||% NA_real_)
+    fit_ll  <- as.numeric(fit$loglik %||% NA_real_)
+    tibble(
+      dist_label = label,
+      fit        = list(fit),
+      converged  = TRUE,
+      error      = NA_character_,
+      aic        = fit_aic,
+      loglik     = fit_ll,
+      n          = nrow(dat),
+      events     = sum(dat$status)
+    )
+  }, error = function(e) {
+    tibble(
+      dist_label = label,
+      fit        = list(NULL),
+      converged  = FALSE,
+      error      = conditionMessage(e),
+      aic        = NA_real_,
+      loglik     = NA_real_,
+      n          = nrow(dat),
+      events     = sum(dat$status)
+    )
+  })
+}
+
+tibble(
+  `Function` = "fit_one_spline(dat, k, scale, label)",
+  `Backend`  = "flexsurvspline()",
+  `Purpose`  = "Fit Royston-Parmar spline model for one curve"
+) |> kable()
+```
+
+```{r pmmr-spline-specs}
+eag_pmmr_spline_specs <- tibble::tribble(
+  ~subgroup, ~endpoint, ~treatment,      ~k, ~scale,   ~dist_label,
+  "pMMR",    "PFS",     "placebo_chemo", 2,  "hazard", "2-knot hazards",
+  "pMMR",    "OS",      "placebo_chemo", 1,  "hazard", "1-knot hazards",
+  "pMMR",    "PFS",     "pembro_chemo",  1,  "hazard", "1-knot hazards",
+  "pMMR",    "OS",      "pembro_chemo",  1,  "normal", "1-knot normal"
+)
+
+eag_pmmr_spline_specs |>
+  kable(caption = "EAG-preferred spline specifications for pMMR (Table 2)", align = "l")
+```
+
+```{r pmmr-spline-fits}
+spline_fit_rows <- vector("list", nrow(eag_pmmr_spline_specs))
+for (i in seq_len(nrow(eag_pmmr_spline_specs))) {
+  spec_i <- eag_pmmr_spline_specs[i, ]
+  dat_i  <- ipd |> filter(
+    as.character(subgroup)  == spec_i$subgroup,
+    as.character(endpoint)  == spec_i$endpoint,
+    as.character(treatment) == spec_i$treatment
+  )
+  res_i <- fit_one_spline(dat_i, spec_i$k, spec_i$scale, spec_i$dist_label)
+  spline_fit_rows[[i]] <- bind_cols(
+    tibble(subgroup = spec_i$subgroup,
+           endpoint = spec_i$endpoint,
+           treatment = spec_i$treatment),
+    res_i
+  )
+}
+eag_pmmr_spline_fits <- bind_rows(spline_fit_rows)
+
+eag_pmmr_spline_fits |>
+  select(subgroup, endpoint, treatment, dist_label, n, events, aic, converged, error) |>
+  kable(digits = 2, caption = "EAG-preferred spline fit summary for pMMR", align = "l")
+
+```
+
+#### 19.2.6 State Occupancy with EAG Spline Models
+
+```{r pmmr-spline-state-occupancy}
+get_spline_surv <- function(fit_obj, times) {
+  # Unwrap list(model_obj) wrapper only if not already a flexsurv model
+  if (!inherits(fit_obj, "flexsurvreg")) fit_obj <- fit_obj[[1]]
+  s <- summary(fit_obj, t = times, type = "survival", ci = FALSE)
+  if (is.data.frame(s))                    return(as.numeric(s$est))
+  if (is.list(s) && is.data.frame(s[[1]])) return(as.numeric(s[[1]]$est))
+  if (is.list(s) && is.numeric(s[[1]]))    return(as.numeric(s[[1]]))
+  stop(paste("Cannot extract survival: class(s)=", class(s), "class(s[[1]])=", class(s[[1]])))
+}
+
+pmmr_sp_curves <- eag_pmmr_spline_fits |>
+  filter(converged) |>
+  mutate(arm = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo")) |>
+  select(arm, endpoint, fit)
+
+surv_rows <- vector("list", nrow(pmmr_sp_curves))
+for (i in seq_len(nrow(pmmr_sp_curves))) {
+  surv_rows[[i]] <- tibble(
+    arm         = pmmr_sp_curves$arm[[i]],
+    endpoint    = pmmr_sp_curves$endpoint[[i]],
+    time_weeks  = ce_time_grid$time_weeks,
+    time_months = ce_time_grid$time_months,
+    surv        = get_spline_surv(pmmr_sp_curves$fit[[i]], ce_time_grid$time_months)
+  )
+}
+
+psm_pmmr_spline <- bind_rows(surv_rows) |>
+  tidyr::pivot_wider(
+    id_cols     = c(arm, time_weeks, time_months),
+    names_from  = endpoint,
+    values_from = surv
+  ) |>
+  mutate(
+    PFS  = pmin(PFS, OS),
+    PF   = PFS,
+    PD   = pmax(OS - PFS, 0),
+    Dead = pmax(1 - OS, 0)
+  )
+
+psm_pmmr_spline |>
+  select(arm, time_weeks, PF, PD, Dead) |>
+  pivot_longer(cols = c(PF, PD, Dead), names_to = "state", values_to = "proportion") |>
+  mutate(time_years = time_weeks / 52) |>
+  ggplot(aes(time_years, proportion, fill = state)) +
+  geom_area(alpha = 0.85) +
+  facet_wrap(~arm) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(limits = c(0, 35), breaks = seq(0, 35, 5)) +
+  labs(
+    title    = "pMMR partitioned survival model: EAG-preferred spline models",
+    subtitle = "CT PFS: 2-knot hazards | CT OS: 1-knot hazards | Pembro PFS: 1-knot hazards | Pembro OS: 1-knot normal",
+    x = "Years", y = "Proportion of cohort", fill = "Health state"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+#### 19.2.7 Discounted Costs and QALYs (EAG Spline Models)
+
+```{r pmmr-spline-ce-results}
+ce_trace_pmmr_spline <- psm_pmmr_spline |>
+  group_by(arm) |>
+  arrange(time_weeks, .by_group = TRUE) |>
+  mutate(
+    discount         = discount_factor(time_weeks, ce_params$annual_discount_rate),
+    death_increment  = pmax(Dead - lag(Dead, default = 0), 0),
+    pf_resource_cost = case_when(
+      time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_initial,
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_pembro_maint,
+      time_weeks <= 104 ~
+        ce_params$weekly_cost_pf_offtreatment,
+      TRUE ~
+        ce_params$weekly_cost_pf_offtreatment_yr3
+    ),
+    qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
+      ce_params$cycle_length_years * discount,
+    disease_management_cost = (
+      PF * pf_resource_cost + PD * ce_params$weekly_cost_pd
+    ) * discount,
+    treatment_cost = case_when(
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
+        PF * ce_params$weekly_cost_pembro_combination *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_pembro_maintenance *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Placebo + chemo" & time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_comparator_chemo * discount,
+      TRUE ~ 0
+    ),
+    ae_cost = case_when(
+      arm == "Pembro + chemo"  & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
+      arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
+      TRUE ~ 0
+    ),
+    terminal_care_cost = death_increment * ce_params$terminal_care_cost * discount,
+    total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
+  ) |>
+  ungroup()
+
+ce_results_pmmr_spline <- ce_trace_pmmr_spline |>
+  group_by(arm) |>
+  summarise(
+    discounted_qalys = sum(qaly),
+    discounted_costs = sum(total_cost),
+    .groups = "drop"
+  )
+
+ce_incremental_pmmr_spline <- ce_results_pmmr_spline |>
+  summarise(
+    incremental_qalys = discounted_qalys[arm == "Pembro + chemo"] -
+      discounted_qalys[arm == "Placebo + chemo"],
+    incremental_costs = discounted_costs[arm == "Pembro + chemo"] -
+      discounted_costs[arm == "Placebo + chemo"],
+    icer = incremental_costs / incremental_qalys
+  )
+
+ce_results_pmmr_spline |>
+  mutate(
+    discounted_qalys = round(discounted_qalys, 3),
+    discounted_costs = round(discounted_costs, 0)
+  ) |>
+  transmute(Arm = arm,
+            `Discounted QALYs` = discounted_qalys,
+            `Discounted costs (&#163;)` = discounted_costs) |>
+  kable(caption = "pMMR (EAG spline): discounted results by arm", align = "l", escape = FALSE)
+
+ce_incremental_pmmr_spline |>
+  mutate(
+    incremental_qalys = round(incremental_qalys, 3),
+    incremental_costs = round(incremental_costs, 0),
+    icer              = round(icer, 0)
+  ) |>
+  transmute(`Incremental QALYs`     = incremental_qalys,
+            `Incremental costs (&#163;)` = incremental_costs,
+            `ICER (&#163;/QALY)`        = icer) |>
+  kable(caption = "pMMR (EAG spline): incremental cost-effectiveness", align = "l", escape = FALSE)
+```
+
 ### 19.3 dMMR Subgroup: EAG-Preferred Models (Table 2)
 
 This section computes the dMMR ICER using the EAG's preferred distributions from Table 2 of the EAG supplementary report.
 
 Two structural caveats apply before interpreting the output:
 
-- The EAG's pMMR preferred models are spline-based (1-knot hazards, 2-knot hazards, 1-knot normal), which are outside the current candidate distribution set. The dMMR preferred models are all standard parametric distributions and can be extracted directly from `fit_tbl`.
+- The EAG's pMMR preferred models are now implemented as spline models in Section 19.2 above.
 - Utility values (PF = 0.814, PD = 0.720) were collected from the pMMR cohort only. KEYNOTE-868 did not collect dMMR HRQoL data due to insufficient power in the smaller dMMR cohort. Applying pMMR utilities to dMMR patients is an approximation with additional uncertainty.
 
 #### 19.3.1 Select EAG-Preferred Distributions
@@ -1657,8 +1889,8 @@ ce_incremental_dmmr |>
 
 ```{r pmmr-dmmr-comparison}
 bind_rows(
-  ce_incremental     |> mutate(subgroup = "pMMR", model = "AIC-selected (standard parametric)"),
-  ce_incremental_dmmr |> mutate(subgroup = "dMMR", model = "EAG-preferred (Table 2)")
+  ce_incremental_pmmr_spline |> mutate(subgroup = "pMMR", model = "EAG-preferred spline (Table 2)"),
+  ce_incremental_dmmr        |> mutate(subgroup = "dMMR", model = "EAG-preferred standard (Table 2)")
 ) |>
   mutate(
     incremental_qalys = round(incremental_qalys, 3),
@@ -1673,7 +1905,7 @@ bind_rows(
     `ICER (&#163;/QALY)` = icer
   ) |>
   kable(
-    caption = "pMMR vs dMMR cost-effectiveness comparison",
+    caption = "pMMR (EAG spline) vs dMMR (EAG standard) cost-effectiveness comparison",
     align = "l",
     escape = FALSE
   )

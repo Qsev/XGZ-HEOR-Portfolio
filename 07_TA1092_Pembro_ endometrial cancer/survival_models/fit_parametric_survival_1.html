@@ -3019,6 +3019,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </div>
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>ce_time_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_weeks  =</span> <span class="dv">0</span><span class="sc">:</span>ce_params<span class="sc">$</span>horizon_weeks,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_months =</span> time_weeks <span class="sc">*</span> <span class="dv">12</span> <span class="sc">/</span> <span class="dv">52</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>discount_factor <span class="ot">&lt;-</span> <span class="cf">function</span>(week, annual_rate) {</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> annual_rate) <span class="sc">^</span> (week <span class="sc">/</span> <span class="dv">52</span>))</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 </section>
 <section id="pmmr-subgroup-aic-selected-standard-parametric-models" class="level3">
@@ -3035,69 +3046,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This is why survival extrapolation matters for cost-effectiveness. If OS is optimistic, patients remain alive longer and generate more life years and QALYs.</p>
 <p>There is one structural rule in a PSM: <strong>PFS should not exceed OS</strong>. PFS is the proportion alive and progression-free. OS is the proportion alive. Since every progression-free patient must also be alive, PFS should always be less than or equal to OS.</p>
 <p>The source materials indicate that the company model included a limit to ensure that PFS could not exceed OS, applied at the per-cycle hazard level. This matters because independently fitted PFS and OS curves can otherwise cross in long-term extrapolation. I cannot reproduce the exact hazard-level implementation without the company workbook, so this public-data teaching model uses a transparent probability-level approximation:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>PFS_constrained <span class="ot">=</span> <span class="fu">min</span>(PFS, OS)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>PFS_constrained <span class="ot">=</span> <span class="fu">min</span>(PFS, OS)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This keeps the simplified PSM structurally coherent. It is not intended to replace full curve-pair selection in a formal submission.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>ce_time_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_weeks =</span> <span class="dv">0</span><span class="sc">:</span>ce_params<span class="sc">$</span>horizon_weeks,</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_months =</span> time_weeks <span class="sc">*</span> <span class="dv">12</span> <span class="sc">/</span> <span class="dv">52</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>psm_survival <span class="ot">&lt;-</span> best_fits <span class="sc">|&gt;</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(subgroup <span class="sc">==</span> <span class="st">"pMMR"</span>, endpoint <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"PFS"</span>, <span class="st">"OS"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">arm =</span> <span class="fu">if_else</span>(treatment <span class="sc">==</span> <span class="st">"pembro_chemo"</span>, <span class="st">"Pembro + chemo"</span>, <span class="st">"Placebo + chemo"</span>),</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred =</span> <span class="fu">map</span>(</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>      fit,</span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span><span class="fu">tibble</span>(</span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_weeks =</span> ce_time_grid<span class="sc">$</span>time_weeks,</span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_months =</span> ce_time_grid<span class="sc">$</span>time_months,</span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">survival =</span> <span class="fu">predict_survival</span>(.x, ce_time_grid<span class="sc">$</span>time_months)</span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, endpoint, pred) <span class="sc">|&gt;</span></span>
-<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(pred) <span class="sc">|&gt;</span></span>
-<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> endpoint, <span class="at">values_from =</span> survival) <span class="sc">|&gt;</span></span>
-<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">PFS =</span> <span class="fu">pmin</span>(PFS, OS),  <span class="co"># Approximation of the company model's PFS &lt;= OS constraint.</span></span>
-<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">PF =</span> PFS,</span>
-<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">PD =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
-<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
-<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>psm_survival <span class="ot">&lt;-</span> best_fits <span class="sc">|&gt;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(subgroup <span class="sc">==</span> <span class="st">"pMMR"</span>, endpoint <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"PFS"</span>, <span class="st">"OS"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">arm =</span> <span class="fu">if_else</span>(treatment <span class="sc">==</span> <span class="st">"pembro_chemo"</span>, <span class="st">"Pembro + chemo"</span>, <span class="st">"Placebo + chemo"</span>),</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred =</span> <span class="fu">map</span>(</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>      fit,</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span><span class="fu">tibble</span>(</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_weeks =</span> ce_time_grid<span class="sc">$</span>time_weeks,</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_months =</span> ce_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">survival =</span> <span class="fu">predict_survival</span>(.x, ce_time_grid<span class="sc">$</span>time_months)</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, endpoint, pred) <span class="sc">|&gt;</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(pred) <span class="sc">|&gt;</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> endpoint, <span class="at">values_from =</span> survival) <span class="sc">|&gt;</span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">PFS =</span> <span class="fu">pmin</span>(PFS, OS),  <span class="co"># Approximation of the company model's PFS &lt;= OS constraint.</span></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">PF =</span> PFS,</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">PD =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>psm_survival <span class="sc">|&gt;</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Simplified pMMR partitioned survival model"</span>,</span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Weekly PSM with a PFS &lt;= OS structural constraint"</span>,</span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>,</span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>,</span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Health state"</span></span>
-<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>psm_survival <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Simplified pMMR partitioned survival model"</span>,</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Weekly PSM with a PFS &lt;= OS structural constraint"</span>,</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>,</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>,</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Health state"</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="fit_parametric_survival_1_files/figure-html/starter-ce-state-occupancy-plot-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 </section>
 <section id="discounted-costs-and-qalys" class="level4">
@@ -3106,140 +3105,95 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>discount_factor <span class="ot">&lt;-</span> <span class="cf">function</span>(week, annual_rate) {</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> annual_rate) <span class="sc">^</span> (week <span class="sc">/</span> <span class="dv">52</span>))</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>ce_trace <span class="ot">&lt;-</span> psm_survival <span class="sc">|&gt;</span></span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_weeks, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">discount =</span> <span class="fu">discount_factor</span>(time_weeks, ce_params<span class="sc">$</span>annual_discount_rate),</span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">death_increment =</span> <span class="fu">pmax</span>(Dead <span class="sc">-</span> <span class="fu">lag</span>(Dead, <span class="at">default =</span> <span class="dv">0</span>), <span class="dv">0</span>),</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pf_resource_cost =</span> <span class="fu">case_when</span>(</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_initial,</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_pembro_maint,</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> <span class="dv">104</span> <span class="sc">~</span></span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment,</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span></span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment_yr3</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">qaly =</span> (PF <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pf <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pd) <span class="sc">*</span></span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>      ce_params<span class="sc">$</span>cycle_length_years <span class="sc">*</span> discount,</span>
-<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">disease_management_cost =</span> (</span>
-<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>      PF <span class="sc">*</span> pf_resource_cost <span class="sc">+</span></span>
-<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>        PD <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pd</span>
-<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">*</span> discount,</span>
-<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_cost =</span> <span class="fu">case_when</span>(</span>
-<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_combination_weeks <span class="sc">~</span></span>
-<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_combination <span class="sc">*</span></span>
-<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
-<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
-<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_maintenance <span class="sc">*</span></span>
-<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
-<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
-<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_comparator_chemo <span class="sc">*</span> discount,</span>
-<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
-<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">ae_cost =</span> <span class="fu">case_when</span>(</span>
-<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_pembro,</span>
-<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_comparator,</span>
-<span id="cb37-41"><a href="#cb37-41" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
-<span id="cb37-42"><a href="#cb37-42" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb37-43"><a href="#cb37-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_care_cost =</span> death_increment <span class="sc">*</span> ce_params<span class="sc">$</span>terminal_care_cost <span class="sc">*</span> discount,</span>
-<span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_cost =</span> disease_management_cost <span class="sc">+</span> treatment_cost <span class="sc">+</span> ae_cost <span class="sc">+</span> terminal_care_cost</span>
-<span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb37-46"><a href="#cb37-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb37-47"><a href="#cb37-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-48"><a href="#cb37-48" aria-hidden="true" tabindex="-1"></a>ce_results <span class="ot">&lt;-</span> ce_trace <span class="sc">|&gt;</span></span>
-<span id="cb37-49"><a href="#cb37-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
-<span id="cb37-50"><a href="#cb37-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb37-51"><a href="#cb37-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">sum</span>(qaly),</span>
-<span id="cb37-52"><a href="#cb37-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">sum</span>(total_cost),</span>
-<span id="cb37-53"><a href="#cb37-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb37-54"><a href="#cb37-54" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb37-55"><a href="#cb37-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-56"><a href="#cb37-56" aria-hidden="true" tabindex="-1"></a>ce_incremental <span class="ot">&lt;-</span> ce_results <span class="sc">|&gt;</span></span>
-<span id="cb37-57"><a href="#cb37-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb37-58"><a href="#cb37-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> discounted_qalys[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
-<span id="cb37-59"><a href="#cb37-59" aria-hidden="true" tabindex="-1"></a>      discounted_qalys[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
-<span id="cb37-60"><a href="#cb37-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> discounted_costs[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
-<span id="cb37-61"><a href="#cb37-61" aria-hidden="true" tabindex="-1"></a>      discounted_costs[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
-<span id="cb37-62"><a href="#cb37-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> incremental_costs <span class="sc">/</span> incremental_qalys</span>
-<span id="cb37-63"><a href="#cb37-63" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb37-64"><a href="#cb37-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-65"><a href="#cb37-65" aria-hidden="true" tabindex="-1"></a>ce_results <span class="sc">|&gt;</span></span>
-<span id="cb37-66"><a href="#cb37-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb37-67"><a href="#cb37-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">round</span>(discounted_qalys, <span class="dv">3</span>),</span>
-<span id="cb37-68"><a href="#cb37-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">round</span>(discounted_costs, <span class="dv">0</span>)</span>
-<span id="cb37-69"><a href="#cb37-69" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb37-70"><a href="#cb37-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
-<span id="cb37-71"><a href="#cb37-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">Arm =</span> arm,</span>
-<span id="cb37-72"><a href="#cb37-72" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Discounted QALYs</span><span class="st">`</span> <span class="ot">=</span> discounted_qalys,</span>
-<span id="cb37-73"><a href="#cb37-73" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Discounted costs</span><span class="st">`</span> <span class="ot">=</span> discounted_costs</span>
-<span id="cb37-74"><a href="#cb37-74" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb37-75"><a href="#cb37-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Mock-case discounted results by arm"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>discount_factor <span class="ot">&lt;-</span> <span class="cf">function</span>(week, annual_rate) {</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> annual_rate) <span class="sc">^</span> (week <span class="sc">/</span> <span class="dv">52</span>))</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>ce_trace <span class="ot">&lt;-</span> psm_survival <span class="sc">|&gt;</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_weeks, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">discount =</span> <span class="fu">discount_factor</span>(time_weeks, ce_params<span class="sc">$</span>annual_discount_rate),</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">death_increment =</span> <span class="fu">pmax</span>(Dead <span class="sc">-</span> <span class="fu">lag</span>(Dead, <span class="at">default =</span> <span class="dv">0</span>), <span class="dv">0</span>),</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pf_resource_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_initial,</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_pembro_maint,</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> <span class="dv">104</span> <span class="sc">~</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment,</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment_yr3</span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">qaly =</span> (PF <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pf <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pd) <span class="sc">*</span></span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>      ce_params<span class="sc">$</span>cycle_length_years <span class="sc">*</span> discount,</span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">disease_management_cost =</span> (</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>      PF <span class="sc">*</span> pf_resource_cost <span class="sc">+</span></span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>        PD <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pd</span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">*</span> discount,</span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_combination_weeks <span class="sc">~</span></span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_combination <span class="sc">*</span></span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_maintenance <span class="sc">*</span></span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_comparator_chemo <span class="sc">*</span> discount,</span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">ae_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_pembro,</span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_comparator,</span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_care_cost =</span> death_increment <span class="sc">*</span> ce_params<span class="sc">$</span>terminal_care_cost <span class="sc">*</span> discount,</span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_cost =</span> disease_management_cost <span class="sc">+</span> treatment_cost <span class="sc">+</span> ae_cost <span class="sc">+</span> terminal_care_cost</span>
+<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a>ce_results <span class="ot">&lt;-</span> ce_trace <span class="sc">|&gt;</span></span>
+<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">sum</span>(qaly),</span>
+<span id="cb38-52"><a href="#cb38-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">sum</span>(total_cost),</span>
+<span id="cb38-53"><a href="#cb38-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb38-54"><a href="#cb38-54" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-55"><a href="#cb38-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-56"><a href="#cb38-56" aria-hidden="true" tabindex="-1"></a>ce_incremental <span class="ot">&lt;-</span> ce_results <span class="sc">|&gt;</span></span>
+<span id="cb38-57"><a href="#cb38-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb38-58"><a href="#cb38-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> discounted_qalys[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
+<span id="cb38-59"><a href="#cb38-59" aria-hidden="true" tabindex="-1"></a>      discounted_qalys[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
+<span id="cb38-60"><a href="#cb38-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> discounted_costs[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
+<span id="cb38-61"><a href="#cb38-61" aria-hidden="true" tabindex="-1"></a>      discounted_costs[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
+<span id="cb38-62"><a href="#cb38-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> incremental_costs <span class="sc">/</span> incremental_qalys</span>
+<span id="cb38-63"><a href="#cb38-63" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-64"><a href="#cb38-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-65"><a href="#cb38-65" aria-hidden="true" tabindex="-1"></a>ce_results <span class="sc">|&gt;</span></span>
+<span id="cb38-66"><a href="#cb38-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-67"><a href="#cb38-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">round</span>(discounted_qalys, <span class="dv">3</span>),</span>
+<span id="cb38-68"><a href="#cb38-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">round</span>(discounted_costs, <span class="dv">0</span>)</span>
+<span id="cb38-69"><a href="#cb38-69" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb38-70"><a href="#cb38-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb38-71"><a href="#cb38-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">Arm =</span> arm,</span>
+<span id="cb38-72"><a href="#cb38-72" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Discounted QALYs</span><span class="st">`</span> <span class="ot">=</span> discounted_qalys,</span>
+<span id="cb38-73"><a href="#cb38-73" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Discounted costs</span><span class="st">`</span> <span class="ot">=</span> discounted_costs</span>
+<span id="cb38-74"><a href="#cb38-74" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb38-75"><a href="#cb38-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Mock-case discounted results by arm"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span>
+<span id="cb38-76"><a href="#cb38-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-77"><a href="#cb38-77" aria-hidden="true" tabindex="-1"></a>ce_incremental <span class="sc">|&gt;</span></span>
+<span id="cb38-78"><a href="#cb38-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-79"><a href="#cb38-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> <span class="fu">round</span>(incremental_qalys, <span class="dv">3</span>),</span>
+<span id="cb38-80"><a href="#cb38-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> <span class="fu">round</span>(incremental_costs, <span class="dv">0</span>),</span>
+<span id="cb38-81"><a href="#cb38-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> <span class="fu">round</span>(icer, <span class="dv">0</span>)</span>
+<span id="cb38-82"><a href="#cb38-82" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb38-83"><a href="#cb38-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb38-84"><a href="#cb38-84" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental QALYs</span><span class="st">`</span> <span class="ot">=</span> incremental_qalys,</span>
+<span id="cb38-85"><a href="#cb38-85" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental costs</span><span class="st">`</span> <span class="ot">=</span> incremental_costs,</span>
+<span id="cb38-86"><a href="#cb38-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">ICER =</span> icer</span>
+<span id="cb38-87"><a href="#cb38-87" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb38-88"><a href="#cb38-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Mock-case incremental cost-effectiveness result"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Mock-case discounted results by arm</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Arm</th>
-<th style="text-align: left;">Discounted QALYs</th>
-<th style="text-align: left;">Discounted costs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Pembro + chemo</td>
-<td style="text-align: left;">2.196</td>
-<td style="text-align: left;">126787</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Placebo + chemo</td>
-<td style="text-align: left;">1.723</td>
-<td style="text-align: left;">14476</td>
-</tr>
-</tbody>
-</table>
-</div>
-<details class="code-fold">
-<summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>ce_incremental <span class="sc">|&gt;</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> <span class="fu">round</span>(incremental_qalys, <span class="dv">3</span>),</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> <span class="fu">round</span>(incremental_costs, <span class="dv">0</span>),</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> <span class="fu">round</span>(icer, <span class="dv">0</span>)</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental QALYs</span><span class="st">`</span> <span class="ot">=</span> incremental_qalys,</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental costs</span><span class="st">`</span> <span class="ot">=</span> incremental_costs,</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">ICER =</span> icer</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Mock-case incremental cost-effectiveness result"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Mock-case incremental cost-effectiveness result</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Incremental QALYs</th>
-<th style="text-align: left;">Incremental costs</th>
-<th style="text-align: left;">ICER</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">0.473</td>
-<td style="text-align: left;">112311</td>
-<td style="text-align: left;">237468</td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 <p>The absolute ICER should still not be interpreted as a TA1092 result. The model now uses more extracted public inputs, including utility values, resource-use unit costs, treatment costs, administration costs, terminal care cost, and one-off AE costs. However, confidential pembrolizumab discounts, exact commercial-in-confidence implementation details, and some AE duration assumptions remain unavailable. The useful point is structural: survival assumptions now flow through to QALYs and costs.</p>
 </section>
@@ -3328,45 +3282,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb39-77"><a href="#cb39-77" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb39-78"><a href="#cb39-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Illustrative confidential-discount sensitivity"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Illustrative confidential-discount sensitivity</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Pembro discount</th>
-<th style="text-align: left;">Incremental QALYs</th>
-<th style="text-align: left;">Incremental costs</th>
-<th style="text-align: left;">ICER</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">0%</td>
-<td style="text-align: left;">0.473</td>
-<td style="text-align: left;">112311</td>
-<td style="text-align: left;">237468</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">25%</td>
-<td style="text-align: left;">0.473</td>
-<td style="text-align: left;">83928</td>
-<td style="text-align: left;">177456</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">50%</td>
-<td style="text-align: left;">0.473</td>
-<td style="text-align: left;">55546</td>
-<td style="text-align: left;">117445</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">75%</td>
-<td style="text-align: left;">0.473</td>
-<td style="text-align: left;">27163</td>
-<td style="text-align: left;">57433</td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 </section>
 <section id="os-tail-sensitivity" class="level4">
@@ -3482,41 +3397,441 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb40-104"><a href="#cb40-104" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb40-105"><a href="#cb40-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Illustrative sensitivity to long-term OS benefit"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+</div>
+<p>This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company’s long-term OS benefit is clinically plausible.</p>
+</section>
+<section id="eag-preferred-spline-models-fitting-function" class="level4">
+<h4 class="anchored" data-anchor-id="eag-preferred-spline-models-fitting-function">19.2.5 EAG-Preferred Spline Models: Fitting Function</h4>
+<p>The EAG preferred spline models for pMMR (Table 2) are Royston-Parmar flexible parametric models fitted with <code>flexsurvspline()</code>. Unlike standard parametric distributions, spline models can accommodate non-monotonic hazard functions and are more flexible in the observed period.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>fit_one_spline <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, k, scale, label) {</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    fit     <span class="ot">&lt;-</span> <span class="fu">flexsurvspline</span>(<span class="fu">Surv</span>(time_months, status) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> dat, <span class="at">k =</span> k, <span class="at">scale =</span> scale)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    fit_aic <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">AIC</span>(fit) <span class="sc">%||%</span> <span class="cn">NA_real_</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    fit_ll  <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(fit<span class="sc">$</span>loglik <span class="sc">%||%</span> <span class="cn">NA_real_</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">dist_label =</span> label,</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">fit        =</span> <span class="fu">list</span>(fit),</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">converged  =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">error      =</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">aic        =</span> fit_aic,</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">loglik     =</span> fit_ll,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">n          =</span> <span class="fu">nrow</span>(dat),</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">events     =</span> <span class="fu">sum</span>(dat<span class="sc">$</span>status)</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">dist_label =</span> label,</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">fit        =</span> <span class="fu">list</span>(<span class="cn">NULL</span>),</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">converged  =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">error      =</span> <span class="fu">conditionMessage</span>(e),</span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">aic        =</span> <span class="cn">NA_real_</span>,</span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">loglik     =</span> <span class="cn">NA_real_</span>,</span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">n          =</span> <span class="fu">nrow</span>(dat),</span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">events     =</span> <span class="fu">sum</span>(dat<span class="sc">$</span>status)</span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Function</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"fit_one_spline(dat, k, scale, label)"</span>,</span>
+<span id="cb41-32"><a href="#cb41-32" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Backend</span><span class="st">`</span>  <span class="ot">=</span> <span class="st">"flexsurvspline()"</span>,</span>
+<span id="cb41-33"><a href="#cb41-33" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Purpose</span><span class="st">`</span>  <span class="ot">=</span> <span class="st">"Fit Royston-Parmar spline model for one curve"</span></span>
+<span id="cb41-34"><a href="#cb41-34" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Illustrative sensitivity to long-term OS benefit</caption>
 <colgroup>
-<col style="width: 42%">
-<col style="width: 24%">
-<col style="width: 24%">
-<col style="width: 9%">
+<col style="width: 37%">
+<col style="width: 17%">
+<col style="width: 46%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Scenario</th>
-<th style="text-align: left;">Incremental QALYs</th>
-<th style="text-align: left;">Incremental costs</th>
-<th style="text-align: left;">ICER</th>
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">Backend</th>
+<th style="text-align: left;">Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">AIC-selected OS tail</td>
-<td style="text-align: left;">0.473</td>
-<td style="text-align: left;">112311</td>
-<td style="text-align: left;">237468</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Reduced long-term OS separation</td>
-<td style="text-align: left;">0.412</td>
-<td style="text-align: left;">112237</td>
-<td style="text-align: left;">272639</td>
+<td style="text-align: left;">fit_one_spline(dat, k, scale, label)</td>
+<td style="text-align: left;">flexsurvspline()</td>
+<td style="text-align: left;">Fit Royston-Parmar spline model for one curve</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company’s long-term OS benefit is clinically plausible.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>eag_pmmr_spline_specs <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>subgroup, <span class="sc">~</span>endpoint, <span class="sc">~</span>treatment,      <span class="sc">~</span>k, <span class="sc">~</span>scale,   <span class="sc">~</span>dist_label,</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"pMMR"</span>,    <span class="st">"PFS"</span>,     <span class="st">"placebo_chemo"</span>, <span class="dv">2</span>,  <span class="st">"hazard"</span>, <span class="st">"2-knot hazards"</span>,</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"pMMR"</span>,    <span class="st">"OS"</span>,      <span class="st">"placebo_chemo"</span>, <span class="dv">1</span>,  <span class="st">"hazard"</span>, <span class="st">"1-knot hazards"</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"pMMR"</span>,    <span class="st">"PFS"</span>,     <span class="st">"pembro_chemo"</span>,  <span class="dv">1</span>,  <span class="st">"hazard"</span>, <span class="st">"1-knot hazards"</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"pMMR"</span>,    <span class="st">"OS"</span>,      <span class="st">"pembro_chemo"</span>,  <span class="dv">1</span>,  <span class="st">"normal"</span>, <span class="st">"1-knot normal"</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>eag_pmmr_spline_specs <span class="sc">|&gt;</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"EAG-preferred spline specifications for pMMR (Table 2)"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>EAG-preferred spline specifications for pMMR (Table 2)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">subgroup</th>
+<th style="text-align: left;">endpoint</th>
+<th style="text-align: left;">treatment</th>
+<th style="text-align: left;">k</th>
+<th style="text-align: left;">scale</th>
+<th style="text-align: left;">dist_label</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">pMMR</td>
+<td style="text-align: left;">PFS</td>
+<td style="text-align: left;">placebo_chemo</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">hazard</td>
+<td style="text-align: left;">2-knot hazards</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pMMR</td>
+<td style="text-align: left;">OS</td>
+<td style="text-align: left;">placebo_chemo</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">hazard</td>
+<td style="text-align: left;">1-knot hazards</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">pMMR</td>
+<td style="text-align: left;">PFS</td>
+<td style="text-align: left;">pembro_chemo</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">hazard</td>
+<td style="text-align: left;">1-knot hazards</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pMMR</td>
+<td style="text-align: left;">OS</td>
+<td style="text-align: left;">pembro_chemo</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">1-knot normal</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>spline_fit_rows <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, <span class="fu">nrow</span>(eag_pmmr_spline_specs))</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(eag_pmmr_spline_specs))) {</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  spec_i <span class="ot">&lt;-</span> eag_pmmr_spline_specs[i, ]</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  dat_i  <span class="ot">&lt;-</span> ipd <span class="sc">|&gt;</span> <span class="fu">filter</span>(</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.character</span>(subgroup)  <span class="sc">==</span> spec_i<span class="sc">$</span>subgroup,</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.character</span>(endpoint)  <span class="sc">==</span> spec_i<span class="sc">$</span>endpoint,</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.character</span>(treatment) <span class="sc">==</span> spec_i<span class="sc">$</span>treatment</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  res_i <span class="ot">&lt;-</span> <span class="fu">fit_one_spline</span>(dat_i, spec_i<span class="sc">$</span>k, spec_i<span class="sc">$</span>scale, spec_i<span class="sc">$</span>dist_label)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  spline_fit_rows[[i]] <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">subgroup =</span> spec_i<span class="sc">$</span>subgroup,</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">endpoint =</span> spec_i<span class="sc">$</span>endpoint,</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">treatment =</span> spec_i<span class="sc">$</span>treatment),</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>    res_i</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>eag_pmmr_spline_fits <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(spline_fit_rows)</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>eag_pmmr_spline_fits <span class="sc">|&gt;</span></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(subgroup, endpoint, treatment, dist_label, n, events, aic, converged, error) <span class="sc">|&gt;</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"EAG-preferred spline fit summary for pMMR"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>EAG-preferred spline fit summary for pMMR</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 17%">
+<col style="width: 18%">
+<col style="width: 4%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">subgroup</th>
+<th style="text-align: left;">endpoint</th>
+<th style="text-align: left;">treatment</th>
+<th style="text-align: left;">dist_label</th>
+<th style="text-align: left;">n</th>
+<th style="text-align: left;">events</th>
+<th style="text-align: left;">aic</th>
+<th style="text-align: left;">converged</th>
+<th style="text-align: left;">error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">pMMR</td>
+<td style="text-align: left;">PFS</td>
+<td style="text-align: left;">placebo_chemo</td>
+<td style="text-align: left;">2-knot hazards</td>
+<td style="text-align: left;">292</td>
+<td style="text-align: left;">133</td>
+<td style="text-align: left;">935.12</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pMMR</td>
+<td style="text-align: left;">OS</td>
+<td style="text-align: left;">placebo_chemo</td>
+<td style="text-align: left;">1-knot hazards</td>
+<td style="text-align: left;">295</td>
+<td style="text-align: left;">61</td>
+<td style="text-align: left;">595.42</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">pMMR</td>
+<td style="text-align: left;">PFS</td>
+<td style="text-align: left;">pembro_chemo</td>
+<td style="text-align: left;">1-knot hazards</td>
+<td style="text-align: left;">290</td>
+<td style="text-align: left;">89</td>
+<td style="text-align: left;">744.38</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pMMR</td>
+<td style="text-align: left;">OS</td>
+<td style="text-align: left;">pembro_chemo</td>
+<td style="text-align: left;">1-knot normal</td>
+<td style="text-align: left;">293</td>
+<td style="text-align: left;">53</td>
+<td style="text-align: left;">540.32</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="state-occupancy-with-eag-spline-models" class="level4">
+<h4 class="anchored" data-anchor-id="state-occupancy-with-eag-spline-models">19.2.6 State Occupancy with EAG Spline Models</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>get_spline_surv <span class="ot">&lt;-</span> <span class="cf">function</span>(fit_obj, times) {</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Unwrap list(model_obj) wrapper only if not already a flexsurv model</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">inherits</span>(fit_obj, <span class="st">"flexsurvreg"</span>)) fit_obj <span class="ot">&lt;-</span> fit_obj[[<span class="dv">1</span>]]</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_obj, <span class="at">t =</span> times, <span class="at">type =</span> <span class="st">"survival"</span>, <span class="at">ci =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.data.frame</span>(s))                    <span class="fu">return</span>(<span class="fu">as.numeric</span>(s<span class="sc">$</span>est))</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.list</span>(s) <span class="sc">&amp;&amp;</span> <span class="fu">is.data.frame</span>(s[[<span class="dv">1</span>]])) <span class="fu">return</span>(<span class="fu">as.numeric</span>(s[[<span class="dv">1</span>]]<span class="sc">$</span>est))</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.list</span>(s) <span class="sc">&amp;&amp;</span> <span class="fu">is.numeric</span>(s[[<span class="dv">1</span>]]))    <span class="fu">return</span>(<span class="fu">as.numeric</span>(s[[<span class="dv">1</span>]]))</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop</span>(<span class="fu">paste</span>(<span class="st">"Cannot extract survival: class(s)="</span>, <span class="fu">class</span>(s), <span class="st">"class(s[[1]])="</span>, <span class="fu">class</span>(s[[<span class="dv">1</span>]])))</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>pmmr_sp_curves <span class="ot">&lt;-</span> eag_pmmr_spline_fits <span class="sc">|&gt;</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(converged) <span class="sc">|&gt;</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">arm =</span> <span class="fu">if_else</span>(treatment <span class="sc">==</span> <span class="st">"pembro_chemo"</span>, <span class="st">"Pembro + chemo"</span>, <span class="st">"Placebo + chemo"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, endpoint, fit)</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>surv_rows <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, <span class="fu">nrow</span>(pmmr_sp_curves))</span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(pmmr_sp_curves))) {</span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>  surv_rows[[i]] <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">arm         =</span> pmmr_sp_curves<span class="sc">$</span>arm[[i]],</span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">endpoint    =</span> pmmr_sp_curves<span class="sc">$</span>endpoint[[i]],</span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_weeks  =</span> ce_time_grid<span class="sc">$</span>time_weeks,</span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_months =</span> ce_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">surv        =</span> <span class="fu">get_spline_surv</span>(pmmr_sp_curves<span class="sc">$</span>fit[[i]], ce_time_grid<span class="sc">$</span>time_months)</span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>psm_pmmr_spline <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(surv_rows) <span class="sc">|&gt;</span></span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(</span>
+<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols     =</span> <span class="fu">c</span>(arm, time_weeks, time_months),</span>
+<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from  =</span> endpoint,</span>
+<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> surv</span>
+<span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb44-34"><a href="#cb44-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">PFS  =</span> <span class="fu">pmin</span>(PFS, OS),</span>
+<span id="cb44-35"><a href="#cb44-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">PF   =</span> PFS,</span>
+<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">PD   =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
+<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
+<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb44-39"><a href="#cb44-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-40"><a href="#cb44-40" aria-hidden="true" tabindex="-1"></a>psm_pmmr_spline <span class="sc">|&gt;</span></span>
+<span id="cb44-41"><a href="#cb44-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
+<span id="cb44-42"><a href="#cb44-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb44-43"><a href="#cb44-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
+<span id="cb44-44"><a href="#cb44-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
+<span id="cb44-45"><a href="#cb44-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb44-46"><a href="#cb44-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
+<span id="cb44-47"><a href="#cb44-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb44-48"><a href="#cb44-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb44-49"><a href="#cb44-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb44-50"><a href="#cb44-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"pMMR partitioned survival model: EAG-preferred spline models"</span>,</span>
+<span id="cb44-51"><a href="#cb44-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"CT PFS: 2-knot hazards | CT OS: 1-knot hazards | Pembro PFS: 1-knot hazards | Pembro OS: 1-knot normal"</span>,</span>
+<span id="cb44-52"><a href="#cb44-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>, <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>, <span class="at">fill =</span> <span class="st">"Health state"</span></span>
+<span id="cb44-53"><a href="#cb44-53" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb44-54"><a href="#cb44-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb44-55"><a href="#cb44-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="fit_parametric_survival_1_files/figure-html/pmmr-spline-state-occupancy-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="discounted-costs-and-qalys-eag-spline-models" class="level4">
+<h4 class="anchored" data-anchor-id="discounted-costs-and-qalys-eag-spline-models">19.2.7 Discounted Costs and QALYs (EAG Spline Models)</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>ce_trace_pmmr_spline <span class="ot">&lt;-</span> psm_pmmr_spline <span class="sc">|&gt;</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_weeks, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">discount         =</span> <span class="fu">discount_factor</span>(time_weeks, ce_params<span class="sc">$</span>annual_discount_rate),</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">death_increment  =</span> <span class="fu">pmax</span>(Dead <span class="sc">-</span> <span class="fu">lag</span>(Dead, <span class="at">default =</span> <span class="dv">0</span>), <span class="dv">0</span>),</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pf_resource_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_initial,</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_pembro_maint,</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> <span class="dv">104</span> <span class="sc">~</span></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment,</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment_yr3</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">qaly =</span> (PF <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pf <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pd) <span class="sc">*</span></span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>      ce_params<span class="sc">$</span>cycle_length_years <span class="sc">*</span> discount,</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">disease_management_cost =</span> (</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>      PF <span class="sc">*</span> pf_resource_cost <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pd</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">*</span> discount,</span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_combination_weeks <span class="sc">~</span></span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_combination <span class="sc">*</span></span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_maintenance <span class="sc">*</span></span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_comparator_chemo <span class="sc">*</span> discount,</span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">ae_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>  <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_pembro,</span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_comparator,</span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_care_cost =</span> death_increment <span class="sc">*</span> ce_params<span class="sc">$</span>terminal_care_cost <span class="sc">*</span> discount,</span>
+<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_cost =</span> disease_management_cost <span class="sc">+</span> treatment_cost <span class="sc">+</span> ae_cost <span class="sc">+</span> terminal_care_cost</span>
+<span id="cb45-40"><a href="#cb45-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb45-41"><a href="#cb45-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb45-42"><a href="#cb45-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-43"><a href="#cb45-43" aria-hidden="true" tabindex="-1"></a>ce_results_pmmr_spline <span class="ot">&lt;-</span> ce_trace_pmmr_spline <span class="sc">|&gt;</span></span>
+<span id="cb45-44"><a href="#cb45-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb45-45"><a href="#cb45-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb45-46"><a href="#cb45-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">sum</span>(qaly),</span>
+<span id="cb45-47"><a href="#cb45-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">sum</span>(total_cost),</span>
+<span id="cb45-48"><a href="#cb45-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb45-49"><a href="#cb45-49" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb45-50"><a href="#cb45-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-51"><a href="#cb45-51" aria-hidden="true" tabindex="-1"></a>ce_incremental_pmmr_spline <span class="ot">&lt;-</span> ce_results_pmmr_spline <span class="sc">|&gt;</span></span>
+<span id="cb45-52"><a href="#cb45-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb45-53"><a href="#cb45-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> discounted_qalys[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
+<span id="cb45-54"><a href="#cb45-54" aria-hidden="true" tabindex="-1"></a>      discounted_qalys[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
+<span id="cb45-55"><a href="#cb45-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> discounted_costs[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
+<span id="cb45-56"><a href="#cb45-56" aria-hidden="true" tabindex="-1"></a>      discounted_costs[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
+<span id="cb45-57"><a href="#cb45-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> incremental_costs <span class="sc">/</span> incremental_qalys</span>
+<span id="cb45-58"><a href="#cb45-58" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb45-59"><a href="#cb45-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-60"><a href="#cb45-60" aria-hidden="true" tabindex="-1"></a>ce_results_pmmr_spline <span class="sc">|&gt;</span></span>
+<span id="cb45-61"><a href="#cb45-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb45-62"><a href="#cb45-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">round</span>(discounted_qalys, <span class="dv">3</span>),</span>
+<span id="cb45-63"><a href="#cb45-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">round</span>(discounted_costs, <span class="dv">0</span>)</span>
+<span id="cb45-64"><a href="#cb45-64" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb45-65"><a href="#cb45-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">Arm =</span> arm,</span>
+<span id="cb45-66"><a href="#cb45-66" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Discounted QALYs</span><span class="st">`</span> <span class="ot">=</span> discounted_qalys,</span>
+<span id="cb45-67"><a href="#cb45-67" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Discounted costs (&amp;#163;)</span><span class="st">`</span> <span class="ot">=</span> discounted_costs) <span class="sc">|&gt;</span></span>
+<span id="cb45-68"><a href="#cb45-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"pMMR (EAG spline): discounted results by arm"</span>, <span class="at">align =</span> <span class="st">"l"</span>, <span class="at">escape =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>pMMR (EAG spline): discounted results by arm</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: left;">Discounted QALYs</th>
+<th style="text-align: left;">Discounted costs (£)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Pembro + chemo</td>
+<td style="text-align: left;">2.831</td>
+<td style="text-align: left;">129287</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Placebo + chemo</td>
+<td style="text-align: left;">1.673</td>
+<td style="text-align: left;">14416</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>ce_incremental_pmmr_spline <span class="sc">|&gt;</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> <span class="fu">round</span>(incremental_qalys, <span class="dv">3</span>),</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> <span class="fu">round</span>(incremental_costs, <span class="dv">0</span>),</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer              =</span> <span class="fu">round</span>(icer, <span class="dv">0</span>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="st">`</span><span class="at">Incremental QALYs</span><span class="st">`</span>     <span class="ot">=</span> incremental_qalys,</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Incremental costs (&amp;#163;)</span><span class="st">`</span> <span class="ot">=</span> incremental_costs,</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">ICER (&amp;#163;/QALY)</span><span class="st">`</span>        <span class="ot">=</span> icer) <span class="sc">|&gt;</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"pMMR (EAG spline): incremental cost-effectiveness"</span>, <span class="at">align =</span> <span class="st">"l"</span>, <span class="at">escape =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>pMMR (EAG spline): incremental cost-effectiveness</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Incremental QALYs</th>
+<th style="text-align: left;">Incremental costs (£)</th>
+<th style="text-align: left;">ICER (£/QALY)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1.158</td>
+<td style="text-align: left;">114870</td>
+<td style="text-align: left;">99203</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 </section>
 <section id="dmmr-subgroup-eag-preferred-models-table-2" class="level3">
@@ -3524,7 +3839,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This section computes the dMMR ICER using the EAG’s preferred distributions from Table 2 of the EAG supplementary report.</p>
 <p>Two structural caveats apply before interpreting the output:</p>
 <ul>
-<li>The EAG’s pMMR preferred models are spline-based (1-knot hazards, 2-knot hazards, 1-knot normal), which are outside the current candidate distribution set. The dMMR preferred models are all standard parametric distributions and can be extracted directly from <code>fit_tbl</code>.</li>
+<li>The EAG’s pMMR preferred models are now implemented as spline models in Section 19.2 above.</li>
 <li>Utility values (PF = 0.814, PD = 0.720) were collected from the pMMR cohort only. KEYNOTE-868 did not collect dMMR HRQoL data due to insufficient power in the smaller dMMR cohort. Applying pMMR utilities to dMMR patients is an approximation with additional uncertainty.</li>
 </ul>
 <section id="select-eag-preferred-distributions" class="level4">
@@ -3532,22 +3847,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>eag_dmmr_selections <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>subgroup, <span class="sc">~</span>endpoint, <span class="sc">~</span>treatment,      <span class="sc">~</span>dist_label,</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dMMR"</span>,    <span class="st">"PFS"</span>,     <span class="st">"placebo_chemo"</span>, <span class="st">"generalized_gamma"</span>,</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dMMR"</span>,    <span class="st">"OS"</span>,      <span class="st">"placebo_chemo"</span>, <span class="st">"exponential"</span>,</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dMMR"</span>,    <span class="st">"PFS"</span>,     <span class="st">"pembro_chemo"</span>,  <span class="st">"loglogistic"</span>,</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dMMR"</span>,    <span class="st">"OS"</span>,      <span class="st">"pembro_chemo"</span>,  <span class="st">"loglogistic"</span></span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>eag_dmmr_fits <span class="ot">&lt;-</span> fit_tbl <span class="sc">|&gt;</span></span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(eag_dmmr_selections, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"subgroup"</span>, <span class="st">"endpoint"</span>, <span class="st">"treatment"</span>, <span class="st">"dist_label"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(converged)</span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>eag_dmmr_fits <span class="sc">|&gt;</span></span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(subgroup, endpoint, treatment, dist_label, n, events, aic, bic) <span class="sc">|&gt;</span></span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(endpoint, treatment) <span class="sc">|&gt;</span></span>
-<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"EAG-preferred distributions for dMMR (Table 2)"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>eag_dmmr_selections <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>subgroup, <span class="sc">~</span>endpoint, <span class="sc">~</span>treatment,      <span class="sc">~</span>dist_label,</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dMMR"</span>,    <span class="st">"PFS"</span>,     <span class="st">"placebo_chemo"</span>, <span class="st">"generalized_gamma"</span>,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dMMR"</span>,    <span class="st">"OS"</span>,      <span class="st">"placebo_chemo"</span>, <span class="st">"exponential"</span>,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dMMR"</span>,    <span class="st">"PFS"</span>,     <span class="st">"pembro_chemo"</span>,  <span class="st">"loglogistic"</span>,</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dMMR"</span>,    <span class="st">"OS"</span>,      <span class="st">"pembro_chemo"</span>,  <span class="st">"loglogistic"</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>eag_dmmr_fits <span class="ot">&lt;-</span> fit_tbl <span class="sc">|&gt;</span></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(eag_dmmr_selections, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"subgroup"</span>, <span class="st">"endpoint"</span>, <span class="st">"treatment"</span>, <span class="st">"dist_label"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(converged)</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>eag_dmmr_fits <span class="sc">|&gt;</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(subgroup, endpoint, treatment, dist_label, n, events, aic, bic) <span class="sc">|&gt;</span></span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(endpoint, treatment) <span class="sc">|&gt;</span></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"EAG-preferred distributions for dMMR (Table 2)"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -3625,46 +3940,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>psm_dmmr <span class="ot">&lt;-</span> eag_dmmr_fits <span class="sc">|&gt;</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">arm =</span> <span class="fu">if_else</span>(treatment <span class="sc">==</span> <span class="st">"pembro_chemo"</span>, <span class="st">"Pembro + chemo"</span>, <span class="st">"Placebo + chemo"</span>),</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred =</span> <span class="fu">map</span>(</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>      fit,</span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span><span class="fu">tibble</span>(</span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_weeks =</span> ce_time_grid<span class="sc">$</span>time_weeks,</span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_months =</span> ce_time_grid<span class="sc">$</span>time_months,</span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">survival =</span> <span class="fu">predict_survival</span>(.x, ce_time_grid<span class="sc">$</span>time_months)</span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, endpoint, pred) <span class="sc">|&gt;</span></span>
-<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(pred) <span class="sc">|&gt;</span></span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> endpoint, <span class="at">values_from =</span> survival) <span class="sc">|&gt;</span></span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">PFS  =</span> <span class="fu">pmin</span>(PFS, OS),</span>
-<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">PF   =</span> PFS,</span>
-<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">PD   =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
-<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
-<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>psm_dmmr <span class="sc">|&gt;</span></span>
-<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
-<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
-<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
-<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
-<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
-<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
-<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
-<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"dMMR partitioned survival model (EAG-preferred distributions)"</span>,</span>
-<span id="cb42-34"><a href="#cb42-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"EAG: generalised gamma / exponential / log-logistic / log-logistic"</span>,</span>
-<span id="cb42-35"><a href="#cb42-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>,</span>
-<span id="cb42-36"><a href="#cb42-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>,</span>
-<span id="cb42-37"><a href="#cb42-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Health state"</span></span>
-<span id="cb42-38"><a href="#cb42-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb42-39"><a href="#cb42-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb42-40"><a href="#cb42-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>psm_dmmr <span class="ot">&lt;-</span> eag_dmmr_fits <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">arm =</span> <span class="fu">if_else</span>(treatment <span class="sc">==</span> <span class="st">"pembro_chemo"</span>, <span class="st">"Pembro + chemo"</span>, <span class="st">"Placebo + chemo"</span>),</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred =</span> <span class="fu">map</span>(</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>      fit,</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span><span class="fu">tibble</span>(</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_weeks =</span> ce_time_grid<span class="sc">$</span>time_weeks,</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_months =</span> ce_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">survival =</span> <span class="fu">predict_survival</span>(.x, ce_time_grid<span class="sc">$</span>time_months)</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, endpoint, pred) <span class="sc">|&gt;</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(pred) <span class="sc">|&gt;</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> endpoint, <span class="at">values_from =</span> survival) <span class="sc">|&gt;</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">PFS  =</span> <span class="fu">pmin</span>(PFS, OS),</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">PF   =</span> PFS,</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">PD   =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>psm_dmmr <span class="sc">|&gt;</span></span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"dMMR partitioned survival model (EAG-preferred distributions)"</span>,</span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"EAG: generalised gamma / exponential / log-logistic / log-logistic"</span>,</span>
+<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>,</span>
+<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>,</span>
+<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Health state"</span></span>
+<span id="cb48-38"><a href="#cb48-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb48-39"><a href="#cb48-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -3680,76 +3995,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>ce_trace_dmmr <span class="ot">&lt;-</span> psm_dmmr <span class="sc">|&gt;</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_weeks, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">discount        =</span> <span class="fu">discount_factor</span>(time_weeks, ce_params<span class="sc">$</span>annual_discount_rate),</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">death_increment =</span> <span class="fu">pmax</span>(Dead <span class="sc">-</span> <span class="fu">lag</span>(Dead, <span class="at">default =</span> <span class="dv">0</span>), <span class="dv">0</span>),</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pf_resource_cost =</span> <span class="fu">case_when</span>(</span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_initial,</span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_pembro_maint,</span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> <span class="dv">104</span> <span class="sc">~</span></span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment,</span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span></span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment_yr3</span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">qaly =</span> (PF <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pf <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pd) <span class="sc">*</span></span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>      ce_params<span class="sc">$</span>cycle_length_years <span class="sc">*</span> discount,</span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">disease_management_cost =</span> (</span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>      PF <span class="sc">*</span> pf_resource_cost <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pd</span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">*</span> discount,</span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_cost =</span> <span class="fu">case_when</span>(</span>
-<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_combination_weeks <span class="sc">~</span></span>
-<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_combination <span class="sc">*</span></span>
-<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
-<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
-<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_maintenance <span class="sc">*</span></span>
-<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
-<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
-<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_comparator_chemo <span class="sc">*</span> discount,</span>
-<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
-<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">ae_cost =</span> <span class="fu">case_when</span>(</span>
-<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>  <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_pembro,</span>
-<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_comparator,</span>
-<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
-<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_care_cost =</span> death_increment <span class="sc">*</span> ce_params<span class="sc">$</span>terminal_care_cost <span class="sc">*</span> discount,</span>
-<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_cost =</span> disease_management_cost <span class="sc">+</span> treatment_cost <span class="sc">+</span> ae_cost <span class="sc">+</span> terminal_care_cost</span>
-<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a>ce_results_dmmr <span class="ot">&lt;-</span> ce_trace_dmmr <span class="sc">|&gt;</span></span>
-<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
-<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">sum</span>(qaly),</span>
-<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">sum</span>(total_cost),</span>
-<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb43-50"><a href="#cb43-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-51"><a href="#cb43-51" aria-hidden="true" tabindex="-1"></a>ce_incremental_dmmr <span class="ot">&lt;-</span> ce_results_dmmr <span class="sc">|&gt;</span></span>
-<span id="cb43-52"><a href="#cb43-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb43-53"><a href="#cb43-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> discounted_qalys[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
-<span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>      discounted_qalys[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
-<span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> discounted_costs[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
-<span id="cb43-56"><a href="#cb43-56" aria-hidden="true" tabindex="-1"></a>      discounted_costs[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
-<span id="cb43-57"><a href="#cb43-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> incremental_costs <span class="sc">/</span> incremental_qalys</span>
-<span id="cb43-58"><a href="#cb43-58" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb43-59"><a href="#cb43-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-60"><a href="#cb43-60" aria-hidden="true" tabindex="-1"></a>ce_results_dmmr <span class="sc">|&gt;</span></span>
-<span id="cb43-61"><a href="#cb43-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb43-62"><a href="#cb43-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">round</span>(discounted_qalys, <span class="dv">3</span>),</span>
-<span id="cb43-63"><a href="#cb43-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">round</span>(discounted_costs, <span class="dv">0</span>)</span>
-<span id="cb43-64"><a href="#cb43-64" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb43-65"><a href="#cb43-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
-<span id="cb43-66"><a href="#cb43-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">Arm =</span> arm,</span>
-<span id="cb43-67"><a href="#cb43-67" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Discounted QALYs</span><span class="st">`</span> <span class="ot">=</span> discounted_qalys,</span>
-<span id="cb43-68"><a href="#cb43-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Discounted costs (&amp;#163;)</span><span class="st">`</span> <span class="ot">=</span> discounted_costs</span>
-<span id="cb43-69"><a href="#cb43-69" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb43-70"><a href="#cb43-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"dMMR: discounted results by arm (EAG-preferred models)"</span>, <span class="at">align =</span> <span class="st">"l"</span>, <span class="at">escape =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>ce_trace_dmmr <span class="ot">&lt;-</span> psm_dmmr <span class="sc">|&gt;</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_weeks, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">discount        =</span> <span class="fu">discount_factor</span>(time_weeks, ce_params<span class="sc">$</span>annual_discount_rate),</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">death_increment =</span> <span class="fu">pmax</span>(Dead <span class="sc">-</span> <span class="fu">lag</span>(Dead, <span class="at">default =</span> <span class="dv">0</span>), <span class="dv">0</span>),</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pf_resource_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_initial,</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_pembro_maint,</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> <span class="dv">104</span> <span class="sc">~</span></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment,</span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span></span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment_yr3</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">qaly =</span> (PF <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pf <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pd) <span class="sc">*</span></span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>      ce_params<span class="sc">$</span>cycle_length_years <span class="sc">*</span> discount,</span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">disease_management_cost =</span> (</span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>      PF <span class="sc">*</span> pf_resource_cost <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pd</span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">*</span> discount,</span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_combination_weeks <span class="sc">~</span></span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_combination <span class="sc">*</span></span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb49-27"><a href="#cb49-27" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_maintenance <span class="sc">*</span></span>
+<span id="cb49-28"><a href="#cb49-28" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
+<span id="cb49-29"><a href="#cb49-29" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb49-30"><a href="#cb49-30" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_comparator_chemo <span class="sc">*</span> discount,</span>
+<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb49-32"><a href="#cb49-32" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb49-33"><a href="#cb49-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">ae_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb49-34"><a href="#cb49-34" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>  <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_pembro,</span>
+<span id="cb49-35"><a href="#cb49-35" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_comparator,</span>
+<span id="cb49-36"><a href="#cb49-36" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb49-37"><a href="#cb49-37" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb49-38"><a href="#cb49-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_care_cost =</span> death_increment <span class="sc">*</span> ce_params<span class="sc">$</span>terminal_care_cost <span class="sc">*</span> discount,</span>
+<span id="cb49-39"><a href="#cb49-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_cost =</span> disease_management_cost <span class="sc">+</span> treatment_cost <span class="sc">+</span> ae_cost <span class="sc">+</span> terminal_care_cost</span>
+<span id="cb49-40"><a href="#cb49-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb49-41"><a href="#cb49-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb49-42"><a href="#cb49-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-43"><a href="#cb49-43" aria-hidden="true" tabindex="-1"></a>ce_results_dmmr <span class="ot">&lt;-</span> ce_trace_dmmr <span class="sc">|&gt;</span></span>
+<span id="cb49-44"><a href="#cb49-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb49-45"><a href="#cb49-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb49-46"><a href="#cb49-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">sum</span>(qaly),</span>
+<span id="cb49-47"><a href="#cb49-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">sum</span>(total_cost),</span>
+<span id="cb49-48"><a href="#cb49-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb49-49"><a href="#cb49-49" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb49-50"><a href="#cb49-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-51"><a href="#cb49-51" aria-hidden="true" tabindex="-1"></a>ce_incremental_dmmr <span class="ot">&lt;-</span> ce_results_dmmr <span class="sc">|&gt;</span></span>
+<span id="cb49-52"><a href="#cb49-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb49-53"><a href="#cb49-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> discounted_qalys[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
+<span id="cb49-54"><a href="#cb49-54" aria-hidden="true" tabindex="-1"></a>      discounted_qalys[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
+<span id="cb49-55"><a href="#cb49-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> discounted_costs[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
+<span id="cb49-56"><a href="#cb49-56" aria-hidden="true" tabindex="-1"></a>      discounted_costs[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
+<span id="cb49-57"><a href="#cb49-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> incremental_costs <span class="sc">/</span> incremental_qalys</span>
+<span id="cb49-58"><a href="#cb49-58" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb49-59"><a href="#cb49-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-60"><a href="#cb49-60" aria-hidden="true" tabindex="-1"></a>ce_results_dmmr <span class="sc">|&gt;</span></span>
+<span id="cb49-61"><a href="#cb49-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb49-62"><a href="#cb49-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">round</span>(discounted_qalys, <span class="dv">3</span>),</span>
+<span id="cb49-63"><a href="#cb49-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">round</span>(discounted_costs, <span class="dv">0</span>)</span>
+<span id="cb49-64"><a href="#cb49-64" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb49-65"><a href="#cb49-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb49-66"><a href="#cb49-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">Arm =</span> arm,</span>
+<span id="cb49-67"><a href="#cb49-67" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Discounted QALYs</span><span class="st">`</span> <span class="ot">=</span> discounted_qalys,</span>
+<span id="cb49-68"><a href="#cb49-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Discounted costs (&amp;#163;)</span><span class="st">`</span> <span class="ot">=</span> discounted_costs</span>
+<span id="cb49-69"><a href="#cb49-69" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb49-70"><a href="#cb49-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"dMMR: discounted results by arm (EAG-preferred models)"</span>, <span class="at">align =</span> <span class="st">"l"</span>, <span class="at">escape =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -3777,18 +4092,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>ce_incremental_dmmr <span class="sc">|&gt;</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> <span class="fu">round</span>(incremental_qalys, <span class="dv">3</span>),</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> <span class="fu">round</span>(incremental_costs, <span class="dv">0</span>),</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> <span class="fu">round</span>(icer, <span class="dv">0</span>)</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
-<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental QALYs</span><span class="st">`</span> <span class="ot">=</span> incremental_qalys,</span>
-<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental costs (&amp;#163;)</span><span class="st">`</span> <span class="ot">=</span> incremental_costs,</span>
-<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ICER (&amp;#163;/QALY)</span><span class="st">`</span> <span class="ot">=</span> icer</span>
-<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"dMMR: incremental cost-effectiveness (EAG-preferred models)"</span>, <span class="at">align =</span> <span class="st">"l"</span>, <span class="at">escape =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>ce_incremental_dmmr <span class="sc">|&gt;</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> <span class="fu">round</span>(incremental_qalys, <span class="dv">3</span>),</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> <span class="fu">round</span>(incremental_costs, <span class="dv">0</span>),</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> <span class="fu">round</span>(icer, <span class="dv">0</span>)</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental QALYs</span><span class="st">`</span> <span class="ot">=</span> incremental_qalys,</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental costs (&amp;#163;)</span><span class="st">`</span> <span class="ot">=</span> incremental_costs,</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ICER (&amp;#163;/QALY)</span><span class="st">`</span> <span class="ot">=</span> icer</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"dMMR: incremental cost-effectiveness (EAG-preferred models)"</span>, <span class="at">align =</span> <span class="st">"l"</span>, <span class="at">escape =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -3816,34 +4131,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  ce_incremental     <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">subgroup =</span> <span class="st">"pMMR"</span>, <span class="at">model =</span> <span class="st">"AIC-selected (standard parametric)"</span>),</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  ce_incremental_dmmr <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">subgroup =</span> <span class="st">"dMMR"</span>, <span class="at">model =</span> <span class="st">"EAG-preferred (Table 2)"</span>)</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> <span class="fu">round</span>(incremental_qalys, <span class="dv">3</span>),</span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> <span class="fu">round</span>(incremental_costs, <span class="dv">0</span>),</span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> <span class="fu">round</span>(icer, <span class="dv">0</span>)</span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Subgroup =</span> subgroup,</span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Curve selection</span><span class="st">`</span> <span class="ot">=</span> model,</span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental QALYs</span><span class="st">`</span> <span class="ot">=</span> incremental_qalys,</span>
-<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental costs (&amp;#163;)</span><span class="st">`</span> <span class="ot">=</span> incremental_costs,</span>
-<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ICER (&amp;#163;/QALY)</span><span class="st">`</span> <span class="ot">=</span> icer</span>
-<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
-<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"pMMR vs dMMR cost-effectiveness comparison"</span>,</span>
-<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"l"</span>,</span>
-<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">escape =</span> <span class="cn">FALSE</span></span>
-<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  ce_incremental_pmmr_spline <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">subgroup =</span> <span class="st">"pMMR"</span>, <span class="at">model =</span> <span class="st">"EAG-preferred spline (Table 2)"</span>),</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  ce_incremental_dmmr        <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">subgroup =</span> <span class="st">"dMMR"</span>, <span class="at">model =</span> <span class="st">"EAG-preferred standard (Table 2)"</span>)</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> <span class="fu">round</span>(incremental_qalys, <span class="dv">3</span>),</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> <span class="fu">round</span>(incremental_costs, <span class="dv">0</span>),</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> <span class="fu">round</span>(icer, <span class="dv">0</span>)</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Subgroup =</span> subgroup,</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Curve selection</span><span class="st">`</span> <span class="ot">=</span> model,</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental QALYs</span><span class="st">`</span> <span class="ot">=</span> incremental_qalys,</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental costs (&amp;#163;)</span><span class="st">`</span> <span class="ot">=</span> incremental_costs,</span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ICER (&amp;#163;/QALY)</span><span class="st">`</span> <span class="ot">=</span> icer</span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
+<span id="cb51-18"><a href="#cb51-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"pMMR (EAG spline) vs dMMR (EAG standard) cost-effectiveness comparison"</span>,</span>
+<span id="cb51-19"><a href="#cb51-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"l"</span>,</span>
+<span id="cb51-20"><a href="#cb51-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">escape =</span> <span class="cn">FALSE</span></span>
+<span id="cb51-21"><a href="#cb51-21" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>pMMR vs dMMR cost-effectiveness comparison</caption>
+<caption>pMMR (EAG spline) vs dMMR (EAG standard) cost-effectiveness comparison</caption>
 <colgroup>
 <col style="width: 8%">
-<col style="width: 32%">
+<col style="width: 31%">
 <col style="width: 16%">
 <col style="width: 25%">
 <col style="width: 17%">
@@ -3860,14 +4175,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">AIC-selected (standard parametric)</td>
-<td style="text-align: left;">0.473</td>
-<td style="text-align: left;">112311</td>
-<td style="text-align: left;">237468</td>
+<td style="text-align: left;">EAG-preferred spline (Table 2)</td>
+<td style="text-align: left;">1.158</td>
+<td style="text-align: left;">114870</td>
+<td style="text-align: left;">99203</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">EAG-preferred (Table 2)</td>
+<td style="text-align: left;">EAG-preferred standard (Table 2)</td>
 <td style="text-align: left;">6.627</td>
 <td style="text-align: left;">146205</td>
 <td style="text-align: left;">22062</td>
@@ -3892,21 +4207,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_summary.csv"</span>))</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(parameter_tbl, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_parameters.csv"</span>))</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(extrapolated, <span class="fu">file.path</span>(output_dir, <span class="st">"best_fit_extrapolated_survival.csv"</span>))</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(top3_fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"top3_fit_summary_by_curve.csv"</span>))</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_file =</span> <span class="fu">c</span>(</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_summary.csv"</span>,</span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_parameters.csv"</span>,</span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"best_fit_extrapolated_survival.csv"</span>,</span>
-<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top3_fit_summary_by_curve.csv"</span></span>
-<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">exists =</span> <span class="fu">file.exists</span>(<span class="fu">file.path</span>(output_dir, output_file))</span>
-<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_summary.csv"</span>))</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(parameter_tbl, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_parameters.csv"</span>))</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(extrapolated, <span class="fu">file.path</span>(output_dir, <span class="st">"best_fit_extrapolated_survival.csv"</span>))</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(top3_fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"top3_fit_summary_by_curve.csv"</span>))</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_file =</span> <span class="fu">c</span>(</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_summary.csv"</span>,</span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_parameters.csv"</span>,</span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"best_fit_extrapolated_survival.csv"</span>,</span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top3_fit_summary_by_curve.csv"</span></span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">exists =</span> <span class="fu">file.exists</span>(<span class="fu">file.path</span>(output_dir, output_file))</span>
+<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb52-15"><a href="#cb52-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
