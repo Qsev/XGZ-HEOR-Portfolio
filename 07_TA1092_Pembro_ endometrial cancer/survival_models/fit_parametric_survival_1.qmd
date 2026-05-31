@@ -2395,11 +2395,13 @@ bind_rows(
 ```
 
 
-> [!NOTE]
-> **A Note on Reconstructed IPD vs. Clinical Trial Database**:
-> In our reconstructed pseudo-IPD (digitized from published KM plots), the fitted spline curves stay very close but do not actually cross in the tail (yielding `NA` for the crossover week above). This is because flexible spline models are highly sensitive to the exact timing of events and censoring patterns in the tail, which are approximated during KM digitization.
->
-> However, implementing this capping logic in the code remains a critical HTA requirement. In HEOR practice, this serves as a **model guardrail (safety net)**. Even if the deterministic base-case curves do not cross, such logical caps are essential to prevent logic violations during Probabilistic Sensitivity Analysis (PSA) or bootstrap iterations where individual simulated trials may produce crossing tails.
+::: {.callout-note}
+## A Note on Reconstructed IPD vs. Clinical Trial Database
+
+In our reconstructed pseudo-IPD (digitized from published KM plots), the fitted spline curves stay very close but do not actually cross in the tail (yielding `NA` for the crossover week above). This is because flexible spline models are highly sensitive to the exact timing of events and censoring patterns in the tail, which are approximated during KM digitization.
+
+However, implementing this capping logic in the code remains a critical HTA requirement. In HEOR practice, this serves as a **model guardrail (safety net)**. Even if the deterministic base-case curves do not cross, such logical caps are essential to prevent logic violations during Probabilistic Sensitivity Analysis (PSA) or bootstrap iterations where individual simulated trials may produce crossing tails.
+:::
 
 
 ### 6.5 HTA Decision Interpretation & Consulting Takeaways
