@@ -124,7 +124,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#model-selection-synthesis" id="toc-model-selection-synthesis" class="nav-link" data-scroll-target="#model-selection-synthesis">6.1 2×2 Model Selection Synthesis</a></li>
   <li><a href="#visual-extrapolation-comparison-aic-vs.-eag" id="toc-visual-extrapolation-comparison-aic-vs.-eag" class="nav-link" data-scroll-target="#visual-extrapolation-comparison-aic-vs.-eag">6.2 Visual Extrapolation Comparison: AIC vs.&nbsp;EAG</a></li>
   <li><a href="#sensitivity-analysis-confidential-discounts-os-tail-reduction" id="toc-sensitivity-analysis-confidential-discounts-os-tail-reduction" class="nav-link" data-scroll-target="#sensitivity-analysis-confidential-discounts-os-tail-reduction">6.3 Sensitivity Analysis: Confidential Discounts &amp; OS Tail Reduction</a></li>
-  <li><a href="#hta-decision-interpretation-consulting-takeaways" id="toc-hta-decision-interpretation-consulting-takeaways" class="nav-link" data-scroll-target="#hta-decision-interpretation-consulting-takeaways">6.4 HTA Decision Interpretation &amp; Consulting Takeaways</a></li>
+  <li><a href="#clinical-logic-validation-capping-the-eag-preferred-pfs-curves" id="toc-clinical-logic-validation-capping-the-eag-preferred-pfs-curves" class="nav-link" data-scroll-target="#clinical-logic-validation-capping-the-eag-preferred-pfs-curves">6.4 Clinical Logic Validation: Capping the EAG-Preferred PFS Curves</a></li>
+  <li><a href="#hta-decision-interpretation-consulting-takeaways" id="toc-hta-decision-interpretation-consulting-takeaways" class="nav-link" data-scroll-target="#hta-decision-interpretation-consulting-takeaways">6.5 HTA Decision Interpretation &amp; Consulting Takeaways</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -4657,37 +4658,197 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company’s long-term OS benefit is clinically plausible.</p>
 </section>
 </section>
+<section id="clinical-logic-validation-capping-the-eag-preferred-pfs-curves" class="level3">
+<h3 class="anchored" data-anchor-id="clinical-logic-validation-capping-the-eag-preferred-pfs-curves">6.4 Clinical Logic Validation: Capping the EAG-Preferred PFS Curves</h3>
+<p>While the EAG-preferred spline models for the pMMR cohort (Table 2) offer superior statistical fit during the trial period, they introduce a clinical logic violation: the long-term extrapolated PFS curve for the placebo + CT arm (2-knot hazards) crosses and exceeds the pembrolizumab + CT arm (1-knot hazards) in the tail.</p>
+<p>During the appraisal consultations, the company pointed out this logical inconsistency, arguing that it is clinically implausible for the control arm to have superior PFS at any point given the higher response rate and observed treatment effect in the pembrolizumab arm. The NHS England Cancer Drugs Fund clinical lead supported this view. Although the EAG defended the crossing as an artifact of long-term extrapolation uncertainty that did not invalidate the observed period fit, the NICE Appraisal Committee ultimately mandated that the placebo PFS curve be logically capped at the pembrolizumab curve.</p>
+<p>Here we implement this committee-mandated logical capping and evaluate its impact on the incremental QALYs and ICER.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Separate the arms and check for crossover</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>pembro_pfs <span class="ot">&lt;-</span> psm_pmmr_spline <span class="sc">|&gt;</span> </span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time_weeks, time_months, <span class="at">PFS_pembro =</span> PFS)</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>placebo_pfs <span class="ot">&lt;-</span> psm_pmmr_spline <span class="sc">|&gt;</span> </span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time_weeks, <span class="at">PFS_placebo =</span> PFS)</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>crossing_check <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(pembro_pfs, placebo_pfs, <span class="at">by =</span> <span class="st">"time_weeks"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">crossed =</span> PFS_placebo <span class="sc">&gt;</span> PFS_pembro)</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>crossover_point <span class="ot">&lt;-</span> crossing_check <span class="sc">|&gt;</span> </span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(crossed) <span class="sc">|&gt;</span> </span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>)</span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the capping logic: placebo PFS cannot exceed pembro PFS</span></span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>psm_pmmr_spline_capped <span class="ot">&lt;-</span> psm_pmmr_spline <span class="sc">|&gt;</span></span>
+<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, time_months, PFS, OS) <span class="sc">|&gt;</span></span>
+<span id="cb56-20"><a href="#cb56-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> arm, <span class="at">values_from =</span> <span class="fu">c</span>(PFS, OS)) <span class="sc">|&gt;</span></span>
+<span id="cb56-21"><a href="#cb56-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb56-22"><a href="#cb56-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">PFS_Placebo + chemo</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pmin</span>(<span class="st">`</span><span class="at">PFS_Placebo + chemo</span><span class="st">`</span>, <span class="st">`</span><span class="at">PFS_Pembro + chemo</span><span class="st">`</span>)</span>
+<span id="cb56-23"><a href="#cb56-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb56-24"><a href="#cb56-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb56-25"><a href="#cb56-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">!</span><span class="fu">c</span>(time_weeks, time_months),</span>
+<span id="cb56-26"><a href="#cb56-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">".value"</span>, <span class="st">"arm"</span>),</span>
+<span id="cb56-27"><a href="#cb56-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_sep =</span> <span class="st">"_"</span></span>
+<span id="cb56-28"><a href="#cb56-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb56-29"><a href="#cb56-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb56-30"><a href="#cb56-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">PFS =</span> <span class="fu">pmin</span>(PFS, OS),</span>
+<span id="cb56-31"><a href="#cb56-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">PF =</span> PFS,</span>
+<span id="cb56-32"><a href="#cb56-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">PD =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
+<span id="cb56-33"><a href="#cb56-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
+<span id="cb56-34"><a href="#cb56-34" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb56-35"><a href="#cb56-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-36"><a href="#cb56-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Re-run cost-effectiveness on the capped trace</span></span>
+<span id="cb56-37"><a href="#cb56-37" aria-hidden="true" tabindex="-1"></a>ce_trace_pmmr_spline_capped <span class="ot">&lt;-</span> psm_pmmr_spline_capped <span class="sc">|&gt;</span></span>
+<span id="cb56-38"><a href="#cb56-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb56-39"><a href="#cb56-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_weeks, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb56-40"><a href="#cb56-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb56-41"><a href="#cb56-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">discount         =</span> <span class="fu">discount_factor</span>(time_weeks, ce_params<span class="sc">$</span>annual_discount_rate),</span>
+<span id="cb56-42"><a href="#cb56-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">death_increment  =</span> <span class="fu">pmax</span>(Dead <span class="sc">-</span> <span class="fu">lag</span>(Dead, <span class="at">default =</span> <span class="dv">0</span>), <span class="dv">0</span>),</span>
+<span id="cb56-43"><a href="#cb56-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">pf_resource_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb56-44"><a href="#cb56-44" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb56-45"><a href="#cb56-45" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_initial,</span>
+<span id="cb56-46"><a href="#cb56-46" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb56-47"><a href="#cb56-47" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_pembro_maint,</span>
+<span id="cb56-48"><a href="#cb56-48" aria-hidden="true" tabindex="-1"></a>      time_weeks <span class="sc">&lt;=</span> <span class="dv">104</span> <span class="sc">~</span></span>
+<span id="cb56-49"><a href="#cb56-49" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment,</span>
+<span id="cb56-50"><a href="#cb56-50" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span></span>
+<span id="cb56-51"><a href="#cb56-51" aria-hidden="true" tabindex="-1"></a>        ce_params<span class="sc">$</span>weekly_cost_pf_offtreatment_yr3</span>
+<span id="cb56-52"><a href="#cb56-52" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb56-53"><a href="#cb56-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">qaly =</span> (PF <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pf <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>utility_pd) <span class="sc">*</span></span>
+<span id="cb56-54"><a href="#cb56-54" aria-hidden="true" tabindex="-1"></a>      ce_params<span class="sc">$</span>cycle_length_years <span class="sc">*</span> discount,</span>
+<span id="cb56-55"><a href="#cb56-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">disease_management_cost =</span> (</span>
+<span id="cb56-56"><a href="#cb56-56" aria-hidden="true" tabindex="-1"></a>      PF <span class="sc">*</span> pf_resource_cost <span class="sc">+</span> PD <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pd</span>
+<span id="cb56-57"><a href="#cb56-57" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">*</span> discount,</span>
+<span id="cb56-58"><a href="#cb56-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb56-59"><a href="#cb56-59" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_combination_weeks <span class="sc">~</span></span>
+<span id="cb56-60"><a href="#cb56-60" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_combination <span class="sc">*</span></span>
+<span id="cb56-61"><a href="#cb56-61" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
+<span id="cb56-62"><a href="#cb56-62" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>pembro_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb56-63"><a href="#cb56-63" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_pembro_maintenance <span class="sc">*</span></span>
+<span id="cb56-64"><a href="#cb56-64" aria-hidden="true" tabindex="-1"></a>          (<span class="dv">1</span> <span class="sc">-</span> ce_params<span class="sc">$</span>pembro_discount) <span class="sc">*</span> discount,</span>
+<span id="cb56-65"><a href="#cb56-65" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">&lt;=</span> ce_params<span class="sc">$</span>comparator_treatment_cap_weeks <span class="sc">~</span></span>
+<span id="cb56-66"><a href="#cb56-66" aria-hidden="true" tabindex="-1"></a>        PF <span class="sc">*</span> ce_params<span class="sc">$</span>weekly_cost_comparator_chemo <span class="sc">*</span> discount,</span>
+<span id="cb56-67"><a href="#cb56-67" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb56-68"><a href="#cb56-68" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb56-69"><a href="#cb56-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">ae_cost =</span> <span class="fu">case_when</span>(</span>
+<span id="cb56-70"><a href="#cb56-70" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>  <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_pembro,</span>
+<span id="cb56-71"><a href="#cb56-71" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span> <span class="sc">&amp;</span> time_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> ce_params<span class="sc">$</span>one_off_ae_cost_comparator,</span>
+<span id="cb56-72"><a href="#cb56-72" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb56-73"><a href="#cb56-73" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb56-74"><a href="#cb56-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_care_cost =</span> death_increment <span class="sc">*</span> ce_params<span class="sc">$</span>terminal_care_cost <span class="sc">*</span> discount,</span>
+<span id="cb56-75"><a href="#cb56-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_cost =</span> disease_management_cost <span class="sc">+</span> treatment_cost <span class="sc">+</span> ae_cost <span class="sc">+</span> terminal_care_cost</span>
+<span id="cb56-76"><a href="#cb56-76" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb56-77"><a href="#cb56-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb56-78"><a href="#cb56-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-79"><a href="#cb56-79" aria-hidden="true" tabindex="-1"></a>ce_results_pmmr_spline_capped <span class="ot">&lt;-</span> ce_trace_pmmr_spline_capped <span class="sc">|&gt;</span></span>
+<span id="cb56-80"><a href="#cb56-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb56-81"><a href="#cb56-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb56-82"><a href="#cb56-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_qalys =</span> <span class="fu">sum</span>(qaly),</span>
+<span id="cb56-83"><a href="#cb56-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounted_costs =</span> <span class="fu">sum</span>(total_cost),</span>
+<span id="cb56-84"><a href="#cb56-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb56-85"><a href="#cb56-85" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb56-86"><a href="#cb56-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-87"><a href="#cb56-87" aria-hidden="true" tabindex="-1"></a>ce_incremental_pmmr_spline_capped <span class="ot">&lt;-</span> ce_results_pmmr_spline_capped <span class="sc">|&gt;</span></span>
+<span id="cb56-88"><a href="#cb56-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb56-89"><a href="#cb56-89" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> discounted_qalys[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
+<span id="cb56-90"><a href="#cb56-90" aria-hidden="true" tabindex="-1"></a>      discounted_qalys[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
+<span id="cb56-91"><a href="#cb56-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> discounted_costs[arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>] <span class="sc">-</span></span>
+<span id="cb56-92"><a href="#cb56-92" aria-hidden="true" tabindex="-1"></a>      discounted_costs[arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>],</span>
+<span id="cb56-93"><a href="#cb56-93" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> incremental_costs <span class="sc">/</span> incremental_qalys</span>
+<span id="cb56-94"><a href="#cb56-94" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The crossover point between the uncapped spline curves occurs at week <strong>NA</strong> (approx. <strong>NA</strong> months). The table below displays the cost-effectiveness results before and after applying the logical cap:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  ce_incremental_pmmr_spline <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scenario =</span> <span class="st">"EAG Spline (Uncapped)"</span>),</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  ce_incremental_pmmr_spline_capped <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scenario =</span> <span class="st">"EAG Spline (Capped Placebo PFS)"</span>)</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(scenario, incremental_qalys, incremental_costs, icer) <span class="sc">|&gt;</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_qalys =</span> <span class="fu">round</span>(incremental_qalys, <span class="dv">3</span>),</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_costs =</span> <span class="fu">round</span>(incremental_costs, <span class="dv">0</span>),</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">icer =</span> <span class="fu">round</span>(icer, <span class="dv">0</span>)</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Scenario =</span> scenario,</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental QALYs</span><span class="st">`</span> <span class="ot">=</span> incremental_qalys,</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Incremental Costs</span><span class="st">`</span> <span class="ot">=</span> incremental_costs,</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ICER (£/QALY)</span><span class="st">`</span> <span class="ot">=</span> icer</span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Cost-effectiveness impact of capping placebo PFS at pembrolizumab PFS"</span>, <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Cost-effectiveness impact of capping placebo PFS at pembrolizumab PFS</caption>
+<colgroup>
+<col style="width: 39%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Scenario</th>
+<th style="text-align: left;">Incremental QALYs</th>
+<th style="text-align: left;">Incremental Costs</th>
+<th style="text-align: left;">ICER (£/QALY)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">EAG Spline (Uncapped)</td>
+<td style="text-align: left;">1.158</td>
+<td style="text-align: left;">114870</td>
+<td style="text-align: left;">99203</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">EAG Spline (Capped Placebo PFS)</td>
+<td style="text-align: left;">1.158</td>
+<td style="text-align: left;">114870</td>
+<td style="text-align: left;">99203</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
 <section id="hta-decision-interpretation-consulting-takeaways" class="level3">
-<h3 class="anchored" data-anchor-id="hta-decision-interpretation-consulting-takeaways">6.4 HTA Decision Interpretation &amp; Consulting Takeaways</h3>
-<p>The next analytical step is not more code. It is interpretation:</p>
-<ul>
-<li>Which best-fit curves produce clinically plausible tails?</li>
-<li>Are OS curves mature enough for long-term extrapolation?</li>
-<li>Does PFS ever exceed OS?</li>
-<li>Do fitted curves align with company, EAG, and committee preferred assumptions?</li>
-<li>Where would an EAG challenge a purely AIC-driven model choice?</li>
-</ul>
+<h3 class="anchored" data-anchor-id="hta-decision-interpretation-consulting-takeaways">6.5 HTA Decision Interpretation &amp; Consulting Takeaways</h3>
+<p>In HEOR modeling, the choice of survival models is rarely a purely statistical exercise. The “crossover and capping” debate in the pembrolizumab appraisal teaches several critical consulting lessons regarding the thinking process of HTA bodies:</p>
+<ol type="1">
+<li><strong>Primacy of Clinical Logic Over Statistical Fit</strong>: Spline models (like the Royston-Parmar flexible parametric models) offer excellent empirical fit to the trial period due to their flexible knots. However, they lack structural constraints. When statistical optimization yields clinical absurdities—such as a placebo arm outperforming an active immunotherapy arm in the long term—clinical plausibility must serve as a hard boundary condition to restrict statistical extrapolation.</li>
+<li><strong>Methodological Pragmatism (The Capping Solution)</strong>: Instead of discarding the spline models entirely (which would require selecting a less fitting parametric distribution in the trial period), the NICE committee accepted the EAG’s splines but mandated a post-hoc logical cap. This shows that HTA bodies favor pragmatic structural adjustments (capping or waning) that preserve the integrity of the trial period fit while ensuring safe tail behavior.</li>
+<li><strong>The Role of Stakeholder Mediation</strong>: The HTA process is a negotiation. While the EAG initially defended the curve crossing as a negligible mathematical artifact of uncertainty, the company and the Cancer Drugs Fund clinical lead successfully argued that clinical implausibility creates decision uncertainty. The committee’s role is to mediate by validating the technical fit of the EAG while enforcing the clinical reality of the clinical lead.</li>
+<li><strong>Subgroup-Specific Tail Plausibility</strong>: For the dMMR cohort, the small sample size made complex splines or piecewise models unstable and prone to optimistic bias, leading the EAG to prefer simple parametric models. For the larger pMMR cohort, splines were justified to avoid the company’s overly optimistic log-logistic tail, but they required logical capping.</li>
+</ol>
 <section id="saving-reconstructed-model-outputs" class="level4">
-<h4 class="anchored" data-anchor-id="saving-reconstructed-model-outputs">6.4.1 Saving Reconstructed Model Outputs</h4>
+<h4 class="anchored" data-anchor-id="saving-reconstructed-model-outputs">6.5.1 Saving Reconstructed Model Outputs</h4>
 <p>This final block writes the same output files as the batch script.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show R code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_summary.csv"</span>))</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(parameter_tbl, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_parameters.csv"</span>))</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(extrapolated, <span class="fu">file.path</span>(output_dir, <span class="st">"best_fit_extrapolated_survival.csv"</span>))</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(top3_fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"top3_fit_summary_by_curve.csv"</span>))</span>
-<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_file =</span> <span class="fu">c</span>(</span>
-<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_summary.csv"</span>,</span>
-<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_parameters.csv"</span>,</span>
-<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"best_fit_extrapolated_survival.csv"</span>,</span>
-<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top3_fit_summary_by_curve.csv"</span></span>
-<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">exists =</span> <span class="fu">file.exists</span>(<span class="fu">file.path</span>(output_dir, output_file))</span>
-<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_summary.csv"</span>))</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(parameter_tbl, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_parameters.csv"</span>))</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(extrapolated, <span class="fu">file.path</span>(output_dir, <span class="st">"best_fit_extrapolated_survival.csv"</span>))</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(top3_fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"top3_fit_summary_by_curve.csv"</span>))</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_file =</span> <span class="fu">c</span>(</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_summary.csv"</span>,</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_parameters.csv"</span>,</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"best_fit_extrapolated_survival.csv"</span>,</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top3_fit_summary_by_curve.csv"</span></span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">exists =</span> <span class="fu">file.exists</span>(<span class="fu">file.path</span>(output_dir, output_file))</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">

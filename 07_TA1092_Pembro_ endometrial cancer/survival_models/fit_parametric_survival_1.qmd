@@ -2267,18 +2267,145 @@ bind_rows(
 This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company's long-term OS benefit is clinically plausible.
 
 
-### 6.4 HTA Decision Interpretation & Consulting Takeaways
+### 6.4 Clinical Logic Validation: Capping the EAG-Preferred PFS Curves
 
-The next analytical step is not more code. It is interpretation:
+While the EAG-preferred spline models for the pMMR cohort (Table 2) offer superior statistical fit during the trial period, they introduce a clinical logic violation: the long-term extrapolated PFS curve for the placebo + CT arm (2-knot hazards) crosses and exceeds the pembrolizumab + CT arm (1-knot hazards) in the tail. 
 
-- Which best-fit curves produce clinically plausible tails?
-- Are OS curves mature enough for long-term extrapolation?
-- Does PFS ever exceed OS?
-- Do fitted curves align with company, EAG, and committee preferred assumptions?
-- Where would an EAG challenge a purely AIC-driven model choice?
+During the appraisal consultations, the company pointed out this logical inconsistency, arguing that it is clinically implausible for the control arm to have superior PFS at any point given the higher response rate and observed treatment effect in the pembrolizumab arm. The NHS England Cancer Drugs Fund clinical lead supported this view. Although the EAG defended the crossing as an artifact of long-term extrapolation uncertainty that did not invalidate the observed period fit, the NICE Appraisal Committee ultimately mandated that the placebo PFS curve be logically capped at the pembrolizumab curve.
+
+Here we implement this committee-mandated logical capping and evaluate its impact on the incremental QALYs and ICER.
+
+```{r pmmr-pfs-capping}
+# Separate the arms and check for crossover
+pembro_pfs <- psm_pmmr_spline |> 
+  filter(arm == "Pembro + chemo") |> 
+  select(time_weeks, time_months, PFS_pembro = PFS)
+
+placebo_pfs <- psm_pmmr_spline |> 
+  filter(arm == "Placebo + chemo") |> 
+  select(time_weeks, PFS_placebo = PFS)
+
+crossing_check <- inner_join(pembro_pfs, placebo_pfs, by = "time_weeks") |> 
+  mutate(crossed = PFS_placebo > PFS_pembro)
+
+crossover_point <- crossing_check |> 
+  filter(crossed) |> 
+  slice(1)
+
+# Apply the capping logic: placebo PFS cannot exceed pembro PFS
+psm_pmmr_spline_capped <- psm_pmmr_spline |>
+  select(arm, time_weeks, time_months, PFS, OS) |>
+  pivot_wider(names_from = arm, values_from = c(PFS, OS)) |>
+  mutate(
+    `PFS_Placebo + chemo` = pmin(`PFS_Placebo + chemo`, `PFS_Pembro + chemo`)
+  ) |>
+  pivot_longer(
+    cols = !c(time_weeks, time_months),
+    names_to = c(".value", "arm"),
+    names_sep = "_"
+  ) |>
+  mutate(
+    PFS = pmin(PFS, OS),
+    PF = PFS,
+    PD = pmax(OS - PFS, 0),
+    Dead = pmax(1 - OS, 0)
+  )
+
+# Re-run cost-effectiveness on the capped trace
+ce_trace_pmmr_spline_capped <- psm_pmmr_spline_capped |>
+  group_by(arm) |>
+  arrange(time_weeks, .by_group = TRUE) |>
+  mutate(
+    discount         = discount_factor(time_weeks, ce_params$annual_discount_rate),
+    death_increment  = pmax(Dead - lag(Dead, default = 0), 0),
+    pf_resource_cost = case_when(
+      time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_initial,
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        ce_params$weekly_cost_pf_pembro_maint,
+      time_weeks <= 104 ~
+        ce_params$weekly_cost_pf_offtreatment,
+      TRUE ~
+        ce_params$weekly_cost_pf_offtreatment_yr3
+    ),
+    qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
+      ce_params$cycle_length_years * discount,
+    disease_management_cost = (
+      PF * pf_resource_cost + PD * ce_params$weekly_cost_pd
+    ) * discount,
+    treatment_cost = case_when(
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
+        PF * ce_params$weekly_cost_pembro_combination *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_pembro_maintenance *
+          (1 - ce_params$pembro_discount) * discount,
+      arm == "Placebo + chemo" & time_weeks <= ce_params$comparator_treatment_cap_weeks ~
+        PF * ce_params$weekly_cost_comparator_chemo * discount,
+      TRUE ~ 0
+    ),
+    ae_cost = case_when(
+      arm == "Pembro + chemo"  & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
+      arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
+      TRUE ~ 0
+    ),
+    terminal_care_cost = death_increment * ce_params$terminal_care_cost * discount,
+    total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
+  ) |>
+  ungroup()
+
+ce_results_pmmr_spline_capped <- ce_trace_pmmr_spline_capped |>
+  group_by(arm) |>
+  summarise(
+    discounted_qalys = sum(qaly),
+    discounted_costs = sum(total_cost),
+    .groups = "drop"
+  )
+
+ce_incremental_pmmr_spline_capped <- ce_results_pmmr_spline_capped |>
+  summarise(
+    incremental_qalys = discounted_qalys[arm == "Pembro + chemo"] -
+      discounted_qalys[arm == "Placebo + chemo"],
+    incremental_costs = discounted_costs[arm == "Pembro + chemo"] -
+      discounted_costs[arm == "Placebo + chemo"],
+    icer = incremental_costs / incremental_qalys
+  )
+```
+
+The crossover point between the uncapped spline curves occurs at week **`r if(nrow(crossover_point) > 0) crossover_point$time_weeks else "NA"`** (approx. **`r if(nrow(crossover_point) > 0) round(crossover_point$time_months, 1) else "NA"`** months). The table below displays the cost-effectiveness results before and after applying the logical cap:
+
+```{r pmmr-capping-comparison-table}
+bind_rows(
+  ce_incremental_pmmr_spline |> mutate(scenario = "EAG Spline (Uncapped)"),
+  ce_incremental_pmmr_spline_capped |> mutate(scenario = "EAG Spline (Capped Placebo PFS)")
+) |>
+  select(scenario, incremental_qalys, incremental_costs, icer) |>
+  mutate(
+    incremental_qalys = round(incremental_qalys, 3),
+    incremental_costs = round(incremental_costs, 0),
+    icer = round(icer, 0)
+  ) |>
+  transmute(
+    Scenario = scenario,
+    `Incremental QALYs` = incremental_qalys,
+    `Incremental Costs` = incremental_costs,
+    `ICER (£/QALY)` = icer
+  ) |>
+  kable(caption = "Cost-effectiveness impact of capping placebo PFS at pembrolizumab PFS", align = "l")
+```
 
 
-#### 6.4.1 Saving Reconstructed Model Outputs
+### 6.5 HTA Decision Interpretation & Consulting Takeaways
+
+In HEOR modeling, the choice of survival models is rarely a purely statistical exercise. The "crossover and capping" debate in the pembrolizumab appraisal teaches several critical consulting lessons regarding the thinking process of HTA bodies:
+
+1. **Primacy of Clinical Logic Over Statistical Fit**: Spline models (like the Royston-Parmar flexible parametric models) offer excellent empirical fit to the trial period due to their flexible knots. However, they lack structural constraints. When statistical optimization yields clinical absurdities—such as a placebo arm outperforming an active immunotherapy arm in the long term—clinical plausibility must serve as a hard boundary condition to restrict statistical extrapolation.
+2. **Methodological Pragmatism (The Capping Solution)**: Instead of discarding the spline models entirely (which would require selecting a less fitting parametric distribution in the trial period), the NICE committee accepted the EAG's splines but mandated a post-hoc logical cap. This shows that HTA bodies favor pragmatic structural adjustments (capping or waning) that preserve the integrity of the trial period fit while ensuring safe tail behavior.
+3. **The Role of Stakeholder Mediation**: The HTA process is a negotiation. While the EAG initially defended the curve crossing as a negligible mathematical artifact of uncertainty, the company and the Cancer Drugs Fund clinical lead successfully argued that clinical implausibility creates decision uncertainty. The committee's role is to mediate by validating the technical fit of the EAG while enforcing the clinical reality of the clinical lead.
+4. **Subgroup-Specific Tail Plausibility**: For the dMMR cohort, the small sample size made complex splines or piecewise models unstable and prone to optimistic bias, leading the EAG to prefer simple parametric models. For the larger pMMR cohort, splines were justified to avoid the company's overly optimistic log-logistic tail, but they required logical capping.
+
+
+#### 6.5.1 Saving Reconstructed Model Outputs
 
 This final block writes the same output files as the batch script.
 
