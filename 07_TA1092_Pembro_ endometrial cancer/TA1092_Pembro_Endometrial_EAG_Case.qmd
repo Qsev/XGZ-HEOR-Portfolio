@@ -589,7 +589,7 @@ While the parametric curves track the trial data reasonably, goodness-of-fit wit
 
 The External Assessment Group (EAG) raised critical concerns regarding the maturity of the KEYNOTE-868 (NRG-GY018) trial data relative to the lifetime projection required for cost-effectiveness decision-making. In health technology assessment (HTA), data maturity cannot be appraised in a vacuum or compared to arbitrary, binary thresholds; instead, it must be evaluated contextually by comparing the trial's follow-up duration against the planned active treatment duration and the lifetime economic horizon.
 
-##### Trial Follow-Up vs. Treatment Exposure
+##### Trial Follow-Up vs. Treatment Exposure {.unnumbered}
 
 Under the KEYNOTE-868 protocol, patients in the pembrolizumab arm are scheduled to receive up to 6 cycles of pembrolizumab in combination with chemotherapy (approximately 18 weeks), followed by up to 14 cycles of pembrolizumab monotherapy (approximately 84 weeks). The maximum planned active treatment duration is therefore 102 weeks, or approximately 2.2 years (26.2 months). 
 
@@ -605,7 +605,7 @@ When the median follow-up of a trial is shorter than the maximum duration of act
 3. The durability of the treatment effect after treatment discontinuation remains entirely unobserved and hypothetical.
 :::
 
-##### Extrapolation Dependency and Economic Leverage
+##### Extrapolation Dependency and Economic Leverage {.unnumbered}
 
 Because median overall survival (OS) was not reached in the pembrolizumab arm of the trial, long-term survival projections are highly sensitive to the mathematical properties of the selected parametric models. When the observed trial data are limited to the early phases of the survival curve:
 - Small, statistically insignificant differences in the fit of the observed period can translate into massive discrepancies in the projected tail.
