@@ -597,7 +597,9 @@ At the time of the primary analysis, the median follow-up in the trial was appro
 
 ::: {.callout-warning}
 ## Methodological Auditing Risk: Truncated Exposure Profiles
+
 When the median follow-up of a trial is shorter than the maximum duration of active treatment:
+
 1. A substantial proportion of patients are censored before completing the planned therapy.
 2. The trial provides minimal observed data on post-treatment survival.
 3. The durability of the treatment effect after treatment discontinuation remains entirely unobserved and hypothetical.
