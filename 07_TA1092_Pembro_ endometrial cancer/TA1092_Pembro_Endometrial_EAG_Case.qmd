@@ -797,8 +797,6 @@ The visualization demonstrates that the area most relevant to cost-effectiveness
 
 ### Step 3: Quantifying Structural Uncertainty (Tail Divergence)
 
-#### Visualizing and Quantifying Tail Divergence
-
 To demonstrate the structural uncertainty of this extrapolation, we plot all seven candidate distributions on the same curve and examine their projected survival at key clinical landmarks. 
 
 While all candidate distributions fit the observed trial period similarly, they diverge massively in the extrapolation zone. This divergence is visualized in the fan plot below and quantified numerically in @tbl-issue3-landmark-survival-table, which shows the projected survival estimates at 2, 3, 5, 10, and 20 years.
