@@ -990,16 +990,21 @@ discount_factor <- function(week, annual_rate) {
 }
 ```
 
-
 ### Subgroup-Specific Cost-Effectiveness Results
 
-To evaluate the economic impact of survival curves selected purely on statistical goodness-of-fit, we execute the weekly Partitioned Survival Model (PSM) for both molecular subgroups (pMMR and dMMR). The tables below summarize the AIC-selected survival distributions and the resulting incremental cost-effectiveness outcomes under public list prices.
+To evaluate the economic impact of survival curves selected purely on statistical goodness-of-fit (AIC), we execute the weekly Partitioned Survival Model (PSM) for both molecular subgroups (pMMR and dMMR). 
 
-#### Mismatch Repair Proficient (pMMR) Cohort
+For the pMMR cohort, the Weibull and Log-logistic distributions represent the best statistical fits for OS and PFS, respectively. The model simulates weekly patient-time over the 35-year horizon to generate cumulative costs and health benefits. For the dMMR cohort, due to the small sample size and highly immature survival data, simple distributions (such as Exponential and Lognormal) are selected by AIC as the best fit candidates.
 
-For the pMMR cohort, the Weibull and Log-logistic distributions represent the best statistical fits for OS and PFS, respectively. The model simulates weekly patient-time over the 35-year horizon to generate cumulative costs and health benefits.
+The tables below summarize the AIC-selected survival distributions and the resulting incremental cost-effectiveness outcomes under public list prices.
 
-```{r pmmr-aic-state-occupancy}
+```{r subgroup-aic-state-occupancy}
+#| warning: false
+#| message: false
+#| label: tbl-aic-selected-distributions
+#| tbl-cap: "AIC-selected survival distributions by subgroup"
+
+# pMMR State Occupancy
 psm_pmmr_aic <- best_fits |>
   filter(subgroup == "pMMR", endpoint %in% c("PFS", "OS")) |>
   mutate(
@@ -1023,15 +1028,44 @@ psm_pmmr_aic <- best_fits |>
     Dead = pmax(1 - OS, 0)
   )
 
-# AIC-selected distributions for pMMR
+# dMMR State Occupancy
+psm_dmmr_aic <- best_fits |>
+  filter(subgroup == "dMMR", endpoint %in% c("PFS", "OS")) |>
+  mutate(
+    arm  = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
+    pred = map(
+      fit,
+      ~tibble(
+        time_weeks  = ce_time_grid$time_weeks,
+        time_months = ce_time_grid$time_months,
+        survival    = predict_survival(.x, ce_time_grid$time_months)
+      )
+    )
+  ) |>
+  select(arm, endpoint, pred) |>
+  unnest(pred) |>
+  tidyr::pivot_wider(names_from = endpoint, values_from = survival) |>
+  mutate(
+    PFS  = pmin(PFS, OS),
+    PF   = PFS,
+    PD   = pmax(OS - PFS, 0),
+    Dead = pmax(1 - OS, 0)
+  )
+
+# Print combined table of AIC-selected distributions
 best_fits |>
-  filter(subgroup == "pMMR", endpoint %in% c("PFS", "OS")) |>
+  filter(endpoint %in% c("PFS", "OS")) |>
   select(subgroup, endpoint, treatment, best_dist = dist_label, aic) |>
-  arrange(endpoint, treatment) |>
-  kable(digits = 2, caption = "pMMR: AIC-selected distributions", align = "l")
+  arrange(subgroup, endpoint, treatment) |>
+  kable(digits = 2, col.names = c("Subgroup", "Endpoint", "Treatment", "AIC-Selected Distribution", "AIC"), align = "l")
 ```
 
-```{r pmmr-aic-ce-results}
+```{r subgroup-aic-ce-results}
+#| warning: false
+#| message: false
+#| label: tbl-pmmr-dmmr-comparison-aic
+#| tbl-cap: "Base-case cost-effectiveness comparison by molecular subgroup (AIC-selected standard parametric curves)"
+
 calc_incremental <- function(psm_data) {
   psm_data |>
     group_by(arm) |>
@@ -1084,73 +1118,12 @@ calc_incremental <- function(psm_data) {
 }
 
 ce_incremental_pmmr_aic <- calc_incremental(psm_pmmr_aic)
-
-ce_incremental_pmmr_aic |>
-  mutate(across(c(incremental_qalys), ~round(.x, 3)),
-         across(c(incremental_costs, icer), ~round(.x, 0))) |>
-  transmute(`Incremental QALYs` = incremental_qalys,
-            `Incremental costs (&#163;)` = incremental_costs,
-            `ICER (&#163;/QALY)` = icer) |>
-  kable(caption = "pMMR (AIC-selected): incremental cost-effectiveness", align = "l", escape = FALSE)
-```
-
-
-#### Mismatch Repair Deficient (dMMR) Cohort
-
-For the dMMR cohort, due to the small sample size and highly immature survival data, simple distributions (such as Exponential and Lognormal) are selected by AIC as the best fit candidates.
-
-```{r dmmr-aic-state-occupancy}
-psm_dmmr_aic <- best_fits |>
-  filter(subgroup == "dMMR", endpoint %in% c("PFS", "OS")) |>
-  mutate(
-    arm  = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
-    pred = map(
-      fit,
-      ~tibble(
-        time_weeks  = ce_time_grid$time_weeks,
-        time_months = ce_time_grid$time_months,
-        survival    = predict_survival(.x, ce_time_grid$time_months)
-      )
-    )
-  ) |>
-  select(arm, endpoint, pred) |>
-  unnest(pred) |>
-  tidyr::pivot_wider(names_from = endpoint, values_from = survival) |>
-  mutate(
-    PFS  = pmin(PFS, OS),
-    PF   = PFS,
-    PD   = pmax(OS - PFS, 0),
-    Dead = pmax(1 - OS, 0)
-  )
-
-best_fits |>
-  filter(subgroup == "dMMR", endpoint %in% c("PFS", "OS")) |>
-  select(subgroup, endpoint, treatment, best_dist = dist_label, aic) |>
-  arrange(endpoint, treatment) |>
-  kable(digits = 2, caption = "dMMR: AIC-selected distributions", align = "l")
-```
-
-```{r dmmr-aic-ce-results}
 ce_incremental_dmmr_aic <- calc_incremental(psm_dmmr_aic)
 
-ce_incremental_dmmr_aic |>
-  mutate(across(c(incremental_qalys), ~round(.x, 3)),
-         across(c(incremental_costs, icer), ~round(.x, 0))) |>
-  transmute(`Incremental QALYs` = incremental_qalys,
-            `Incremental costs (&#163;)` = incremental_costs,
-            `ICER (&#163;/QALY)` = icer) |>
-  kable(caption = "dMMR (AIC-selected): incremental cost-effectiveness", align = "l", escape = FALSE)
-```
-
-
-### Subgroup Synthesis & Comparison
-
-Below, we compare the cost-effectiveness results of the pMMR and dMMR subgroups under the AIC-selected standard parametric distributions.
-
-```{r pmmr-dmmr-comparison-aic}
+# Print combined cost-effectiveness comparison table
 bind_rows(
-  ce_incremental_pmmr_aic |> mutate(subgroup = "pMMR", model = "AIC-selected standard parametric"),
-  ce_incremental_dmmr_aic |> mutate(subgroup = "dMMR", model = "AIC-selected standard parametric")
+  ce_incremental_pmmr_aic |> mutate(subgroup = "pMMR"),
+  ce_incremental_dmmr_aic |> mutate(subgroup = "dMMR")
 ) |>
   mutate(
     incremental_qalys = round(incremental_qalys, 3),
@@ -1159,13 +1132,11 @@ bind_rows(
   ) |>
   transmute(
     Subgroup = subgroup,
-    `Curve selection` = model,
     `Incremental QALYs` = incremental_qalys,
-    `Incremental costs (£)` = incremental_costs,
+    `Incremental Costs (£)` = incremental_costs,
     `ICER (£/QALY)` = icer
   ) |>
   kable(
-    caption = "pMMR (AIC-selected) vs dMMR (AIC-selected) cost-effectiveness comparison",
     align = "l",
     escape = FALSE
   )
@@ -1290,13 +1261,13 @@ eag_dmmr_fits |>
 
 ### Subgroup-Specific Cost-Effectiveness Results
 
-To evaluate the economic implications of the EAG-preferred survival curves, we rerun the weekly Partitioned Survival Model (PSM) for the pMMR and dMMR cohorts. The tables below summarize the health-state occupancy, discounted costs, and QALY outcomes under these alternative, clinical-consensus-driven assumptions.
+To evaluate the economic implications of the EAG-preferred survival curves, we execute the weekly Partitioned Survival Model (PSM) for the pMMR and dMMR cohorts. The analysis uses flexible spline survival models for the pMMR cohort and EAG-selected standard distributions for the dMMR cohort. 
 
-#### Mismatch Repair Proficient (pMMR) Cohort
-
-#### State Occupancy with EAG Spline Models
+The figures below show the simulated state occupancy traces for the two subgroups under the EAG-preferred model specifications.
 
 ```{r pmmr-spline-state-occupancy}
+#| warning: false
+#| message: false
 get_spline_surv <- function(fit_obj, times) {
   # Unwrap list(model_obj) wrapper only if not already a flexsurv model
   if (!inherits(fit_obj, "flexsurvreg")) fit_obj <- fit_obj[[1]]
@@ -1354,10 +1325,8 @@ psm_pmmr_spline |>
   theme(legend.position = "bottom")
 ```
 
-
-#### Discounted Costs and QALYs (EAG Spline Models)
-
 ```{r pmmr-spline-ce-results}
+#| include: false
 ce_trace_pmmr_spline <- psm_pmmr_spline |>
   group_by(arm) |>
   arrange(time_weeks, .by_group = TRUE) |>
@@ -1416,35 +1385,11 @@ ce_incremental_pmmr_spline <- ce_results_pmmr_spline |>
       discounted_costs[arm == "Placebo + chemo"],
     icer = incremental_costs / incremental_qalys
   )
-
-ce_results_pmmr_spline |>
-  mutate(
-    discounted_qalys = round(discounted_qalys, 3),
-    discounted_costs = round(discounted_costs, 0)
-  ) |>
-  transmute(Arm = arm,
-            `Discounted QALYs` = discounted_qalys,
-            `Discounted costs (&#163;)` = discounted_costs) |>
-  kable(caption = "pMMR (EAG spline): discounted results by arm", align = "l", escape = FALSE)
-
-ce_incremental_pmmr_spline |>
-  mutate(
-    incremental_qalys = round(incremental_qalys, 3),
-    incremental_costs = round(incremental_costs, 0),
-    icer              = round(icer, 0)
-  ) |>
-  transmute(`Incremental QALYs`     = incremental_qalys,
-            `Incremental costs (&#163;)` = incremental_costs,
-            `ICER (&#163;/QALY)`        = icer) |>
-  kable(caption = "pMMR (EAG spline): incremental cost-effectiveness", align = "l", escape = FALSE)
 ```
 
-
-#### Mismatch Repair Deficient (dMMR) Cohort
-
-#### State Occupancy with EAG-Preferred Models
-
 ```{r dmmr-state-occupancy}
+#| warning: false
+#| message: false
 psm_dmmr <- eag_dmmr_fits |>
   mutate(
     arm = if_else(treatment == "pembro_chemo", "Pembro + chemo", "Placebo + chemo"),
@@ -1487,10 +1432,12 @@ psm_dmmr |>
   theme(legend.position = "bottom")
 ```
 
-
-#### Discounted Costs and QALYs
-
 ```{r dmmr-ce-results}
+#| warning: false
+#| message: false
+#| label: tbl-pmmr-dmmr-comparison
+#| tbl-cap: "Base-case cost-effectiveness comparison by molecular subgroup (EAG-preferred spline/standard curves)"
+
 ce_trace_dmmr <- psm_dmmr |>
   group_by(arm) |>
   arrange(time_weeks, .by_group = TRUE) |>
@@ -1550,39 +1497,27 @@ ce_incremental_dmmr <- ce_results_dmmr |>
     icer = incremental_costs / incremental_qalys
   )
 
-ce_results_dmmr |>
+# Print combined absolute cost-effectiveness results table
+bind_rows(
+  ce_results_pmmr_spline |> mutate(subgroup = "pMMR"),
+  ce_results_dmmr        |> mutate(subgroup = "dMMR")
+) |>
   mutate(
     discounted_qalys = round(discounted_qalys, 3),
     discounted_costs = round(discounted_costs, 0)
   ) |>
   transmute(
+    Subgroup = subgroup,
     Arm = arm,
     `Discounted QALYs` = discounted_qalys,
-    `Discounted costs (&#163;)` = discounted_costs
+    `Discounted Costs (£)` = discounted_costs
   ) |>
-  kable(caption = "dMMR: discounted results by arm (EAG-preferred models)", align = "l", escape = FALSE)
+  kable(caption = "EAG-preferred scenarios: absolute discounted QALYs and costs by arm", align = "l")
 
-ce_incremental_dmmr |>
-  mutate(
-    incremental_qalys = round(incremental_qalys, 3),
-    incremental_costs = round(incremental_costs, 0),
-    icer = round(icer, 0)
-  ) |>
-  transmute(
-    `Incremental QALYs` = incremental_qalys,
-    `Incremental costs (&#163;)` = incremental_costs,
-    `ICER (&#163;/QALY)` = icer
-  ) |>
-  kable(caption = "dMMR: incremental cost-effectiveness (EAG-preferred models)", align = "l", escape = FALSE)
-```
-
-
-### Subgroup Synthesis & Comparison
-
-```{r pmmr-dmmr-comparison}
+# Print combined incremental cost-effectiveness comparison table
 bind_rows(
-  ce_incremental_pmmr_spline |> mutate(subgroup = "pMMR", model = "EAG-preferred spline (Table 2)"),
-  ce_incremental_dmmr        |> mutate(subgroup = "dMMR", model = "EAG-preferred standard (Table 2)")
+  ce_incremental_pmmr_spline |> mutate(subgroup = "pMMR"),
+  ce_incremental_dmmr        |> mutate(subgroup = "dMMR")
 ) |>
   mutate(
     incremental_qalys = round(incremental_qalys, 3),
@@ -1591,13 +1526,11 @@ bind_rows(
   ) |>
   transmute(
     Subgroup = subgroup,
-    `Curve selection` = model,
     `Incremental QALYs` = incremental_qalys,
-    `Incremental costs (&#163;)` = incremental_costs,
-    `ICER (&#163;/QALY)` = icer
+    `Incremental Costs (£)` = incremental_costs,
+    `ICER (£/QALY)` = icer
   ) |>
   kable(
-    caption = "pMMR (EAG spline) vs dMMR (EAG standard) cost-effectiveness comparison",
     align = "l",
     escape = FALSE
   )
