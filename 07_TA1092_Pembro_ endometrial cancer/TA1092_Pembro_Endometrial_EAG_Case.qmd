@@ -589,40 +589,26 @@ The EAG's Issue 3 points out that the KEYNOTE-868 trial has a short follow-up (m
 
 The tables below translate the EAG's data immaturity concerns into concrete modeling issues and maturity checks.
 
-```{r issue3-eag-logic-table}
-issue3_eag_logic <- tibble::tribble(
-  ~`EAG point`, ~`Meaning for modelling`,
-  "Median follow-up was about 16.3 months", "Most direct trial evidence covers early survival only",
-  "Survival estimates for 2 years or more rely on extrapolation", "Beyond roughly 24 months, estimates are increasingly model-driven",
-  "PFS and OS estimates extend out to 20 years", "The model must predict far beyond observed follow-up",
-  "Median OS was not reached in the pembrolizumab arm", "The OS benefit is immature and long-term benefit is uncertain",
-  "Active treatment lasts up to about 2.2 years", "Follow-up is short relative to the full treatment and post-treatment period"
-)
+| EAG point | Meaning for modelling |
+| :--- | :--- |
+| Median follow-up was about 16.3 months | Most direct trial evidence covers early survival only |
+| Survival estimates for 2 years or more rely on extrapolation | Beyond roughly 24 months, estimates are increasingly model-driven |
+| PFS and OS estimates extend out to 20 years | The model must predict far beyond observed follow-up |
+| Median OS was not reached in the pembrolizumab arm | The OS benefit is immature and long-term benefit is uncertain |
+| Active treatment lasts up to about 2.2 years | Follow-up is short relative to the full treatment and post-treatment period |
 
-issue3_eag_logic |>
-  kable(
-    caption = "Issue 3 translated into modelling questions",
-    align = "l"
-  )
-```
+: Issue 3 translated into modelling questions {#tbl-issue3-logic}
 
 In HTA auditing, we evaluate model maturity across four standard dimensions:
 
-```{r issue3-maturity-checks}
-issue3_maturity_checks <- tibble::tribble(
-  ~`Maturity check`, ~`What it asks`, ~`Why it matters for Issue 3`,
-  "Median OS reached?", "Has at least half the arm experienced the OS event?", "If median OS is not reached, long-term OS benefit is inferred rather than directly observed.",
-  "Median follow-up vs active treatment duration", "Has the median patient been observed through the full planned treatment period and beyond?", "If median follow-up is shorter than maximum treatment duration, there is limited evidence on post-treatment survival and treatment-effect durability.",
-  "2-year boundary", "Are estimates beyond roughly 24 months still supported by enough observed data?", "The EAG considered 2 years+ estimates highly susceptible to extrapolation error.",
-  "20-year projection", "How far beyond trial follow-up does the economic model project?", "The longer the projection, the more long-term QALYs depend on model structure and tail assumptions."
-)
+| Maturity check | What it asks | Why it matters for Issue 3 |
+| :--- | :--- | :--- |
+| Median OS reached? | Has at least half the arm experienced the OS event? | If median OS is not reached, long-term OS benefit is inferred rather than directly observed. |
+| Median follow-up vs active treatment duration | Has the median patient been observed through the full planned treatment period and beyond? | If median follow-up is shorter than maximum treatment duration, there is limited evidence on post-treatment survival and treatment-effect durability. |
+| 2-year boundary | Are estimates beyond roughly 24 months still supported by enough observed data? | The EAG considered 2 years+ estimates highly susceptible to extrapolation error. |
+| 20-year projection | How far beyond trial follow-up does the economic model project? | The longer the projection, the more long-term QALYs depend on model structure and tail assumptions. |
 
-issue3_maturity_checks |>
-  kable(
-    caption = "Issue 3 maturity checks used to interpret short follow-up",
-    align = "l"
-  )
-```
+: Issue 3 maturity checks used to interpret short follow-up {#tbl-issue3-maturity-checks}
 
 #### Observed Evidence vs. Model Horizon
 
