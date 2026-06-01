@@ -608,6 +608,7 @@ When the median follow-up of a trial is shorter than the maximum duration of act
 ##### Extrapolation Dependency and Economic Leverage {.unnumbered}
 
 Because median overall survival (OS) was not reached in the pembrolizumab arm of the trial, long-term survival projections are highly sensitive to the mathematical properties of the selected parametric models. When the observed trial data are limited to the early phases of the survival curve:
+
 - Small, statistically insignificant differences in the fit of the observed period can translate into massive discrepancies in the projected tail.
 - In a typical 20-year (240-month) or 30-year model horizon, the vast majority of projected QALYs—often exceeding 80%—are generated in the extrapolated tail (beyond the observed trial period).
 - Underestimation or overestimation of the long-term survival fraction directly controls the incremental cost-effectiveness ratio (ICER), turning the appraisal from an empirical clinical evaluation into a highly sensitive extrapolation exercise.
