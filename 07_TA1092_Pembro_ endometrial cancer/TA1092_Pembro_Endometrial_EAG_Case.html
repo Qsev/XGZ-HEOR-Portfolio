@@ -135,10 +135,10 @@ window.Quarto = {
   <li><a href="#goodness-of-fit-summary" id="toc-goodness-of-fit-summary" class="nav-link" data-scroll-target="#goodness-of-fit-summary"><span class="header-section-number">4.1</span> Goodness-of-Fit Summary</a></li>
   <li><a href="#statistical-fit-vs.-extrapolation-plausibility" id="toc-statistical-fit-vs.-extrapolation-plausibility" class="nav-link" data-scroll-target="#statistical-fit-vs.-extrapolation-plausibility"><span class="header-section-number">4.2</span> Statistical Fit vs.&nbsp;Extrapolation Plausibility</a></li>
   </ul></li>
-  <li><a href="#sec-issue3" id="toc-sec-issue3" class="nav-link" data-scroll-target="#sec-issue3"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</a>
+  <li><a href="#sec-issue3-main" id="toc-sec-issue3-main" class="nav-link" data-scroll-target="#sec-issue3-main"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</a>
   <ul class="collapse">
   <li><a href="#step-1-baseline-30-year-survival-extrapolation" id="toc-step-1-baseline-30-year-survival-extrapolation" class="nav-link" data-scroll-target="#step-1-baseline-30-year-survival-extrapolation"><span class="header-section-number">5.1</span> Step 1: Baseline 30-Year Survival Extrapolation</a></li>
-  <li><a href="#step-2-eag-issue-3-audit-trial-data-immaturity" id="toc-step-2-eag-issue-3-audit-trial-data-immaturity" class="nav-link" data-scroll-target="#step-2-eag-issue-3-audit-trial-data-immaturity"><span class="header-section-number">5.2</span> Step 2: EAG Issue 3 Audit (Trial Data Immaturity)</a></li>
+  <li><a href="#sec-issue3" id="toc-sec-issue3" class="nav-link" data-scroll-target="#sec-issue3"><span class="header-section-number">5.2</span> Step 2: EAG Issue 3 Audit (Trial Data Immaturity)</a></li>
   <li><a href="#step-3-quantifying-structural-uncertainty-tail-divergence" id="toc-step-3-quantifying-structural-uncertainty-tail-divergence" class="nav-link" data-scroll-target="#step-3-quantifying-structural-uncertainty-tail-divergence"><span class="header-section-number">5.3</span> Step 3: Quantifying Structural Uncertainty (Tail Divergence)</a></li>
   </ul></li>
   <li><a href="#cost-effectiveness-under-aic-selected-standard-parametric-models" id="toc-cost-effectiveness-under-aic-selected-standard-parametric-models" class="nav-link" data-scroll-target="#cost-effectiveness-under-aic-selected-standard-parametric-models"><span class="header-section-number">6</span> Cost-Effectiveness under AIC-Selected Standard Parametric Models</a>
@@ -1109,8 +1109,8 @@ window.Quarto = {
 <p>Therefore, these statistical rankings serve as candidates for further clinical tail critique, which is evaluated in the next chapter.</p>
 </section>
 </section>
-<section id="sec-issue3" class="level2 page-columns page-full" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="sec-issue3"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</h2>
+<section id="sec-issue3-main" class="level2 page-columns page-full" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="sec-issue3-main"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p><strong>Time Log: 2.5 hours</strong></p>
@@ -1353,101 +1353,35 @@ window.Quarto = {
 <p>While the parametric curves track the trial data reasonably, goodness-of-fit within the observed period does not guarantee long-term clinical plausibility. Extrapolations are highly sensitive to small tail variations, which is the focus of the EAG’s immaturity critique.</p>
 </section>
 </section>
-<section id="step-2-eag-issue-3-audit-trial-data-immaturity" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="step-2-eag-issue-3-audit-trial-data-immaturity"><span class="header-section-number">5.2</span> Step 2: EAG Issue 3 Audit (Trial Data Immaturity)</h3>
+<section id="sec-issue3" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="sec-issue3"><span class="header-section-number">5.2</span> Step 2: EAG Issue 3 Audit (Trial Data Immaturity)</h3>
 <section id="the-core-appraisal-critique" class="level4" data-number="5.2.1">
 <h4 data-number="5.2.1" class="anchored" data-anchor-id="the-core-appraisal-critique"><span class="header-section-number">5.2.1</span> The Core Appraisal Critique</h4>
-<p>The EAG’s Issue 3 points out that the KEYNOTE-868 trial has a short follow-up (median of approximately <strong>16.3 months</strong>), whereas the model projects survival outcomes over a multi-decade horizon. This means the majority of the projected survival area (and thus QALY gains) is model-driven rather than observed.</p>
-<p>The tables below translate the EAG’s data immaturity concerns into concrete modeling issues and maturity checks.</p>
-<div id="tbl-issue3-logic" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-issue3-logic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Issue 3 translated into modelling questions
-</figcaption>
-<div aria-describedby="tbl-issue3-logic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">EAG point</th>
-<th style="text-align: left;">Meaning for modelling</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Median follow-up was about 16.3 months</td>
-<td style="text-align: left;">Most direct trial evidence covers early survival only</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Survival estimates for 2 years or more rely on extrapolation</td>
-<td style="text-align: left;">Beyond roughly 24 months, estimates are increasingly model-driven</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">PFS and OS estimates extend out to 20 years</td>
-<td style="text-align: left;">The model must predict far beyond observed follow-up</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Median OS was not reached in the pembrolizumab arm</td>
-<td style="text-align: left;">The OS benefit is immature and long-term benefit is uncertain</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Active treatment lasts up to about 2.2 years</td>
-<td style="text-align: left;">Follow-up is short relative to the full treatment and post-treatment period</td>
-</tr>
-</tbody>
-</table>
+<p>(<a href="#issue-3-list">Back to Key Issues List</a>)</p>
+<p>The External Assessment Group (EAG) raised critical concerns regarding the maturity of the KEYNOTE-868 (NRG-GY018) trial data relative to the lifetime projection required for cost-effectiveness decision-making. In health technology assessment (HTA), data maturity cannot be appraised in a vacuum or compared to arbitrary, binary thresholds; instead, it must be evaluated contextually by comparing the trial’s follow-up duration against the planned active treatment duration and the lifetime economic horizon.</p>
+<section id="trial-follow-up-vs.-treatment-exposure" class="level5" data-number="5.2.1.1">
+<h5 data-number="5.2.1.1" class="anchored" data-anchor-id="trial-follow-up-vs.-treatment-exposure"><span class="header-section-number">5.2.1.1</span> Trial Follow-Up vs.&nbsp;Treatment Exposure</h5>
+<p>Under the KEYNOTE-868 protocol, patients in the pembrolizumab arm are scheduled to receive up to 6 cycles of pembrolizumab in combination with chemotherapy (approximately 18 weeks), followed by up to 14 cycles of pembrolizumab monotherapy (approximately 84 weeks). The maximum planned active treatment duration is therefore 102 weeks, or approximately 2.2 years (26.2 months).</p>
+<p>At the time of the primary analysis, the median follow-up in the trial was approximately <strong>16.3 months</strong>. This leads to a major structural limitation: <strong>the median trial follow-up is shorter than the planned active treatment exposure</strong>.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-</figure>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Methodological Auditing Risk: Truncated Exposure Profiles
 </div>
-<p>In HTA auditing, we evaluate model maturity across four standard dimensions:</p>
-<div id="tbl-issue3-maturity-checks" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-issue3-maturity-checks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Issue 3 maturity checks used to interpret short follow-up
-</figcaption>
-<div aria-describedby="tbl-issue3-maturity-checks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Maturity check</th>
-<th style="text-align: left;">What it asks</th>
-<th style="text-align: left;">Why it matters for Issue 3</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Median OS reached?</td>
-<td style="text-align: left;">Has at least half the arm experienced the OS event?</td>
-<td style="text-align: left;">If median OS is not reached, long-term OS benefit is inferred rather than directly observed.</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Median follow-up vs active treatment duration</td>
-<td style="text-align: left;">Has the median patient been observed through the full planned treatment period and beyond?</td>
-<td style="text-align: left;">If median follow-up is shorter than maximum treatment duration, there is limited evidence on post-treatment survival and treatment-effect durability.</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2-year boundary</td>
-<td style="text-align: left;">Are estimates beyond roughly 24 months still supported by enough observed data?</td>
-<td style="text-align: left;">The EAG considered 2 years+ estimates highly susceptible to extrapolation error.</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">20-year projection</td>
-<td style="text-align: left;">How far beyond trial follow-up does the economic model project?</td>
-<td style="text-align: left;">The longer the projection, the more long-term QALYs depend on model structure and tail assumptions.</td>
-</tr>
-</tbody>
-</table>
 </div>
-</figure>
+<div class="callout-body-container callout-body">
+<p>When the median follow-up of a trial is shorter than the maximum duration of active treatment: 1. A substantial proportion of patients are censored before completing the planned therapy. 2. The trial provides minimal observed data on post-treatment survival. 3. The durability of the treatment effect after treatment discontinuation remains entirely unobserved and hypothetical.</p>
 </div>
+</div>
+</section>
+<section id="extrapolation-dependency-and-economic-leverage" class="level5" data-number="5.2.1.2">
+<h5 data-number="5.2.1.2" class="anchored" data-anchor-id="extrapolation-dependency-and-economic-leverage"><span class="header-section-number">5.2.1.2</span> Extrapolation Dependency and Economic Leverage</h5>
+<p>Because median overall survival (OS) was not reached in the pembrolizumab arm of the trial, long-term survival projections are highly sensitive to the mathematical properties of the selected parametric models. When the observed trial data are limited to the early phases of the survival curve: - Small, statistically insignificant differences in the fit of the observed period can translate into massive discrepancies in the projected tail. - In a typical 20-year (240-month) or 30-year model horizon, the vast majority of projected QALYs—often exceeding 80%—are generated in the extrapolated tail (beyond the observed trial period). - Underestimation or overestimation of the long-term survival fraction directly controls the incremental cost-effectiveness ratio (ICER), turning the appraisal from an empirical clinical evaluation into a highly sensitive extrapolation exercise.</p>
+<p>To address these risks, the EAG emphasized that any survival estimates extending beyond the 2-year boundary must be interpreted with extreme caution, and structural caps or treatment effect waning parameters must be explored to prevent the model from projecting unrealistic lifetime survival benefits.</p>
+</section>
 </section>
 <section id="observed-evidence-vs.-model-horizon" class="level4" data-number="5.2.2">
 <h4 data-number="5.2.2" class="anchored" data-anchor-id="observed-evidence-vs.-model-horizon"><span class="header-section-number">5.2.2</span> Observed Evidence vs.&nbsp;Model Horizon</h4>

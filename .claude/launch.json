@@ -12,6 +12,12 @@
       "runtimeExecutable": "quarto",
       "runtimeArgs": ["preview", "index.qmd", "--port", "4748", "--no-browser"],
       "port": 4748
+    },
+    {
+      "name": "ta1092-survival-preview",
+      "runtimeExecutable": "quarto",
+      "runtimeArgs": ["preview", "07_TA1092_Pembro_ endometrial cancer/survival_models/fit_parametric_survival_1.qmd", "--port", "4749", "--no-browser"],
+      "port": 4749
     }
   ]
 }

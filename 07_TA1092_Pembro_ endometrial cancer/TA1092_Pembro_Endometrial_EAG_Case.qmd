@@ -411,7 +411,7 @@ Therefore, these statistical rankings serve as candidates for further clinical t
 
 
 
-## Extrapolation Zone & Data Maturity Critique (Issue 3) {#sec-issue3}
+## Extrapolation Zone & Data Maturity Critique (Issue 3) {#sec-issue3-main}
 
 ::: {.column-margin}
 **Time Log: 2.5 hours**
@@ -581,34 +581,36 @@ ggplot(plot_data, aes(time_months, survival, colour = curve_label)) +
 
 While the parametric curves track the trial data reasonably, goodness-of-fit within the observed period does not guarantee long-term clinical plausibility. Extrapolations are highly sensitive to small tail variations, which is the focus of the EAG's immaturity critique.
 
-### Step 2: EAG Issue 3 Audit (Trial Data Immaturity)
+### Step 2: EAG Issue 3 Audit (Trial Data Immaturity) {#sec-issue3}
 
 #### The Core Appraisal Critique
 
-The EAG's Issue 3 points out that the KEYNOTE-868 trial has a short follow-up (median of approximately **16.3 months**), whereas the model projects survival outcomes over a multi-decade horizon. This means the majority of the projected survival area (and thus QALY gains) is model-driven rather than observed.
+([Back to Key Issues List](#issue-3-list))
 
-The tables below translate the EAG's data immaturity concerns into concrete modeling issues and maturity checks.
+The External Assessment Group (EAG) raised critical concerns regarding the maturity of the KEYNOTE-868 (NRG-GY018) trial data relative to the lifetime projection required for cost-effectiveness decision-making. In health technology assessment (HTA), data maturity cannot be appraised in a vacuum or compared to arbitrary, binary thresholds; instead, it must be evaluated contextually by comparing the trial's follow-up duration against the planned active treatment duration and the lifetime economic horizon.
 
-| EAG point | Meaning for modelling |
-| :--- | :--- |
-| Median follow-up was about 16.3 months | Most direct trial evidence covers early survival only |
-| Survival estimates for 2 years or more rely on extrapolation | Beyond roughly 24 months, estimates are increasingly model-driven |
-| PFS and OS estimates extend out to 20 years | The model must predict far beyond observed follow-up |
-| Median OS was not reached in the pembrolizumab arm | The OS benefit is immature and long-term benefit is uncertain |
-| Active treatment lasts up to about 2.2 years | Follow-up is short relative to the full treatment and post-treatment period |
+##### Trial Follow-Up vs. Treatment Exposure
 
-: Issue 3 translated into modelling questions {#tbl-issue3-logic}
+Under the KEYNOTE-868 protocol, patients in the pembrolizumab arm are scheduled to receive up to 6 cycles of pembrolizumab in combination with chemotherapy (approximately 18 weeks), followed by up to 14 cycles of pembrolizumab monotherapy (approximately 84 weeks). The maximum planned active treatment duration is therefore 102 weeks, or approximately 2.2 years (26.2 months). 
 
-In HTA auditing, we evaluate model maturity across four standard dimensions:
+At the time of the primary analysis, the median follow-up in the trial was approximately **16.3 months**. This leads to a major structural limitation: **the median trial follow-up is shorter than the planned active treatment exposure**. 
 
-| Maturity check | What it asks | Why it matters for Issue 3 |
-| :--- | :--- | :--- |
-| Median OS reached? | Has at least half the arm experienced the OS event? | If median OS is not reached, long-term OS benefit is inferred rather than directly observed. |
-| Median follow-up vs active treatment duration | Has the median patient been observed through the full planned treatment period and beyond? | If median follow-up is shorter than maximum treatment duration, there is limited evidence on post-treatment survival and treatment-effect durability. |
-| 2-year boundary | Are estimates beyond roughly 24 months still supported by enough observed data? | The EAG considered 2 years+ estimates highly susceptible to extrapolation error. |
-| 20-year projection | How far beyond trial follow-up does the economic model project? | The longer the projection, the more long-term QALYs depend on model structure and tail assumptions. |
+::: {.callout-warning}
+## Methodological Auditing Risk: Truncated Exposure Profiles
+When the median follow-up of a trial is shorter than the maximum duration of active treatment:
+1. A substantial proportion of patients are censored before completing the planned therapy.
+2. The trial provides minimal observed data on post-treatment survival.
+3. The durability of the treatment effect after treatment discontinuation remains entirely unobserved and hypothetical.
+:::
 
-: Issue 3 maturity checks used to interpret short follow-up {#tbl-issue3-maturity-checks}
+##### Extrapolation Dependency and Economic Leverage
+
+Because median overall survival (OS) was not reached in the pembrolizumab arm of the trial, long-term survival projections are highly sensitive to the mathematical properties of the selected parametric models. When the observed trial data are limited to the early phases of the survival curve:
+- Small, statistically insignificant differences in the fit of the observed period can translate into massive discrepancies in the projected tail.
+- In a typical 20-year (240-month) or 30-year model horizon, the vast majority of projected QALYs—often exceeding 80%—are generated in the extrapolated tail (beyond the observed trial period).
+- Underestimation or overestimation of the long-term survival fraction directly controls the incremental cost-effectiveness ratio (ICER), turning the appraisal from an empirical clinical evaluation into a highly sensitive extrapolation exercise.
+
+To address these risks, the EAG emphasized that any survival estimates extending beyond the 2-year boundary must be interpreted with extreme caution, and structural caps or treatment effect waning parameters must be explored to prevent the model from projecting unrealistic lifetime survival benefits.
 
 #### Observed Evidence vs. Model Horizon
 
