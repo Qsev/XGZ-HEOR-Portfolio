@@ -1649,9 +1649,10 @@ window.Quarto = {
 </section>
 <section id="step-3-quantifying-structural-uncertainty-tail-divergence" class="level3" data-number="5.3">
 <h3 data-number="5.3" class="anchored" data-anchor-id="step-3-quantifying-structural-uncertainty-tail-divergence"><span class="header-section-number">5.3</span> Step 3: Quantifying Structural Uncertainty (Tail Divergence)</h3>
-<section id="distribution-fan-plot" class="level4" data-number="5.3.1">
-<h4 data-number="5.3.1" class="anchored" data-anchor-id="distribution-fan-plot"><span class="header-section-number">5.3.1</span> Distribution Fan Plot</h4>
-<p>To demonstrate the structural uncertainty of this extrapolation, we plot all seven candidate distributions on the same curve. While they all fit the observed trial period similarly, they diverge massively in the extrapolation zone.</p>
+<section id="visualizing-and-quantifying-tail-divergence" class="level4" data-number="5.3.1">
+<h4 data-number="5.3.1" class="anchored" data-anchor-id="visualizing-and-quantifying-tail-divergence"><span class="header-section-number">5.3.1</span> Visualizing and Quantifying Tail Divergence</h4>
+<p>To demonstrate the structural uncertainty of this extrapolation, we plot all seven candidate distributions on the same curve and examine their projected survival at key clinical landmarks.</p>
+<p>While all candidate distributions fit the observed trial period similarly, they diverge massively in the extrapolation zone. This divergence is visualized in the fan plot below and quantified numerically in <a href="#tbl-issue3-landmark-survival-table" class="quarto-xref">Table&nbsp;1</a>, which shows the projected survival estimates at 2, 3, 5, 10, and 20 years.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1721,10 +1722,6 @@ window.Quarto = {
 </div>
 </div>
 </div>
-</section>
-<section id="landmark-survival-comparisons" class="level4" data-number="5.3.2">
-<h4 data-number="5.3.2" class="anchored" data-anchor-id="landmark-survival-comparisons"><span class="header-section-number">5.3.2</span> Landmark Survival Comparisons</h4>
-<p>This divergence is quantified numerically below, showing the survival estimates projected by each candidate distribution at key clinical landmarks (2, 3, 5, 10, and 20 years).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1750,9 +1747,14 @@ window.Quarto = {
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"l"</span></span>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div id="tbl-issue3-landmark-survival-table" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-issue3-landmark-survival-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: pMMR OS pembro arm: landmark survival predictions by distribution (%)
+</figcaption>
+<div aria-describedby="tbl-issue3-landmark-survival-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>pMMR OS pembro arm: landmark survival predictions by distribution (%)</caption>
+<table class="cell caption-top table table-sm table-striped small">
 <colgroup>
 <col style="width: 25%">
 <col style="width: 8%">
@@ -1841,9 +1843,12 @@ window.Quarto = {
 </table>
 </div>
 </div>
+</figure>
+</div>
+</div>
 </section>
-<section id="lead-modeler-appraisal-synthesis" class="level4" data-number="5.3.3">
-<h4 data-number="5.3.3" class="anchored" data-anchor-id="lead-modeler-appraisal-synthesis"><span class="header-section-number">5.3.3</span> Lead Modeler Appraisal Synthesis</h4>
+<section id="lead-modeler-appraisal-synthesis" class="level4" data-number="5.3.2">
+<h4 data-number="5.3.2" class="anchored" data-anchor-id="lead-modeler-appraisal-synthesis"><span class="header-section-number">5.3.2</span> Lead Modeler Appraisal Synthesis</h4>
 <p>The landmark predictions reveal substantial structural uncertainty. For instance, at 20 years (240 months), the log-normal model projects a <strong>30.3%</strong> survival rate, whereas the exponential model projects <strong>0.3%</strong>.</p>
 <p>This highlights why choosing a curve based on statistical fit (AIC/BIC) alone is insufficient. Both log-normal and log-logistic models have very similar statistical fits during the observed trial period, yet they lead to completely different lifetime clinical and economic outcomes.</p>
 <p>In HTA submissions, modelers must justify their choice of extrapolation curve not just on statistical diagnostics, but on <strong>clinical tail plausibility</strong> (e.g., matching projected long-term survival to real-world cancer registries, registry-based mortality statistics, or clinical expert consensus on cure rates).</p>
