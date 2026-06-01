@@ -1157,7 +1157,7 @@ In this chapter, we evaluate the cost-effectiveness of pembrolizumab plus chemot
 
 ### Spline and Standard Model Fitting Setup
 
-#### EAG Spline Model Fitting (pMMR)
+**EAG Spline Model Fitting (pMMR)**
 
 The EAG preferred spline models for pMMR (Table 2) are Royston-Parmar flexible parametric models fitted with `flexsurvspline()`. Unlike standard parametric distributions, spline models can accommodate non-monotonic hazard functions and are more flexible in the observed period.
 
@@ -1191,11 +1191,90 @@ fit_one_spline <- function(dat, k, scale, label) {
   })
 }
 
-tibble(
-  `Function` = "fit_one_spline(dat, k, scale, label)",
-  `Backend`  = "flexsurvspline()",
-  `Purpose`  = "Fit Royston-Parmar spline model for one curve"
-) |> kable()
+# Function to apply 5-to-7 year treatment effect waning on hazards
+apply_efficacy_waning <- function(psm_df, start_week = 260, end_week = 364) {
+  # Separate arms
+  ctrl <- psm_df |> filter(arm == "Placebo + chemo") |> arrange(time_weeks)
+  act  <- psm_df |> filter(arm == "Pembro + chemo")  |> arrange(time_weeks)
+  
+  n_weeks <- nrow(ctrl)
+  if (n_weeks == 0 || nrow(act) == 0) return(psm_df)
+  
+  # Ensure survival values are non-increasing and positive
+  clean_surv <- function(x) {
+    pmax(pmin(cummin(x), 1), 1e-10)
+  }
+  
+  ctrl$PFS <- clean_surv(ctrl$PFS)
+  ctrl$OS  <- clean_surv(ctrl$OS)
+  act$PFS  <- clean_surv(act$PFS)
+  act$OS   <- clean_surv(act$OS)
+  
+  # Extract vectors
+  S_c_pfs <- ctrl$PFS
+  S_c_os  <- ctrl$OS
+  S_a_pfs <- act$PFS
+  S_a_os  <- act$OS
+  
+  # Compute weekly hazards (using S(0) = 1)
+  get_hazards <- function(S) {
+    haz <- numeric(length(S))
+    haz[1] <- -log(S[1])
+    for (t in 2:length(S)) {
+      haz[t] <- -log(S[t] / S[t-1])
+    }
+    pmax(haz, 0)
+  }
+  
+  h_c_pfs <- get_hazards(S_c_pfs)
+  h_c_os  <- get_hazards(S_c_os)
+  h_a_pfs <- get_hazards(S_a_pfs)
+  h_a_os  <- get_hazards(S_a_os)
+  
+  # Compute waning weights
+  w <- numeric(n_weeks)
+  for (t in 1:n_weeks) {
+    week_num <- ctrl$time_weeks[t]
+    if (week_num < start_week) {
+      w[t] <- 0
+    } else if (week_num > end_week) {
+      w[t] <- 1
+    } else {
+      w[t] <- (week_num - start_week) / (end_week - start_week)
+    }
+  }
+  
+  # Compute waned hazards for active arm
+  h_a_pfs_waned <- (1 - w) * h_a_pfs + w * h_c_pfs
+  h_a_os_waned  <- (1 - w) * h_a_os  + w * h_c_os
+  
+  # Reconstruct survival probabilities for active arm
+  S_a_pfs_waned <- numeric(n_weeks)
+  S_a_os_waned  <- numeric(n_weeks)
+  
+  S_a_pfs_waned[1] <- exp(-h_a_pfs_waned[1])
+  S_a_os_waned[1]  <- exp(-h_a_os_waned[1])
+  
+  for (t in 2:n_weeks) {
+    S_a_pfs_waned[t] <- S_a_pfs_waned[t-1] * exp(-h_a_pfs_waned[t])
+    S_a_os_waned[t]  <- S_a_os_waned[t-1]  * exp(-h_a_os_waned[t])
+  }
+  
+  # Update active arm values
+  act$PFS <- S_a_pfs_waned
+  act$OS  <- S_a_os_waned
+  
+  # Bind arms back together
+  res <- bind_rows(ctrl, act) |>
+    mutate(
+      PFS  = pmin(PFS, OS), # Apply logic cap after waning
+      PF   = PFS,
+      PD   = pmax(OS - PFS, 0),
+      Dead = pmax(1 - OS, 0)
+    )
+  
+  return(res)
+}
 ```
 
 ```{r pmmr-spline-specs}
@@ -1237,7 +1316,7 @@ eag_pmmr_spline_fits |>
 ```
 
 
-#### EAG Model Selection (dMMR)
+**EAG Model Selection (dMMR)**
 
 ```{r dmmr-eag-model-selection}
 eag_dmmr_selections <- tibble::tribble(
@@ -1300,12 +1379,7 @@ psm_pmmr_spline <- bind_rows(surv_rows) |>
     names_from  = endpoint,
     values_from = surv
   ) |>
-  mutate(
-    PFS  = pmin(PFS, OS),
-    PF   = PFS,
-    PD   = pmax(OS - PFS, 0),
-    Dead = pmax(1 - OS, 0)
-  )
+  apply_efficacy_waning(start_week = 260, end_week = 364)
 
 psm_pmmr_spline |>
   select(arm, time_weeks, PF, PD, Dead) |>
@@ -1405,12 +1479,7 @@ psm_dmmr <- eag_dmmr_fits |>
   select(arm, endpoint, pred) |>
   unnest(pred) |>
   tidyr::pivot_wider(names_from = endpoint, values_from = survival) |>
-  mutate(
-    PFS  = pmin(PFS, OS),
-    PF   = PFS,
-    PD   = pmax(OS - PFS, 0),
-    Dead = pmax(1 - OS, 0)
-  )
+  apply_efficacy_waning(start_week = 260, end_week = 364)
 
 psm_dmmr |>
   select(arm, time_weeks, PF, PD, Dead) |>

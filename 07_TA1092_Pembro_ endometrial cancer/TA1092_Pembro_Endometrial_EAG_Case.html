@@ -2049,8 +2049,7 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 </div></div><p>In this chapter, we evaluate the cost-effectiveness of pembrolizumab plus chemotherapy across subgroups using the EAG-preferred curve selections. For the pMMR cohort, the EAG preferred Royston-Parmar flexible spline models, whereas for the dMMR cohort, standard parametric models were retained but alternative distributions were selected.</p>
 <section id="spline-and-standard-model-fitting-setup" class="level3" data-number="7.1">
 <h3 data-number="7.1" class="anchored" data-anchor-id="spline-and-standard-model-fitting-setup"><span class="header-section-number">7.1</span> Spline and Standard Model Fitting Setup</h3>
-<section id="eag-spline-model-fitting-pmmr" class="level4" data-number="7.1.1">
-<h4 data-number="7.1.1" class="anchored" data-anchor-id="eag-spline-model-fitting-pmmr"><span class="header-section-number">7.1.1</span> EAG Spline Model Fitting (pMMR)</h4>
+<p><strong>EAG Spline Model Fitting (pMMR)</strong></p>
 <p>The EAG preferred spline models for pMMR (Table 2) are Royston-Parmar flexible parametric models fitted with <code>flexsurvspline()</code>. Unlike standard parametric distributions, spline models can accommodate non-monotonic hazard functions and are more flexible in the observed period.</p>
 <div class="cell">
 <details class="code-fold">
@@ -2084,35 +2083,91 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  })</span>
 <span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Function</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"fit_one_spline(dat, k, scale, label)"</span>,</span>
-<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Backend</span><span class="st">`</span>  <span class="ot">=</span> <span class="st">"flexsurvspline()"</span>,</span>
-<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Purpose</span><span class="st">`</span>  <span class="ot">=</span> <span class="st">"Fit Royston-Parmar spline model for one curve"</span></span>
-<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to apply 5-to-7 year treatment effect waning on hazards</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>apply_efficacy_waning <span class="ot">&lt;-</span> <span class="cf">function</span>(psm_df, <span class="at">start_week =</span> <span class="dv">260</span>, <span class="at">end_week =</span> <span class="dv">364</span>) {</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Separate arms</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  ctrl <span class="ot">&lt;-</span> psm_df <span class="sc">|&gt;</span> <span class="fu">filter</span>(arm <span class="sc">==</span> <span class="st">"Placebo + chemo"</span>) <span class="sc">|&gt;</span> <span class="fu">arrange</span>(time_weeks)</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>  act  <span class="ot">&lt;-</span> psm_df <span class="sc">|&gt;</span> <span class="fu">filter</span>(arm <span class="sc">==</span> <span class="st">"Pembro + chemo"</span>)  <span class="sc">|&gt;</span> <span class="fu">arrange</span>(time_weeks)</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>  n_weeks <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ctrl)</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (n_weeks <span class="sc">==</span> <span class="dv">0</span> <span class="sc">||</span> <span class="fu">nrow</span>(act) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(psm_df)</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Ensure survival values are non-increasing and positive</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>  clean_surv <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pmax</span>(<span class="fu">pmin</span>(<span class="fu">cummin</span>(x), <span class="dv">1</span>), <span class="fl">1e-10</span>)</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>  ctrl<span class="sc">$</span>PFS <span class="ot">&lt;-</span> <span class="fu">clean_surv</span>(ctrl<span class="sc">$</span>PFS)</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>  ctrl<span class="sc">$</span>OS  <span class="ot">&lt;-</span> <span class="fu">clean_surv</span>(ctrl<span class="sc">$</span>OS)</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>  act<span class="sc">$</span>PFS  <span class="ot">&lt;-</span> <span class="fu">clean_surv</span>(act<span class="sc">$</span>PFS)</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>  act<span class="sc">$</span>OS   <span class="ot">&lt;-</span> <span class="fu">clean_surv</span>(act<span class="sc">$</span>OS)</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract vectors</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>  S_c_pfs <span class="ot">&lt;-</span> ctrl<span class="sc">$</span>PFS</span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>  S_c_os  <span class="ot">&lt;-</span> ctrl<span class="sc">$</span>OS</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>  S_a_pfs <span class="ot">&lt;-</span> act<span class="sc">$</span>PFS</span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>  S_a_os  <span class="ot">&lt;-</span> act<span class="sc">$</span>OS</span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute weekly hazards (using S(0) = 1)</span></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>  get_hazards <span class="ot">&lt;-</span> <span class="cf">function</span>(S) {</span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>    haz <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">length</span>(S))</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>    haz[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(S[<span class="dv">1</span>])</span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="fu">length</span>(S)) {</span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a>      haz[t] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(S[t] <span class="sc">/</span> S[t<span class="dv">-1</span>])</span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pmax</span>(haz, <span class="dv">0</span>)</span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a>  h_c_pfs <span class="ot">&lt;-</span> <span class="fu">get_hazards</span>(S_c_pfs)</span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a>  h_c_os  <span class="ot">&lt;-</span> <span class="fu">get_hazards</span>(S_c_os)</span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>  h_a_pfs <span class="ot">&lt;-</span> <span class="fu">get_hazards</span>(S_a_pfs)</span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a>  h_a_os  <span class="ot">&lt;-</span> <span class="fu">get_hazards</span>(S_a_os)</span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute waning weights</span></span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a>  w <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n_weeks)</span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_weeks) {</span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a>    week_num <span class="ot">&lt;-</span> ctrl<span class="sc">$</span>time_weeks[t]</span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (week_num <span class="sc">&lt;</span> start_week) {</span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a>      w[t] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (week_num <span class="sc">&gt;</span> end_week) {</span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a>      w[t] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a>      w[t] <span class="ot">&lt;-</span> (week_num <span class="sc">-</span> start_week) <span class="sc">/</span> (end_week <span class="sc">-</span> start_week)</span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute waned hazards for active arm</span></span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>  h_a_pfs_waned <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> w) <span class="sc">*</span> h_a_pfs <span class="sc">+</span> w <span class="sc">*</span> h_c_pfs</span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a>  h_a_os_waned  <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> w) <span class="sc">*</span> h_a_os  <span class="sc">+</span> w <span class="sc">*</span> h_c_os</span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Reconstruct survival probabilities for active arm</span></span>
+<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a>  S_a_pfs_waned <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n_weeks)</span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a>  S_a_os_waned  <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n_weeks)</span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a>  S_a_pfs_waned[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="sc">-</span>h_a_pfs_waned[<span class="dv">1</span>])</span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a>  S_a_os_waned[<span class="dv">1</span>]  <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="sc">-</span>h_a_os_waned[<span class="dv">1</span>])</span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n_weeks) {</span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a>    S_a_pfs_waned[t] <span class="ot">&lt;-</span> S_a_pfs_waned[t<span class="dv">-1</span>] <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>h_a_pfs_waned[t])</span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a>    S_a_os_waned[t]  <span class="ot">&lt;-</span> S_a_os_waned[t<span class="dv">-1</span>]  <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>h_a_os_waned[t])</span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Update active arm values</span></span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a>  act<span class="sc">$</span>PFS <span class="ot">&lt;-</span> S_a_pfs_waned</span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a>  act<span class="sc">$</span>OS  <span class="ot">&lt;-</span> S_a_os_waned</span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Bind arms back together</span></span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(ctrl, act) <span class="sc">|&gt;</span></span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a>      <span class="at">PFS  =</span> <span class="fu">pmin</span>(PFS, OS), <span class="co"># Apply logic cap after waning</span></span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a>      <span class="at">PF   =</span> PFS,</span>
+<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a>      <span class="at">PD   =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
+<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a>      <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<colgroup>
-<col style="width: 37%">
-<col style="width: 17%">
-<col style="width: 46%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Function</th>
-<th style="text-align: left;">Backend</th>
-<th style="text-align: left;">Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">fit_one_spline(dat, k, scale, label)</td>
-<td style="text-align: left;">flexsurvspline()</td>
-<td style="text-align: left;">Fit Royston-Parmar spline model for one curve</td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 <div class="cell">
 <details class="code-fold">
@@ -2279,9 +2334,7 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 </table>
 </div>
 </div>
-</section>
-<section id="eag-model-selection-dmmr" class="level4" data-number="7.1.2">
-<h4 data-number="7.1.2" class="anchored" data-anchor-id="eag-model-selection-dmmr"><span class="header-section-number">7.1.2</span> EAG Model Selection (dMMR)</h4>
+<p><strong>EAG Model Selection (dMMR)</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2373,7 +2426,6 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 </div>
 </div>
 </section>
-</section>
 <section id="subgroup-specific-cost-effectiveness-results-1" class="level3" data-number="7.2">
 <h3 data-number="7.2" class="anchored" data-anchor-id="subgroup-specific-cost-effectiveness-results-1"><span class="header-section-number">7.2</span> Subgroup-Specific Cost-Effectiveness Results</h3>
 <p>To evaluate the economic implications of the EAG-preferred survival curves, we execute the weekly Partitioned Survival Model (PSM) for the pMMR and dMMR cohorts. The analysis uses flexible spline survival models for the pMMR cohort and EAG-selected standard distributions for the dMMR cohort.</p>
@@ -2413,29 +2465,24 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from  =</span> endpoint,</span>
 <span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> surv</span>
 <span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">PFS  =</span> <span class="fu">pmin</span>(PFS, OS),</span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">PF   =</span> PFS,</span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">PD   =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>psm_pmmr_spline <span class="sc">|&gt;</span></span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
-<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
-<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
-<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
-<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
-<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"pMMR partitioned survival model: EAG-preferred spline models"</span>,</span>
-<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"CT PFS: 2-knot hazards | CT OS: 1-knot hazards | Pembro PFS: 1-knot hazards | Pembro OS: 1-knot normal"</span>,</span>
-<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>, <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>, <span class="at">fill =</span> <span class="st">"Health state"</span></span>
-<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">apply_efficacy_waning</span>(<span class="at">start_week =</span> <span class="dv">260</span>, <span class="at">end_week =</span> <span class="dv">364</span>)</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>psm_pmmr_spline <span class="sc">|&gt;</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"pMMR partitioned survival model: EAG-preferred spline models"</span>,</span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"CT PFS: 2-knot hazards | CT OS: 1-knot hazards | Pembro PFS: 1-knot hazards | Pembro OS: 1-knot normal"</span>,</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>, <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>, <span class="at">fill =</span> <span class="st">"Health state"</span></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -2463,31 +2510,26 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, endpoint, pred) <span class="sc">|&gt;</span></span>
 <span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(pred) <span class="sc">|&gt;</span></span>
 <span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> endpoint, <span class="at">values_from =</span> survival) <span class="sc">|&gt;</span></span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">PFS  =</span> <span class="fu">pmin</span>(PFS, OS),</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">PF   =</span> PFS,</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">PD   =</span> <span class="fu">pmax</span>(OS <span class="sc">-</span> PFS, <span class="dv">0</span>),</span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dead =</span> <span class="fu">pmax</span>(<span class="dv">1</span> <span class="sc">-</span> OS, <span class="dv">0</span>)</span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>psm_dmmr <span class="sc">|&gt;</span></span>
-<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
-<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
-<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
-<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
-<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
-<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
-<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
-<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"dMMR partitioned survival model (EAG-preferred distributions)"</span>,</span>
-<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"EAG: generalised gamma / exponential / log-logistic / log-logistic"</span>,</span>
-<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>,</span>
-<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>,</span>
-<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Health state"</span></span>
-<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">apply_efficacy_waning</span>(<span class="at">start_week =</span> <span class="dv">260</span>, <span class="at">end_week =</span> <span class="dv">364</span>)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>psm_dmmr <span class="sc">|&gt;</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, time_weeks, PF, PD, Dead) <span class="sc">|&gt;</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PF, PD, Dead), <span class="at">names_to =</span> <span class="st">"state"</span>, <span class="at">values_to =</span> <span class="st">"proportion"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_years =</span> time_weeks <span class="sc">/</span> <span class="dv">52</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time_years, proportion, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>arm) <span class="sc">+</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">35</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"dMMR partitioned survival model (EAG-preferred distributions)"</span>,</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"EAG: generalised gamma / exponential / log-logistic / log-logistic"</span>,</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Years"</span>,</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion of cohort"</span>,</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Health state"</span></span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -2617,8 +2659,8 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <tr class="odd">
 <td style="text-align: left;">pMMR</td>
 <td style="text-align: left;">Pembro + chemo</td>
-<td style="text-align: left;">2.831</td>
-<td style="text-align: left;">129287</td>
+<td style="text-align: left;">2.323</td>
+<td style="text-align: left;">128539</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">pMMR</td>
@@ -2629,8 +2671,8 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <tr class="odd">
 <td style="text-align: left;">dMMR</td>
 <td style="text-align: left;">Pembro + chemo</td>
-<td style="text-align: left;">10.481</td>
-<td style="text-align: left;">163657</td>
+<td style="text-align: left;">6.109</td>
+<td style="text-align: left;">159090</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">dMMR</td>
@@ -2654,15 +2696,15 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">1.158</td>
-<td style="text-align: left;">114870</td>
-<td style="text-align: left;">99203</td>
+<td style="text-align: left;">0.650</td>
+<td style="text-align: left;">114123</td>
+<td style="text-align: left;">175571</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">6.627</td>
-<td style="text-align: left;">146205</td>
-<td style="text-align: left;">22062</td>
+<td style="text-align: left;">2.256</td>
+<td style="text-align: left;">141638</td>
+<td style="text-align: left;">62786</td>
 </tr>
 </tbody>
 </table>
@@ -2748,9 +2790,9 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <tr class="even">
 <td style="text-align: left;">pMMR</td>
 <td style="text-align: left;">EAG-preferred (spline, Table 2)</td>
-<td style="text-align: left;">1.158</td>
-<td style="text-align: left;">114870</td>
-<td style="text-align: left;">99203</td>
+<td style="text-align: left;">0.650</td>
+<td style="text-align: left;">114123</td>
+<td style="text-align: left;">175571</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">dMMR</td>
@@ -2762,9 +2804,9 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <tr class="even">
 <td style="text-align: left;">dMMR</td>
 <td style="text-align: left;">EAG-preferred (standard, Table 2)</td>
-<td style="text-align: left;">6.627</td>
-<td style="text-align: left;">146205</td>
-<td style="text-align: left;">22062</td>
+<td style="text-align: left;">2.256</td>
+<td style="text-align: left;">141638</td>
+<td style="text-align: left;">62786</td>
 </tr>
 </tbody>
 </table>
@@ -3328,23 +3370,23 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <tr class="odd">
 <td style="text-align: left;">Deterministic Base Case (Spline, Capped &amp; Uncapped)</td>
 <td style="text-align: left;">0%</td>
-<td style="text-align: left;">1.158</td>
-<td style="text-align: left;">114870</td>
-<td style="text-align: left;">99203</td>
+<td style="text-align: left;">0.650</td>
+<td style="text-align: left;">114123</td>
+<td style="text-align: left;">175571</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Probabilistic PSA Mean (Uncapped Splines)</td>
 <td style="text-align: left;">45%</td>
-<td style="text-align: left;">1.161</td>
-<td style="text-align: left;">115096</td>
-<td style="text-align: left;">99095</td>
+<td style="text-align: left;">0.653</td>
+<td style="text-align: left;">114352</td>
+<td style="text-align: left;">175096</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Probabilistic PSA Mean (Capped Placebo PFS)</td>
 <td style="text-align: left;">0%</td>
-<td style="text-align: left;">1.162</td>
-<td style="text-align: left;">115098</td>
-<td style="text-align: left;">99087</td>
+<td style="text-align: left;">0.653</td>
+<td style="text-align: left;">114355</td>
+<td style="text-align: left;">175069</td>
 </tr>
 </tbody>
 </table>
