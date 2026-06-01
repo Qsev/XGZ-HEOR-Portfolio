@@ -7,13 +7,9 @@ format:
   html:
     toc: true
     toc-depth: 3
-    toc-location: left
     code-fold: true
     number-sections: true
     code-annotations: below
-    grid:
-      body-width: 1000px
-      margin-width: 250px
 execute:
   warning: false
   message: false
