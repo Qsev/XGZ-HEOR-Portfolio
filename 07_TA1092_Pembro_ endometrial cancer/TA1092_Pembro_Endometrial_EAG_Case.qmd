@@ -1161,7 +1161,10 @@ In this chapter, we evaluate the cost-effectiveness of pembrolizumab plus chemot
 
 The EAG preferred spline models for pMMR (Table 2) are Royston-Parmar flexible parametric models fitted with `flexsurvspline()`. Unlike standard parametric distributions, spline models can accommodate non-monotonic hazard functions and are more flexible in the observed period.
 
-```{r pmmr-spline-function}
+```{r pmmr-spline-fitting}
+#| warning: false
+#| message: false
+
 fit_one_spline <- function(dat, k, scale, label) {
   tryCatch({
     fit     <- flexsurvspline(Surv(time_months, status) ~ 1, data = dat, k = k, scale = scale)
@@ -1275,9 +1278,8 @@ apply_efficacy_waning <- function(psm_df, start_week = 260, end_week = 364) {
   
   return(res)
 }
-```
 
-```{r pmmr-spline-specs}
+# Define EAG spline specifications for pMMR (Table 2)
 eag_pmmr_spline_specs <- tibble::tribble(
   ~subgroup, ~endpoint, ~treatment,      ~k, ~scale,   ~dist_label,
   "pMMR",    "PFS",     "placebo_chemo", 2,  "hazard", "2-knot hazards",
@@ -1288,9 +1290,8 @@ eag_pmmr_spline_specs <- tibble::tribble(
 
 eag_pmmr_spline_specs |>
   kable(caption = "EAG-preferred spline specifications for pMMR (Table 2)", align = "l")
-```
 
-```{r pmmr-spline-fits}
+# Fit spline models
 spline_fit_rows <- vector("list", nrow(eag_pmmr_spline_specs))
 for (i in seq_len(nrow(eag_pmmr_spline_specs))) {
   spec_i <- eag_pmmr_spline_specs[i, ]
@@ -1312,7 +1313,6 @@ eag_pmmr_spline_fits <- bind_rows(spline_fit_rows)
 eag_pmmr_spline_fits |>
   select(subgroup, endpoint, treatment, dist_label, n, events, aic, converged, error) |>
   kable(digits = 2, caption = "EAG-preferred spline fit summary for pMMR", align = "l")
-
 ```
 
 
