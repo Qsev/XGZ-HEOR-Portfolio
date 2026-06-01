@@ -112,6 +112,7 @@ This distinction is important for the portfolio: a health economist in consultin
 ### Summary of NICE Decision Tensions
 
 Based on the HTA dossier review, the appraisal debate centers on translating immature trial survival data into a 30-year extrapolation model. The key methodological debates include:
+
 - **Survival Tail Plausibility**: Standard parametric models preferred by the company yielded optimistic long-term tails. The EAG preferred flexible spline models to better capture hazard dynamics.
 - **Curve-Crossing Implausibility**: The EAG's spline-based placebo PFS model crossed and exceeded the active pembrolizumab PFS model in the long-term tail. This logical inconsistency required a structural capping mechanism.
 - **Efficacy Waning**: The company assumed infinite treatment benefit post-discontinuation, which the EAG challenged. A compromise waning window was introduced to transition active treatment hazards to control hazards.
