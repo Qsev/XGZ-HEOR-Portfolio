@@ -475,9 +475,11 @@ extrapolated |>
   kable(digits = 4, caption = "Extrapolated survival check for pMMR PFS, pembrolizumab arm")
 ```
 
-#### Visualizing Long-Run Extrapolations
+#### Visualizing Long-Run Extrapolations and KM Alignment
 
-Plotting the curves provides a clearer view of their long-term shapes. The plots below show the extrapolations for two critical decision curves: **pMMR PFS** (which dictates progression-free occupancy in the PSM model) and **dMMR OS** (which exhibits high immaturity).
+Plotting the curves provides a visual inspection of their extrapolated shapes and their alignment with the observed trial period. 
+
+The first plot below displays the 10-year (120-month) projections for two key curves: **pMMR PFS** (which drives progression-free state occupancy in the partitioned survival model) and **dMMR OS** (which exhibits high immaturity). The second plot overlays the reconstructed Kaplan-Meier step curves with the parametric best fits for **pMMR PFS** to assess the goodness-of-fit during the observed trial period.
 
 ```{r plot-selected-long-run-extrapolations}
 selected_long_run <- extrapolated |>
@@ -513,10 +515,6 @@ ggplot(selected_long_run, aes(time_months, survival, colour = line_label)) +
     legend.key.width = unit(1.2, "lines")
   )
 ```
-
-#### Comparing Reconstructed KM with Parametric Best Fits
-
-Before assessing the tail, we check how well the parametric fits align with the observed trial period. The plot below overlays the reconstructed KM step curve with the AIC-best fit for **pMMR PFS**.
 
 ```{r plot-pmmr-pfs-best-fit}
 km_points <- ipd |>
