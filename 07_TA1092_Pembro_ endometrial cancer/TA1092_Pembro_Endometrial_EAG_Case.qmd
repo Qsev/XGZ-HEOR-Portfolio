@@ -1288,9 +1288,6 @@ eag_pmmr_spline_specs <- tibble::tribble(
   "pMMR",    "OS",      "pembro_chemo",  1,  "normal", "1-knot normal"
 )
 
-eag_pmmr_spline_specs |>
-  kable(caption = "EAG-preferred spline specifications for pMMR (Table 2)", align = "l")
-
 # Fit spline models
 spline_fit_rows <- vector("list", nrow(eag_pmmr_spline_specs))
 for (i in seq_len(nrow(eag_pmmr_spline_specs))) {
@@ -1312,7 +1309,7 @@ eag_pmmr_spline_fits <- bind_rows(spline_fit_rows)
 
 eag_pmmr_spline_fits |>
   select(subgroup, endpoint, treatment, dist_label, n, events, aic, converged, error) |>
-  kable(digits = 2, caption = "EAG-preferred spline fit summary for pMMR", align = "l")
+  kable(digits = 2, caption = "EAG-preferred spline model fitting results for pMMR cohort (based on EAG Report Table 2)", align = "l")
 ```
 
 
@@ -1334,7 +1331,7 @@ eag_dmmr_fits <- fit_tbl |>
 eag_dmmr_fits |>
   select(subgroup, endpoint, treatment, dist_label, n, events, aic, bic) |>
   arrange(endpoint, treatment) |>
-  kable(digits = 2, caption = "EAG-preferred distributions for dMMR (Table 2)", align = "l")
+  kable(digits = 2, caption = "EAG-preferred standard parametric model fitting results for dMMR cohort (based on EAG Report Table 2)", align = "l")
 ```
 
 
