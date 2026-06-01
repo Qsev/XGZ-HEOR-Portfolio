@@ -419,12 +419,13 @@ Therefore, these statistical rankings serve as candidates for further clinical t
 - Digitised subgroup curves from NEJM Figure 2A/B.
 - Built and tidied the long-format IPD dataset for R processing.
 :::
+::: {.callout-note}
+## EAG Issue 3: Short trial follow-up / data immaturity
 
-> [!NOTE]
-> **EAG Issue 3: Short trial follow-up / data immaturity.** In health economic evaluations, if the clinical trial follow-up is too short, the long-term survival projections rely heavily on model extrapolations rather than observed patient data. The EAG raised this issue because KEYNOTE-868's OS and PFS data were immature, meaning the vast majority of projected QALY gains in the company's model were driven by mathematical tail assumptions rather than direct trial evidence.
-> 
-> [Go back to EAG Key Issue List](#issue-3-list)
+In health economic evaluations, if the clinical trial follow-up is too short, the long-term survival projections rely heavily on model extrapolations rather than observed patient data. The EAG raised this issue because KEYNOTE-868's OS and PFS data were immature, meaning the vast majority of projected QALY gains in the company's model were driven by mathematical tail assumptions rather than direct trial evidence.
 
+[Go back to EAG Key Issue List](#issue-3-list)
+:::
 This section audits the transition from observed clinical trial data to long-term extrapolation. We analyze the European Advisory Group's (EAG) **Issue 3 critique (data immaturity)** by comparing observed trial evidence against the long-term model horizon, visualizing the "extrapolation zone," and demonstrating how parametric tail choices diverge.
 
 ### Step 1: Baseline 30-Year Survival Extrapolation
