@@ -40,7 +40,7 @@ This project demonstrates a pragmatic, **value-driven scope management strategy*
 
 | Domain | In Scope (High-Value Delivery) | Out of Scope (Academic perfectionism / Confidentiality barriers) |
 |---|---|---|
-| **Efficacy Data** | • Reconstructing pseudo-IPD from published trial subgroup curves (NEJM Fig 2A/B) via digitized KM estimates.<br>• Fitting candidate parametric distributions and Royston-Parmar splines in R. | • Full patient-level clinical trial database replication (confidential and unavailable). |
+| **Efficacy Data** | • Reconstructing pseudo-IPD from published trial subgroup curves (NEJM Fig 2A/B) via computer vision (HSV) and Guyot-reconstructed KM estimates.<br>• Fitting candidate parametric distributions and Royston-Parmar splines in R. | • Full patient-level clinical trial database replication (confidential and unavailable). |
 | **Model Structure** | • Building a de novo 3-state weekly PSM simulation engine in R (progression-free, progressed disease, death). | • Replicating the exact proprietary, multi-sheet manufacturer Excel workbook layout. |
 | **HTA Adjustments** | • Coding technical solutions for HTA critiques: starting age corrections, treatment-effect waning (5–7 years), and curve-crossing capping (`pmin(PFS, OS)`). | • Re-estimating utilities or resource frequencies without public data access. |
 | **Costs & Economics** | • Mapping public list prices, administration costs, acute AE management costs, and NHS-aligned subsequent therapies. | • Accessing or estimating confidential Drug Access Agreements (patient access scheme discounts). |
@@ -176,7 +176,7 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 ::: {.column-margin}
 **Time Log: 2.5 hours**
 
-- Digitised sub-group curves from NEJM Figure 2A/B.
+- Extracted subgroup curves using Computer Vision HSV color segmentation.
 - Reconstructed pseudo-IPD using the Guyot algorithm.
 :::
 
@@ -184,7 +184,7 @@ This section initializes the analysis environment and loads the raw clinical inp
 
 The reconstruction workflow follows a standardized HTA auditing process:
 
-1. **Digitization**: Time-survival coordinates were extracted from the published PFS and OS curves for the mismatch repair deficient (dMMR) and mismatch repair proficient (pMMR) cohorts using high-resolution digitization software.
+1. **Digitization**: Time-survival coordinates were extracted from the published PFS and OS curves for the mismatch repair deficient (dMMR) and mismatch repair proficient (pMMR) cohorts using a custom computer vision HSV (Hue, Saturation, Value) color segmentation script, which eliminates the manual error associated with point-and-click tools.
 2. **IPD Re-creation**: The digital coordinates, along with reported patients-at-risk tables and event counts, were processed using the iterative algorithm proposed by Guyot et al. (2012) to reconstruct patient-level times and censoring indicators.
 3. **Harmonization**: The individual datasets for each endpoint, subgroup, and treatment arm were consolidated into a single long-format database (`survival_ipd_long.csv`).
 4. **Validation**: The reconstructed individual patient data (pseudo-IPD) are summarized and plotted below to confirm structural alignment with the original trial publications prior to fitting parametric survival models.
@@ -2461,7 +2461,7 @@ bind_rows(
 ::: {.callout-note}
 ## A Note on Reconstructed IPD vs. Clinical Trial Database
 
-In our reconstructed pseudo-IPD base case, the deterministic curves stay very close but do not cross, rendering the cap inactive. This is because flexible spline models are highly sensitive to the exact timing of event and censoring patterns in the tail, which are approximated during KM digitization.
+In our reconstructed pseudo-IPD base case, the deterministic curves stay very close but do not cross, rendering the cap inactive. This is because flexible spline models are highly sensitive to the exact timing of event and censoring patterns in the tail, which are approximated during KM digitization (here resolved using Computer Vision HSV color segmentation to minimize extraction bias).
 
 However, implementing this capping logic remains a critical HTA requirement. In HEOR practice, this serves as a **structural model guardrail**. During Probabilistic Sensitivity Analysis (PSA) or bootstrap simulations, parameter uncertainty draws will frequently cause the Placebo PFS tail to rise and cross, violating clinical logic. Implementing the cap in the code ensures that every PSA iteration remains logically and clinically valid.
 :::

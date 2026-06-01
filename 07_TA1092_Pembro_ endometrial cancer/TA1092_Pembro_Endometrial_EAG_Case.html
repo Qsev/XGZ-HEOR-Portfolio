@@ -242,7 +242,7 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td><strong>Efficacy Data</strong></td>
-<td>• Reconstructing pseudo-IPD from published trial subgroup curves (NEJM Fig 2A/B) via digitized KM estimates.<br>• Fitting candidate parametric distributions and Royston-Parmar splines in R.</td>
+<td>• Reconstructing pseudo-IPD from published trial subgroup curves (NEJM Fig 2A/B) via computer vision (HSV) and Guyot-reconstructed KM estimates.<br>• Fitting candidate parametric distributions and Royston-Parmar splines in R.</td>
 <td>• Full patient-level clinical trial database replication (confidential and unavailable).</td>
 </tr>
 <tr class="even">
@@ -608,13 +608,13 @@ window.Quarto = {
 <div class="no-row-height column-margin column-container"><div class="">
 <p><strong>Time Log: 2.5 hours</strong></p>
 <ul>
-<li>Digitised sub-group curves from NEJM Figure 2A/B.</li>
+<li>Extracted subgroup curves using Computer Vision HSV color segmentation.</li>
 <li>Reconstructed pseudo-IPD using the Guyot algorithm.</li>
 </ul>
 </div></div><p>This section initializes the analysis environment and loads the raw clinical inputs. The individual patient-level data (IPD) used throughout this appraisal were reconstructed from the published Kaplan-Meier survival curves in the KEYNOTE-868 (NRG-GY018) trial (Eskander et al., 2023).</p>
 <p>The reconstruction workflow follows a standardized HTA auditing process:</p>
 <ol type="1">
-<li><strong>Digitization</strong>: Time-survival coordinates were extracted from the published PFS and OS curves for the mismatch repair deficient (dMMR) and mismatch repair proficient (pMMR) cohorts using high-resolution digitization software.</li>
+<li><strong>Digitization</strong>: Time-survival coordinates were extracted from the published PFS and OS curves for the mismatch repair deficient (dMMR) and mismatch repair proficient (pMMR) cohorts using a custom computer vision HSV (Hue, Saturation, Value) color segmentation script, which eliminates the manual error associated with point-and-click tools.</li>
 <li><strong>IPD Re-creation</strong>: The digital coordinates, along with reported patients-at-risk tables and event counts, were processed using the iterative algorithm proposed by Guyot et al.&nbsp;(2012) to reconstruct patient-level times and censoring indicators.</li>
 <li><strong>Harmonization</strong>: The individual datasets for each endpoint, subgroup, and treatment arm were consolidated into a single long-format database (<code>survival_ipd_long.csv</code>).</li>
 <li><strong>Validation</strong>: The reconstructed individual patient data (pseudo-IPD) are summarized and plotted below to confirm structural alignment with the original trial publications prior to fitting parametric survival models.</li>
@@ -4830,7 +4830,7 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In our reconstructed pseudo-IPD base case, the deterministic curves stay very close but do not cross, rendering the cap inactive. This is because flexible spline models are highly sensitive to the exact timing of event and censoring patterns in the tail, which are approximated during KM digitization.</p>
+<p>In our reconstructed pseudo-IPD base case, the deterministic curves stay very close but do not cross, rendering the cap inactive. This is because flexible spline models are highly sensitive to the exact timing of event and censoring patterns in the tail, which are approximated during KM digitization (here resolved using Computer Vision HSV color segmentation to minimize extraction bias).</p>
 <p>However, implementing this capping logic remains a critical HTA requirement. In HEOR practice, this serves as a <strong>structural model guardrail</strong>. During Probabilistic Sensitivity Analysis (PSA) or bootstrap simulations, parameter uncertainty draws will frequently cause the Placebo PFS tail to rise and cross, violating clinical logic. Implementing the cap in the code ensures that every PSA iteration remains logically and clinically valid.</p>
 </div>
 </div>
