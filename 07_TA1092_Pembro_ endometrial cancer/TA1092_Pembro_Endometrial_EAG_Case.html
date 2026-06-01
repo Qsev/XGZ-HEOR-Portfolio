@@ -135,7 +135,7 @@ window.Quarto = {
   <li><a href="#goodness-of-fit-summary" id="toc-goodness-of-fit-summary" class="nav-link" data-scroll-target="#goodness-of-fit-summary"><span class="header-section-number">4.1</span> Goodness-of-Fit Summary</a></li>
   <li><a href="#statistical-fit-vs.-extrapolation-plausibility" id="toc-statistical-fit-vs.-extrapolation-plausibility" class="nav-link" data-scroll-target="#statistical-fit-vs.-extrapolation-plausibility"><span class="header-section-number">4.2</span> Statistical Fit vs.&nbsp;Extrapolation Plausibility</a></li>
   </ul></li>
-  <li><a href="#extrapolation-zone-data-maturity-critique-issue-3" id="toc-extrapolation-zone-data-maturity-critique-issue-3" class="nav-link" data-scroll-target="#extrapolation-zone-data-maturity-critique-issue-3"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</a>
+  <li><a href="#sec-issue3" id="toc-sec-issue3" class="nav-link" data-scroll-target="#sec-issue3"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</a>
   <ul class="collapse">
   <li><a href="#step-1-baseline-30-year-survival-extrapolation" id="toc-step-1-baseline-30-year-survival-extrapolation" class="nav-link" data-scroll-target="#step-1-baseline-30-year-survival-extrapolation"><span class="header-section-number">5.1</span> Step 1: Baseline 30-Year Survival Extrapolation</a></li>
   <li><a href="#step-2-eag-issue-3-audit-trial-data-immaturity" id="toc-step-2-eag-issue-3-audit-trial-data-immaturity" class="nav-link" data-scroll-target="#step-2-eag-issue-3-audit-trial-data-immaturity"><span class="header-section-number">5.2</span> Step 2: EAG Issue 3 Audit (Trial Data Immaturity)</a></li>
@@ -394,7 +394,7 @@ window.Quarto = {
 <ol type="1">
 <li><strong>Representativeness of post-hoc all-comer analysis</strong>: Post-hoc pooling of trial cohorts may not represent the trial’s original design and statistical analysis plan.</li>
 <li><strong>Subgroup limitations</strong>: Site of recurrence (local vs.&nbsp;metastatic) and debulking surgery history were not systematically collected in KEYNOTE-868.</li>
-<li><strong>Short trial follow-up</strong>: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.</li>
+<li><span id="issue-3-list"><a href="#sec-issue3"><strong>Short trial follow-up</strong></a></span>: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.</li>
 <li><strong>Subgroup-restricted HRQoL</strong>: Health-related quality of life was collected only in the pMMR cohort, leaving the dMMR cohort without trial-specific utility data.</li>
 <li><strong>Uncertain overall survival benefit</strong>: The company’s survival models potentially overestimate long-term immunotherapy tail benefits.</li>
 <li><strong>Understated baseline age</strong>: The modeled baseline age (65.4 years) was younger than standard UK patients (67.1 years), affecting background mortality.</li>
@@ -1109,8 +1109,8 @@ window.Quarto = {
 <p>Therefore, these statistical rankings serve as candidates for further clinical tail critique, which is evaluated in the next chapter.</p>
 </section>
 </section>
-<section id="extrapolation-zone-data-maturity-critique-issue-3" class="level2 page-columns page-full" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="extrapolation-zone-data-maturity-critique-issue-3"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</h2>
+<section id="sec-issue3" class="level2 page-columns page-full" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="sec-issue3"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p><strong>Time Log: 2.5 hours</strong></p>
@@ -1118,7 +1118,11 @@ window.Quarto = {
 <li>Digitised subgroup curves from NEJM Figure 2A/B.</li>
 <li>Built and tidied the long-format IPD dataset for R processing.</li>
 </ul>
-</div></div><p>This section audits the transition from observed clinical trial data to long-term extrapolation. We analyze the European Advisory Group’s (EAG) <strong>Issue 3 critique (data immaturity)</strong> by comparing observed trial evidence against the long-term model horizon, visualizing the “extrapolation zone,” and demonstrating how parametric tail choices diverge.</p>
+</div></div><blockquote class="blockquote">
+<p>[!NOTE] <strong>EAG Issue 3: Short trial follow-up / data immaturity.</strong> In health economic evaluations, if the clinical trial follow-up is too short, the long-term survival projections rely heavily on model extrapolations rather than observed patient data. The EAG raised this issue because KEYNOTE-868’s OS and PFS data were immature, meaning the vast majority of projected QALY gains in the company’s model were driven by mathematical tail assumptions rather than direct trial evidence.</p>
+<p><a href="#issue-3-list">Go back to EAG Key Issue List</a></p>
+</blockquote>
+<p>This section audits the transition from observed clinical trial data to long-term extrapolation. We analyze the European Advisory Group’s (EAG) <strong>Issue 3 critique (data immaturity)</strong> by comparing observed trial evidence against the long-term model horizon, visualizing the “extrapolation zone,” and demonstrating how parametric tail choices diverge.</p>
 <section id="step-1-baseline-30-year-survival-extrapolation" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="step-1-baseline-30-year-survival-extrapolation"><span class="header-section-number">5.1</span> Step 1: Baseline 30-Year Survival Extrapolation</h3>
 <p>We begin by taking the statistical best-fit models (selected by minimum AIC in the previous section) and projecting survival probabilities over a 30-year (360-month) lifetime horizon.</p>

@@ -125,7 +125,7 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 
 1. **Representativeness of post-hoc all-comer analysis**: Post-hoc pooling of trial cohorts may not represent the trial's original design and statistical analysis plan.
 2. **Subgroup limitations**: Site of recurrence (local vs. metastatic) and debulking surgery history were not systematically collected in KEYNOTE-868.
-3. **Short trial follow-up**: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.
+3. <span id="issue-3-list">[**Short trial follow-up**](#sec-issue3)</span>: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.
 4. **Subgroup-restricted HRQoL**: Health-related quality of life was collected only in the pMMR cohort, leaving the dMMR cohort without trial-specific utility data.
 5. **Uncertain overall survival benefit**: The company's survival models potentially overestimate long-term immunotherapy tail benefits.
 6. **Understated baseline age**: The modeled baseline age (65.4 years) was younger than standard UK patients (67.1 years), affecting background mortality.
@@ -411,7 +411,7 @@ Therefore, these statistical rankings serve as candidates for further clinical t
 
 
 
-## Extrapolation Zone & Data Maturity Critique (Issue 3)
+## Extrapolation Zone & Data Maturity Critique (Issue 3) {#sec-issue3}
 
 ::: {.column-margin}
 **Time Log: 2.5 hours**
@@ -419,6 +419,11 @@ Therefore, these statistical rankings serve as candidates for further clinical t
 - Digitised subgroup curves from NEJM Figure 2A/B.
 - Built and tidied the long-format IPD dataset for R processing.
 :::
+
+> [!NOTE]
+> **EAG Issue 3: Short trial follow-up / data immaturity.** In health economic evaluations, if the clinical trial follow-up is too short, the long-term survival projections rely heavily on model extrapolations rather than observed patient data. The EAG raised this issue because KEYNOTE-868's OS and PFS data were immature, meaning the vast majority of projected QALY gains in the company's model were driven by mathematical tail assumptions rather than direct trial evidence.
+> 
+> [Go back to EAG Key Issue List](#issue-3-list)
 
 This section audits the transition from observed clinical trial data to long-term extrapolation. We analyze the European Advisory Group's (EAG) **Issue 3 critique (data immaturity)** by comparing observed trial evidence against the long-term model horizon, visualizing the "extrapolation zone," and demonstrating how parametric tail choices diverge.
 
