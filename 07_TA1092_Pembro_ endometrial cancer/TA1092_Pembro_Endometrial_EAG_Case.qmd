@@ -137,13 +137,15 @@ Based on the HTA dossier review, the appraisal debate centers on translating imm
 
 ### Summary of the 10 EAG Key Issues
 
-The EAG identified ten key clinical, methodological, and economic issues in the company's submission:
+The EAG identified ten key clinical, methodological, and economic issues in the company's submission. To demonstrate compliance with a value-driven consulting scope (where we avoid duplicating every minor manufacturer calculation), this case study focuses on auditing and simulating the two most critical methodological and structural issues: **Issue 3 (Short trial follow-up / data immaturity)** and **Issue 5 (Uncertain overall survival benefit)**. These two issues represent the primary sources of uncertainty in long-term extrapolation and have the most significant impact on the resulting cost-effectiveness decisions.
+
+The complete list of the ten key issues is summarized below, with links to the interactive audit sections for the two prioritized issues:
 
 1. **Representativeness of post-hoc all-comer analysis**: Post-hoc pooling of trial cohorts may not represent the trial's original design and statistical analysis plan.
 2. **Subgroup limitations**: Site of recurrence (local vs. metastatic) and debulking surgery history were not systematically collected in KEYNOTE-868.
-3. <span id="issue-3-list">[**Short trial follow-up**](#sec-issue3)</span>: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.
+3. <span id="issue-3-list">[**Short trial follow-up (Data Immaturity)**](#sec-issue3)</span>: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.
 4. **Subgroup-restricted HRQoL**: Health-related quality of life was collected only in the pMMR cohort, leaving the dMMR cohort without trial-specific utility data.
-5. **Uncertain overall survival benefit**: The company's survival models potentially overestimate long-term immunotherapy tail benefits.
+5. <span id="issue-5-list">[**Uncertain overall survival benefit**](#sec-issue5)</span>: The company's survival models potentially overestimate long-term immunotherapy tail benefits.
 6. **Understated baseline age**: The modeled baseline age (65.4 years) was younger than standard UK patients (67.1 years), affecting background mortality.
 7. **Representativeness of health state utilities**: Mapped utilities from KEYNOTE-158 (second-line dMMR) may not represent the first-line all-comer population.
 8. **Underestimated safety monitoring resources**: Safety monitoring costs (blood, liver, thyroid tests) for patients on active immunotherapy were omitted.
@@ -1889,9 +1891,11 @@ bind_rows(
   kable(caption = "EAG Scenario Sensitivity: Illustrative pembrolizumab commercial discount", align = "l")
 ```
 
-**OS Tail Sensitivity**
+### OS Tail Sensitivity & Overall Survival Plausibility (Issue 5) {#sec-issue5}
 
 Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate this is to reduce the long-term OS separation between arms after the EAG's 2-year boundary.
+
+([Back to Key Issues List](#issue-5-list))
 
 This scenario is not an EAG preferred model. It is a teaching sensitivity: after 104 weeks, the pembro OS benefit is gradually reduced so that only 50% of the modelled OS separation remains by 10 years.
 

@@ -156,8 +156,9 @@ window.Quarto = {
   <li><a href="#model-selection-synthesis" id="toc-model-selection-synthesis" class="nav-link" data-scroll-target="#model-selection-synthesis"><span class="header-section-number">8.1</span> 2×2 Model Selection Synthesis</a></li>
   <li><a href="#visual-extrapolation-comparison-aic-vs.-eag" id="toc-visual-extrapolation-comparison-aic-vs.-eag" class="nav-link" data-scroll-target="#visual-extrapolation-comparison-aic-vs.-eag"><span class="header-section-number">8.2</span> Visual Extrapolation Comparison: AIC vs.&nbsp;EAG</a></li>
   <li><a href="#sensitivity-analysis-confidential-discounts-os-tail-reduction" id="toc-sensitivity-analysis-confidential-discounts-os-tail-reduction" class="nav-link" data-scroll-target="#sensitivity-analysis-confidential-discounts-os-tail-reduction"><span class="header-section-number">8.3</span> Sensitivity Analysis: Confidential Discounts &amp; OS Tail Reduction</a></li>
-  <li><a href="#clinical-logic-validation-and-capping-under-parameter-uncertainty" id="toc-clinical-logic-validation-and-capping-under-parameter-uncertainty" class="nav-link" data-scroll-target="#clinical-logic-validation-and-capping-under-parameter-uncertainty"><span class="header-section-number">8.4</span> Clinical Logic Validation and Capping under Parameter Uncertainty</a></li>
-  <li><a href="#hta-decision-interpretation-consulting-takeaways" id="toc-hta-decision-interpretation-consulting-takeaways" class="nav-link" data-scroll-target="#hta-decision-interpretation-consulting-takeaways"><span class="header-section-number">8.5</span> HTA Decision Interpretation &amp; Consulting Takeaways</a></li>
+  <li><a href="#sec-issue5" id="toc-sec-issue5" class="nav-link" data-scroll-target="#sec-issue5"><span class="header-section-number">8.4</span> OS Tail Sensitivity &amp; Overall Survival Plausibility (Issue 5)</a></li>
+  <li><a href="#clinical-logic-validation-and-capping-under-parameter-uncertainty" id="toc-clinical-logic-validation-and-capping-under-parameter-uncertainty" class="nav-link" data-scroll-target="#clinical-logic-validation-and-capping-under-parameter-uncertainty"><span class="header-section-number">8.5</span> Clinical Logic Validation and Capping under Parameter Uncertainty</a></li>
+  <li><a href="#hta-decision-interpretation-consulting-takeaways" id="toc-hta-decision-interpretation-consulting-takeaways" class="nav-link" data-scroll-target="#hta-decision-interpretation-consulting-takeaways"><span class="header-section-number">8.6</span> HTA Decision Interpretation &amp; Consulting Takeaways</a></li>
   </ul></li>
   <li><a href="#appendices" id="toc-appendices" class="nav-link" data-scroll-target="#appendices">Appendices</a>
   <ul class="collapse">
@@ -404,13 +405,14 @@ window.Quarto = {
 </section>
 <section id="summary-of-the-10-eag-key-issues" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="summary-of-the-10-eag-key-issues"><span class="header-section-number">2.3</span> Summary of the 10 EAG Key Issues</h3>
-<p>The EAG identified ten key clinical, methodological, and economic issues in the company’s submission:</p>
+<p>The EAG identified ten key clinical, methodological, and economic issues in the company’s submission. To demonstrate compliance with a value-driven consulting scope (where we avoid duplicating every minor manufacturer calculation), this case study focuses on auditing and simulating the two most critical methodological and structural issues: <strong>Issue 3 (Short trial follow-up / data immaturity)</strong> and <strong>Issue 5 (Uncertain overall survival benefit)</strong>. These two issues represent the primary sources of uncertainty in long-term extrapolation and have the most significant impact on the resulting cost-effectiveness decisions.</p>
+<p>The complete list of the ten key issues is summarized below, with links to the interactive audit sections for the two prioritized issues:</p>
 <ol type="1">
 <li><strong>Representativeness of post-hoc all-comer analysis</strong>: Post-hoc pooling of trial cohorts may not represent the trial’s original design and statistical analysis plan.</li>
 <li><strong>Subgroup limitations</strong>: Site of recurrence (local vs.&nbsp;metastatic) and debulking surgery history were not systematically collected in KEYNOTE-868.</li>
-<li><span id="issue-3-list"><a href="#sec-issue3"><strong>Short trial follow-up</strong></a></span>: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.</li>
+<li><span id="issue-3-list"><a href="#sec-issue3"><strong>Short trial follow-up (Data Immaturity)</strong></a></span>: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.</li>
 <li><strong>Subgroup-restricted HRQoL</strong>: Health-related quality of life was collected only in the pMMR cohort, leaving the dMMR cohort without trial-specific utility data.</li>
-<li><strong>Uncertain overall survival benefit</strong>: The company’s survival models potentially overestimate long-term immunotherapy tail benefits.</li>
+<li><span id="issue-5-list"><a href="#sec-issue5"><strong>Uncertain overall survival benefit</strong></a></span>: The company’s survival models potentially overestimate long-term immunotherapy tail benefits.</li>
 <li><strong>Understated baseline age</strong>: The modeled baseline age (65.4 years) was younger than standard UK patients (67.1 years), affecting background mortality.</li>
 <li><strong>Representativeness of health state utilities</strong>: Mapped utilities from KEYNOTE-158 (second-line dMMR) may not represent the first-line all-comer population.</li>
 <li><strong>Underestimated safety monitoring resources</strong>: Safety monitoring costs (blood, liver, thyroid tests) for patients on active immunotherapy were omitted.</li>
@@ -3086,8 +3088,11 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 </table>
 </div>
 </div>
-<p><strong>OS Tail Sensitivity</strong></p>
+</section>
+<section id="sec-issue5" class="level3" data-number="8.4">
+<h3 data-number="8.4" class="anchored" data-anchor-id="sec-issue5"><span class="header-section-number">8.4</span> OS Tail Sensitivity &amp; Overall Survival Plausibility (Issue 5)</h3>
 <p>Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate this is to reduce the long-term OS separation between arms after the EAG’s 2-year boundary.</p>
+<p>(<a href="#issue-5-list">Back to Key Issues List</a>)</p>
 <p>This scenario is not an EAG preferred model. It is a teaching sensitivity: after 104 weeks, the pembro OS benefit is gradually reduced so that only 50% of the modelled OS separation remains by 10 years.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -3201,8 +3206,8 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 </div>
 <p>This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company’s long-term OS benefit is clinically plausible.</p>
 </section>
-<section id="clinical-logic-validation-and-capping-under-parameter-uncertainty" class="level3" data-number="8.4">
-<h3 data-number="8.4" class="anchored" data-anchor-id="clinical-logic-validation-and-capping-under-parameter-uncertainty"><span class="header-section-number">8.4</span> Clinical Logic Validation and Capping under Parameter Uncertainty</h3>
+<section id="clinical-logic-validation-and-capping-under-parameter-uncertainty" class="level3" data-number="8.5">
+<h3 data-number="8.5" class="anchored" data-anchor-id="clinical-logic-validation-and-capping-under-parameter-uncertainty"><span class="header-section-number">8.5</span> Clinical Logic Validation and Capping under Parameter Uncertainty</h3>
 <p>While the EAG-preferred spline models for the pMMR cohort (Table 2) offer superior statistical fit during the trial period, they introduce a clinical logic violation: the long-term extrapolated PFS curve for the placebo + CT arm (2-knot hazards) can cross and exceed the pembrolizumab + CT arm (1-knot hazards) in the tail.</p>
 <p>During the appraisal consultations, the company pointed out this logical inconsistency, arguing that it is clinically implausible for the control arm to have superior PFS at any point given the higher response rate and observed treatment effect in the pembrolizumab arm. The NHS England Cancer Drugs Fund clinical lead supported this view. Although the EAG defended the crossing as an artifact of long-term extrapolation uncertainty that did not invalidate the observed period fit, the NICE Appraisal Committee ultimately mandated that the placebo PFS curve be logically capped at the pembrolizumab curve.</p>
 <p>In our reconstructed pseudo-IPD deterministic base case, the point-estimate Placebo PFS and Pembro PFS curves remain extremely close in the tail but do not cross. The cap is therefore inactive in the base case (crossover week = NA), yielding identical cost-effectiveness results for capped and uncapped runs.</p>
@@ -3443,8 +3448,8 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 </div>
 </div>
 </section>
-<section id="hta-decision-interpretation-consulting-takeaways" class="level3" data-number="8.5">
-<h3 data-number="8.5" class="anchored" data-anchor-id="hta-decision-interpretation-consulting-takeaways"><span class="header-section-number">8.5</span> HTA Decision Interpretation &amp; Consulting Takeaways</h3>
+<section id="hta-decision-interpretation-consulting-takeaways" class="level3" data-number="8.6">
+<h3 data-number="8.6" class="anchored" data-anchor-id="hta-decision-interpretation-consulting-takeaways"><span class="header-section-number">8.6</span> HTA Decision Interpretation &amp; Consulting Takeaways</h3>
 <p>In HEOR modeling, the choice of survival models is rarely a purely statistical exercise. The “crossover and capping” debate in the pembrolizumab appraisal teaches several critical consulting lessons regarding the thinking process of HTA bodies:</p>
 <ol type="1">
 <li><strong>Primacy of Clinical Logic Over Statistical Fit</strong>: Spline models (like the Royston-Parmar flexible parametric models) offer excellent empirical fit to the trial period due to their flexible knots. However, they lack structural constraints. When statistical optimization yields clinical absurdities—such as a placebo arm outperforming an active immunotherapy arm in the long term—clinical plausibility must serve as a hard boundary condition to restrict statistical extrapolation.</li>
