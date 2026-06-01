@@ -384,11 +384,14 @@ fit_summary <- fit_tbl |>
 
 ### Goodness-of-Fit Summary
 
-The table below presents the top three candidate survival distributions for each cohort, ranked by their Akaike Information Criterion (AIC).
+The table below presents the top three candidate survival distributions for each cohort, ranked by their Akaike Information Criterion (AIC). To maximize information density, the candidates and their corresponding fit statistics (AIC/BIC) are presented side-by-side.
 
 ```{r display-fit-summary}
 #| warning: false
 #| message: false
+#| label: tbl-top3-fit-summary
+#| tbl-cap: "Top three candidate survival distributions by cohort ranked by AIC"
+
 top3_fit_summary <- fit_summary |>
   filter(converged) |>
   group_by(subgroup, endpoint, treatment) |>
@@ -397,8 +400,26 @@ top3_fit_summary <- fit_summary |>
   ungroup() |>
   select(subgroup, endpoint, treatment, dist_label, n, events, aic, bic)
 
-top3_fit_summary |>
-  kable(digits = 2, col.names = c("Subgroup", "Endpoint", "Treatment", "Distribution", "N", "Events", "AIC", "BIC"))
+top3_fit_pivoted <- top3_fit_summary |>
+  group_by(subgroup, endpoint, treatment) |>
+  mutate(rank = row_number()) |>
+  ungroup() |>
+  mutate(
+    treatment_clean = if_else(treatment == "pembro_chemo", "Pembro + Chemo", "Placebo + Chemo"),
+    dist_info = paste0(dist_label, " (AIC: ", round(aic, 1), ", BIC: ", round(bic, 1), ")")
+  ) |>
+  select(subgroup, endpoint, treatment_clean, n, events, rank, dist_info) |>
+  pivot_wider(
+    names_from = rank,
+    values_from = dist_info,
+    names_prefix = "rank_"
+  )
+
+top3_fit_pivoted |>
+  kable(
+    col.names = c("Subgroup", "Endpoint", "Treatment", "N", "Events", "Rank 1 (Best AIC)", "Rank 2", "Rank 3"),
+    align = "l"
+  )
 ```
 
 ### Statistical Fit vs. Extrapolation Plausibility

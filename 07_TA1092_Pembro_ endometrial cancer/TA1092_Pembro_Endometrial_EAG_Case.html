@@ -817,7 +817,7 @@ window.Quarto = {
 </div>
 <section id="goodness-of-fit-summary" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="goodness-of-fit-summary"><span class="header-section-number">4.1</span> Goodness-of-Fit Summary</h3>
-<p>The table below presents the top three candidate survival distributions for each cohort, ranked by their Akaike Information Criterion (AIC).</p>
+<p>The table below presents the top three candidate survival distributions for each cohort, ranked by their Akaike Information Criterion (AIC). To maximize information density, the candidates and their corresponding fit statistics (AIC/BIC) are presented side-by-side.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -829,276 +829,143 @@ window.Quarto = {
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(subgroup, endpoint, treatment, dist_label, n, events, aic, bic)</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>top3_fit_summary <span class="sc">|&gt;</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Subgroup"</span>, <span class="st">"Endpoint"</span>, <span class="st">"Treatment"</span>, <span class="st">"Distribution"</span>, <span class="st">"N"</span>, <span class="st">"Events"</span>, <span class="st">"AIC"</span>, <span class="st">"BIC"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>top3_fit_pivoted <span class="ot">&lt;-</span> top3_fit_summary <span class="sc">|&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(subgroup, endpoint, treatment) <span class="sc">|&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_clean =</span> <span class="fu">if_else</span>(treatment <span class="sc">==</span> <span class="st">"pembro_chemo"</span>, <span class="st">"Pembro + Chemo"</span>, <span class="st">"Placebo + Chemo"</span>),</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">dist_info =</span> <span class="fu">paste0</span>(dist_label, <span class="st">" (AIC: "</span>, <span class="fu">round</span>(aic, <span class="dv">1</span>), <span class="st">", BIC: "</span>, <span class="fu">round</span>(bic, <span class="dv">1</span>), <span class="st">")"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(subgroup, endpoint, treatment_clean, n, events, rank, dist_info) <span class="sc">|&gt;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> rank,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> dist_info,</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_prefix =</span> <span class="st">"rank_"</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>top3_fit_pivoted <span class="sc">|&gt;</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Subgroup"</span>, <span class="st">"Endpoint"</span>, <span class="st">"Treatment"</span>, <span class="st">"N"</span>, <span class="st">"Events"</span>, <span class="st">"Rank 1 (Best AIC)"</span>, <span class="st">"Rank 2"</span>, <span class="st">"Rank 3"</span>),</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"l"</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div id="tbl-top3-fit-summary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-top3-fit-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Top three candidate survival distributions by cohort ranked by AIC
+</figcaption>
+<div aria-describedby="tbl-top3-fit-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="cell caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 18%">
-<col style="width: 24%">
+<col style="width: 5%">
 <col style="width: 5%">
 <col style="width: 9%">
-<col style="width: 9%">
-<col style="width: 9%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 26%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Subgroup</th>
 <th style="text-align: left;">Endpoint</th>
 <th style="text-align: left;">Treatment</th>
-<th style="text-align: left;">Distribution</th>
-<th style="text-align: right;">N</th>
-<th style="text-align: right;">Events</th>
-<th style="text-align: right;">AIC</th>
-<th style="text-align: right;">BIC</th>
+<th style="text-align: left;">N</th>
+<th style="text-align: left;">Events</th>
+<th style="text-align: left;">Rank 1 (Best AIC)</th>
+<th style="text-align: left;">Rank 2</th>
+<th style="text-align: left;">Rank 3</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">dMMR</td>
 <td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">loglogistic</td>
-<td style="text-align: right;">113</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">421.23</td>
-<td style="text-align: right;">426.68</td>
+<td style="text-align: left;">Placebo + Chemo</td>
+<td style="text-align: left;">113</td>
+<td style="text-align: left;">59</td>
+<td style="text-align: left;">loglogistic (AIC: 421.2, BIC: 426.7)</td>
+<td style="text-align: left;">lognormal (AIC: 421.5, BIC: 427)</td>
+<td style="text-align: left;">generalized_gamma (AIC: 422.6, BIC: 430.8)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">dMMR</td>
 <td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">lognormal</td>
-<td style="text-align: right;">113</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">421.53</td>
-<td style="text-align: right;">426.98</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">generalized_gamma</td>
-<td style="text-align: right;">113</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">422.58</td>
-<td style="text-align: right;">430.76</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">exponential</td>
-<td style="text-align: right;">112</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">253.92</td>
-<td style="text-align: right;">256.64</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">loglogistic</td>
-<td style="text-align: right;">112</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">254.75</td>
-<td style="text-align: right;">260.18</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">lognormal</td>
-<td style="text-align: right;">112</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">255.10</td>
-<td style="text-align: right;">260.54</td>
+<td style="text-align: left;">Pembro + Chemo</td>
+<td style="text-align: left;">112</td>
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">exponential (AIC: 253.9, BIC: 256.6)</td>
+<td style="text-align: left;">loglogistic (AIC: 254.7, BIC: 260.2)</td>
+<td style="text-align: left;">lognormal (AIC: 255.1, BIC: 260.5)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">dMMR</td>
 <td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">lognormal</td>
-<td style="text-align: right;">113</td>
-<td style="text-align: right;">18</td>
-<td style="text-align: right;">193.65</td>
-<td style="text-align: right;">199.11</td>
+<td style="text-align: left;">Placebo + Chemo</td>
+<td style="text-align: left;">113</td>
+<td style="text-align: left;">18</td>
+<td style="text-align: left;">lognormal (AIC: 193.7, BIC: 199.1)</td>
+<td style="text-align: left;">exponential (AIC: 193.7, BIC: 196.5)</td>
+<td style="text-align: left;">loglogistic (AIC: 194.9, BIC: 200.4)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">dMMR</td>
 <td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">exponential</td>
-<td style="text-align: right;">113</td>
-<td style="text-align: right;">18</td>
-<td style="text-align: right;">193.74</td>
-<td style="text-align: right;">196.47</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">loglogistic</td>
-<td style="text-align: right;">113</td>
-<td style="text-align: right;">18</td>
-<td style="text-align: right;">194.95</td>
-<td style="text-align: right;">200.40</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">exponential</td>
-<td style="text-align: right;">112</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">102.26</td>
-<td style="text-align: right;">104.98</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">lognormal</td>
-<td style="text-align: right;">112</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">103.30</td>
-<td style="text-align: right;">108.74</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">gompertz</td>
-<td style="text-align: right;">112</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">103.31</td>
-<td style="text-align: right;">108.75</td>
+<td style="text-align: left;">Pembro + Chemo</td>
+<td style="text-align: left;">112</td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">exponential (AIC: 102.3, BIC: 105)</td>
+<td style="text-align: left;">lognormal (AIC: 103.3, BIC: 108.7)</td>
+<td style="text-align: left;">gompertz (AIC: 103.3, BIC: 108.7)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">pMMR</td>
 <td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">weibull</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: right;">133</td>
-<td style="text-align: right;">941.27</td>
-<td style="text-align: right;">948.62</td>
+<td style="text-align: left;">Placebo + Chemo</td>
+<td style="text-align: left;">292</td>
+<td style="text-align: left;">133</td>
+<td style="text-align: left;">weibull (AIC: 941.3, BIC: 948.6)</td>
+<td style="text-align: left;">gamma (AIC: 943.1, BIC: 950.5)</td>
+<td style="text-align: left;">generalized_gamma (AIC: 943.2, BIC: 954.2)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">pMMR</td>
 <td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">gamma</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: right;">133</td>
-<td style="text-align: right;">943.10</td>
-<td style="text-align: right;">950.45</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">generalized_gamma</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: right;">133</td>
-<td style="text-align: right;">943.21</td>
-<td style="text-align: right;">954.24</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">loglogistic</td>
-<td style="text-align: right;">290</td>
-<td style="text-align: right;">89</td>
-<td style="text-align: right;">738.45</td>
-<td style="text-align: right;">745.79</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">gamma</td>
-<td style="text-align: right;">290</td>
-<td style="text-align: right;">89</td>
-<td style="text-align: right;">741.89</td>
-<td style="text-align: right;">749.23</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">generalized_gamma</td>
-<td style="text-align: right;">290</td>
-<td style="text-align: right;">89</td>
-<td style="text-align: right;">743.26</td>
-<td style="text-align: right;">754.27</td>
+<td style="text-align: left;">Pembro + Chemo</td>
+<td style="text-align: left;">290</td>
+<td style="text-align: left;">89</td>
+<td style="text-align: left;">loglogistic (AIC: 738.5, BIC: 745.8)</td>
+<td style="text-align: left;">gamma (AIC: 741.9, BIC: 749.2)</td>
+<td style="text-align: left;">generalized_gamma (AIC: 743.3, BIC: 754.3)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">pMMR</td>
 <td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">weibull</td>
-<td style="text-align: right;">295</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">593.60</td>
-<td style="text-align: right;">600.97</td>
+<td style="text-align: left;">Placebo + Chemo</td>
+<td style="text-align: left;">295</td>
+<td style="text-align: left;">61</td>
+<td style="text-align: left;">weibull (AIC: 593.6, BIC: 601)</td>
+<td style="text-align: left;">gamma (AIC: 594.4, BIC: 601.8)</td>
+<td style="text-align: left;">generalized_gamma (AIC: 595.2, BIC: 606.3)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">pMMR</td>
 <td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">gamma</td>
-<td style="text-align: right;">295</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">594.38</td>
-<td style="text-align: right;">601.76</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">generalized_gamma</td>
-<td style="text-align: right;">295</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">595.24</td>
-<td style="text-align: right;">606.30</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">weibull</td>
-<td style="text-align: right;">293</td>
-<td style="text-align: right;">53</td>
-<td style="text-align: right;">538.74</td>
-<td style="text-align: right;">546.10</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">gamma</td>
-<td style="text-align: right;">293</td>
-<td style="text-align: right;">53</td>
-<td style="text-align: right;">538.78</td>
-<td style="text-align: right;">546.14</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">loglogistic</td>
-<td style="text-align: right;">293</td>
-<td style="text-align: right;">53</td>
-<td style="text-align: right;">538.97</td>
-<td style="text-align: right;">546.33</td>
+<td style="text-align: left;">Pembro + Chemo</td>
+<td style="text-align: left;">293</td>
+<td style="text-align: left;">53</td>
+<td style="text-align: left;">weibull (AIC: 538.7, BIC: 546.1)</td>
+<td style="text-align: left;">gamma (AIC: 538.8, BIC: 546.1)</td>
+<td style="text-align: left;">loglogistic (AIC: 539, BIC: 546.3)</td>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</figure>
 </div>
 </div>
 </section>
@@ -1652,7 +1519,7 @@ window.Quarto = {
 <section id="visualizing-and-quantifying-tail-divergence" class="level4" data-number="5.3.1">
 <h4 data-number="5.3.1" class="anchored" data-anchor-id="visualizing-and-quantifying-tail-divergence"><span class="header-section-number">5.3.1</span> Visualizing and Quantifying Tail Divergence</h4>
 <p>To demonstrate the structural uncertainty of this extrapolation, we plot all seven candidate distributions on the same curve and examine their projected survival at key clinical landmarks.</p>
-<p>While all candidate distributions fit the observed trial period similarly, they diverge massively in the extrapolation zone. This divergence is visualized in the fan plot below and quantified numerically in <a href="#tbl-issue3-landmark-survival-table" class="quarto-xref">Table&nbsp;1</a>, which shows the projected survival estimates at 2, 3, 5, 10, and 20 years.</p>
+<p>While all candidate distributions fit the observed trial period similarly, they diverge massively in the extrapolation zone. This divergence is visualized in the fan plot below and quantified numerically in <a href="#tbl-issue3-landmark-survival-table" class="quarto-xref">Table&nbsp;2</a>, which shows the projected survival estimates at 2, 3, 5, 10, and 20 years.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1750,7 +1617,7 @@ window.Quarto = {
 <div id="tbl-issue3-landmark-survival-table" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-issue3-landmark-survival-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: pMMR OS pembro arm: landmark survival predictions by distribution (%)
+Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution (%)
 </figcaption>
 <div aria-describedby="tbl-issue3-landmark-survival-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -1846,7 +1713,7 @@ Table&nbsp;1: pMMR OS pembro arm: landmark survival predictions by distribution 
 </figure>
 </div>
 </div>
-<p>The landmark predictions in <a href="#tbl-issue3-landmark-survival-table" class="quarto-xref">Table&nbsp;1</a> reveal substantial structural uncertainty in the long-term projections. For instance, at the 20-year landmark (240 months), the log-normal model projects a <strong>30.3%</strong> survival rate, whereas the exponential model projects a mere <strong>0.3%</strong>.</p>
+<p>The landmark predictions in <a href="#tbl-issue3-landmark-survival-table" class="quarto-xref">Table&nbsp;2</a> reveal substantial structural uncertainty in the long-term projections. For instance, at the 20-year landmark (240 months), the log-normal model projects a <strong>30.3%</strong> survival rate, whereas the exponential model projects a mere <strong>0.3%</strong>.</p>
 <p>This divergence highlights why choosing an extrapolation curve based on statistical fit (AIC/BIC) alone is insufficient. Multiple distributions can exhibit near-identical statistical fits during the observed trial period, yet lead to completely different lifetime clinical and economic outcomes. In HTA submissions, modelers must justify their choice of extrapolation curve not just on statistical diagnostics, but on <strong>clinical tail plausibility</strong> (e.g., comparing projections against real-world cancer registries, national life tables, and clinical expert consensus on long-term survival rates).</p>
 </section>
 </section>
