@@ -118,7 +118,25 @@ Based on the HTA dossier review, the appraisal debate centers on translating imm
 - **Efficacy Waning**: The company assumed infinite treatment benefit post-discontinuation, which the EAG challenged. A compromise waning window was introduced to transition active treatment hazards to control hazards.
 - **Utility Consistency**: To avoid confounding utility estimates by mixing clinical trial sources (KEYNOTE-158 and KEYNOTE-B21), the EAG advocated for exclusive use of KEYNOTE-158.
 
+### Summary of the 10 EAG Key Issues
+
+The EAG identified ten key clinical, methodological, and economic issues in the company's submission:
+
+1. **Representativeness of post-hoc all-comer analysis**: Post-hoc pooling of trial cohorts may not represent the trial's original design and statistical analysis plan.
+2. **Subgroup limitations**: Site of recurrence (local vs. metastatic) and debulking surgery history were not systematically collected in KEYNOTE-868.
+3. **Short trial follow-up**: Immaturity of trial data limits the robustness of long-term survival effectiveness conclusions.
+4. **Subgroup-restricted HRQoL**: Health-related quality of life was collected only in the pMMR cohort, leaving the dMMR cohort without trial-specific utility data.
+5. **Uncertain overall survival benefit**: The company's survival models potentially overestimate long-term immunotherapy tail benefits.
+6. **Understated baseline age**: The modeled baseline age (65.4 years) was younger than standard UK patients (67.1 years), affecting background mortality.
+7. **Representativeness of health state utilities**: Mapped utilities from KEYNOTE-158 (second-line dMMR) may not represent the first-line all-comer population.
+8. **Underestimated safety monitoring resources**: Safety monitoring costs (blood, liver, thyroid tests) for patients on active immunotherapy were omitted.
+9. **Incomplete adverse event costing**: High >=5% incidence threshold omitted expensive immunotherapy-related adverse events.
+10. **Misaligned subsequent treatment mix**: Subsequent therapies in the comparator arm did not align with NHS clinical guidelines.
+
 ### EAG Challenge Log
+
+::: {.callout-note collapse="true"}
+## Click to expand: Detailed EAG Challenge Log & ICER Impact Map
 
 | Issue | Company position | EAG concern | Why the EAG cares | Potential ICER direction |
 |---|---|---|---|---|
@@ -131,9 +149,13 @@ Based on the HTA dossier review, the appraisal debate centers on translating imm
 | Starting age | 65.4 years (mean age of dMMR/pMMR pooled cohort in KEYNOTE-868) | Trial population is younger than UK real-world patients (mean age 67.1 years based on Pennington 2016) | Affects background mortality and lifetime QALY potential | Modestly increases ICER (due to higher background mortality truncating long-term QALYs) |
 | Resource use / Monitoring | Standard monitoring costs applied to both arms | Intervention arm requires additional routine safety monitoring (blood tests, thyroid, liver, glucose tests) | Underestimating routine monitoring costs artificially reduces intervention costs | Modestly increases ICER (due to higher treatment monitoring costs in the intervention arm) |
 | Adverse events | Standard AE costing (Grade 3-5 AEs with >5% incidence; only anemia/hypertension costed) | Immunotherapy-related AEs (irAEs) are expensive and omitted from the costings | Omiting severe immunotherapy AEs understates treatment-related management costs | Minimally increases ICER (due to limited impact of one-off acute AE costs) |
-| Subsequent therapy | Company assumed a portion of the CT arm receives pembrolizumab monotherapy post-progression | Pembrolizumab monotherapy is not NHS standard 2L care for pMMR patients; should be pembrolizumab + lenvatinib | Standardizing subsequent care in the comparator arm directly influences comparator cost levels | Decreases ICER (due to higher subsequent therapy costs in the comparator arm narrowing the cost delta) |
+| Subsequent therapy | Company assumed a portion of the CT arm receives pembrolizumab monotherapy post-progression | Pembrolizumab monotherapy is not NHS standard 2L care for pMMR patients; should be pembrolizumab + lenvatinib | Standardizing subsequent care in the comparator arm directly influences comparator cost levels | Decreases ICER (due to subsequent therapy costs in the comparator arm narrowing the cost delta) |
+:::
 
 ### Committee Preferred Assumptions
+
+::: {.callout-note collapse="true"}
+## Click to expand: Company vs. EAG vs. Committee Preferred Assumptions Table
 
 | Assumption | Company base case | EAG preferred | Committee preferred | My comment |
 |---|---|---|---|---|
@@ -146,7 +168,8 @@ Based on the HTA dossier review, the appraisal debate centers on translating imm
 | Starting age | 65.4 years | 67.1 years | 67.1 years | Committee preferred 67.1 years to reflect real-world NHS patients and maintain consistency with TA963 |
 | Resource use / Monitoring | Standard monitoring | Additional routine safety monitoring (EAG clinical expert estimates) | Additional routine safety monitoring | Committee preferred EAG's monitoring frequencies to reflect NHS clinical guidelines for patients on immunotherapy |
 | Adverse events | >5% Grade 3-5 AEs (anemia & hypertension only) | Include Grade 3-5 AEs with >=2% incidence | Company base case (>5% Grade 3-5 AEs) | Committee accepted the company base case because including broader AEs had a minimal impact on the ICER |
-| Subsequent therapy | Pembrolizumab monotherapy allowed in CT arm | Reallocate pembrolizumab monotherapy to pembrolizumab + lenvatinib | Reallocated subsequent therapy for pMMR patients | Committee preferred aligning subsequent therapies with NHS clinical guidelines for pMMR patients, which reduced the cost delta and decreased the ICER |delta and decreased the ICER |
+| Subsequent therapy | Pembrolizumab monotherapy allowed in CT arm | Reallocate pembrolizumab monotherapy to pembrolizumab + lenvatinib | Reallocated subsequent therapy for pMMR patients | Committee preferred aligning subsequent therapies with NHS clinical guidelines for pMMR patients, which reduced the cost delta and decreased the ICER |
+:::
 
 ## Workflow Setup & Exploratory Analysis
 
