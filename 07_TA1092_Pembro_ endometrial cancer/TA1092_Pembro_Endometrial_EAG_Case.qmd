@@ -2154,29 +2154,6 @@ In HEOR modeling, the choice of survival models is rarely a purely statistical e
 6. **Strategic Alignment of Clinical Logic and Commercial Interests**: The crossover debate illustrates how clinical critique and commercial submission strategy can align. While the company framed its objection to the crossing curves on clinical and logical grounds, implementing the logical cap mathematically favored the cost-effectiveness case for pembrolizumab. Capping the Placebo PFS at the Pembro PFS curve reduces the Placebo PFS probability in the tail, which shifts simulated patient-time from the progression-free (PF) state to the progressed disease (PD) state. Because the PF health state is assigned a higher utility (0.814) than the PD state (0.720), this shift lowers the cumulative QALYs in the Placebo arm. This increases the incremental QALY benefit ($\Delta E$) in favor of the active treatment, which mathematically **reduces the ICER**. In HTA consulting, identifying areas where clinical realism arguments also happen to strengthen the cost-effectiveness case is a key element of strategic value demonstration.
 
 
-#### Saving Reconstructed Model Outputs
-
-This final block writes the same output files as the batch script.
-
-```{r save-outputs}
-write_csv(fit_summary, file.path(output_dir, "parametric_fit_summary.csv"))
-write_csv(parameter_tbl, file.path(output_dir, "parametric_fit_parameters.csv"))
-write_csv(extrapolated, file.path(output_dir, "best_fit_extrapolated_survival.csv"))
-write_csv(top3_fit_summary, file.path(output_dir, "top3_fit_summary_by_curve.csv"))
-
-tibble(
-  output_file = c(
-    "parametric_fit_summary.csv",
-    "parametric_fit_parameters.csv",
-    "best_fit_extrapolated_survival.csv",
-    "top3_fit_summary_by_curve.csv"
-  ),
-  exists = file.exists(file.path(output_dir, output_file))
-) |>
-  kable()
-```
-
-
 
 ## Appendices {.unnumbered}
 

@@ -3437,58 +3437,6 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <li><strong>The Divergence Between Model Validity and ICER Impact</strong>: As shown in the probabilistic analysis, the difference in the mean ICER between the capped and uncapped spline models is extremely small (around £8, or ~0.01%). This is because the crossover occurs in the long-term tail where PFS probability in both arms is already very close to zero, and the difference is further minimized by the 3.5% annual discount rate. However, in HTA appraisals, logical corrections are driven by <strong>structural validity and scientific credibility</strong>, not just by their numerical impact on the ICER. A model that allows placebo patients to have better progression-free survival than active treatment patients is structurally flawed, compromising the credibility of the entire submission. HTA committees will reject model structures that allow clinically impossible states, regardless of whether the numerical impact is £8 or £8,000. Therefore, implementing guardrails is a matter of professional model quality assurance.</li>
 <li><strong>Strategic Alignment of Clinical Logic and Commercial Interests</strong>: The crossover debate illustrates how clinical critique and commercial submission strategy can align. While the company framed its objection to the crossing curves on clinical and logical grounds, implementing the logical cap mathematically favored the cost-effectiveness case for pembrolizumab. Capping the Placebo PFS at the Pembro PFS curve reduces the Placebo PFS probability in the tail, which shifts simulated patient-time from the progression-free (PF) state to the progressed disease (PD) state. Because the PF health state is assigned a higher utility (0.814) than the PD state (0.720), this shift lowers the cumulative QALYs in the Placebo arm. This increases the incremental QALY benefit (<span class="math inline">\(\Delta E\)</span>) in favor of the active treatment, which mathematically <strong>reduces the ICER</strong>. In HTA consulting, identifying areas where clinical realism arguments also happen to strengthen the cost-effectiveness case is a key element of strategic value demonstration.</li>
 </ol>
-<section id="saving-reconstructed-model-outputs" class="level4" data-number="8.5.1">
-<h4 data-number="8.5.1" class="anchored" data-anchor-id="saving-reconstructed-model-outputs"><span class="header-section-number">8.5.1</span> Saving Reconstructed Model Outputs</h4>
-<p>This final block writes the same output files as the batch script.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_summary.csv"</span>))</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(parameter_tbl, <span class="fu">file.path</span>(output_dir, <span class="st">"parametric_fit_parameters.csv"</span>))</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(extrapolated, <span class="fu">file.path</span>(output_dir, <span class="st">"best_fit_extrapolated_survival.csv"</span>))</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(top3_fit_summary, <span class="fu">file.path</span>(output_dir, <span class="st">"top3_fit_summary_by_curve.csv"</span>))</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_file =</span> <span class="fu">c</span>(</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_summary.csv"</span>,</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parametric_fit_parameters.csv"</span>,</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"best_fit_extrapolated_survival.csv"</span>,</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top3_fit_summary_by_curve.csv"</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">exists =</span> <span class="fu">file.exists</span>(<span class="fu">file.path</span>(output_dir, output_file))</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">output_file</th>
-<th style="text-align: left;">exists</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">parametric_fit_summary.csv</td>
-<td style="text-align: left;">TRUE</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">parametric_fit_parameters.csv</td>
-<td style="text-align: left;">TRUE</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">best_fit_extrapolated_survival.csv</td>
-<td style="text-align: left;">TRUE</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">top3_fit_summary_by_curve.csv</td>
-<td style="text-align: left;">TRUE</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</section>
 </section>
 </section>
 <section id="appendices" class="level2 unnumbered">
