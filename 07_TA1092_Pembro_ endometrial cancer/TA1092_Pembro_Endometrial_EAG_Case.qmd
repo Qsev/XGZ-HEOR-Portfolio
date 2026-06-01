@@ -135,8 +135,8 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 
 ### EAG Challenge Log
 
-::: {.callout-note collapse="true"}
-## Click to expand: Detailed EAG Challenge Log & ICER Impact Map
+<details>
+<summary><b>Click to expand: Detailed EAG Challenge Log & ICER Impact Map</b></summary>
 
 | Issue | Company position | EAG concern | Why the EAG cares | Potential ICER direction |
 |---|---|---|---|---|
@@ -150,12 +150,12 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 | Resource use / Monitoring | Standard monitoring costs applied to both arms | Intervention arm requires additional routine safety monitoring (blood tests, thyroid, liver, glucose tests) | Underestimating routine monitoring costs artificially reduces intervention costs | Modestly increases ICER (due to higher treatment monitoring costs in the intervention arm) |
 | Adverse events | Standard AE costing (Grade 3-5 AEs with >5% incidence; only anemia/hypertension costed) | Immunotherapy-related AEs (irAEs) are expensive and omitted from the costings | Omiting severe immunotherapy AEs understates treatment-related management costs | Minimally increases ICER (due to limited impact of one-off acute AE costs) |
 | Subsequent therapy | Company assumed a portion of the CT arm receives pembrolizumab monotherapy post-progression | Pembrolizumab monotherapy is not NHS standard 2L care for pMMR patients; should be pembrolizumab + lenvatinib | Standardizing subsequent care in the comparator arm directly influences comparator cost levels | Decreases ICER (due to subsequent therapy costs in the comparator arm narrowing the cost delta) |
-:::
+</details>
 
 ### Committee Preferred Assumptions
 
-::: {.callout-note collapse="true"}
-## Click to expand: Company vs. EAG vs. Committee Preferred Assumptions Table
+<details>
+<summary><b>Click to expand: Company vs. EAG vs. Committee Preferred Assumptions Table</b></summary>
 
 | Assumption | Company base case | EAG preferred | Committee preferred | My comment |
 |---|---|---|---|---|
@@ -169,7 +169,7 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 | Resource use / Monitoring | Standard monitoring | Additional routine safety monitoring (EAG clinical expert estimates) | Additional routine safety monitoring | Committee preferred EAG's monitoring frequencies to reflect NHS clinical guidelines for patients on immunotherapy |
 | Adverse events | >5% Grade 3-5 AEs (anemia & hypertension only) | Include Grade 3-5 AEs with >=2% incidence | Company base case (>5% Grade 3-5 AEs) | Committee accepted the company base case because including broader AEs had a minimal impact on the ICER |
 | Subsequent therapy | Pembrolizumab monotherapy allowed in CT arm | Reallocate pembrolizumab monotherapy to pembrolizumab + lenvatinib | Reallocated subsequent therapy for pMMR patients | Committee preferred aligning subsequent therapies with NHS clinical guidelines for pMMR patients, which reduced the cost delta and decreased the ICER |
-:::
+</details>
 
 ## Workflow Setup & Exploratory Analysis
 
