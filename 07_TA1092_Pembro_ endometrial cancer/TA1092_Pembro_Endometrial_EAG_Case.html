@@ -115,7 +115,12 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#project-scope-statement" id="toc-project-scope-statement" class="nav-link active" data-scroll-target="#project-scope-statement"><span class="header-section-number">1</span> Project Scope Statement</a></li>
+  <li><a href="#executive-summary-appraisal-blueprint" id="toc-executive-summary-appraisal-blueprint" class="nav-link active" data-scroll-target="#executive-summary-appraisal-blueprint"><span class="header-section-number">1</span> Executive Summary &amp; Appraisal Blueprint</a>
+  <ul class="collapse">
+  <li><a href="#consulting-paradigm-value-driven-scope-budget-control" id="toc-consulting-paradigm-value-driven-scope-budget-control" class="nav-link" data-scroll-target="#consulting-paradigm-value-driven-scope-budget-control"><span class="header-section-number">1.1</span> Consulting Paradigm: Value-Driven Scope &amp; Budget Control</a></li>
+  <li><a href="#project-scope-statement" id="toc-project-scope-statement" class="nav-link" data-scroll-target="#project-scope-statement"><span class="header-section-number">1.2</span> Project Scope Statement</a></li>
+  <li><a href="#time-budget-resource-allocation" id="toc-time-budget-resource-allocation" class="nav-link" data-scroll-target="#time-budget-resource-allocation"><span class="header-section-number">1.3</span> Time Budget &amp; Resource Allocation</a></li>
+  </ul></li>
   <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background"><span class="header-section-number">2</span> Background</a>
   <ul class="collapse">
   <li><a href="#clinical-context" id="toc-clinical-context" class="nav-link" data-scroll-target="#clinical-context"><span class="header-section-number">2.1</span> Clinical Context</a></li>
@@ -215,69 +220,109 @@ window.Quarto = {
 </header>
 
 
-<div class="callout callout-style-default callout-important no-icon callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Case Study Status
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This is a working Quarto template for a NICE TA1092 case study. The R code uses synthetic placeholder parameters until the public NICE committee papers and appraisal tables are manually abstracted. The final version should replace the placeholder inputs with values traceable to the NICE guidance, company submission, and EAG report.</p>
-</div>
-</div>
-<section id="project-scope-statement" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="project-scope-statement"><span class="header-section-number">1</span> Project Scope Statement</h2>
-<p><strong>In scope:</strong></p>
-<ul>
-<li>Reconstruct a simplified three-state Partitioned Survival Model (PSM): progression-free, progressed disease, death.</li>
-<li>Implement a technical R replication of survival extrapolation and state occupancy.</li>
-<li>Compare a company-style base case with EAG-style alternative assumptions.</li>
-<li>Add an explicit <strong>EAG critique lens</strong>: what the EAG challenged, why it mattered, and how it affected the committee’s preferred assumptions.</li>
-<li>Translate appraisal disagreements into practical HEOR modelling lessons.</li>
-</ul>
-<p><strong>Out of scope:</strong></p>
-<ul>
-<li>Full confidential ICER replication.</li>
-<li>Patient-level reconstruction from Kaplan-Meier curves unless digitised data are later added.</li>
-<li>Full probabilistic sensitivity analysis (PSA).</li>
-<li>Commercial arrangement or confidential discount reconstruction.</li>
-<li>Recreating the exact manufacturer model workbook.</li>
-</ul>
-<p><strong>Time budget:</strong> ~12-15 hours total</p>
+<section id="executive-summary-appraisal-blueprint" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="executive-summary-appraisal-blueprint"><span class="header-section-number">1</span> Executive Summary &amp; Appraisal Blueprint</h2>
+<p>This case study functions as a high-fidelity HTA appraisal audit and model reconstruction portfolio, simulating the role of a Principal Health Economist or Senior Modeler in a consulting practice. It evaluates the NICE technology appraisal <strong>TA1092</strong> concerning pembrolizumab with carboplatin and paclitaxel for first-line advanced or recurrent endometrial cancer.</p>
+<section id="consulting-paradigm-value-driven-scope-budget-control" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="consulting-paradigm-value-driven-scope-budget-control"><span class="header-section-number">1.1</span> Consulting Paradigm: Value-Driven Scope &amp; Budget Control</h3>
+<p>In commercial HEOR consulting, project delivery is strictly constrained by billable hours and the contract’s Scope of Work (SOW). A common challenge for modelers transitioning from academia is the tendency toward academic perfectionism—spending excessive hours pursuing non-reproducible parameters or trying to replicate confidential manufacturer calculations.</p>
+<p>This project demonstrates a pragmatic, <strong>value-driven scope management strategy</strong> under a target budget of ~15 hours. The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on <strong>high-value technical nodes</strong>—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive.</p>
+<hr>
+</section>
+<section id="project-scope-statement" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="project-scope-statement"><span class="header-section-number">1.2</span> Project Scope Statement</h3>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Task</th>
-<th style="text-align: right;">Allocated time</th>
+<th>Domain</th>
+<th>In Scope (High-Value Delivery)</th>
+<th>Out of Scope (Academic perfectionism / Confidentiality barriers)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>NICE document abstraction</td>
-<td style="text-align: right;">2.0 h</td>
+<td><strong>Efficacy Data</strong></td>
+<td>• Reconstructing pseudo-IPD from published trial subgroup curves (NEJM Fig 2A/B) via digitized KM estimates.<br>• Fitting candidate parametric distributions and Royston-Parmar splines in R.</td>
+<td>• Full patient-level clinical trial database replication (confidential and unavailable).</td>
 </tr>
 <tr class="even">
-<td>Decision problem and evidence summary</td>
-<td style="text-align: right;">1.5 h</td>
+<td><strong>Model Structure</strong></td>
+<td>• Building a de novo 3-state weekly PSM simulation engine in R (progression-free, progressed disease, death).</td>
+<td>• Replicating the exact proprietary, multi-sheet manufacturer Excel workbook layout.</td>
 </tr>
 <tr class="odd">
-<td>EAG critique extraction</td>
-<td style="text-align: right;">3.0 h</td>
+<td><strong>HTA Adjustments</strong></td>
+<td>• Coding technical solutions for HTA critiques: starting age corrections, treatment-effect waning (5–7 years), and curve-crossing capping (<code>pmin(PFS, OS)</code>).</td>
+<td>• Re-estimating utilities or resource frequencies without public data access.</td>
 </tr>
 <tr class="even">
-<td>R technical replication</td>
-<td style="text-align: right;">5.0 h</td>
+<td><strong>Costs &amp; Economics</strong></td>
+<td>• Mapping public list prices, administration costs, acute AE management costs, and NHS-reallocated subsequent therapies.</td>
+<td>• Accessing or estimating confidential Drug Access Agreements (patient access scheme discounts).</td>
 </tr>
 <tr class="odd">
-<td>Interpretation and portfolio write-up</td>
-<td style="text-align: right;">3.0 h</td>
+<td><strong>Uncertainty Analysis</strong></td>
+<td>• Running parallel deterministic scenario analysis (Company vs.&nbsp;EAG base case) and parameter capping checks.</td>
+<td>• Full 5,000-run probabilistic sensitivity analysis (PSA) requiring joint parameter covariance matrices.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Deliberate trade-off:</strong> The goal is not to reproduce NICE’s confidential base-case ICER. The goal is to demonstrate how an EAG interrogates survival modelling, subgroup evidence, and economic assumptions under uncertainty.</p>
+<hr>
+</section>
+<section id="time-budget-resource-allocation" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="time-budget-resource-allocation"><span class="header-section-number">1.3</span> Time Budget &amp; Resource Allocation</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 40%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th style="text-align: right;">Allocated Time</th>
+<th>High-Value Outputs Delivered</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>NICE Document Abstraction</strong></td>
+<td style="text-align: right;">2.0 h</td>
+<td>Systematically abstracting the EAG report, draft consultations, and FAD to log the 10 core HTA issues.</td>
+</tr>
+<tr class="even">
+<td><strong>Appraisal Audit &amp; Critique</strong></td>
+<td style="text-align: right;">3.0 h</td>
+<td>Documenting the commercial and clinical game-play logic (e.g., subsequent therapy market-share adjustments).</td>
+</tr>
+<tr class="odd">
+<td><strong>KM Digitisation &amp; IPD Prep</strong></td>
+<td style="text-align: right;">2.5 h</td>
+<td>Digitising sub-group curves and structuring the long-format IPD file for batch fitting in R.</td>
+</tr>
+<tr class="even">
+<td><strong>R Technical Implementation</strong></td>
+<td style="text-align: right;">5.0 h</td>
+<td>Coding the fitting wrapper, Royston-Parmar splines, capping logic, waning logic, and the PSM engine.</td>
+</tr>
+<tr class="odd">
+<td><strong>Interpretation &amp; Synthesis</strong></td>
+<td style="text-align: right;">2.5 h</td>
+<td>Designing the 2x2 comparison matrix and detailing the methodological “cost-efficacy disconnect” reflection.</td>
+</tr>
+<tr class="even">
+<td><strong>Total Target Budget</strong></td>
+<td style="text-align: right;"><strong>15.0 h</strong></td>
+<td><strong>A fully validated, rendering-ready Portfolio Case Study.</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="background" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="background"><span class="header-section-number">2</span> Background</h2>

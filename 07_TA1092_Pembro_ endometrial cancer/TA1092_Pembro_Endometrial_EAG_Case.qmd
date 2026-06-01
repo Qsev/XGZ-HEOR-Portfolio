@@ -24,41 +24,40 @@ library(knitr)
 set.seed(2026)
 ```
 
-::: {.callout-important icon=false}
-## Case Study Status
+## Executive Summary & Appraisal Blueprint
 
-This is a working Quarto template for a NICE TA1092 case study. The R code uses synthetic placeholder parameters until the public NICE committee papers and appraisal tables are manually abstracted. The final version should replace the placeholder inputs with values traceable to the NICE guidance, company submission, and EAG report.
-:::
+This case study functions as a high-fidelity HTA appraisal audit and model reconstruction portfolio, simulating the role of a Principal Health Economist or Senior Modeler in a consulting practice. It evaluates the NICE technology appraisal **TA1092** concerning pembrolizumab with carboplatin and paclitaxel for first-line advanced or recurrent endometrial cancer.
 
-## Project Scope Statement
+### Consulting Paradigm: Value-Driven Scope & Budget Control
 
-**In scope:**
+In commercial HEOR consulting, project delivery is strictly constrained by billable hours and the contract’s Scope of Work (SOW). A common challenge for modelers transitioning from academia is the tendency toward academic perfectionism—spending excessive hours pursuing non-reproducible parameters or trying to replicate confidential manufacturer calculations. 
 
-- Reconstruct a simplified three-state Partitioned Survival Model (PSM): progression-free, progressed disease, death.
-- Implement a technical R replication of survival extrapolation and state occupancy.
-- Compare a company-style base case with EAG-style alternative assumptions.
-- Add an explicit **EAG critique lens**: what the EAG challenged, why it mattered, and how it affected the committee's preferred assumptions.
-- Translate appraisal disagreements into practical HEOR modelling lessons.
+This project demonstrates a pragmatic, **value-driven scope management strategy** under a target budget of ~15 hours. The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on **high-value technical nodes**—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive. 
 
-**Out of scope:**
+---
 
-- Full confidential ICER replication.
-- Patient-level reconstruction from Kaplan-Meier curves unless digitised data are later added.
-- Full probabilistic sensitivity analysis (PSA).
-- Commercial arrangement or confidential discount reconstruction.
-- Recreating the exact manufacturer model workbook.
+### Project Scope Statement
 
-**Time budget:** ~12-15 hours total
+| Domain | In Scope (High-Value Delivery) | Out of Scope (Academic perfectionism / Confidentiality barriers) |
+|---|---|---|
+| **Efficacy Data** | • Reconstructing pseudo-IPD from published trial subgroup curves (NEJM Fig 2A/B) via digitized KM estimates.<br>• Fitting candidate parametric distributions and Royston-Parmar splines in R. | • Full patient-level clinical trial database replication (confidential and unavailable). |
+| **Model Structure** | • Building a de novo 3-state weekly PSM simulation engine in R (progression-free, progressed disease, death). | • Replicating the exact proprietary, multi-sheet manufacturer Excel workbook layout. |
+| **HTA Adjustments** | • Coding technical solutions for HTA critiques: starting age corrections, treatment-effect waning (5–7 years), and curve-crossing capping (`pmin(PFS, OS)`). | • Re-estimating utilities or resource frequencies without public data access. |
+| **Costs & Economics** | • Mapping public list prices, administration costs, acute AE management costs, and NHS-reallocated subsequent therapies. | • Accessing or estimating confidential Drug Access Agreements (patient access scheme discounts). |
+| **Uncertainty Analysis** | • Running parallel deterministic scenario analysis (Company vs. EAG base case) and parameter capping checks. | • Full 5,000-run probabilistic sensitivity analysis (PSA) requiring joint parameter covariance matrices. |
 
-| Task | Allocated time |
-|---|---:|
-| NICE document abstraction | 2.0 h |
-| Decision problem and evidence summary | 1.5 h |
-| EAG critique extraction | 3.0 h |
-| R technical replication | 5.0 h |
-| Interpretation and portfolio write-up | 3.0 h |
+---
 
-**Deliberate trade-off:** The goal is not to reproduce NICE's confidential base-case ICER. The goal is to demonstrate how an EAG interrogates survival modelling, subgroup evidence, and economic assumptions under uncertainty.
+### Time Budget & Resource Allocation
+
+| Phase | Allocated Time | High-Value Outputs Delivered |
+|---|---:|---|
+| **NICE Document Abstraction** | 2.0 h | Systematically abstracting the EAG report, draft consultations, and FAD to log the 10 core HTA issues. |
+| **Appraisal Audit & Critique** | 3.0 h | Documenting the commercial and clinical game-play logic (e.g., subsequent therapy market-share adjustments). |
+| **KM Digitisation & IPD Prep** | 2.5 h | Digitising sub-group curves and structuring the long-format IPD file for batch fitting in R. |
+| **R Technical Implementation** | 5.0 h | Coding the fitting wrapper, Royston-Parmar splines, capping logic, waning logic, and the PSM engine. |
+| **Interpretation & Synthesis** | 2.5 h | Designing the 2x2 comparison matrix and detailing the methodological "cost-efficacy disconnect" reflection. |
+| **Total Target Budget** | **15.0 h** | **A fully validated, rendering-ready Portfolio Case Study.** |
 
 ## Background
 
