@@ -24,17 +24,16 @@ library(knitr)
 set.seed(2026)
 ```
 
-## Executive Summary & Appraisal Blueprint
+## Background
+
+::: {.callout-note collapse="true"}
+## Consulting Blueprint: Value-Driven Scope & Budget Control (Click to expand)
 
 This case study functions as a high-fidelity HTA appraisal audit and model reconstruction portfolio, simulating the role of a Principal Health Economist or Senior Modeler in a consulting practice. It evaluates the NICE technology appraisal **TA1092** concerning pembrolizumab with carboplatin and paclitaxel for first-line advanced or recurrent endometrial cancer.
 
-### Consulting Paradigm: Value-Driven Scope & Budget Control
+In commercial HEOR consulting, project delivery is strictly constrained by billable hours and the contract’s Scope of Work (SOW). A common challenge for modelers transitioning from academia is the tendency toward academic perfectionism—spending excessive hours pursuing non-reproducible parameters or trying to replicate confidential manufacturer calculations.
 
-In commercial HEOR consulting, project delivery is strictly constrained by billable hours and the contract’s Scope of Work (SOW). A common challenge for modelers transitioning from academia is the tendency toward academic perfectionism—spending excessive hours pursuing non-reproducible parameters or trying to replicate confidential manufacturer calculations. 
-
-This project demonstrates a pragmatic, **value-driven scope management strategy** under a target budget of ~15 hours. The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on **high-value technical nodes**—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive. 
-
----
+This project demonstrates a pragmatic, **value-driven scope management strategy** under a target budget of ~15 hours. The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on **high-value technical nodes**—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive.
 
 ### Project Scope Statement
 
@@ -43,23 +42,10 @@ This project demonstrates a pragmatic, **value-driven scope management strategy*
 | **Efficacy Data** | • Reconstructing pseudo-IPD from published trial subgroup curves (NEJM Fig 2A/B) via digitized KM estimates.<br>• Fitting candidate parametric distributions and Royston-Parmar splines in R. | • Full patient-level clinical trial database replication (confidential and unavailable). |
 | **Model Structure** | • Building a de novo 3-state weekly PSM simulation engine in R (progression-free, progressed disease, death). | • Replicating the exact proprietary, multi-sheet manufacturer Excel workbook layout. |
 | **HTA Adjustments** | • Coding technical solutions for HTA critiques: starting age corrections, treatment-effect waning (5–7 years), and curve-crossing capping (`pmin(PFS, OS)`). | • Re-estimating utilities or resource frequencies without public data access. |
-| **Costs & Economics** | • Mapping public list prices, administration costs, acute AE management costs, and NHS-reallocated subsequent therapies. | • Accessing or estimating confidential Drug Access Agreements (patient access scheme discounts). |
+| **Costs & Economics** | • Mapping public list prices, administration costs, acute AE management costs, and NHS-aligned subsequent therapies. | • Accessing or estimating confidential Drug Access Agreements (patient access scheme discounts). |
 | **Uncertainty Analysis** | • Running parallel deterministic scenario analysis (Company vs. EAG base case) and parameter capping checks. | • Full 5,000-run probabilistic sensitivity analysis (PSA) requiring joint parameter covariance matrices. |
+:::
 
----
-
-### Time Budget & Resource Allocation
-
-| Phase | Allocated Time | High-Value Outputs Delivered |
-|---|---:|---|
-| **NICE Document Abstraction** | 2.0 h | Systematically abstracting the EAG report, draft consultations, and FAD to log the 10 core HTA issues. |
-| **Appraisal Audit & Critique** | 3.0 h | Documenting the commercial and clinical game-play logic (e.g., subsequent therapy market-share adjustments). |
-| **KM Digitisation & IPD Prep** | 2.5 h | Digitising sub-group curves and structuring the long-format IPD file for batch fitting in R. |
-| **R Technical Implementation** | 5.0 h | Coding the fitting wrapper, Royston-Parmar splines, capping logic, waning logic, and the PSM engine. |
-| **Interpretation & Synthesis** | 2.5 h | Designing the 2x2 comparison matrix and detailing the methodological "cost-efficacy disconnect" reflection. |
-| **Total Target Budget** | **15.0 h** | **A fully validated, rendering-ready Portfolio Case Study.** |
-
-## Background
 
 ### Clinical Context
 
@@ -232,6 +218,13 @@ My takeaway is that this is not a main technical replication target at this stag
 
 ## Workflow Setup & Exploratory Analysis
 
+::: {.column-margin}
+**Time Log: 2.5 hours**
+- Digitised sub-group curves from NEJM Figure 2A/B.
+- Built and tidied the long-format IPD dataset for R processing.
+:::
+
+
 In this chapter, we load the required packages, set up local file paths, import the reconstructed individual patient-level data (pseudo-IPD), and perform exploratory curve inspections.
 
 ### Load Packages & Settings
@@ -385,6 +378,13 @@ ggplot(pmmr_pfs_pembro_km_df, aes(time_months, survival)) +
 
 
 ## Parametric Survival Fitting & Diagnostics
+
+::: {.column-margin}
+**Time Log: 5.0 hours (Core Extrapolation)**
+- Developed the `flexsurv` model fitting wrappers and batch parameters extraction.
+- Plotted Extrapolation-Zones and the Distribution Fan Plot to evaluate long-run tail divergence.
+:::
+
 
 This chapter outlines the standard parametric survival fitting workflow. We fit seven candidate distributions (exponential, Weibull, Gompertz, log-normal, log-logistic, gamma, and generalized gamma) to each curve, assess fit summaries via information criteria (AIC and BIC), and extract the fitted parameters.
 
@@ -1211,6 +1211,13 @@ The key portfolio message is: short follow-up matters when the cost-effectivenes
 
 ## Cost-Effectiveness under AIC-Selected Standard Parametric Models
 
+::: {.column-margin}
+**Time Log: 2.0 hours (Base Engine)**
+- Coded the weekly cycle Partitioned Survival Model (PSM) engine over a 35-year horizon.
+- Mapped health-state utility values and list treatment cost parameters.
+:::
+
+
 In this chapter, we implement a three-state Partitioned Survival Model (PSM) using a weekly cycle and a 35-year time horizon. This section focuses on health-state occupancy, discounted costs, and QALY outcomes under standard parametric curves selected purely by the best AIC fit.
 
 ### Economic Inputs & PSM Engine Setup
@@ -1561,6 +1568,14 @@ bind_rows(
 ```
 
 ## Cost-Effectiveness under EAG-Preferred Survival Models
+
+::: {.column-margin}
+**Time Log: 3.5 hours (EAG Scenarios)**
+- Programmed Royston-Parmar Splines and the `pmin(PFS, OS)` crossing diagnostic capping rules.
+- Integrated the 5-7 year immunotherapy treatment efficacy waning function.
+- Reallocated subsequent treatment market shares to reflect UK NHS guidelines.
+:::
+
 
 In this chapter, we evaluate the cost-effectiveness of pembrolizumab plus chemotherapy across subgroups using the EAG-preferred curve selections. For the pMMR cohort, the EAG preferred Royston-Parmar flexible spline models, whereas for the dMMR cohort, standard parametric models were retained but alternative distributions were selected.
 
@@ -1987,6 +2002,13 @@ Interpretation notes:
 
 
 ## Model Selection Critique: AIC-Selected vs. EAG-Preferred Models
+
+::: {.column-margin}
+**Time Log: 2.0 hours (Audit Synthesis)**
+- Synthesized the final 2x2 ICER comparison tables.
+- Conducted methodological reflections on the subsequent therapy "cost-efficacy disconnect" and crossover correction.
+:::
+
 
 This chapter summarizes the cost-effectiveness estimates across the different survival modeling approaches. We present a 2×2 comparison table, explore sensitivity analyses around confidential discounts and overall survival tail assumptions, and discuss key HTA consulting takeaways.
 
