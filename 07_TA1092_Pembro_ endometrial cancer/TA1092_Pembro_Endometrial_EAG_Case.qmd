@@ -2226,7 +2226,7 @@ tibble(
 
 ## Appendices {.unnumbered}
 
-### Appendix A: HTA Parameter Traceability & Reference Registry
+### Appendix A: HTA Parameter Traceability & Reference Registry {.unnumbered}
 
 All data inputs, parameters, and clinical evidence mapped in the de novo R replication model are registered against their primary public HTA and clinical sources:
 
@@ -2237,7 +2237,7 @@ All data inputs, parameters, and clinical evidence mapped in the de novo R repli
 | **Committee Consultation & Consultation Papers** | NICE Committee Papers | • Market shares for subsequent therapies (pembrolizumab + lenvatinib reallocation).<br>• Health state utilities (KEYNOTE-158 and KEYNOTE-B21) and AE management unit costs. |
 | **Pivotal Trial Publication (NEJM)** | KEYNOTE-868 (NRG-GY018) | • Trial protocol, subgroup baseline demographics (mean age 65.4 years).<br>• Subgroup-specific PFS and OS Kaplan-Meier survival curves used for digitization. |
 
-### Appendix B: Economic Model Technical Parameters & Model Setup {#sec-appendix-b}
+### Appendix B: Economic Model Technical Parameters & Model Setup {#sec-appendix-b .unnumbered}
 
 The tables below map the exact inputs and variables used in the weekly-cycle de novo Partitioned Survival Model (PSM) engine.
 
