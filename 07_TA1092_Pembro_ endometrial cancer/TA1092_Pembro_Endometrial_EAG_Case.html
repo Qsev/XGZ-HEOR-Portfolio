@@ -615,7 +615,7 @@ window.Quarto = {
 <li><strong>Harmonization</strong>: The individual datasets for each endpoint, subgroup, and treatment arm were consolidated into a single long-format database (<code>survival_ipd_long.csv</code>).</li>
 <li><strong>Validation</strong>: The reconstructed individual patient data (pseudo-IPD) are summarized and plotted below to confirm structural alignment with the original trial publications prior to fitting parametric survival models.</li>
 </ol>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
@@ -686,9 +686,9 @@ window.Quarto = {
 <span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/workflow-setup-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/workflow-setup-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -705,7 +705,7 @@ window.Quarto = {
 </ul>
 </div></div><p>This section implements the standard parametric survival analysis. We fit seven candidate distributions (exponential, Weibull, Gompertz, log-normal, log-logistic, gamma, and generalized gamma) to each of the eight reconstructed patient-level survival curves (PFS and OS for dMMR and pMMR cohorts under both active pembrolizumab and placebo comparator arms).</p>
 <p>Goodness-of-fit within the observed trial period is evaluated using standard information criteria (Akaike Information Criterion, AIC, and Bayesian Information Criterion, BIC) to establish a first-pass statistical baseline for survival modeling.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define candidate distributions for flexsurv</span></span>
@@ -815,7 +815,7 @@ window.Quarto = {
 <section id="goodness-of-fit-summary" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="goodness-of-fit-summary"><span class="header-section-number">4.1</span> Goodness-of-Fit Summary</h3>
 <p>The table below presents the top two candidate survival distributions for each cohort, ranked by their Akaike Information Criterion (AIC). To maximize information density, the candidates and their corresponding fit statistics (AIC/BIC) are presented side-by-side.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>top3_fit_summary <span class="ot">&lt;-</span> fit_summary <span class="sc">|&gt;</span></span>
@@ -848,7 +848,7 @@ window.Quarto = {
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"l"</span></span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="tbl-top2-fit-summary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<div id="tbl-top2-fit-summary" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-layout-align="center">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-top2-fit-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
@@ -994,7 +994,7 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <section id="extrapolation-of-aic-selected-distributions" class="level4" data-number="5.1.1">
 <h4 data-number="5.1.1" class="anchored" data-anchor-id="extrapolation-of-aic-selected-distributions"><span class="header-section-number">5.1.1</span> Extrapolation of AIC-Selected Distributions</h4>
 <p>The chunk below runs the extrapolation for all selected parametric models. For validation, a small sanity check is shown for the pMMR PFS pembrolizumab cohort.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>time_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">time_months =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">360</span>, <span class="at">by =</span> <span class="dv">1</span>))</span>
@@ -1095,7 +1095,7 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <h4 data-number="5.1.2" class="anchored" data-anchor-id="visualizing-long-run-extrapolations-and-km-alignment"><span class="header-section-number">5.1.2</span> Visualizing Long-Run Extrapolations and KM Alignment</h4>
 <p>Plotting the curves provides a visual inspection of their extrapolated shapes and their alignment with the observed trial period.</p>
 <p>The first plot below displays the 10-year (120-month) projections for two key curves: <strong>pMMR PFS</strong> (which drives progression-free state occupancy in the partitioned survival model) and <strong>dMMR OS</strong> (which exhibits high immaturity). The second plot overlays the reconstructed Kaplan-Meier step curves with the parametric best fits for <strong>pMMR PFS</strong> to assess the goodness-of-fit during the observed trial period.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>selected_long_run <span class="ot">&lt;-</span> extrapolated <span class="sc">|&gt;</span></span>
@@ -1132,14 +1132,14 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/plot-selected-long-run-extrapolations-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/plot-selected-long-run-extrapolations-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>km_points <span class="ot">&lt;-</span> ipd <span class="sc">|&gt;</span></span>
@@ -1198,9 +1198,9 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/plot-pmmr-pfs-best-fit-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/plot-pmmr-pfs-best-fit-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -1251,7 +1251,7 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <section id="observed-evidence-vs.-model-horizon" class="level4" data-number="5.2.2">
 <h4 data-number="5.2.2" class="anchored" data-anchor-id="observed-evidence-vs.-model-horizon"><span class="header-section-number">5.2.2</span> Observed Evidence vs.&nbsp;Model Horizon</h4>
 <p>To quantify this, we calculate the proportion of the 20-year (240-month) model horizon that is covered by the trial’s observed period across all 8 curves.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>issue3_projection_horizon_months <span class="ot">&lt;-</span> <span class="dv">240</span></span>
@@ -1385,7 +1385,7 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <section id="visualizing-the-extrapolation-zone" class="level4" data-number="5.2.3">
 <h4 data-number="5.2.3" class="anchored" data-anchor-id="visualizing-the-extrapolation-zone"><span class="header-section-number">5.2.3</span> Visualizing the Extrapolation Zone</h4>
 <p>The plot below visualizes this data gap for <strong>pMMR OS (pembrolizumab arm)</strong>. The yellow rectangle highlights the model-driven extrapolation zone (beyond 24 months) relative to the trial’s median follow-up (16.3 months) and the maximum active treatment duration (26.2 months).</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>issue3_curve_id <span class="ot">&lt;-</span> <span class="st">"pMMR_OS_pembro_chemo"</span></span>
@@ -1492,9 +1492,9 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/issue3-extrapolation-zone-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/issue3-extrapolation-zone-plot-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -1506,7 +1506,7 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <h3 data-number="5.3" class="anchored" data-anchor-id="step-3-quantifying-structural-uncertainty-tail-divergence"><span class="header-section-number">5.3</span> Step 3: Quantifying Structural Uncertainty (Tail Divergence)</h3>
 <p>To demonstrate the structural uncertainty of this extrapolation, we plot all seven candidate distributions on the same curve and examine their projected survival at key clinical landmarks.</p>
 <p>While all candidate distributions fit the observed trial period similarly, they diverge massively in the extrapolation zone. This divergence is visualized in the fan plot below and quantified numerically in <a href="#tbl-issue3-landmark-survival-table" class="quarto-xref">Table&nbsp;2</a>, which shows the projected survival estimates at 2, 3, 5, 10, and 20 years.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>issue3_all_distribution_predictions <span class="ot">&lt;-</span> fit_tbl <span class="sc">|&gt;</span></span>
@@ -1568,14 +1568,14 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/issue3-distribution-fan-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/issue3-distribution-fan-plot-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>issue3_landmarks <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">36</span>, <span class="dv">60</span>, <span class="dv">120</span>, <span class="dv">240</span>)</span>
@@ -1600,7 +1600,7 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"l"</span></span>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="tbl-issue3-landmark-survival-table" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<div id="tbl-issue3-landmark-survival-table" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-layout-align="center">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-issue3-landmark-survival-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution (%)
@@ -1737,7 +1737,7 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 <li><strong>NHS Resource Use &amp; Administration</strong>: Weekly costs represent chemotherapy administration fees, outpatient visits, routine laboratory monitoring (blood, liver, thyroid tests), and CT surveillance scans based on NICE-updated resource frequencies.</li>
 </ul>
 <p>Please refer to <a href="#sec-appendix-b">Appendix B: Economic Model Technical Parameters &amp; Model Setup</a> for the complete parameter mapping, NHS unit costs, and R code variables.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ce_params <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
@@ -1781,7 +1781,7 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 <p>To evaluate the economic impact of survival curves selected purely on statistical goodness-of-fit (AIC), we execute the weekly Partitioned Survival Model (PSM) for both molecular subgroups (pMMR and dMMR).</p>
 <p>For the pMMR cohort, the Weibull and Log-logistic distributions represent the best statistical fits for OS and PFS, respectively. The model simulates weekly patient-time over the 35-year horizon to generate cumulative costs and health benefits. For the dMMR cohort, due to the small sample size and highly immature survival data, simple distributions (such as Exponential and Lognormal) are selected by AIC as the best fit candidates.</p>
 <p>The tables below summarize the AIC-selected survival distributions and the resulting incremental cost-effectiveness outcomes under public list prices.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pMMR State Occupancy</span></span>
@@ -1839,7 +1839,7 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 <span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(subgroup, endpoint, treatment) <span class="sc">|&gt;</span></span>
 <span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Subgroup"</span>, <span class="st">"Endpoint"</span>, <span class="st">"Treatment"</span>, <span class="st">"AIC-Selected Distribution"</span>, <span class="st">"AIC"</span>), <span class="at">align =</span> <span class="st">"l"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="tbl-aic-selected-distributions" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<div id="tbl-aic-selected-distributions" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-layout-align="center">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-aic-selected-distributions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;3: AIC-selected survival distributions by subgroup
@@ -1920,7 +1920,7 @@ Table&nbsp;3: AIC-selected survival distributions by subgroup
 </figure>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>calc_incremental <span class="ot">&lt;-</span> <span class="cf">function</span>(psm_data) {</span>
@@ -1998,7 +1998,7 @@ Table&nbsp;3: AIC-selected survival distributions by subgroup
 <span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">escape =</span> <span class="cn">FALSE</span></span>
 <span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="tbl-pmmr-dmmr-comparison-aic" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<div id="tbl-pmmr-dmmr-comparison-aic" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-layout-align="center">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pmmr-dmmr-comparison-aic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC-selected standard parametric curves)
@@ -2051,7 +2051,7 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <h3 data-number="7.1" class="anchored" data-anchor-id="spline-and-standard-model-fitting-setup"><span class="header-section-number">7.1</span> Spline and Standard Model Fitting Setup</h3>
 <p><strong>EAG Spline Model Fitting (pMMR)</strong></p>
 <p>The EAG preferred spline models for pMMR (Table 2) are Royston-Parmar flexible parametric models fitted with <code>flexsurvspline()</code>. Unlike standard parametric distributions, spline models can accommodate non-monotonic hazard functions and are more flexible in the observed period.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fit_one_spline <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, k, scale, label) {</span>
@@ -2277,7 +2277,7 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 </div>
 </div>
 <p><strong>EAG Model Selection (dMMR)</strong></p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>eag_dmmr_selections <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
@@ -2372,7 +2372,7 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <h3 data-number="7.2" class="anchored" data-anchor-id="subgroup-specific-cost-effectiveness-results-1"><span class="header-section-number">7.2</span> Subgroup-Specific Cost-Effectiveness Results</h3>
 <p>To evaluate the economic implications of the EAG-preferred survival curves, we execute the weekly Partitioned Survival Model (PSM) for the pMMR and dMMR cohorts. The analysis uses flexible spline survival models for the pMMR cohort and EAG-selected standard distributions for the dMMR cohort.</p>
 <p>The figures below show the simulated state occupancy traces for the two subgroups under the EAG-preferred model specifications.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>get_spline_surv <span class="ot">&lt;-</span> <span class="cf">function</span>(fit_obj, times) {</span>
@@ -2427,14 +2427,14 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/pmmr-spline-state-occupancy-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/pmmr-spline-state-occupancy-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>psm_dmmr <span class="ot">&lt;-</span> eag_dmmr_fits <span class="sc">|&gt;</span></span>
@@ -2474,14 +2474,14 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/dmmr-state-occupancy-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/dmmr-state-occupancy-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ce_trace_dmmr <span class="ot">&lt;-</span> psm_dmmr <span class="sc">|&gt;</span></span>
@@ -2580,7 +2580,7 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <span id="cb18-94"><a href="#cb18-94" aria-hidden="true" tabindex="-1"></a>    <span class="at">escape =</span> <span class="cn">FALSE</span></span>
 <span id="cb18-95"><a href="#cb18-95" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="tbl-pmmr-dmmr-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<div id="tbl-pmmr-dmmr-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-layout-align="center">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pmmr-dmmr-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG-preferred spline/standard curves)
@@ -2675,7 +2675,7 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 </div></div><p>This chapter summarizes the cost-effectiveness estimates across the different survival modeling approaches. We present a 2×2 comparison table, explore sensitivity analyses around confidential discounts and overall survival tail assumptions, and discuss key HTA consulting takeaways.</p>
 <section id="model-selection-synthesis" class="level3" data-number="8.1">
 <h3 data-number="8.1" class="anchored" data-anchor-id="model-selection-synthesis"><span class="header-section-number">8.1</span> 2×2 Model Selection Synthesis</h3>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
@@ -2759,7 +2759,7 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <section id="visual-extrapolation-comparison-aic-vs.-eag" class="level3" data-number="8.2">
 <h3 data-number="8.2" class="anchored" data-anchor-id="visual-extrapolation-comparison-aic-vs.-eag"><span class="header-section-number">8.2</span> Visual Extrapolation Comparison: AIC vs.&nbsp;EAG</h3>
 <p>To visually understand why the cost-effectiveness results differ substantially, we plot the reconstructed KM curves alongside the fitted and extrapolated curves for both the AIC-selected standard parametric models and the EAG-preferred spline models. The plots show the first 10 years (120 months) of projection.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
@@ -2857,9 +2857,9 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p_pfs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/visual-extrapolation-comparison-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/visual-extrapolation-comparison-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -2892,9 +2892,9 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p_os)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/visual-extrapolation-comparison-2.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/visual-extrapolation-comparison-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -2905,7 +2905,7 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <p>We now implement sensitivity analyses for the confidential discount of pembrolizumab and the OS tail reduction assumption under the EAG-preferred survival model specifications.</p>
 <p><strong>Confidential Discount Sensitivity</strong></p>
 <p>The pembrolizumab commercial arrangement is confidential. Instead of guessing it, the mock model treats the discount as a scenario parameter. This makes the limitation explicit and lets us ask a practical question: how sensitive is the ICER to the assumed pembrolizumab acquisition discount?</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>run_discount_sensitivity <span class="ot">&lt;-</span> <span class="cf">function</span>(psm_data, discount_value) {</span>
@@ -3072,7 +3072,7 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <p><strong>OS Tail Sensitivity</strong></p>
 <p>Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate this is to reduce the long-term OS separation between arms after the EAG’s 2-year boundary.</p>
 <p>This scenario is not an EAG preferred model. It is a teaching sensitivity: after 104 weeks, the pembro OS benefit is gradually reduced so that only 50% of the modelled OS separation remains by 10 years.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>apply_os_tail_reduction <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, <span class="at">start_week =</span> <span class="dv">104</span>, <span class="at">end_week =</span> <span class="dv">520</span>, <span class="at">final_fraction =</span> <span class="fl">0.5</span>) {</span>
@@ -3196,7 +3196,7 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 </ul>
 <p>The variation range of these parameters is defined by their <strong>joint multivariate normal distribution (MVN)</strong>: <span class="math display">\[\boldsymbol{\gamma} \sim \mathcal{MVN}(\hat{\boldsymbol{\gamma}}, \boldsymbol{\Sigma})\]</span> where <span class="math inline">\(\hat{\boldsymbol{\gamma}}\)</span> represents the vector of estimated coefficients (the point estimates or means) and <span class="math inline">\(\boldsymbol{\Sigma}\)</span> is the estimated variance-covariance matrix (VCOV) of the coefficients from the regression model. This approach propagates both the fitting uncertainty of each parameter and their mathematical correlation. Due to the tail sensitivity of flexible spline models, these parameter draws frequently cause the Placebo PFS curve to cross and exceed the Pembro PFS curve. Implementing the logical cap is a <strong>critical structural model guardrail</strong> to ensure that every simulated PSA iteration remains clinically valid.</p>
 <p>To demonstrate how this guardrail behaves under joint parameter uncertainty, we implement a mini-PSA loop (100 iterations) sampling the spline parameter vectors from their respective MVN distributions, and evaluate the frequency of crossovers and the cost-effectiveness impact of capping:</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper to run cost-effectiveness trace on a given PSM data frame</span></span>
@@ -3342,7 +3342,7 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 </div>
 <p>In the deterministic point estimate (base case), the fitted curves do not cross (crossover frequency = 0%). However, under parameter uncertainty (PSA simulation), the placebo PFS curve crosses and exceeds the pembrolizumab curve in <strong>45%</strong> of the 100 simulated runs.</p>
 <p>The table below summarizes the cost-effectiveness results under deterministic and probabilistic scenarios, demonstrating the stabilizing effect of the committee-mandated logical cap:</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
@@ -3485,7 +3485,7 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <h3 class="unnumbered anchored" data-anchor-id="sec-appendix-b">Appendix B: Economic Model Technical Parameters &amp; Model Setup</h3>
 <p>The tables below map the exact inputs and variables used in the weekly-cycle de novo Partitioned Survival Model (PSM) engine.</p>
 <p><a href="#sec-ce-models-aic">Back to Chapter 4</a></p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Economic inputs used in the mock PSM</caption>
