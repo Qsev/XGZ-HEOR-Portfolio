@@ -483,15 +483,30 @@ kable(
 
 ### Where I Agree with the EAG
 
-TODO: Summarise the EAG concerns that are methodologically strongest.
+- **Starting Age Alignment**: The EAG's adjustment of the baseline starting age from 65.4 to 67.1 years to match UK RWE (Pennington 2016) is methodologically sound, as general population mortality rates rise exponentially with age, and using a younger trial population overestimates the lifetime survival potential (QALYs) of the intervention.
+- **Resource Use and Monitoring Costs**: The EAG correctly identified that routine clinical monitoring for patients on immunotherapies (thyroid, liver, and glucose function tests) was omitted by the company, which artificially deflated the cost of the pembrolizumab arm.
+- **Decision Pathway Alignment**: Subsequent therapy mix must align with actual UK NHS clinical practice (e.g., reallocating pembrolizumab monotherapy to pembrolizumab + lenvatinib combination for progressed pMMR patients) rather than directly copy trial-specific crossover patterns that are not reimbursed in the UK.
 
 ### Where the Company Case Is Still Plausible
 
-TODO: Identify where the company assumptions are defensible, especially if supported by trial follow-up, biological rationale, or clinical expert validation.
+- **Trial-Based Consistency (Anti-Disconnect)**: The company's retention of the trial-observed subsequent treatment mix (which included pembrolizumab monotherapy in the comparator arm) maintains a strict alignment between the observed overall survival (OS) data and subsequent therapy costs. Forcing a change in subsequent therapy costs (to the more expensive combination) without adjusting the corresponding OS curve creates a structural **"Cost-Efficacy Disconnect"** (charging for a more expensive treatment without modeling its additional survival benefit).
+
+### Methodological Discussion: Resolving the Cost-Efficacy Disconnect
+
+In HTA submissions, subsequent therapy modeling often faces a conflict between decision-context validity (matching NHS pathway costs) and evidence-base validity (matching trial-observed survival). To resolve this structural disconnect in future models, the following methodological improvements are recommended:
+
+1. **Crossover Adjustment Algorithms**:
+   - Apply statistical correction methods such as **RPSFTM (Rank Preserving Structural Failure Time Model)**, **IPCW (Inverse Probability Censoring Weights)**, or the **Two-Stage Method** to adjust the comparator OS curve by subtracting the survival benefit gained from trial crossover (pembrolizumab monotherapy).
+   - Once the "crossover-adjusted" OS curve is established, the model can logically pair it with the standard NHS subsequent treatment costs without violating cost-efficacy consistency.
+2. **Multi-State Transition Models**:
+   - Replace the simplistic 3-state PSM with a **Multi-State Markov/Simulation Model** that explicitly splits the "Progressed Disease" (PD) state into sub-states (e.g., PD on Active 2L Therapy, PD on Palliation).
+   - Transition probabilities and state-specific utilities/costs can then be modeled dynamically based on the specific subsequent therapies received, avoiding static cost-swapping errors.
+3. **Evidence Synthesis via Network Meta-Analysis (NMA)**:
+   - Perform a formal NMA to synthesize OS data from other trials (e.g., KEYNOTE-775) where the preferred subsequent therapies were actively used, providing empirical survival inputs for the comparator arm under the preferred NHS pathway.
 
 ### What This Case Teaches for HEOR Consulting
 
-This case is useful for consulting practice because it shows that technical modelling is only one layer of a NICE submission. The more important skill is understanding how evidence uncertainty becomes an appraisal risk. A model can be internally coherent and still be challenged if its long-term assumptions are not clinically credible or decision-relevant.
+This case highlights that economic modeling is not merely a technical exercise in fitting curves and summing costs. A model can be internally consistent (as the company argued regarding trial crossover) but still fail appraisal if it is structurally detached from the decision context (the NHS funding reality). HEOR consultants must anticipate these pathway misalignments early and prepare robust crossover adjustments to ensure the model remains both clinically plausible and decision-relevant.
 
 ## Next Steps
 
