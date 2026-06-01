@@ -176,6 +176,7 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 
 ::: {.column-margin}
 **Time Log: 2.5 hours**
+
 - Digitised sub-group curves from NEJM Figure 2A/B.
 - Built and tidied the long-format IPD dataset for R processing.
 :::
@@ -337,6 +338,7 @@ ggplot(pmmr_pfs_pembro_km_df, aes(time_months, survival)) +
 
 ::: {.column-margin}
 **Time Log: 5.0 hours (Core Extrapolation)**
+
 - Developed the `flexsurv` model fitting wrappers and batch parameters extraction.
 - Plotted Extrapolation-Zones and the Distribution Fan Plot to evaluate long-run tail divergence.
 :::
@@ -1169,6 +1171,7 @@ The key portfolio message is: short follow-up matters when the cost-effectivenes
 
 ::: {.column-margin}
 **Time Log: 2.0 hours (Base Engine)**
+
 - Coded the weekly cycle Partitioned Survival Model (PSM) engine over a 35-year horizon.
 - Mapped health-state utility values and list treatment cost parameters.
 :::
@@ -1527,6 +1530,7 @@ bind_rows(
 
 ::: {.column-margin}
 **Time Log: 3.5 hours (EAG Scenarios)**
+
 - Programmed Royston-Parmar Splines and the `pmin(PFS, OS)` crossing diagnostic capping rules.
 - Integrated the 5-7 year immunotherapy treatment efficacy waning function.
 - Reallocated subsequent treatment market shares to reflect UK NHS guidelines.
@@ -1961,6 +1965,7 @@ Interpretation notes:
 
 ::: {.column-margin}
 **Time Log: 2.0 hours (Audit Synthesis)**
+
 - Synthesized the final 2x2 ICER comparison tables.
 - Conducted methodological reflections on the subsequent therapy "cost-efficacy disconnect" and crossover correction.
 :::

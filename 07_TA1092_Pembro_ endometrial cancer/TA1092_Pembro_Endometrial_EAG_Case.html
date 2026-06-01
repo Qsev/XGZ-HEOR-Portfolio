@@ -612,7 +612,11 @@ window.Quarto = {
 <h2 data-number="3" class="anchored" data-anchor-id="workflow-setup-exploratory-analysis"><span class="header-section-number">3</span> Workflow Setup &amp; Exploratory Analysis</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 2.5 hours</strong> - Digitised sub-group curves from NEJM Figure 2A/B. - Built and tidied the long-format IPD dataset for R processing.</p>
+<p><strong>Time Log: 2.5 hours</strong></p>
+<ul>
+<li>Digitised sub-group curves from NEJM Figure 2A/B.</li>
+<li>Built and tidied the long-format IPD dataset for R processing.</li>
+</ul>
 </div></div><p>In this chapter, we load the required packages, set up local file paths, import the reconstructed individual patient-level data (pseudo-IPD), and perform exploratory curve inspections.</p>
 <section id="load-packages-settings" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="load-packages-settings"><span class="header-section-number">3.1</span> Load Packages &amp; Settings</h3>
@@ -1243,7 +1247,11 @@ window.Quarto = {
 <h2 data-number="4" class="anchored" data-anchor-id="parametric-survival-fitting-diagnostics"><span class="header-section-number">4</span> Parametric Survival Fitting &amp; Diagnostics</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 5.0 hours (Core Extrapolation)</strong> - Developed the <code>flexsurv</code> model fitting wrappers and batch parameters extraction. - Plotted Extrapolation-Zones and the Distribution Fan Plot to evaluate long-run tail divergence.</p>
+<p><strong>Time Log: 5.0 hours (Core Extrapolation)</strong></p>
+<ul>
+<li>Developed the <code>flexsurv</code> model fitting wrappers and batch parameters extraction.</li>
+<li>Plotted Extrapolation-Zones and the Distribution Fan Plot to evaluate long-run tail divergence.</li>
+</ul>
 </div></div><p>This chapter outlines the standard parametric survival fitting workflow. We fit seven candidate distributions (exponential, Weibull, Gompertz, log-normal, log-logistic, gamma, and generalized gamma) to each curve, assess fit summaries via information criteria (AIC and BIC), and extract the fitted parameters.</p>
 <section id="model-setup-safe-fitting-wrapper" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="model-setup-safe-fitting-wrapper"><span class="header-section-number">4.1</span> Model Setup &amp; Safe Fitting Wrapper</h3>
@@ -3121,7 +3129,11 @@ window.Quarto = {
 <h2 data-number="6" class="anchored" data-anchor-id="cost-effectiveness-under-aic-selected-standard-parametric-models"><span class="header-section-number">6</span> Cost-Effectiveness under AIC-Selected Standard Parametric Models</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 2.0 hours (Base Engine)</strong> - Coded the weekly cycle Partitioned Survival Model (PSM) engine over a 35-year horizon. - Mapped health-state utility values and list treatment cost parameters.</p>
+<p><strong>Time Log: 2.0 hours (Base Engine)</strong></p>
+<ul>
+<li>Coded the weekly cycle Partitioned Survival Model (PSM) engine over a 35-year horizon.</li>
+<li>Mapped health-state utility values and list treatment cost parameters.</li>
+</ul>
 </div></div><p>In this chapter, we implement a three-state Partitioned Survival Model (PSM) using a weekly cycle and a 35-year time horizon. This section focuses on health-state occupancy, discounted costs, and QALY outcomes under standard parametric curves selected purely by the best AIC fit.</p>
 <section id="economic-inputs-psm-engine-setup" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="economic-inputs-psm-engine-setup"><span class="header-section-number">6.1</span> Economic Inputs &amp; PSM Engine Setup</h3>
@@ -3876,7 +3888,12 @@ window.Quarto = {
 <h2 data-number="7" class="anchored" data-anchor-id="cost-effectiveness-under-eag-preferred-survival-models"><span class="header-section-number">7</span> Cost-Effectiveness under EAG-Preferred Survival Models</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 3.5 hours (EAG Scenarios)</strong> - Programmed Royston-Parmar Splines and the <code>pmin(PFS, OS)</code> crossing diagnostic capping rules. - Integrated the 5-7 year immunotherapy treatment efficacy waning function. - Reallocated subsequent treatment market shares to reflect UK NHS guidelines.</p>
+<p><strong>Time Log: 3.5 hours (EAG Scenarios)</strong></p>
+<ul>
+<li>Programmed Royston-Parmar Splines and the <code>pmin(PFS, OS)</code> crossing diagnostic capping rules.</li>
+<li>Integrated the 5-7 year immunotherapy treatment efficacy waning function.</li>
+<li>Reallocated subsequent treatment market shares to reflect UK NHS guidelines.</li>
+</ul>
 </div></div><p>In this chapter, we evaluate the cost-effectiveness of pembrolizumab plus chemotherapy across subgroups using the EAG-preferred curve selections. For the pMMR cohort, the EAG preferred Royston-Parmar flexible spline models, whereas for the dMMR cohort, standard parametric models were retained but alternative distributions were selected.</p>
 <section id="spline-and-standard-model-fitting-setup" class="level3" data-number="7.1">
 <h3 data-number="7.1" class="anchored" data-anchor-id="spline-and-standard-model-fitting-setup"><span class="header-section-number">7.1</span> Spline and Standard Model Fitting Setup</h3>
@@ -4681,7 +4698,11 @@ window.Quarto = {
 <h2 data-number="8" class="anchored" data-anchor-id="model-selection-critique-aic-selected-vs.-eag-preferred-models"><span class="header-section-number">8</span> Model Selection Critique: AIC-Selected vs.&nbsp;EAG-Preferred Models</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 2.0 hours (Audit Synthesis)</strong> - Synthesized the final 2x2 ICER comparison tables. - Conducted methodological reflections on the subsequent therapy “cost-efficacy disconnect” and crossover correction.</p>
+<p><strong>Time Log: 2.0 hours (Audit Synthesis)</strong></p>
+<ul>
+<li>Synthesized the final 2x2 ICER comparison tables.</li>
+<li>Conducted methodological reflections on the subsequent therapy “cost-efficacy disconnect” and crossover correction.</li>
+</ul>
 </div></div><p>This chapter summarizes the cost-effectiveness estimates across the different survival modeling approaches. We present a 2×2 comparison table, explore sensitivity analyses around confidential discounts and overall survival tail assumptions, and discuss key HTA consulting takeaways.</p>
 <section id="model-selection-synthesis" class="level3" data-number="8.1">
 <h3 data-number="8.1" class="anchored" data-anchor-id="model-selection-synthesis"><span class="header-section-number">8.1</span> 2×2 Model Selection Synthesis</h3>
