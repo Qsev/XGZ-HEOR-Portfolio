@@ -10,6 +10,7 @@ project:
     - 02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.qmd
     - 03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.qmd
     - 01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.qmd
+    - 07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.qmd
     - 00_HTA_LLM_Wiki/README.md
     - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
     - 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
@@ -47,6 +48,8 @@ website:
             text: "RWE ECA: R/R DLBCL"
           - href: 01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.qmd
             text: "PSM: Survival Extrapolation in RRMM"
+          - href: 07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.qmd
+            text: "NICE TA1092 (Pembro) Case"
       - text: "NMA Library"
         menu:
           - href: 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd

@@ -50,7 +50,7 @@ rsconnect/
 
 # Local drafts and AI-assisted files
 scratch/
-07_TA1092_Pembro_ endometrial cancer/
+/07_TA1092_Pembro_ endometrial cancer/
 .DS_Store
 /.quarto/
 **/*.quarto_ipynb
