@@ -73,7 +73,7 @@ This project demonstrates a pragmatic, **value-driven scope management strategy*
 
 ### Evidence & Appraisal Registry
 
-To maintain a concise background narrative, the complete HTA literature registry and parameter traceability mapping are detailed in the [HTA Evidence & Reference Registry](#appendix-data-reference-traceability) in the Appendix.
+To maintain a concise background narrative, the complete HTA literature registry and parameter traceability mapping are detailed in the [HTA Evidence & Reference Registry](#appendix-a-hta-parameter-traceability-reference-registry) in the Appendix.
 
 ## My Independent Assessment
 
@@ -2609,7 +2609,9 @@ tibble(
 
 
 
-## Appendix: Data & Reference Traceability
+## Appendices {.unnumbered}
+
+### Appendix A: HTA Parameter Traceability & Reference Registry
 
 All data inputs, parameters, and clinical evidence mapped in the de novo R replication model are registered against their primary public HTA and clinical sources:
 
