@@ -203,10 +203,23 @@ window.Quarto = {
 </header>
 
 
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Mock Case Disclosure
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a methodological proof-of-concept. All context and data are <strong>generated</strong> or <strong>reconstructed</strong> for demonstration purposes. Patient-level data are pseudo-individual patient data (pseudo-IPD) reconstructed from published trial curves (KEYNOTE-868) using digitization and the Guyot algorithm. All numbers, economic models, and clinical parameters are <strong>illustrative</strong> only and do not represent the proprietary or confidential manufacturer model submission.</p>
+</div>
+</div>
 <section id="background" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="background"><span class="header-section-number">1</span> Background</h2>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -215,7 +228,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>This case study functions as a high-fidelity HTA appraisal audit and model reconstruction portfolio, simulating the role of a Principal Health Economist or Senior Modeler in a consulting practice. It evaluates the NICE technology appraisal <strong>TA1092</strong> concerning pembrolizumab with carboplatin and paclitaxel for first-line advanced or recurrent endometrial cancer.</p>
 <p>In commercial HEOR consulting, project delivery is strictly constrained by billable hours and the contract’s Scope of Work (SOW). A common challenge for modelers transitioning from academia is the tendency toward academic perfectionism—spending excessive hours pursuing non-reproducible parameters or trying to replicate confidential manufacturer calculations.</p>
@@ -269,11 +282,15 @@ window.Quarto = {
 </div>
 <section id="clinical-context" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="clinical-context"><span class="header-section-number">1.2</span> Clinical Context</h3>
-<p><strong>Disease area:</strong> untreated primary advanced or recurrent endometrial cancer.</p>
-<p><strong>Intervention:</strong> Pembrolizumab with carboplatin and paclitaxel, followed by pembrolizumab maintenance (up to 14 additional cycles).</p>
-<p><strong>Comparator:</strong> Carboplatin with paclitaxel followed by placebo maintenance in the clinical trial setting (KEYNOTE-868), and carboplatin with paclitaxel alone without maintenance in the economic model setting representing standard NHS clinical practice.</p>
-<p><strong>Key clinical trial:</strong> KEYNOTE-868 / NRG-GY018.</p>
-<p><strong>Main modelling issue:</strong> the intervention combines immunotherapy with platinum-taxane chemotherapy. The health economic question is whether the additional cost of pembrolizumab is justified by improved progression-free survival (PFS), overall survival (OS), and quality-adjusted life years (QALYs), especially when long-term OS data are immature.</p>
+<p>This page presents a de novo economic evaluation and survival extrapolation audit reconstructing the NICE TA1092 appraisal of pembrolizumab in combination with chemotherapy for first-line advanced or recurrent endometrial cancer. The analysis replicates the clinical and economic modeling choices debated during the technology appraisal consultations, contrasting standard parametric modeling against the flexible spline-based models preferred by the External Assessment Group (EAG). By leveraging digitized patient-level data, the model explores the cost-effectiveness impact of structural and parameter uncertainties across molecularly defined subgroups (dMMR and pMMR).</p>
+<p>The clinical and decision framework is structured as follows:</p>
+<ul>
+<li><strong>Disease Area</strong>: Untreated primary advanced or recurrent endometrial cancer.</li>
+<li><strong>Intervention</strong>: Pembrolizumab in combination with carboplatin and paclitaxel, followed by pembrolizumab monotherapy maintenance (for up to 14 additional cycles).</li>
+<li><strong>Comparator</strong>: Carboplatin and paclitaxel followed by placebo maintenance (representing the KEYNOTE-868 clinical trial setting) and carboplatin/paclitaxel alone without maintenance (representing standard NHS clinical practice).</li>
+<li><strong>Key Clinical Trial</strong>: KEYNOTE-868 / NRG-GY018, which evaluated the efficacy and safety of the combination.</li>
+<li><strong>Main Modeling Challenge</strong>: The combination of immunotherapy and platinum-taxane chemotherapy requires translating immature trial overall survival (OS) data into long-term projections. The key clinical and economic question is whether the additional cost of pembrolizumab is justified by the progression-free survival (PFS) and OS gains, particularly when long-term efficacy waning and structural curve-crossing constraints are applied.</li>
+</ul>
 </section>
 <section id="decision-problem" class="level3" data-number="1.3">
 <h3 data-number="1.3" class="anchored" data-anchor-id="decision-problem"><span class="header-section-number">1.3</span> Decision Problem</h3>
@@ -324,7 +341,7 @@ window.Quarto = {
 <h3 data-number="1.4" class="anchored" data-anchor-id="evidence-appraisal-registry"><span class="header-section-number">1.4</span> Evidence &amp; Appraisal Registry</h3>
 <p>To maintain a concise background narrative, the complete HTA literature registry and parameter traceability mapping are detailed in the <a href="#appendix-a-hta-parameter-traceability-reference-registry">HTA Evidence &amp; Reference Registry</a> in the Appendix.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -333,7 +350,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>When evaluating a manufacturer’s cost-effectiveness submission for an oncology immunotherapy combination, an experienced HTA model auditor screens for standard systemic risk nodes. In this appraisal, our initial risk-screening checklist targets four critical domains:</p>
 <ol type="1">
