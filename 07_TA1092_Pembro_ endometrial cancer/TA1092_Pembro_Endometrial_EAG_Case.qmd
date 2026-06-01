@@ -171,24 +171,20 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 | Adverse events | >5% Grade 3-5 AEs (anemia & hypertension only) | Include Grade 3-5 AEs with >=2% incidence | Company base case (>5% Grade 3-5 AEs) | Committee accepted the company base case because including broader AEs had a minimal impact on the ICER |
 | Subsequent therapy | Pembrolizumab monotherapy allowed in CT arm | Reallocate pembrolizumab monotherapy to pembrolizumab + lenvatinib | Reallocated subsequent therapy for pMMR patients | Committee preferred aligning subsequent therapies with NHS clinical guidelines for pMMR patients, which reduced the cost delta and decreased the ICER |
 </details>
-
 ## Workflow Setup & Exploratory Analysis
 
 ::: {.column-margin}
 **Time Log: 2.5 hours**
 
 - Digitised sub-group curves from NEJM Figure 2A/B.
-- Built and tidied the long-format IPD dataset for R processing.
+- Reconstructed pseudo-IPD using the Guyot algorithm.
 :::
 
+This section loads analytical packages, establishes working directories, and imports the patient-level survival data (IPD) reconstructed from digitized KEYNOTE-868 (NRG-GY018) trial curves (PFS and OS for dMMR and pMMR cohorts) using the Guyot et al. iterative algorithm.
 
-In this chapter, we load the required packages, set up local file paths, import the reconstructed individual patient-level data (pseudo-IPD), and perform exploratory curve inspections.
-
-### Load Packages & Settings
-
-This block loads the R packages used in this workflow.
-
-```{r load-packages}
+```{r workflow-setup}
+#| message: false
+#| warning: false
 library(survival)
 library(flexsurv)
 library(dplyr)
@@ -198,28 +194,7 @@ library(readr)
 library(ggplot2)
 library(knitr)
 
-tibble(
-  package = c("survival", "flexsurv", "dplyr", "tidyr", "purrr", "readr", "ggplot2", "knitr"),
-  role = c(
-    "Create survival objects and Kaplan-Meier estimates",
-    "Fit parametric survival models",
-    "Data manipulation",
-    "Unnest list-columns",
-    "Loop over curves and distributions",
-    "Read and write CSV files",
-    "Plot KM curves and extrapolations",
-    "Display readable tables"
-  )
-) |>
-  kable()
-```
-
-
-### Define File Paths
-
-The main input is the combined long-format pseudo-IPD file.
-
-```{r define-paths}
+# Set file paths
 base_dir <- normalizePath(".", mustWork = TRUE)
 input_path <- file.path(base_dir, "survival_inputs", "survival_ipd_long.csv")
 output_dir <- file.path(base_dir, "survival_models")
@@ -228,31 +203,8 @@ plot_dir <- file.path(output_dir, "plots")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 dir.create(plot_dir, showWarnings = FALSE, recursive = TRUE)
 
-tibble(
-  object = c("base_dir", "input_path", "output_dir", "plot_dir"),
-  path = c(base_dir, input_path, output_dir, plot_dir),
-  exists = c(dir.exists(base_dir), file.exists(input_path), dir.exists(output_dir), dir.exists(plot_dir))
-) |>
-  kable()
-```
-
-
-### Read & Transform Reconstructed Input IPD
-
-The dataset is reconstructed pseudo-IPD. Each row is one pseudo-patient.
-
-`status = 1` means the event happened. For PFS this means progression/death; for OS this means death.
-
-```{r read-input-data}
-ipd <- read_csv(input_path, show_col_types = FALSE)
-
-ipd |>
-  head(3) |>
-  knitr::kable()
-```
-
-```{r transform-input-data}
-ipd <- ipd |>
+# Load and transform reconstructed IPD
+ipd <- read_csv(input_path, show_col_types = FALSE) |>
   mutate(
     subgroup = factor(subgroup, levels = c("dMMR", "pMMR")),
     endpoint = factor(endpoint, levels = c("PFS", "OS")),
@@ -262,75 +214,15 @@ ipd <- ipd |>
     curve_id = paste(subgroup, endpoint, treatment, sep = "_")
   )
 
-ipd |>
-  count(subgroup, endpoint, treatment, status_label) |>
-  arrange(subgroup, endpoint, treatment, status_label) |>
-  kable()
-```
-
-
-### Exploratory Curve Inspection & KM Plotting
-
-#### Inspecting pMMR PFS Pembrolizumab Cohort
-
-Before fitting every curve, inspect one explicitly named curve: **pMMR PFS, pembro arm**.
-
-```{r inspect-pmmr-pfs-pembro-ipd}
+# Validation subset for standard parametric testing
 pmmr_pfs_pembro_ipd <- ipd |>
   filter(subgroup == "pMMR", endpoint == "PFS", treatment == "pembro_chemo")
 
-pmmr_pfs_pembro_ipd |>
-  head(3) |>
-  knitr::kable()
-
-tibble(
-  curve = "pMMR PFS pembrolizumab + chemotherapy",
-  n = nrow(pmmr_pfs_pembro_ipd),
-  events = sum(pmmr_pfs_pembro_ipd$status),
-  censored = sum(pmmr_pfs_pembro_ipd$status == 0),
-  max_follow_up_months = max(pmmr_pfs_pembro_ipd$time_months)
-) |>
-  kable()
-```
-
-
-#### Creating the Survival Object
-
-`Surv(time, status)` is the standard R representation of right-censored survival data.
-
-```{r create-surv-object}
-pmmr_pfs_pembro_surv <- Surv(pmmr_pfs_pembro_ipd$time_months, pmmr_pfs_pembro_ipd$status)
-
-tibble(
-  raw_time = pmmr_pfs_pembro_ipd$time_months[1:5],
-  raw_status = pmmr_pfs_pembro_ipd$status[1:5],
-  surv_object = as.character(pmmr_pfs_pembro_surv[1:5])
-) |>
-  kable()
-```
-
-
-#### Reconstructed Kaplan-Meier Curve
-
-This is the Kaplan-Meier curve reconstructed from pseudo-IPD.
-
-```{r plot-pmmr-pfs-pembro-km}
-pmmr_pfs_pembro_km <- survfit(Surv(time_months, status) ~ 1, data = pmmr_pfs_pembro_ipd)
-
-pmmr_pfs_pembro_km_df <- tibble(
-  time_months = c(0, pmmr_pfs_pembro_km$time),
-  survival = c(1, pmmr_pfs_pembro_km$surv)
-)
-
-ggplot(pmmr_pfs_pembro_km_df, aes(time_months, survival)) +
-  geom_step(linewidth = 0.8, colour = "#008B8B") +
-  scale_y_continuous(limits = c(0, 1)) +
-  labs(
-    title = "Reconstructed KM: pMMR PFS, pembro arm",
-    x = "Months",
-    y = "Survival probability"
-  ) +
-  theme_minimal()
+# Reconstructed IPD sample sizes (Total N = `r nrow(ipd)`)
+ipd |>
+  count(subgroup, endpoint, treatment, status_label) |>
+  arrange(subgroup, endpoint, treatment, status_label) |>
+  kable(col.names = c("Subgroup", "Endpoint", "Treatment Arm", "Event Status", "Sample Size (N)"))
 ```
 
 
