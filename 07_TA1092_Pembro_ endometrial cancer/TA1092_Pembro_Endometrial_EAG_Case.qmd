@@ -51,9 +51,9 @@ This project demonstrates a pragmatic, **value-driven scope management strategy*
 
 **Disease area:** untreated primary advanced or recurrent endometrial cancer.
 
-**Intervention:** pembrolizumab with carboplatin and paclitaxel, followed by pembrolizumab maintenance.
+**Intervention:** Pembrolizumab with carboplatin and paclitaxel, followed by pembrolizumab maintenance (up to 14 additional cycles).
 
-**Comparator:** carboplatin with paclitaxel.
+**Comparator:** Carboplatin with paclitaxel followed by placebo maintenance in the clinical trial setting (KEYNOTE-868), and carboplatin with paclitaxel alone without maintenance in the economic model setting representing standard NHS clinical practice.
 
 **Key clinical trial:** KEYNOTE-868 / NRG-GY018.
 
@@ -66,7 +66,7 @@ This project demonstrates a pragmatic, **value-driven scope management strategy*
 | Population | Adults with untreated primary advanced or recurrent endometrial cancer |
 | Subgroups | dMMR/MSI-H and pMMR/MSS populations |
 | Intervention | Pembrolizumab + carboplatin + paclitaxel, then pembrolizumab maintenance |
-| Comparator | Carboplatin + paclitaxel |
+| Comparator | Carboplatin + paclitaxel followed by placebo maintenance (trial); Carboplatin + paclitaxel alone without maintenance (NHS economic model) |
 | Outcomes | PFS, OS, adverse events, health-related quality of life, costs, QALYs |
 | Model type | Three-state PSM |
 | NICE decision tension | Whether extrapolated survival benefit is clinically plausible and cost-effective across molecular subgroups |
