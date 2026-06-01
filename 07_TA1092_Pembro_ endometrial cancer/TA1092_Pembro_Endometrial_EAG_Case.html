@@ -124,11 +124,9 @@ window.Quarto = {
   <li><a href="#eag-critique-lens" id="toc-eag-critique-lens" class="nav-link" data-scroll-target="#eag-critique-lens"><span class="header-section-number">2</span> EAG Critique Lens</a>
   <ul class="collapse">
   <li><a href="#how-the-eag-reviews-this-type-of-case" id="toc-how-the-eag-reviews-this-type-of-case" class="nav-link" data-scroll-target="#how-the-eag-reviews-this-type-of-case"><span class="header-section-number">2.1</span> How the EAG Reviews This Type of Case</a></li>
-  <li><a href="#working-reflection-on-issue-1" id="toc-working-reflection-on-issue-1" class="nav-link" data-scroll-target="#working-reflection-on-issue-1"><span class="header-section-number">2.2</span> Working Reflection on Issue 1</a></li>
-  <li><a href="#working-reflection-on-issue-3" id="toc-working-reflection-on-issue-3" class="nav-link" data-scroll-target="#working-reflection-on-issue-3"><span class="header-section-number">2.3</span> Working Reflection on Issue 3</a></li>
-  <li><a href="#working-reflection-on-issue-4" id="toc-working-reflection-on-issue-4" class="nav-link" data-scroll-target="#working-reflection-on-issue-4"><span class="header-section-number">2.4</span> Working Reflection on Issue 4</a></li>
-  <li><a href="#eag-challenge-log" id="toc-eag-challenge-log" class="nav-link" data-scroll-target="#eag-challenge-log"><span class="header-section-number">2.5</span> EAG Challenge Log</a></li>
-  <li><a href="#committee-preferred-assumptions" id="toc-committee-preferred-assumptions" class="nav-link" data-scroll-target="#committee-preferred-assumptions"><span class="header-section-number">2.6</span> Committee Preferred Assumptions</a></li>
+  <li><a href="#summary-of-nice-decision-tensions" id="toc-summary-of-nice-decision-tensions" class="nav-link" data-scroll-target="#summary-of-nice-decision-tensions"><span class="header-section-number">2.2</span> Summary of NICE Decision Tensions</a></li>
+  <li><a href="#eag-challenge-log" id="toc-eag-challenge-log" class="nav-link" data-scroll-target="#eag-challenge-log"><span class="header-section-number">2.3</span> EAG Challenge Log</a></li>
+  <li><a href="#committee-preferred-assumptions" id="toc-committee-preferred-assumptions" class="nav-link" data-scroll-target="#committee-preferred-assumptions"><span class="header-section-number">2.4</span> Committee Preferred Assumptions</a></li>
   </ul></li>
   <li><a href="#workflow-setup-exploratory-analysis" id="toc-workflow-setup-exploratory-analysis" class="nav-link" data-scroll-target="#workflow-setup-exploratory-analysis"><span class="header-section-number">3</span> Workflow Setup &amp; Exploratory Analysis</a>
   <ul class="collapse">
@@ -384,128 +382,12 @@ window.Quarto = {
 </ul>
 <p>This distinction is important for the portfolio: a health economist in consulting must be able to understand both the company logic and the EAG logic.</p>
 </section>
-<section id="working-reflection-on-issue-1" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="working-reflection-on-issue-1"><span class="header-section-number">2.2</span> Working Reflection on Issue 1</h3>
-<p>Issue 1 is my first example of how the EAG examines the alignment between trial design, trial objectives, trial results, and later interpretation of those results.</p>
-<p>My current understanding is that the EAG is concerned about <strong>target consistency</strong>. If the trial was originally designed to answer one type of question, for example treatment effects within separate dMMR and pMMR cohorts, but the later economic modelling relies on a different question, for example an all-comer analysis combining those populations, then there is a risk of misalignment between the evidence generation process and the modelled decision problem.</p>
-<p>In practical HTA terms, the concern is not simply that all-comer analysis is wrong. The concern is that a post-hoc all-comer analysis may be less reliable if it was not the original basis of the trial design and statistical analysis plan. This can create uncertainty about whether the estimated treatment effect is truly representative of the population used in the economic model.</p>
-<p>This issue is therefore mainly an <strong>evidence validity</strong> issue rather than a direct cost-effectiveness parameter issue. It affects confidence in the survival inputs and subgroup assumptions that feed into the model. For this portfolio, I will treat Issue 1 as part of the EAG’s broader logic: before challenging model extrapolations, the EAG first checks whether the clinical evidence being extrapolated is aligned with the decision problem.</p>
-<p>Issue 2 extends the same evidence-validity concern to more granular subgroups. The EAG notes that some NICE-specified subgroups, such as local versus metastatic recurrence or prior surgery history, were not systematically captured in the pivotal trial. My takeaway is that this is not a main technical replication target, but it reinforces an important appraisal principle: broad modelled indications can become uncertain when the trial evidence does not fully describe clinically relevant heterogeneity.</p>
-<p>This type of subgroup limitation is probably common in oncology appraisals because pivotal trials are rarely large enough to support robust analyses across many clinically detailed subgroups. The key point is not that every missing subgroup analysis is equally important. The EAG appears to elevate subgroup limitations when they are <strong>decision-relevant</strong>: when the subgroup was specified in the NICE scope, may have different prognosis or treatment effect, affects the clinical pathway, or could change the cost-effectiveness conclusion.</p>
+<section id="summary-of-nice-decision-tensions" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="summary-of-nice-decision-tensions"><span class="header-section-number">2.2</span> Summary of NICE Decision Tensions</h3>
+<p>Based on the HTA dossier review, the appraisal debate centers on translating immature trial survival data into a 30-year extrapolation model. The key methodological debates include: - <strong>Survival Tail Plausibility</strong>: Standard parametric models preferred by the company yielded optimistic long-term tails. The EAG preferred flexible spline models to better capture hazard dynamics. - <strong>Curve-Crossing Implausibility</strong>: The EAG’s spline-based placebo PFS model crossed and exceeded the active pembrolizumab PFS model in the long-term tail. This logical inconsistency required a structural capping mechanism. - <strong>Efficacy Waning</strong>: The company assumed infinite treatment benefit post-discontinuation, which the EAG challenged. A compromise waning window was introduced to transition active treatment hazards to control hazards. - <strong>Utility Consistency</strong>: To avoid confounding utility estimates by mixing clinical trial sources (KEYNOTE-158 and KEYNOTE-B21), the EAG advocated for exclusive use of KEYNOTE-158.</p>
 </section>
-<section id="working-reflection-on-issue-3" class="level3" data-number="2.3">
-<h3 data-number="2.3" class="anchored" data-anchor-id="working-reflection-on-issue-3"><span class="header-section-number">2.3</span> Working Reflection on Issue 3</h3>
-<p>Issue 3 is a stronger candidate for a technical deep dive because it connects directly to survival modelling. The EAG’s concern is that KEYNOTE-868 has relatively short follow-up, while the economic model needs to project PFS, OS, costs, and QALYs over a much longer horizon.</p>
-<p>My current interpretation is that short follow-up is not a problem simply because “more data would always be better”. It becomes decision-relevant when the observed trial period covers only the early part of the survival curves, but a material share of the modelled incremental benefit is generated in the extrapolated tail. In that setting, the model result depends heavily on assumptions about curve selection, long-term tail behaviour, treatment effect duration, and clinical plausibility.</p>
-<p>After checking the EAG report and later factual-accuracy material in the committee papers, my more precise working interpretation is that the short-follow-up concern can be condensed into a few case-specific signals rather than a universal threshold. The median follow-up appears to be around 16.3 months, while the planned active treatment period is approximately 2.2 years. This means that the median observation time does not even fully cover the planned treatment duration. In addition, the pembrolizumab arm median OS was not reached, meaning the trial had not yet observed the time point at which 50% of patients had died.</p>
-<p>These are not formal NICE cut-offs, but they are useful data-maturity signals. If median OS has not been reached, long-term OS benefit is still not directly observed. If median follow-up is shorter than the intended treatment duration, there is limited evidence about what happens after patients complete or stop pembrolizumab. This makes assumptions about sustained treatment effect, treatment waning, and long-term survival tails especially important.</p>
-<p>NotebookLM review of the EAG material suggests that the EAG’s concern was broader than these two signals. The EAG also appears to use several related judgement signals when assessing whether the follow-up is sufficient for long-term extrapolation:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>EAG judgement signal</th>
-<th>Why it matters for Issue 3</th>
-<th>How I could show it in the portfolio</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Few patients at risk in the KM tail</td>
-<td>Late KM steps become unstable, so the apparent tail shape may be driven by very small numbers</td>
-<td>Add numbers-at-risk context and avoid overinterpreting late KM steps</td>
-</tr>
-<tr class="even">
-<td>Median OS not reached</td>
-<td>The trial has not directly observed the point at which half of patients have died</td>
-<td>Add a horizontal 50% survival line to OS plots and mark whether it is crossed</td>
-</tr>
-<tr class="odd">
-<td>Models diverge after the observed period</td>
-<td>Several models can fit the observed KM but imply different long-term survival</td>
-<td>Use a distribution fan plot and landmark survival table</td>
-</tr>
-<tr class="even">
-<td>Uncertain treatment-effect duration</td>
-<td>Short follow-up gives limited evidence on whether pembrolizumab benefit persists after stopping treatment</td>
-<td>Compare sustained benefit versus treatment-effect waning scenarios</td>
-</tr>
-<tr class="odd">
-<td>External validation is weak or indirect</td>
-<td>Evidence from melanoma or dMMR-only studies may not generalise to advanced/recurrent endometrial cancer or pMMR disease</td>
-<td>Document external evidence limitations rather than treating them as proof of sustained benefit</td>
-</tr>
-<tr class="even">
-<td>Expert landmark estimates are speculative</td>
-<td>Advisory-board estimates can guide plausibility but are not empirical trial evidence</td>
-<td>Use expert landmarks as plausibility checks, not as observed validation</td>
-</tr>
-</tbody>
-</table>
-<p>This gives a more defensible interpretation than using a simple follow-up-to-horizon ratio. The EAG’s concern is cumulative: immature OS, sparse KM tails, divergent extrapolation models, and uncertain post-treatment benefit all point in the same direction. Together, they make the long-term extrapolated survival benefit less secure.</p>
-<p>For the portfolio, I should therefore avoid treating Issue 3 as a generic limitation. The useful demonstration is to show the gap between <strong>observed evidence</strong> and <strong>modelled horizon</strong>. A practical way to do this is:</p>
-<ul>
-<li>show the reconstructed KM curve and fitted parametric survival curve on the same plot;</li>
-<li>mark the approximate observed follow-up boundary with a vertical line;</li>
-<li>shade the extrapolated region beyond the observed trial data;</li>
-<li>compare plausible parametric distributions that fit similarly during the observed period but diverge in the long-term tail;</li>
-<li>report landmark survival predictions, for example 5-year, 10-year, and 20-year PFS/OS.</li>
-</ul>
-<p>This also clarifies the role of uncertainty. Short follow-up can widen statistical uncertainty, but the larger HTA concern is often <strong>structural uncertainty</strong>: different plausible extrapolation models may produce meaningfully different long-term survival, even if their in-sample AIC/BIC or visual fit is similar. This is why an EAG may challenge an AIC-selected curve if its long-term behaviour lacks clinical credibility.</p>
-<p>Initial technical plan for this issue:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Demonstration</th>
-<th>Purpose</th>
-<th>Possible output</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Observed vs modelled horizon</td>
-<td>Show why follow-up is short in model terms</td>
-<td>Table comparing follow-up length with model horizon</td>
-</tr>
-<tr class="even">
-<td>Extrapolation-zone plot</td>
-<td>Separate observed KM evidence from modelled tail</td>
-<td>KM + fitted curve + shaded extrapolation region</td>
-</tr>
-<tr class="odd">
-<td>Distribution fan plot</td>
-<td>Show structural uncertainty across plausible curves</td>
-<td>Multiple parametric survival tails</td>
-</tr>
-<tr class="even">
-<td>Landmark survival table</td>
-<td>Quantify tail differences</td>
-<td>5-, 10-, and 20-year survival by distribution</td>
-</tr>
-<tr class="odd">
-<td>Simplified scenario impact</td>
-<td>Link survival uncertainty to economic outputs</td>
-<td>Directional QALY / ICER impact</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="working-reflection-on-issue-4" class="level3" data-number="2.4">
-<h3 data-number="2.4" class="anchored" data-anchor-id="working-reflection-on-issue-4"><span class="header-section-number">2.4</span> Working Reflection on Issue 4</h3>
-<p>Issue 4 is a utility evidence limitation. The EAG notes that HRQoL/patient-reported outcomes were assessed in the pMMR cohort only, with no equivalent dMMR HRQoL data available. The company’s explanation is that the smaller dMMR sample size created insufficient statistical power, so HRQoL analyses were prespecified for pMMR.</p>
-<p>My takeaway is that this is not a main technical replication target at this stage, but it is important for the appraisal logic. In a cost-utility model, HRQoL evidence feeds into health-state utilities and therefore QALYs. If utility evidence comes only from pMMR patients but is applied more broadly, then the representativeness of utility inputs becomes uncertain, especially for subgroup-specific cost-effectiveness.</p>
-</section>
-<section id="eag-challenge-log" class="level3" data-number="2.5">
-<h3 data-number="2.5" class="anchored" data-anchor-id="eag-challenge-log"><span class="header-section-number">2.5</span> EAG Challenge Log</h3>
+<section id="eag-challenge-log" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="eag-challenge-log"><span class="header-section-number">2.3</span> EAG Challenge Log</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 20%">
@@ -526,45 +408,45 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td>OS extrapolation</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>Long-term OS tail often drives QALY gain</td>
-<td>TODO</td>
+<td>Standard parametric curves (log-logistic/gamma) based on trial data fit</td>
+<td>Overestimated overall survival tails due to short trial follow-up; preferred flexible splines for pMMR</td>
+<td>Long-term OS tail is the major driver of lifetime QALY gains</td>
+<td>Significantly increases the ICER</td>
 </tr>
 <tr class="even">
 <td>PFS extrapolation</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>Affects time in PF state and treatment exposure</td>
-<td>TODO</td>
+<td>Generalised gamma (dMMR) and 2-piece generalised gamma (pMMR)</td>
+<td>Prone to tail overestimation; preferred log-logistic/generalised gamma (dMMR) and flexible splines (pMMR)</td>
+<td>Determines duration of progression-free utility and active treatment exposure</td>
+<td>Increases the ICER</td>
 </tr>
 <tr class="odd">
 <td>Curve crossing</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>OS should remain above PFS; implausible crossing signals model failure</td>
-<td>TODO</td>
+<td>Long-term crossing is clinically implausible; active treatment should always be superior</td>
+<td>Crossing is a tail extrapolation uncertainty artifact and doesn’t invalidate observed trial fit</td>
+<td>PFS must not cross treatment arms; uncapped models are structurally flawed</td>
+<td>Modestly reduces the ICER when placebo PFS is capped</td>
 </tr>
 <tr class="even">
 <td>Subgroup modelling</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>dMMR and pMMR may have different baseline risks and treatment effects</td>
-<td>TODO</td>
+<td>Modeled dMMR and pMMR cohorts separately using trial subgroup baseline inputs</td>
+<td>Supported separate models, but highlighted dMMR immaturity due to small sample size</td>
+<td>Treatment effect and background risks differ fundamentally by molecular status</td>
+<td>Results in distinct ICERs for dMMR (cost-effective) and pMMR (marginal)</td>
 </tr>
 <tr class="odd">
 <td>Treatment effect waning</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>Indefinite immunotherapy benefit may overstate long-term gain</td>
-<td>TODO</td>
+<td>No waning applied (assumed lifetime immunotherapy benefit)</td>
+<td>Short trial follow-up cannot justify indefinite post-discontinuation benefit; preferred 5-7 year waning</td>
+<td>Overestimates long-term survival gain in the extrapolated tail</td>
+<td>Significantly increases the ICER</td>
 </tr>
 <tr class="even">
 <td>Utility values</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>Utility source can materially affect incremental QALYs</td>
-<td>TODO</td>
+<td>Used mixed sources (KEYNOTE-158 for PD, KEYNOTE-B21 for PF health states)</td>
+<td>Opposed mixing utility sources; preferred using KEYNOTE-158 exclusively for all states</td>
+<td>Health state utility values directly scale cumulative QALY gains</td>
+<td>Modestly to significantly increases the ICER</td>
 </tr>
 <tr class="odd">
 <td>Starting age</td>
@@ -597,8 +479,8 @@ window.Quarto = {
 </tbody>
 </table>
 </section>
-<section id="committee-preferred-assumptions" class="level3" data-number="2.6">
-<h3 data-number="2.6" class="anchored" data-anchor-id="committee-preferred-assumptions"><span class="header-section-number">2.6</span> Committee Preferred Assumptions</h3>
+<section id="committee-preferred-assumptions" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="committee-preferred-assumptions"><span class="header-section-number">2.4</span> Committee Preferred Assumptions</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 20%">
@@ -619,45 +501,45 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td>dMMR OS curve</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
+<td>Log-logistic (pembro) / Exponential (placebo)</td>
+<td>Log-logistic (pembro) / Exponential (placebo)</td>
+<td>Log-logistic (pembro) / Exponential (placebo)</td>
+<td>Consensus reached. Both parties agreed these represented the best fit and clinical plausibility for the dMMR cohort.</td>
 </tr>
 <tr class="even">
 <td>pMMR OS curve</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
+<td>Log-logistic (pembro) / Gamma (placebo)</td>
+<td>1-knot normal spline (pembro) / 1-knot hazard spline (placebo)</td>
+<td>1-knot normal spline (pembro) / 1-knot hazard spline (placebo)</td>
+<td>Committee preferred the EAG’s spline models to capture the changing hazard observed in the trial.</td>
 </tr>
 <tr class="odd">
 <td>dMMR PFS curve</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
+<td>Generalised gamma (pembro) / 2-piece gamma (placebo, 27-wk cut)</td>
+<td>Log-logistic (pembro) / Generalised gamma (placebo)</td>
+<td>Log-logistic (pembro) / Generalised gamma (placebo)</td>
+<td>Committee adopted the EAG’s preferred curves due to improved fit and tail plausibility.</td>
 </tr>
 <tr class="even">
 <td>pMMR PFS curve</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
+<td>2-piece generalised gamma (pembro, 37-wk cut) / 1-knot odds spline (placebo)</td>
+<td>1-knot hazard spline (pembro) / 2-knot hazard spline (placebo)</td>
+<td>1-knot hazard spline (pembro) / 2-knot hazard spline (placebo, capped)</td>
+<td>Sided with the company’s implausibility argument: mandated capping placebo PFS at pembro PFS in the tail.</td>
 </tr>
 <tr class="odd">
 <td>Waning assumption</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
+<td>No waning (lifetime treatment effect)</td>
+<td>Gradual waning 5 to 7 years (all patients)</td>
+<td>Gradual waning 5 to 7 years (non-complete responders only)</td>
+<td>Plausible compromise. Waning applied between 5-7 years only for patients without complete response.</td>
 </tr>
 <tr class="even">
 <td>Utility source</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
-<td>TODO</td>
+<td>Mixed (KEYNOTE-158 for PD, KEYNOTE-B21 for PF)</td>
+<td>KEYNOTE-158 (all states and subgroups)</td>
+<td>KEYNOTE-158 (all states and subgroups)</td>
+<td>Committee preferred keeping a single consistent trial source to avoid mixing different patient populations.</td>
 </tr>
 <tr class="odd">
 <td>Starting age</td>
