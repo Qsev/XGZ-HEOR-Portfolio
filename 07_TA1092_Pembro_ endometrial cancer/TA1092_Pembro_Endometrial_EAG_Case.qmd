@@ -50,7 +50,7 @@ This case study functions as a high-fidelity HTA appraisal audit and model recon
 
 In commercial HEOR consulting, project delivery is strictly constrained by billable hours and the contract’s Scope of Work (SOW). A common challenge for modelers transitioning from academia is the tendency toward academic perfectionism—spending excessive hours pursuing non-reproducible parameters or trying to replicate confidential manufacturer calculations.
 
-This project demonstrates a pragmatic, **value-driven scope management strategy** under a target budget of ~15 hours. The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on **high-value technical nodes**—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive.
+This project demonstrates a pragmatic, **value-driven scope management strategy** under a target budget. To show compliance with commercial constraints and resource allocation, the relative effort distribution for each technical step is logged in the page margins (as percentages of total project effort). The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on **high-value technical nodes**—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive.
 
 ### Project Scope Statement
 
@@ -190,7 +190,7 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 ## Workflow Setup & Exploratory Analysis
 
 ::: {.column-margin}
-**Time Log: 2.5 hours**
+**Effort Allocation: 15%**
 
 - Extracted subgroup curves using Computer Vision HSV color segmentation.
 - Reconstructed pseudo-IPD using the Guyot algorithm.
@@ -280,7 +280,7 @@ ggplot(km_data, aes(x = time_months, y = survival, color = treatment_label)) +
 ## Parametric Survival Fitting & Diagnostics
 
 ::: {.column-margin}
-**Time Log: 5.0 hours**
+**Effort Allocation: 30%**
 
 - Developed automated fitting wrapper for batch survival modeling.
 - Evaluated AIC/BIC goodness-of-fit criteria across 56 model configurations.
@@ -452,7 +452,7 @@ Therefore, these statistical rankings serve as candidates for further clinical t
 ## Extrapolation Zone & Data Maturity Critique (Issue 3) {#sec-issue3-main}
 
 ::: {.column-margin}
-**Time Log: 2.5 hours**
+**Effort Allocation: 15%**
 
 - Digitised subgroup curves from NEJM Figure 2A/B.
 - Built and tidied the long-format IPD dataset for R processing.
@@ -907,7 +907,7 @@ This divergence highlights why choosing an extrapolation curve based on statisti
 ## Cost-Effectiveness under AIC-Selected Standard Parametric Models
 
 ::: {.column-margin}
-**Time Log: 2.0 hours (Base Engine)**
+**Effort Allocation: 10% (Base Engine)**
 
 - Coded the weekly cycle Partitioned Survival Model (PSM) engine over a 35-year horizon.
 - Mapped health-state utility values and list treatment cost parameters.
@@ -1158,7 +1158,7 @@ bind_rows(
 ## Cost-Effectiveness under EAG-Preferred Survival Models
 
 ::: {.column-margin}
-**Time Log: 3.5 hours (EAG Scenarios)**
+**Effort Allocation: 20% (EAG Scenarios)**
 
 - Programmed Royston-Parmar Splines and the `pmin(PFS, OS)` crossing diagnostic capping rules.
 - Integrated the 5-7 year immunotherapy treatment efficacy waning function.
@@ -1625,7 +1625,7 @@ Interpretation notes:
 ## Model Selection Critique: AIC-Selected vs. EAG-Preferred Models
 
 ::: {.column-margin}
-**Time Log: 2.0 hours (Audit Synthesis)**
+**Effort Allocation: 10% (Audit Synthesis)**
 
 - Synthesized the final 2x2 ICER comparison tables.
 - Conducted methodological reflections on the subsequent therapy "cost-efficacy disconnect" and crossover correction.

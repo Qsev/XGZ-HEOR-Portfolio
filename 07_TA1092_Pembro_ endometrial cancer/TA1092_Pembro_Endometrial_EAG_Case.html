@@ -232,7 +232,7 @@ window.Quarto = {
 <div class="callout-body-container callout-body">
 <p>This case study functions as a high-fidelity HTA appraisal audit and model reconstruction portfolio, simulating the role of a Principal Health Economist or Senior Modeler in a consulting practice. It evaluates the NICE technology appraisal <strong>TA1092</strong> concerning pembrolizumab with carboplatin and paclitaxel for first-line advanced or recurrent endometrial cancer.</p>
 <p>In commercial HEOR consulting, project delivery is strictly constrained by billable hours and the contract’s Scope of Work (SOW). A common challenge for modelers transitioning from academia is the tendency toward academic perfectionism—spending excessive hours pursuing non-reproducible parameters or trying to replicate confidential manufacturer calculations.</p>
-<p>This project demonstrates a pragmatic, <strong>value-driven scope management strategy</strong> under a target budget of ~15 hours. The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on <strong>high-value technical nodes</strong>—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive.</p>
+<p>This project demonstrates a pragmatic, <strong>value-driven scope management strategy</strong> under a target budget. To show compliance with commercial constraints and resource allocation, the relative effort distribution for each technical step is logged in the page margins (as percentages of total project effort). The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on <strong>high-value technical nodes</strong>—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive.</p>
 <section id="project-scope-statement" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="project-scope-statement"><span class="header-section-number">1.1</span> Project Scope Statement</h3>
 <table class="caption-top table">
@@ -619,7 +619,7 @@ window.Quarto = {
 <h2 data-number="3" class="anchored" data-anchor-id="workflow-setup-exploratory-analysis"><span class="header-section-number">3</span> Workflow Setup &amp; Exploratory Analysis</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 2.5 hours</strong></p>
+<p><strong>Effort Allocation: 15%</strong></p>
 <ul>
 <li>Extracted subgroup curves using Computer Vision HSV color segmentation.</li>
 <li>Reconstructed pseudo-IPD using the Guyot algorithm.</li>
@@ -715,7 +715,7 @@ window.Quarto = {
 <h2 data-number="4" class="anchored" data-anchor-id="parametric-survival-fitting-diagnostics"><span class="header-section-number">4</span> Parametric Survival Fitting &amp; Diagnostics</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 5.0 hours</strong></p>
+<p><strong>Effort Allocation: 30%</strong></p>
 <ul>
 <li>Developed automated fitting wrapper for batch survival modeling.</li>
 <li>Evaluated AIC/BIC goodness-of-fit criteria across 56 model configurations.</li>
@@ -985,7 +985,7 @@ Table&nbsp;1: Top two candidate survival distributions by cohort ranked by AIC
 <h2 data-number="5" class="anchored" data-anchor-id="sec-issue3-main"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 2.5 hours</strong></p>
+<p><strong>Effort Allocation: 15%</strong></p>
 <ul>
 <li>Digitised subgroup curves from NEJM Figure 2A/B.</li>
 <li>Built and tidied the long-format IPD dataset for R processing.</li>
@@ -1724,7 +1724,7 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 <h2 data-number="6" class="anchored" data-anchor-id="cost-effectiveness-under-aic-selected-standard-parametric-models"><span class="header-section-number">6</span> Cost-Effectiveness under AIC-Selected Standard Parametric Models</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 2.0 hours (Base Engine)</strong></p>
+<p><strong>Effort Allocation: 10% (Base Engine)</strong></p>
 <ul>
 <li>Coded the weekly cycle Partitioned Survival Model (PSM) engine over a 35-year horizon.</li>
 <li>Mapped health-state utility values and list treatment cost parameters.</li>
@@ -2057,7 +2057,7 @@ Table&nbsp;4: Base-case cost-effectiveness comparison by molecular subgroup (AIC
 <h2 data-number="7" class="anchored" data-anchor-id="cost-effectiveness-under-eag-preferred-survival-models"><span class="header-section-number">7</span> Cost-Effectiveness under EAG-Preferred Survival Models</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 3.5 hours (EAG Scenarios)</strong></p>
+<p><strong>Effort Allocation: 20% (EAG Scenarios)</strong></p>
 <ul>
 <li>Programmed Royston-Parmar Splines and the <code>pmin(PFS, OS)</code> crossing diagnostic capping rules.</li>
 <li>Integrated the 5-7 year immunotherapy treatment efficacy waning function.</li>
@@ -2684,7 +2684,7 @@ Table&nbsp;5: Base-case cost-effectiveness comparison by molecular subgroup (EAG
 <h2 data-number="8" class="anchored" data-anchor-id="model-selection-critique-aic-selected-vs.-eag-preferred-models"><span class="header-section-number">8</span> Model Selection Critique: AIC-Selected vs.&nbsp;EAG-Preferred Models</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><strong>Time Log: 2.0 hours (Audit Synthesis)</strong></p>
+<p><strong>Effort Allocation: 10% (Audit Synthesis)</strong></p>
 <ul>
 <li>Synthesized the final 2x2 ICER comparison tables.</li>
 <li>Conducted methodological reflections on the subsequent therapy “cost-efficacy disconnect” and crossover correction.</li>
