@@ -48,7 +48,7 @@ In commercial HEOR consulting, project delivery is strictly constrained by billa
 
 This project demonstrates a pragmatic, **value-driven scope management strategy** under a target budget. To show compliance with commercial constraints and resource allocation, the relative effort distribution for each technical step is logged in the page margins (as percentages of total project effort). The objective is not to reproduce the confidential manufacturer workbook or match the exact confidential ICERs (which are driven by undisclosed discounts). Instead, we deliberately restrict our scope to focus on **high-value technical nodes**—the key structural assumptions and parameters that EAGs challenge most and to which the cost-effectiveness decisions are highly sensitive.
 
-### Project Scope Statement
+**Project Scope Statement**
 
 | Domain | In Scope (High-Value Delivery) | Out of Scope (Academic perfectionism / Confidentiality barriers) |
 |---|---|---|
