@@ -1784,38 +1784,23 @@ print(p_os)
 
 ### Sensitivity Analysis: Confidential Discounts & OS Tail Reduction
 
-We now implement sensitivity analyses for the confidential discount of pembrolizumab and the OS tail reduction assumption.
+We now implement sensitivity analyses for the confidential discount of pembrolizumab and the OS tail reduction assumption under the EAG-preferred survival model specifications.
 
-#### Confidential Discount Sensitivity
+**Confidential Discount Sensitivity**
 
 The pembrolizumab commercial arrangement is confidential. Instead of guessing it, the mock model treats the discount as a scenario parameter. This makes the limitation explicit and lets us ask a practical question: how sensitive is the ICER to the assumed pembrolizumab acquisition discount?
 
-```{r starter-ce-discount-sensitivity}
-#| eval: false
-calculate_incremental_ce <- function(trace) {
-  trace |>
-    group_by(arm) |>
-    summarise(
-      discounted_qalys = sum(qaly),
-      discounted_costs = sum(total_cost),
-      .groups = "drop"
-    ) |>
-    summarise(
-      incremental_qalys = discounted_qalys[arm == "Pembro + chemo"] -
-        discounted_qalys[arm == "Placebo + chemo"],
-      incremental_costs = discounted_costs[arm == "Pembro + chemo"] -
-        discounted_costs[arm == "Placebo + chemo"],
-      icer = incremental_costs / incremental_qalys
-    )
-}
+```{r ce-discount-sensitivity}
+#| warning: false
+#| message: false
 
-run_discount_sensitivity <- function(discount_value) {
-  psm_survival |>
+run_discount_sensitivity <- function(psm_data, discount_value) {
+  psm_data |>
     group_by(arm) |>
     arrange(time_weeks, .by_group = TRUE) |>
     mutate(
-      discount = discount_factor(time_weeks, ce_params$annual_discount_rate),
-      death_increment = pmax(Dead - lag(Dead, default = 0), 0),
+      discount         = discount_factor(time_weeks, ce_params$annual_discount_rate),
+      death_increment  = pmax(Dead - lag(Dead, default = 0), 0),
       pf_resource_cost = case_when(
         time_weeks <= ce_params$comparator_treatment_cap_weeks ~
           ce_params$weekly_cost_pf_initial,
@@ -1829,8 +1814,7 @@ run_discount_sensitivity <- function(discount_value) {
       qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
         ce_params$cycle_length_years * discount,
       disease_management_cost = (
-        PF * pf_resource_cost +
-          PD * ce_params$weekly_cost_pd
+        PF * pf_resource_cost + PD * ce_params$weekly_cost_pd
       ) * discount,
       treatment_cost = case_when(
         arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
@@ -1844,7 +1828,7 @@ run_discount_sensitivity <- function(discount_value) {
         TRUE ~ 0
       ),
       ae_cost = case_when(
-        arm == "Pembro + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
+        arm == "Pembro + chemo"  & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
         arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
         TRUE ~ 0
       ),
@@ -1852,11 +1836,30 @@ run_discount_sensitivity <- function(discount_value) {
       total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
     ) |>
     ungroup() |>
-    calculate_incremental_ce() |>
+    group_by(arm) |>
+    summarise(
+      qalys = sum(qaly),
+      costs = sum(total_cost),
+      .groups = "drop"
+    ) |>
+    summarise(
+      incremental_qalys = qalys[arm == "Pembro + chemo"] - qalys[arm == "Placebo + chemo"],
+      incremental_costs = costs[arm == "Pembro + chemo"] - costs[arm == "Placebo + chemo"],
+      icer = incremental_costs / incremental_qalys,
+      .groups = "drop"
+    ) |>
     mutate(pembro_discount = discount_value)
 }
 
-map_dfr(c(0, 0.25, 0.50, 0.75), run_discount_sensitivity) |>
+# Run discount sensitivity across cohorts under EAG-preferred survival models
+bind_rows(
+  bind_rows(lapply(c(0, 0.25, 0.50, 0.75), function(d) {
+    run_discount_sensitivity(psm_pmmr_spline, d) |> mutate(subgroup = "pMMR")
+  })),
+  bind_rows(lapply(c(0, 0.25, 0.50, 0.75), function(d) {
+    run_discount_sensitivity(psm_dmmr, d) |> mutate(subgroup = "dMMR")
+  }))
+) |>
   mutate(
     pembro_discount = scales::percent(pembro_discount, accuracy = 1),
     incremental_qalys = round(incremental_qalys, 3),
@@ -1864,23 +1867,25 @@ map_dfr(c(0, 0.25, 0.50, 0.75), run_discount_sensitivity) |>
     icer = round(icer, 0)
   ) |>
   transmute(
+    Subgroup = subgroup,
     `Pembro discount` = pembro_discount,
     `Incremental QALYs` = incremental_qalys,
-    `Incremental costs` = incremental_costs,
-    ICER = icer
+    `Incremental Costs (£)` = incremental_costs,
+    `ICER (£/QALY)` = icer
   ) |>
-  kable(caption = "Illustrative confidential-discount sensitivity", align = "l")
+  kable(caption = "EAG Scenario Sensitivity: Illustrative pembrolizumab commercial discount", align = "l")
 ```
 
-
-#### OS Tail Sensitivity
+**OS Tail Sensitivity**
 
 Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate this is to reduce the long-term OS separation between arms after the EAG's 2-year boundary.
 
 This scenario is not an EAG preferred model. It is a teaching sensitivity: after 104 weeks, the pembro OS benefit is gradually reduced so that only 50% of the modelled OS separation remains by 10 years.
 
-```{r starter-ce-os-tail-sensitivity}
-#| eval: false
+```{r ce-os-tail-sensitivity}
+#| warning: false
+#| message: false
+
 apply_os_tail_reduction <- function(dat, start_week = 104, end_week = 520, final_fraction = 0.5) {
   dat |>
     select(arm, time_weeks, time_months, PFS, OS) |>
@@ -1903,89 +1908,38 @@ apply_os_tail_reduction <- function(dat, start_week = 104, end_week = 520, final
     ) |>
     pivot_wider(names_from = endpoint, values_from = survival) |>
     mutate(
-      PF = pmin(PFS, OS),
+      PFS = pmin(PFS, OS),
+      PF = PFS,
       PD = pmax(OS - PFS, 0),
       Dead = pmax(1 - OS, 0)
     )
 }
 
-psm_survival_os_sensitivity <- apply_os_tail_reduction(psm_survival)
+psm_pmmr_os_sens <- apply_os_tail_reduction(psm_pmmr_spline)
+psm_dmmr_os_sens  <- apply_os_tail_reduction(psm_dmmr)
 
-ce_trace_os_sensitivity <- psm_survival_os_sensitivity |>
-  group_by(arm) |>
-  arrange(time_weeks, .by_group = TRUE) |>
-  mutate(
-    discount = discount_factor(time_weeks, ce_params$annual_discount_rate),
-    death_increment = pmax(Dead - lag(Dead, default = 0), 0),
-    pf_resource_cost = case_when(
-      time_weeks <= ce_params$comparator_treatment_cap_weeks ~
-        ce_params$weekly_cost_pf_initial,
-      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
-        ce_params$weekly_cost_pf_pembro_maint,
-      time_weeks <= 104 ~
-        ce_params$weekly_cost_pf_offtreatment,
-      TRUE ~
-        ce_params$weekly_cost_pf_offtreatment_yr3
-    ),
-    qaly = (PF * ce_params$utility_pf + PD * ce_params$utility_pd) *
-      ce_params$cycle_length_years * discount,
-    disease_management_cost = (
-      PF * pf_resource_cost +
-        PD * ce_params$weekly_cost_pd
-    ) * discount,
-    treatment_cost = case_when(
-      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_combination_weeks ~
-        PF * ce_params$weekly_cost_pembro_combination *
-          (1 - ce_params$pembro_discount) * discount,
-      arm == "Pembro + chemo" & time_weeks <= ce_params$pembro_treatment_cap_weeks ~
-        PF * ce_params$weekly_cost_pembro_maintenance *
-          (1 - ce_params$pembro_discount) * discount,
-      arm == "Placebo + chemo" & time_weeks <= ce_params$comparator_treatment_cap_weeks ~
-        PF * ce_params$weekly_cost_comparator_chemo * discount,
-      TRUE ~ 0
-    ),
-    ae_cost = case_when(
-      arm == "Pembro + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_pembro,
-      arm == "Placebo + chemo" & time_weeks == 0 ~ ce_params$one_off_ae_cost_comparator,
-      TRUE ~ 0
-    ),
-    terminal_care_cost = death_increment * ce_params$terminal_care_cost * discount,
-    total_cost = disease_management_cost + treatment_cost + ae_cost + terminal_care_cost
-  ) |>
-  ungroup()
-
-ce_scenario_results <- ce_trace_os_sensitivity |>
-  group_by(arm) |>
-  summarise(
-    discounted_qalys = sum(qaly),
-    discounted_costs = sum(total_cost),
-    .groups = "drop"
-  ) |>
-  summarise(
-    incremental_qalys = discounted_qalys[arm == "Pembro + chemo"] -
-      discounted_qalys[arm == "Placebo + chemo"],
-    incremental_costs = discounted_costs[arm == "Pembro + chemo"] -
-      discounted_costs[arm == "Placebo + chemo"],
-    icer = incremental_costs / incremental_qalys
-  )
+ce_pmmr_os_sens <- run_discount_sensitivity(psm_pmmr_os_sens, 0)
+ce_dmmr_os_sens  <- run_discount_sensitivity(psm_dmmr_os_sens, 0)
 
 bind_rows(
-  ce_incremental |> mutate(scenario = "AIC-selected OS tail"),
-  ce_scenario_results |> mutate(scenario = "Reduced long-term OS separation")
+  ce_incremental_pmmr_spline |> select(incremental_qalys, incremental_costs, icer) |> mutate(subgroup = "pMMR", Scenario = "EAG-preferred Base Case (Splines)"),
+  ce_pmmr_os_sens            |> select(incremental_qalys, incremental_costs, icer) |> mutate(subgroup = "pMMR", Scenario = "50% OS Tail Separation at 10 yrs"),
+  ce_incremental_dmmr        |> select(incremental_qalys, incremental_costs, icer) |> mutate(subgroup = "dMMR", Scenario = "EAG-preferred Base Case (Standard)"),
+  ce_dmmr_os_sens             |> select(incremental_qalys, incremental_costs, icer) |> mutate(subgroup = "dMMR", Scenario = "50% OS Tail Separation at 10 yrs")
 ) |>
-  select(scenario, incremental_qalys, incremental_costs, icer) |>
   mutate(
     incremental_qalys = round(incremental_qalys, 3),
     incremental_costs = round(incremental_costs, 0),
     icer = round(icer, 0)
   ) |>
   transmute(
-    Scenario = scenario,
+    Subgroup = subgroup,
+    Scenario,
     `Incremental QALYs` = incremental_qalys,
-    `Incremental costs` = incremental_costs,
-    ICER = icer
+    `Incremental Costs (£)` = incremental_costs,
+    `ICER (£/QALY)` = icer
   ) |>
-  kable(caption = "Illustrative sensitivity to long-term OS benefit", align = "l")
+  kable(caption = "EAG Scenario Sensitivity: 50% OS tail separation reduction at 10 years", align = "l")
 ```
 
 This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company's long-term OS benefit is clinically plausible.
