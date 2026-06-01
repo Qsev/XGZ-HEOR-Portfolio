@@ -75,33 +75,25 @@ This project demonstrates a pragmatic, **value-driven scope management strategy*
 
 To maintain a concise background narrative, the complete HTA literature registry and parameter traceability mapping are detailed in the [HTA Evidence & Reference Registry](#appendix-a-hta-parameter-traceability-reference-registry) in the Appendix.
 
-## My Independent Assessment
+::: {.callout-note collapse="true"}
+## Modeler's Initial Risk Screening & HTA Audit Focus (Click to expand)
 
-> Written before reading the full EAG report in detail.
+When evaluating a manufacturer's cost-effectiveness submission for an oncology immunotherapy combination, an experienced HTA model auditor screens for standard systemic risk nodes. In this appraisal, our initial risk-screening checklist targets four critical domains:
 
-### What I Would Check First
+1. **Survival Extrapolation & Tail Plausibility (High Risk)**:
+   - *Audit Target*: When clinical trial follow-up is relatively short (median < 2 years), the choice of parametric models is highly sensitive. We must verify if the long-term overall survival (OS) tails are clinically plausible or if they project unrealistic lifetime "immortal patient" fractions.
+   - *Key Focus*: Subgroup sample sizes (dMMR vs. pMMR) and the risk of PFS and OS curves crossing in the long term, which violates logical consistency.
 
-From a reviewer perspective, this appraisal raises four immediate questions:
+2. **Immunotherapy Treatment Duration & Efficacy Waning (High Risk)**:
+   - *Audit Target*: Immunotherapies like pembrolizumab are typically capped (e.g., a 2-year stopping rule). The model must not assume that treatment benefit persists indefinitely after treatment discontinuation.
+   - *Key Focus*: Implementing and testing treatment-effect waning scenarios (e.g., waning starting at 2 or 5 years and converging to control hazards) to evaluate the stability of the ICER.
 
-1. **Survival maturity:** Is OS mature enough to support a lifetime extrapolation?
-2. **Subgroup credibility:** Are dMMR/MSI-H and pMMR/MSS results stable enough for separate modelling?
-3. **Curve behaviour:** Do the selected PFS and OS curves produce clinically plausible long-term survival?
-4. **Treatment effect duration:** Does the pembrolizumab benefit persist indefinitely, wane over time, or stop after treatment discontinuation?
+3. **Subgroup Applicability & Data Maturity (Medium Risk)**:
+   - *Audit Target*: The clinical and economic benefits may differ significantly between mismatch repair deficient (dMMR) and proficient (pMMR) cohorts. We need to check if separate models are statistically stable and if baseline characteristics align with the UK target population.
 
-### Initial Model Risk Map
-
-| Model domain | Why it matters | Initial risk level | What I need to verify |
-|---|---|---:|---|
-| OS extrapolation | Usually a major ICER driver in oncology PSMs | High | Chosen distribution, clinical validation, tail behaviour |
-| PFS extrapolation | Determines time on progression-free utility and treatment costs | High | Curve crossing and subgroup fit |
-| Treatment duration | Pembrolizumab has a capped treatment duration | Medium | Whether cost stopping and effect stopping are handled separately |
-| Treatment effect waning | EAGs often challenge indefinite immunotherapy benefit | High | Waning start/end and effect on ICER |
-| Utilities | Utility source may not match modelled population | Medium | Trial EQ-5D vs external utility values |
-| Subsequent treatments | Can change OS and post-progression costs | Medium | Mix, duration, and consistency with NHS practice |
-
-### Early View
-
-My prior expectation is that the EAG critique will focus less on the PSM structure itself and more on the **credibility of extrapolated survival benefit**. In a NICE appraisal, the PSM is usually acceptable as a structure; the disputed part is whether the survival curves and treatment-effect assumptions produce a clinically plausible long-term trajectory.
+4. **Resource Cost & Subsequent Therapy Alignments (Medium Risk)**:
+   - *Audit Target*: Subsequent treatment mixes in the comparator arm must reflect real-world NHS standard pathways rather than non-reimbursed trial settings, as differences in active subsequent therapies can distort the cost delta.
+:::
 
 ## EAG Critique Lens
 
