@@ -231,11 +231,11 @@ My takeaway is that this is not a main technical replication target at this stag
 | Adverse events | >5% Grade 3-5 AEs (anemia & hypertension only) | Include Grade 3-5 AEs with >=2% incidence | Company base case (>5% Grade 3-5 AEs) | Committee accepted the company base case because including broader AEs had a minimal impact on the ICER |
 | Subsequent therapy | Pembrolizumab monotherapy allowed in CT arm | Reallocate pembrolizumab monotherapy to pembrolizumab + lenvatinib | Reallocated subsequent therapy for pMMR patients | Committee preferred aligning subsequent therapies with NHS clinical guidelines for pMMR patients, which reduced the cost delta and decreased the ICER |
 
-## 1. Workflow Setup & Exploratory Analysis
+## Workflow Setup & Exploratory Analysis
 
 In this chapter, we load the required packages, set up local file paths, import the reconstructed individual patient-level data (pseudo-IPD), and perform exploratory curve inspections.
 
-### 1.1 Load Packages & Settings
+### Load Packages & Settings
 
 This block loads the R packages used in this workflow.
 
@@ -266,7 +266,7 @@ tibble(
 ```
 
 
-### 1.2 Define File Paths
+### Define File Paths
 
 The main input is the combined long-format pseudo-IPD file.
 
@@ -288,7 +288,7 @@ tibble(
 ```
 
 
-### 1.3 Read & Transform Reconstructed Input IPD
+### Read & Transform Reconstructed Input IPD
 
 The dataset is reconstructed pseudo-IPD. Each row is one pseudo-patient.
 
@@ -320,9 +320,9 @@ ipd |>
 ```
 
 
-### 1.4 Exploratory Curve Inspection & KM Plotting
+### Exploratory Curve Inspection & KM Plotting
 
-#### 1.4.1 Inspecting pMMR PFS Pembrolizumab Cohort
+#### Inspecting pMMR PFS Pembrolizumab Cohort
 
 Before fitting every curve, inspect one explicitly named curve: **pMMR PFS, pembro arm**.
 
@@ -345,7 +345,7 @@ tibble(
 ```
 
 
-#### 1.4.2 Creating the Survival Object
+#### Creating the Survival Object
 
 `Surv(time, status)` is the standard R representation of right-censored survival data.
 
@@ -361,7 +361,7 @@ tibble(
 ```
 
 
-#### 1.4.3 Reconstructed Kaplan-Meier Curve
+#### Reconstructed Kaplan-Meier Curve
 
 This is the Kaplan-Meier curve reconstructed from pseudo-IPD.
 
@@ -385,13 +385,13 @@ ggplot(pmmr_pfs_pembro_km_df, aes(time_months, survival)) +
 ```
 
 
-## 2. Parametric Survival Fitting & Diagnostics
+## Parametric Survival Fitting & Diagnostics
 
 This chapter outlines the standard parametric survival fitting workflow. We fit seven candidate distributions (exponential, Weibull, Gompertz, log-normal, log-logistic, gamma, and generalized gamma) to each curve, assess fit summaries via information criteria (AIC and BIC), and extract the fitted parameters.
 
-### 2.1 Model Setup & Safe Fitting Wrapper
+### Model Setup & Safe Fitting Wrapper
 
-#### 2.1.1 Candidate Parametric Distributions
+#### Candidate Parametric Distributions
 
 These are common survival distributions used in oncology HTA submissions and EAG critiques.
 
@@ -414,7 +414,7 @@ tibble(
 ```
 
 
-#### 2.1.2 Weibull Model Fitting Demonstration
+#### Weibull Model Fitting Demonstration
 
 This block fits a Weibull model to the pMMR PFS pembro curve.
 
@@ -433,7 +433,7 @@ as.data.frame(pmmr_pfs_pembro_weibull$res) |>
 ```
 
 
-#### 2.1.3 Safe Fitting Wrapper Function
+#### Safe Fitting Wrapper Function
 
 Some distributions can fail for sparse or immature OS data. This function catches failures and returns a row explaining what happened.
 
@@ -483,7 +483,7 @@ tibble(function_created = "fit_one_distribution()", purpose = "Fit one distribut
 ```
 
 
-#### 2.1.4 Details of the Wrapper Logic
+#### Details of the Wrapper Logic
 
 This function is a small wrapper around `flexsurvreg()`. The reason to write a wrapper is that we want to fit many distributions across many curves. Some fits may fail, especially for immature OS curves with few events. If one fit fails, we do not want the whole document to stop.
 
@@ -572,9 +572,9 @@ This is useful for modelling workflow QA. Instead of silently losing failed fits
 In HEOR work, this matters because sparse OS data can make complex models unstable. A reviewer or EAG would want to know not only which model had the best AIC, but also whether some candidate models failed, behaved oddly, or were unsuitable for extrapolation.
 
 
-### 2.2 Fitting Batch Curves & Extracting Parameters
+### Fitting Batch Curves & Extracting Parameters
 
-#### 2.2.1 Comparing Candidate Fits for One Curve
+#### Comparing Candidate Fits for One Curve
 
 For the pMMR PFS pembro curve, fit all candidate distributions and rank by AIC.
 
@@ -592,7 +592,7 @@ pmmr_pfs_pembro_fit_comparison |>
 ```
 
 
-#### 2.2.2 Fitting Every Curve
+#### Fitting Every Curve
 
 Now repeat the same process for all subgroup-endpoint-treatment curves.
 
@@ -621,7 +621,7 @@ fit_tbl |>
 ```
 
 
-#### 2.2.3 Creating the Fit Summary Table
+#### Creating the Fit Summary Table
 
 AIC is useful for first-pass comparison, but not sufficient for final HTA model choice.
 
@@ -646,7 +646,7 @@ top3_fit_summary |>
 ```
 
 
-#### 2.2.4 Extract Model Parameters
+#### Extract Model Parameters
 
 The object `parameter_tbl` stores parameter estimates from **every converged model** across all subgroups, endpoints, treatment arms, and distributions.
 
@@ -683,7 +683,7 @@ parameter_tbl |>
 ```
 
 
-### 2.3 Model Ranking & First-Pass AIC Selection
+### Model Ranking & First-Pass AIC Selection
 
 This is a mechanical first-pass choice. Later we will critique the tails.
 
@@ -701,13 +701,13 @@ best_fits |>
 ```
 
 
-## 3. Extrapolation Zone & Data Maturity Critique (Issue 3)
+## Extrapolation Zone & Data Maturity Critique (Issue 3)
 
 This chapter demonstrates how the short follow-up in clinical trials can create substantial uncertainty during long-term overall survival and progression-free survival extrapolations. We present the EAG's Issue 3 critique framework, visualize the extrapolation zones, and evaluate parametric tail divergence at key clinical landmarks.
 
-### 3.1 Predicting Survival Over 30-Year Horizon
+### Predicting Survival Over 30-Year Horizon
 
-#### 3.1.1 Extrapolating Selected Distributions
+#### Extrapolating Selected Distributions
 
 The extrapolation horizon is 360 months, or 30 years.
 
@@ -759,7 +759,7 @@ extrapolated |>
 ```
 
 
-#### 3.1.2 Visualizing Long-Run Extrapolations
+#### Visualizing Long-Run Extrapolations
 
 Tables are not the best way to inspect extrapolated survival. For HTA work, the curve shape is more informative. Here we show two examples:
 
@@ -802,7 +802,7 @@ ggplot(selected_long_run, aes(time_months, survival, colour = line_label)) +
 ```
 
 
-#### 3.1.3 Comparing Reconstructed KM with Parametric Best Fits
+#### Comparing Reconstructed KM with Parametric Best Fits
 
 This plot is where HTA judgement begins. In this specific pMMR PFS example, the AIC-selected curves do not show an obvious visual problem. The point of the plot is more modest: it lets us check whether the fitted curve tracks the reconstructed KM reasonably before we start interpreting the long-term extrapolation.
 
@@ -873,9 +873,9 @@ ggplot(plot_data, aes(time_months, survival, colour = curve_label)) +
 ```
 
 
-### 3.2 EAG Issue 3 Framework & Extrapolation-Zone Plotting
+### EAG Issue 3 Framework & Extrapolation-Zone Plotting
 
-#### 3.2.1 Introduction to Issue 3 Demonstration
+#### Introduction to Issue 3 Demonstration
 
 The EAG's Issue 3 is not just saying that longer follow-up would be preferable. The practical concern is that KEYNOTE-868 provides relatively early survival evidence, while the economic model requires long-term PFS and OS predictions.
 
@@ -884,7 +884,7 @@ In the EAG report, several values are redacted in the Issue 3 table. Later consu
 This section uses **pMMR OS, pembro arm** as the worked example. OS is usually one of the most important drivers of life years and QALYs in oncology models, and short follow-up is especially important when OS benefit is immature.
 
 
-#### 3.2.2 EAG Logic Behind Issue 3
+#### EAG Logic Behind Issue 3
 
 Before plotting anything, it is useful to translate the EAG's concern into modelling terms.
 
@@ -930,7 +930,7 @@ issue3_maturity_checks |>
 ```
 
 
-#### 3.2.3 Observed Evidence Versus the 20-Year Projection
+#### Observed Evidence Versus the 20-Year Projection
 
 The first technical check is descriptive: how much reconstructed follow-up do we have, and how does it compare with the 20-year projection horizon discussed by the EAG?
 
@@ -980,7 +980,7 @@ For this portfolio, the table sets up the next two checks:
 - whether different plausible parametric curves produce different long-term survival.
 
 
-#### 3.2.4 Extrapolation-Zone Plot
+#### Extrapolation-Zone Plot
 
 The next plot turns Issue 3 into a visual modelling problem. It marks:
 
@@ -1097,9 +1097,9 @@ ggplot() +
 The point of this plot is not that the red curve is necessarily wrong. The point is that the area most relevant to 5-, 10-, and 20-year survival is not directly observed in the trial. It is a modelled continuation from early evidence.
 
 
-### 3.3 Parametric Tail Divergence & Landmark Predictions
+### Parametric Tail Divergence & Landmark Predictions
 
-#### 3.3.1 Distribution Fan Plot
+#### Distribution Fan Plot
 
 A second EAG-style check is to ask whether several distributions fit the observed period reasonably but imply different long-term tails.
 
@@ -1166,7 +1166,7 @@ ggplot() +
 This is the visual reason why short follow-up matters. The observed KM can look compatible with several parametric shapes, but the long-term tail can differ materially once the model moves beyond the trial data.
 
 
-#### 3.3.2 Landmark Survival Table
+#### Landmark Survival Table
 
 The same point can be expressed numerically. This table compares predicted survival at landmark time points that are far beyond the observed follow-up.
 
@@ -1197,7 +1197,7 @@ issue3_landmark_table |>
 If the 10-year or 20-year predictions differ meaningfully across distributions, then the model has structural uncertainty. This is not solved by choosing the lowest AIC alone, because AIC mainly assesses fit to the available observed data. It does not prove that the extrapolated tail is clinically plausible.
 
 
-#### 3.3.3 Appraisal Interpretation
+#### Appraisal Interpretation
 
 This section turns the EAG's Issue 3 into a reproducible modelling demonstration:
 
@@ -1210,13 +1210,13 @@ This section turns the EAG's Issue 3 into a reproducible modelling demonstration
 The key portfolio message is: short follow-up matters when the cost-effectiveness result depends on survival benefits generated beyond the observed trial period. The issue is not that extrapolation is avoidable; oncology economic models often require extrapolation. The EAG concern is that, with immature OS and limited follow-up, the long-term survival benefit may be driven more by modelling assumptions than by observed trial evidence.
 
 
-## 4. Cost-Effectiveness under AIC-Selected Standard Parametric Models
+## Cost-Effectiveness under AIC-Selected Standard Parametric Models
 
 In this chapter, we implement a three-state Partitioned Survival Model (PSM) using a weekly cycle and a 35-year time horizon. This section focuses on health-state occupancy, discounted costs, and QALY outcomes under standard parametric curves selected purely by the best AIC fit.
 
-### 4.1 Economic Inputs & PSM Engine Setup
+### Economic Inputs & PSM Engine Setup
 
-#### 4.1.1 Overview of the Starter Cost-Effectiveness Module
+#### Overview of the Starter Cost-Effectiveness Module
 
 The previous sections focus on survival modelling. To connect Issue 5 to the economic model, we need to show how PFS and OS extrapolations feed into cost-effectiveness.
 
@@ -1227,7 +1227,7 @@ This is not yet a NICE base-case replication. It is a transparent, simplified pa
 - OS tail assumptions can materially change incremental QALYs and the ICER.
 
 
-#### 4.1.2 Economic Parameter Table
+#### Economic Parameter Table
 
 The table below separates the inputs into three groups:
 
@@ -1389,7 +1389,7 @@ discount_factor <- function(week, annual_rate) {
 ```
 
 
-### 4.2 pMMR Cohort Analysis
+### pMMR Cohort Analysis
 
 ```{r pmmr-aic-state-occupancy}
 psm_pmmr_aic <- best_fits |>
@@ -1487,7 +1487,7 @@ ce_incremental_pmmr_aic |>
 ```
 
 
-### 4.3 dMMR Cohort Analysis
+### dMMR Cohort Analysis
 
 ```{r dmmr-aic-state-occupancy}
 psm_dmmr_aic <- best_fits |>
@@ -1533,7 +1533,7 @@ ce_incremental_dmmr_aic |>
 ```
 
 
-### 4.4 Subgroup Synthesis & Comparison
+### Subgroup Synthesis & Comparison
 
 Below, we compare the cost-effectiveness results of the pMMR and dMMR subgroups under the AIC-selected standard parametric distributions.
 
@@ -1561,13 +1561,13 @@ bind_rows(
   )
 ```
 
-## 5. Cost-Effectiveness under EAG-Preferred Survival Models
+## Cost-Effectiveness under EAG-Preferred Survival Models
 
 In this chapter, we evaluate the cost-effectiveness of pembrolizumab plus chemotherapy across subgroups using the EAG-preferred curve selections. For the pMMR cohort, the EAG preferred Royston-Parmar flexible spline models, whereas for the dMMR cohort, standard parametric models were retained but alternative distributions were selected.
 
-### 5.1 Spline and Standard Model Fitting Setup
+### Spline and Standard Model Fitting Setup
 
-#### 5.1.1 EAG Spline Model Fitting (pMMR)
+#### EAG Spline Model Fitting (pMMR)
 
 The EAG preferred spline models for pMMR (Table 2) are Royston-Parmar flexible parametric models fitted with `flexsurvspline()`. Unlike standard parametric distributions, spline models can accommodate non-monotonic hazard functions and are more flexible in the observed period.
 
@@ -1647,7 +1647,7 @@ eag_pmmr_spline_fits |>
 ```
 
 
-#### 5.1.2 EAG Model Selection (dMMR)
+#### EAG Model Selection (dMMR)
 
 ```{r dmmr-eag-model-selection}
 eag_dmmr_selections <- tibble::tribble(
@@ -1669,9 +1669,9 @@ eag_dmmr_fits |>
 ```
 
 
-### 5.2 pMMR Cohort Analysis
+### pMMR Cohort Analysis
 
-#### 5.2.1 State Occupancy with EAG Spline Models
+#### State Occupancy with EAG Spline Models
 
 ```{r pmmr-spline-state-occupancy}
 get_spline_surv <- function(fit_obj, times) {
@@ -1732,7 +1732,7 @@ psm_pmmr_spline |>
 ```
 
 
-#### 5.2.2 Discounted Costs and QALYs (EAG Spline Models)
+#### Discounted Costs and QALYs (EAG Spline Models)
 
 ```{r pmmr-spline-ce-results}
 ce_trace_pmmr_spline <- psm_pmmr_spline |>
@@ -1817,9 +1817,9 @@ ce_incremental_pmmr_spline |>
 ```
 
 
-### 5.3 dMMR Cohort Analysis
+### dMMR Cohort Analysis
 
-#### 5.3.1 State Occupancy with EAG-Preferred Models
+#### State Occupancy with EAG-Preferred Models
 
 ```{r dmmr-state-occupancy}
 psm_dmmr <- eag_dmmr_fits |>
@@ -1865,7 +1865,7 @@ psm_dmmr |>
 ```
 
 
-#### 5.3.2 Discounted Costs and QALYs
+#### Discounted Costs and QALYs
 
 ```{r dmmr-ce-results}
 ce_trace_dmmr <- psm_dmmr |>
@@ -1954,7 +1954,7 @@ ce_incremental_dmmr |>
 ```
 
 
-### 5.4 Subgroup Synthesis & Comparison
+### Subgroup Synthesis & Comparison
 
 ```{r pmmr-dmmr-comparison}
 bind_rows(
@@ -1987,11 +1987,11 @@ Interpretation notes:
 - Pembrolizumab confidential discount is set to 0% in both calculations; the real ICER under PAS pricing would be lower.
 
 
-## 6. Model Selection Critique: AIC-Selected vs. EAG-Preferred Models
+## Model Selection Critique: AIC-Selected vs. EAG-Preferred Models
 
 This chapter summarizes the cost-effectiveness estimates across the different survival modeling approaches. We present a 2×2 comparison table, explore sensitivity analyses around confidential discounts and overall survival tail assumptions, and discuss key HTA consulting takeaways.
 
-### 6.1 2×2 Model Selection Synthesis
+### 2×2 Model Selection Synthesis
 
 ```{r model-selection-comparison}
 bind_rows(
@@ -2023,7 +2023,7 @@ The key question this table answers: how sensitive is the ICER to the choice of 
 
 
 
-### 6.2 Visual Extrapolation Comparison: AIC vs. EAG
+### Visual Extrapolation Comparison: AIC vs. EAG
 
 To visually understand why the cost-effectiveness results differ substantially, we plot the reconstructed KM curves alongside the fitted and extrapolated curves for both the AIC-selected standard parametric models and the EAG-preferred spline models. The plots show the first 10 years (120 months) of projection.
 
@@ -2034,7 +2034,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-# 1. Combine PFS Plot Data
+# Combine PFS Plot Data
 plot_data_pfs <- bind_rows(
   km_points |>
     filter(subgroup == "pMMR", endpoint == "PFS") |>
@@ -2060,7 +2060,7 @@ plot_data_pfs <- bind_rows(
     select(arm, time_months, survival, source, model)
 )
 
-# 2. Combine OS Plot Data
+# Combine OS Plot Data
 plot_data_os <- bind_rows(
   km_points |>
     filter(subgroup == "pMMR", endpoint == "OS") |>
@@ -2152,11 +2152,11 @@ print(p_os)
 ```
 
 
-### 6.3 Sensitivity Analysis: Confidential Discounts & OS Tail Reduction
+### Sensitivity Analysis: Confidential Discounts & OS Tail Reduction
 
 We now implement sensitivity analyses for the confidential discount of pembrolizumab and the OS tail reduction assumption.
 
-#### 6.3.1 Confidential Discount Sensitivity
+#### Confidential Discount Sensitivity
 
 The pembrolizumab commercial arrangement is confidential. Instead of guessing it, the mock model treats the discount as a scenario parameter. This makes the limitation explicit and lets us ask a practical question: how sensitive is the ICER to the assumed pembrolizumab acquisition discount?
 
@@ -2243,7 +2243,7 @@ map_dfr(c(0, 0.25, 0.50, 0.75), run_discount_sensitivity) |>
 ```
 
 
-#### 6.3.2 OS Tail Sensitivity
+#### OS Tail Sensitivity
 
 Issue 5 is about the uncertain degree of OS benefit. A simple way to demonstrate this is to reduce the long-term OS separation between arms after the EAG's 2-year boundary.
 
@@ -2361,7 +2361,7 @@ bind_rows(
 This is the bridge to Issue 5. If reducing the long-term OS separation reduces incremental QALYs and increases the ICER, then the OS tail is decision-relevant. That is why the EAG focuses on whether the company's long-term OS benefit is clinically plausible.
 
 
-### 6.4 Clinical Logic Validation and Capping under Parameter Uncertainty
+### Clinical Logic Validation and Capping under Parameter Uncertainty
 
 While the EAG-preferred spline models for the pMMR cohort (Table 2) offer superior statistical fit during the trial period, they introduce a clinical logic violation: the long-term extrapolated PFS curve for the placebo + CT arm (2-knot hazards) can cross and exceed the pembrolizumab + CT arm (1-knot hazards) in the tail.
 
@@ -2558,7 +2558,7 @@ However, implementing this capping logic remains a critical HTA requirement. In 
 :::
 
 
-### 6.5 HTA Decision Interpretation & Consulting Takeaways
+### HTA Decision Interpretation & Consulting Takeaways
 
 In HEOR modeling, the choice of survival models is rarely a purely statistical exercise. The "crossover and capping" debate in the pembrolizumab appraisal teaches several critical consulting lessons regarding the thinking process of HTA bodies:
 
@@ -2570,7 +2570,7 @@ In HEOR modeling, the choice of survival models is rarely a purely statistical e
 6. **Strategic Alignment of Clinical Logic and Commercial Interests**: The crossover debate illustrates how clinical critique and commercial submission strategy can align. While the company framed its objection to the crossing curves on clinical and logical grounds, implementing the logical cap mathematically favored the cost-effectiveness case for pembrolizumab. Capping the Placebo PFS at the Pembro PFS curve reduces the Placebo PFS probability in the tail, which shifts simulated patient-time from the progression-free (PF) state to the progressed disease (PD) state. Because the PF health state is assigned a higher utility (0.814) than the PD state (0.720), this shift lowers the cumulative QALYs in the Placebo arm. This increases the incremental QALY benefit ($\Delta E$) in favor of the active treatment, which mathematically **reduces the ICER**. In HTA consulting, identifying areas where clinical realism arguments also happen to strengthen the cost-effectiveness case is a key element of strategic value demonstration.
 
 
-#### 6.5.1 Saving Reconstructed Model Outputs
+#### Saving Reconstructed Model Outputs
 
 This final block writes the same output files as the batch script.
 
