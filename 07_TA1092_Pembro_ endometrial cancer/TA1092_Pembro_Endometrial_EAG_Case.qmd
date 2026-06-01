@@ -903,28 +903,31 @@ This divergence highlights why choosing an extrapolation curve based on statisti
 
 In this chapter, we implement a three-state Partitioned Survival Model (PSM) using a weekly cycle and a 35-year time horizon. This section focuses on health-state occupancy, discounted costs, and QALY outcomes under standard parametric curves selected purely by the best AIC fit.
 
-### Economic Inputs & PSM Engine Setup
+### Economic Inputs & PSM Engine Setup {#sec-ce-models-aic}
 
-#### Overview of the Starter Cost-Effectiveness Module
+To translate the reconstructed progression-free survival (PFS) and overall survival (OS) curves into cost-effectiveness estimates, we construct a de novo Partitioned Survival Model (PSM) in R. Partitioned survival models are the standard structural framework used in oncology submissions to NICE. In this weekly-cycle model, patient-time is partitioned across three mutually exclusive health states:
 
-The previous sections focus on survival modelling. To connect Issue 5 to the economic model, we need to show how PFS and OS extrapolations feed into cost-effectiveness.
+1. **Progression-Free (PF)**: The proportion of patients alive and progression-free at week $t$ is directly determined by the progression-free survival probability ($PFS(t)$).
+2. **Progressed Disease (PD)**: The proportion of progressed patients is calculated as the difference between overall survival and progression-free survival ($OS(t) - PFS(t)$).
+3. **Death (D)**: The proportion of deceased patients is determined by the cumulative mortality probability ($1 - OS(t)$).
 
-This is not yet a NICE base-case replication. It is a transparent, simplified partitioned survival model (PSM) that uses extracted public parameters where I can currently verify them, and clearly labels remaining illustrative or unverified inputs. The purpose is to move from a pure survival-fitting exercise toward a mock cost-effectiveness case.
+#### Key Model Assumptions and Parameters
 
-- PFS and OS curves determine health-state occupancy.
-- Health-state occupancy determines QALYs and costs.
-- OS tail assumptions can materially change incremental QALYs and the ICER.
+The economic model is built around a set of standard UK HTA parameters. While a simplified starter module is implemented here, it reflects the primary clinical and financial drivers:
 
+- **Lifetime Horizon**: The simulation runs over a **35-year time horizon** (1,820 weekly cycles) to capture the lifetime costs and health outcomes of patients in this cohort.
+- **Discounting**: Costs and health effects (QALYs) are discounted at an **annual rate of 3.5%**, in line with NICE reference case guidelines.
+- **Health State Utilities**: Quality-adjusted life years (QALYs) are calculated by weighting state occupancy with utility values. We apply utility weights of **0.814** for the PF state and **0.720** for the PD state, mapped from public appraisal documentation.
+- **Treatment Acquisition & Dosing**: 
+  - *Pembrolizumab Arm*: 6 cycles of pembrolizumab in combination with chemotherapy (every 3 weeks, approx. 18 weeks), followed by up to 14 cycles of pembrolizumab monotherapy maintenance (every 6 weeks, approx. 84 weeks), capped at a maximum treatment duration of 102 weeks (2 years).
+  - *Comparator Arm*: 6 cycles of standard chemotherapy (every 3 weeks, approx. 18 weeks).
+  - Drug cost estimates are based on public list prices (excluding confidential commercial discounts).
+- **NHS Resource Use & Administration**: Weekly costs represent chemotherapy administration fees, outpatient visits, routine laboratory monitoring (blood, liver, thyroid tests), and CT surveillance scans based on NICE-updated resource frequencies.
 
-#### Economic Parameter Table
-
-The table below separates the inputs into three groups:
-
-- **Extracted:** taken from the NotebookLM extraction output and plausible to use in this mock case.
-- **Needs source verification:** extracted or implied, but should be checked against the original PDF before being treated as final.
-- **Illustrative:** used only to keep the model runnable until a verified parameter is abstracted.
+Please refer to [Appendix B: Economic Model Technical Parameters & Model Setup](#sec-appendix-b) for the complete parameter mapping, NHS unit costs, and R code variables.
 
 ```{r starter-ce-inputs}
+#| include: false
 ce_inputs <- tibble::tribble(
   ~Input, ~Value, ~Status, ~Note,
   "Time horizon", "35 years", "Extracted", "Lifetime horizon in the economic model",
@@ -947,12 +950,12 @@ ce_inputs <- tibble::tribble(
   "AE cost", "One-off Grade 3+ anaemia and hypertension cost", "Inferred from extracted inputs", "Duration for AE QALY decrement remains redacted, so only one-off AE costs are included here",
   "Confidential pembrolizumab discount", "Scenario parameter", "Unavailable", "Handled through pembro_discount sensitivity rather than assumed in the base case"
 )
-
-ce_inputs |>
-  kable(caption = "Economic inputs used in the mock PSM", align = "l", escape = FALSE)
 ```
 
 ```{r starter-ce-parameters}
+#| warning: false
+#| message: false
+
 ce_params <- list(
   horizon_weeks = 35 * 52,
   cycle_length_years = 1 / 52,
@@ -976,96 +979,6 @@ ce_params <- list(
   one_off_ae_cost_pembro = 0.169 * 565.40 + 0.056 * 735.07,
   one_off_ae_cost_comparator = 0.116 * 565.40 + 0.052 * 735.07
 )
-
-param_display <- tibble(
-  Parameter = c(
-    "horizon_weeks",
-    "cycle_length_years",
-    "annual_discount_rate",
-    "utility_pf",
-    "utility_pd",
-    "weekly_cost_pf_initial",
-    "weekly_cost_pf_pembro_maint",
-    "weekly_cost_pf_offtreatment",
-    "weekly_cost_pf_offtreatment_yr3",
-    "weekly_cost_pd",
-    "weekly_cost_pembro_combination",
-    "weekly_cost_pembro_maintenance",
-    "weekly_cost_comparator_chemo",
-    "pembro_discount",
-    "pembro_combination_weeks",
-    "pembro_maintenance_weeks",
-    "pembro_treatment_cap_weeks",
-    "comparator_treatment_cap_weeks",
-    "terminal_care_cost",
-    "one_off_ae_cost_pembro",
-    "one_off_ae_cost_comparator"
-  ),
-  Value = c(
-    "1,820 weeks",
-    "1/52 year per cycle",
-    "3.5% per year",
-    "0.814",
-    "0.720",
-    scales::dollar(ce_params$weekly_cost_pf_initial, prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pf_pembro_maint, prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pf_offtreatment, prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pf_offtreatment_yr3, prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pd, prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pembro_combination, prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pembro_maintenance, prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_comparator_chemo, prefix = "&#163;"),
-    "0% in base case",
-    "18 weeks",
-    "84 weeks",
-    "102 weeks",
-    "18 weeks",
-    "&#163;8,829.07",
-    scales::dollar(ce_params$one_off_ae_cost_pembro, prefix = "&#163;"),
-    scales::dollar(ce_params$one_off_ae_cost_comparator, prefix = "&#163;")
-  )
-)
-
-tibble(
-  Parameter_1 = c(
-    "horizon_weeks", "cycle_length_years", "annual_discount_rate",
-    "utility_pf", "utility_pd", "weekly_cost_pf_initial",
-    "weekly_cost_pf_pembro_maint", "weekly_cost_pf_offtreatment",
-    "weekly_cost_pf_offtreatment_yr3", "weekly_cost_pd",
-    "weekly_cost_pembro_combination"
-  ),
-  Value_1 = c(
-    "1,820 weeks", "1/52 year per cycle", "3.5% per year",
-    "0.814", "0.720",
-    scales::dollar(ce_params$weekly_cost_pf_initial,        prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pf_pembro_maint,   prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pf_offtreatment,   prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pf_offtreatment_yr3, prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pd,                prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_pembro_combination, prefix = "&#163;")
-  ),
-  Parameter_2 = c(
-    "weekly_cost_pembro_maintenance", "weekly_cost_comparator_chemo",
-    "pembro_discount", "pembro_combination_weeks", "pembro_maintenance_weeks",
-    "pembro_treatment_cap_weeks", "comparator_treatment_cap_weeks",
-    "terminal_care_cost", "one_off_ae_cost_pembro", "one_off_ae_cost_comparator", ""
-  ),
-  Value_2 = c(
-    scales::dollar(ce_params$weekly_cost_pembro_maintenance,  prefix = "&#163;"),
-    scales::dollar(ce_params$weekly_cost_comparator_chemo,    prefix = "&#163;"),
-    "0% in base case", "18 weeks", "84 weeks", "102 weeks", "18 weeks",
-    "&#163;8,829.07",
-    scales::dollar(ce_params$one_off_ae_cost_pembro,          prefix = "&#163;"),
-    scales::dollar(ce_params$one_off_ae_cost_comparator,      prefix = "&#163;"),
-    ""
-  )
-) |>
-  kable(
-    col.names = c("Parameter", "Value", "Parameter", "Value"),
-    caption   = "Parameter object used by the simplified PSM",
-    align     = "l",
-    escape    = FALSE
-  )
 
 ce_time_grid <- tibble(
   time_weeks  = 0:ce_params$horizon_weeks,
@@ -2312,3 +2225,59 @@ All data inputs, parameters, and clinical evidence mapped in the de novo R repli
 | **EAG Evaluation Report & Supplementary Papers** | EAG Report Section 4.2 | • Manufacturer base case parametrics vs. EAG-preferred Royston-Parmar splines.<br>• EAG clinical expert estimates for starting age (67.1 years) and routine monitoring costs. |
 | **Committee Consultation & Consultation Papers** | NICE Committee Papers | • Market shares for subsequent therapies (pembrolizumab + lenvatinib reallocation).<br>• Health state utilities (KEYNOTE-158 and KEYNOTE-B21) and AE management unit costs. |
 | **Pivotal Trial Publication (NEJM)** | KEYNOTE-868 (NRG-GY018) | • Trial protocol, subgroup baseline demographics (mean age 65.4 years).<br>• Subgroup-specific PFS and OS Kaplan-Meier survival curves used for digitization. |
+
+### Appendix B: Economic Model Technical Parameters & Model Setup {#sec-appendix-b}
+
+The tables below map the exact inputs and variables used in the weekly-cycle de novo Partitioned Survival Model (PSM) engine.
+
+[Back to Chapter 4](#sec-ce-models-aic)
+
+```{r display-appendix-params}
+#| echo: false
+#| warning: false
+#| message: false
+
+ce_inputs |>
+  kable(caption = "Economic inputs used in the mock PSM", align = "l", escape = FALSE)
+
+tibble(
+  Parameter_1 = c(
+    "horizon_weeks", "cycle_length_years", "annual_discount_rate",
+    "utility_pf", "utility_pd", "weekly_cost_pf_initial",
+    "weekly_cost_pf_pembro_maint", "weekly_cost_pf_offtreatment",
+    "weekly_cost_pf_offtreatment_yr3", "weekly_cost_pd",
+    "weekly_cost_pembro_combination"
+  ),
+  Value_1 = c(
+    "1,820 weeks", "1/52 year per cycle", "3.5% per year",
+    "0.814", "0.720",
+    scales::dollar(ce_params$weekly_cost_pf_initial,        prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_pembro_maint,   prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_offtreatment,   prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pf_offtreatment_yr3, prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pd,                prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_pembro_combination, prefix = "&#163;")
+  ),
+  Parameter_2 = c(
+    "weekly_cost_pembro_maintenance", "weekly_cost_comparator_chemo",
+    "pembro_discount", "pembro_combination_weeks", "pembro_maintenance_weeks",
+    "pembro_treatment_cap_weeks", "comparator_treatment_cap_weeks",
+    "terminal_care_cost", "one_off_ae_cost_pembro", "one_off_ae_cost_comparator", ""
+  ),
+  Value_2 = c(
+    scales::dollar(ce_params$weekly_cost_pembro_maintenance,  prefix = "&#163;"),
+    scales::dollar(ce_params$weekly_cost_comparator_chemo,    prefix = "&#163;"),
+    "0% in base case", "18 weeks", "84 weeks", "102 weeks", "18 weeks",
+    "&#163;8,829.07",
+    scales::dollar(ce_params$one_off_ae_cost_pembro,          prefix = "&#163;"),
+    scales::dollar(ce_params$one_off_ae_cost_comparator,      prefix = "&#163;"),
+    ""
+  )
+) |>
+  kable(
+    col.names = c("Parameter", "Value", "Parameter", "Value"),
+    caption   = "Parameter object used by the simplified PSM",
+    align     = "l",
+    escape    = FALSE
+  )
+```
