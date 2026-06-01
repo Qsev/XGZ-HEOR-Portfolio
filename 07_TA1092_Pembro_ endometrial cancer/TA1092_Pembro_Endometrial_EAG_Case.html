@@ -137,9 +137,9 @@ window.Quarto = {
   </ul></li>
   <li><a href="#extrapolation-zone-data-maturity-critique-issue-3" id="toc-extrapolation-zone-data-maturity-critique-issue-3" class="nav-link" data-scroll-target="#extrapolation-zone-data-maturity-critique-issue-3"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</a>
   <ul class="collapse">
-  <li><a href="#predicting-survival-over-30-year-horizon" id="toc-predicting-survival-over-30-year-horizon" class="nav-link" data-scroll-target="#predicting-survival-over-30-year-horizon"><span class="header-section-number">5.1</span> Predicting Survival Over 30-Year Horizon</a></li>
-  <li><a href="#eag-issue-3-framework-extrapolation-zone-plotting" id="toc-eag-issue-3-framework-extrapolation-zone-plotting" class="nav-link" data-scroll-target="#eag-issue-3-framework-extrapolation-zone-plotting"><span class="header-section-number">5.2</span> EAG Issue 3 Framework &amp; Extrapolation-Zone Plotting</a></li>
-  <li><a href="#parametric-tail-divergence-landmark-predictions" id="toc-parametric-tail-divergence-landmark-predictions" class="nav-link" data-scroll-target="#parametric-tail-divergence-landmark-predictions"><span class="header-section-number">5.3</span> Parametric Tail Divergence &amp; Landmark Predictions</a></li>
+  <li><a href="#step-1-baseline-30-year-survival-extrapolation" id="toc-step-1-baseline-30-year-survival-extrapolation" class="nav-link" data-scroll-target="#step-1-baseline-30-year-survival-extrapolation"><span class="header-section-number">5.1</span> Step 1: Baseline 30-Year Survival Extrapolation</a></li>
+  <li><a href="#step-2-eag-issue-3-audit-trial-data-immaturity" id="toc-step-2-eag-issue-3-audit-trial-data-immaturity" class="nav-link" data-scroll-target="#step-2-eag-issue-3-audit-trial-data-immaturity"><span class="header-section-number">5.2</span> Step 2: EAG Issue 3 Audit (Trial Data Immaturity)</a></li>
+  <li><a href="#step-3-quantifying-structural-uncertainty-tail-divergence" id="toc-step-3-quantifying-structural-uncertainty-tail-divergence" class="nav-link" data-scroll-target="#step-3-quantifying-structural-uncertainty-tail-divergence"><span class="header-section-number">5.3</span> Step 3: Quantifying Structural Uncertainty (Tail Divergence)</a></li>
   </ul></li>
   <li><a href="#cost-effectiveness-under-aic-selected-standard-parametric-models" id="toc-cost-effectiveness-under-aic-selected-standard-parametric-models" class="nav-link" data-scroll-target="#cost-effectiveness-under-aic-selected-standard-parametric-models"><span class="header-section-number">6</span> Cost-Effectiveness under AIC-Selected Standard Parametric Models</a>
   <ul class="collapse">
@@ -1109,15 +1109,22 @@ window.Quarto = {
 <p>Therefore, these statistical rankings serve as candidates for further clinical tail critique, which is evaluated in the next chapter.</p>
 </section>
 </section>
-<section id="extrapolation-zone-data-maturity-critique-issue-3" class="level2" data-number="5">
+<section id="extrapolation-zone-data-maturity-critique-issue-3" class="level2 page-columns page-full" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="extrapolation-zone-data-maturity-critique-issue-3"><span class="header-section-number">5</span> Extrapolation Zone &amp; Data Maturity Critique (Issue 3)</h2>
-<p>This chapter demonstrates how the short follow-up in clinical trials can create substantial uncertainty during long-term overall survival and progression-free survival extrapolations. We present the EAG’s Issue 3 critique framework, visualize the extrapolation zones, and evaluate parametric tail divergence at key clinical landmarks.</p>
-<section id="predicting-survival-over-30-year-horizon" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="predicting-survival-over-30-year-horizon"><span class="header-section-number">5.1</span> Predicting Survival Over 30-Year Horizon</h3>
-<section id="extrapolating-selected-distributions" class="level4" data-number="5.1.1">
-<h4 data-number="5.1.1" class="anchored" data-anchor-id="extrapolating-selected-distributions"><span class="header-section-number">5.1.1</span> Extrapolating Selected Distributions</h4>
-<p>The extrapolation horizon is 360 months, or 30 years.</p>
-<p>The object <code>extrapolated</code> still stores every best-fit curve over the full monthly time grid. To keep the document readable, the displayed output below is only a small sanity check for <strong>pMMR PFS, pembro arm</strong>.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><strong>Time Log: 2.5 hours</strong></p>
+<ul>
+<li>Digitised subgroup curves from NEJM Figure 2A/B.</li>
+<li>Built and tidied the long-format IPD dataset for R processing.</li>
+</ul>
+</div></div><p>This section audits the transition from observed clinical trial data to long-term extrapolation. We analyze the European Advisory Group’s (EAG) <strong>Issue 3 critique (data immaturity)</strong> by comparing observed trial evidence against the long-term model horizon, visualizing the “extrapolation zone,” and demonstrating how parametric tail choices diverge.</p>
+<section id="step-1-baseline-30-year-survival-extrapolation" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="step-1-baseline-30-year-survival-extrapolation"><span class="header-section-number">5.1</span> Step 1: Baseline 30-Year Survival Extrapolation</h3>
+<p>We begin by taking the statistical best-fit models (selected by minimum AIC in the previous section) and projecting survival probabilities over a 30-year (360-month) lifetime horizon.</p>
+<section id="extrapolation-of-aic-selected-distributions" class="level4" data-number="5.1.1">
+<h4 data-number="5.1.1" class="anchored" data-anchor-id="extrapolation-of-aic-selected-distributions"><span class="header-section-number">5.1.1</span> Extrapolation of AIC-Selected Distributions</h4>
+<p>The chunk below runs the extrapolation for all selected parametric models. For validation, a small sanity check is shown for the pMMR PFS pembrolizumab cohort.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1162,11 +1169,11 @@ window.Quarto = {
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(subgroup, endpoint, treatment, time_months) <span class="sc">|&gt;</span></span>
 <span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(subgroup, endpoint, treatment, best_dist, time_months, survival) <span class="sc">|&gt;</span></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Sanity-check display: pMMR PFS pembro extrapolated survival"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Extrapolated survival check for pMMR PFS, pembrolizumab arm"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Sanity-check display: pMMR PFS pembro extrapolated survival</caption>
+<caption>Extrapolated survival check for pMMR PFS, pembrolizumab arm</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;">subgroup</th>
@@ -1217,11 +1224,7 @@ window.Quarto = {
 </section>
 <section id="visualizing-long-run-extrapolations" class="level4" data-number="5.1.2">
 <h4 data-number="5.1.2" class="anchored" data-anchor-id="visualizing-long-run-extrapolations"><span class="header-section-number">5.1.2</span> Visualizing Long-Run Extrapolations</h4>
-<p>Tables are not the best way to inspect extrapolated survival. For HTA work, the curve shape is more informative. Here we show two examples:</p>
-<ul>
-<li>pMMR PFS, because it is technically important for the partitioned survival model.</li>
-<li>dMMR OS, because it is immature and therefore useful for thinking about EAG-style tail critique.</li>
-</ul>
+<p>Plotting the curves provides a clearer view of their long-term shapes. The plots below show the extrapolations for two critical decision curves: <strong>pMMR PFS</strong> (which dictates progression-free occupancy in the PSM model) and <strong>dMMR OS</strong> (which exhibits high immaturity).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1269,15 +1272,7 @@ window.Quarto = {
 </section>
 <section id="comparing-reconstructed-km-with-parametric-best-fits" class="level4" data-number="5.1.3">
 <h4 data-number="5.1.3" class="anchored" data-anchor-id="comparing-reconstructed-km-with-parametric-best-fits"><span class="header-section-number">5.1.3</span> Comparing Reconstructed KM with Parametric Best Fits</h4>
-<p>This plot is where HTA judgement begins. In this specific pMMR PFS example, the AIC-selected curves do not show an obvious visual problem. The point of the plot is more modest: it lets us check whether the fitted curve tracks the reconstructed KM reasonably before we start interpreting the long-term extrapolation.</p>
-<p>The broader EAG-style warning is that a curve can have the best AIC and still become implausible later. Examples would include:</p>
-<ul>
-<li>a PFS curve that remains high for decades despite advanced cancer;</li>
-<li>an OS curve that falls below PFS, which is structurally impossible in a partitioned survival model;</li>
-<li>a treatment curve with an indefinitely widening benefit when clinical experts expect treatment effect waning;</li>
-<li>a curve tail that implies long-term survival far above age- and disease-plausible expectations.</li>
-</ul>
-<p>Those problems are not necessarily visible in this pMMR PFS plot; they are the kinds of issues we will check in later model critique.</p>
+<p>Before assessing the tail, we check how well the parametric fits align with the observed trial period. The plot below overlays the reconstructed KM step curve with the AIC-best fit for <strong>pMMR PFS</strong>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1344,19 +1339,15 @@ window.Quarto = {
 </div>
 </div>
 </div>
+<p>While the parametric curves track the trial data reasonably, goodness-of-fit within the observed period does not guarantee long-term clinical plausibility. Extrapolations are highly sensitive to small tail variations, which is the focus of the EAG’s immaturity critique.</p>
 </section>
 </section>
-<section id="eag-issue-3-framework-extrapolation-zone-plotting" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="eag-issue-3-framework-extrapolation-zone-plotting"><span class="header-section-number">5.2</span> EAG Issue 3 Framework &amp; Extrapolation-Zone Plotting</h3>
-<section id="introduction-to-issue-3-demonstration" class="level4" data-number="5.2.1">
-<h4 data-number="5.2.1" class="anchored" data-anchor-id="introduction-to-issue-3-demonstration"><span class="header-section-number">5.2.1</span> Introduction to Issue 3 Demonstration</h4>
-<p>The EAG’s Issue 3 is not just saying that longer follow-up would be preferable. The practical concern is that KEYNOTE-868 provides relatively early survival evidence, while the economic model requires long-term PFS and OS predictions.</p>
-<p>In the EAG report, several values are redacted in the Issue 3 table. Later consultation comments in the same committee papers refer to the median follow-up as <strong>16.3 months</strong>. I use that value below as a working interpretation, while noting that the value is redacted in the Issue 3 table itself.</p>
-<p>This section uses <strong>pMMR OS, pembro arm</strong> as the worked example. OS is usually one of the most important drivers of life years and QALYs in oncology models, and short follow-up is especially important when OS benefit is immature.</p>
-</section>
-<section id="eag-logic-behind-issue-3" class="level4" data-number="5.2.2">
-<h4 data-number="5.2.2" class="anchored" data-anchor-id="eag-logic-behind-issue-3"><span class="header-section-number">5.2.2</span> EAG Logic Behind Issue 3</h4>
-<p>Before plotting anything, it is useful to translate the EAG’s concern into modelling terms.</p>
+<section id="step-2-eag-issue-3-audit-trial-data-immaturity" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="step-2-eag-issue-3-audit-trial-data-immaturity"><span class="header-section-number">5.2</span> Step 2: EAG Issue 3 Audit (Trial Data Immaturity)</h3>
+<section id="the-core-appraisal-critique" class="level4" data-number="5.2.1">
+<h4 data-number="5.2.1" class="anchored" data-anchor-id="the-core-appraisal-critique"><span class="header-section-number">5.2.1</span> The Core Appraisal Critique</h4>
+<p>The EAG’s Issue 3 points out that the KEYNOTE-868 trial has a short follow-up (median of approximately <strong>16.3 months</strong>), whereas the model projects survival outcomes over a multi-decade horizon. This means the majority of the projected survival area (and thus QALY gains) is model-driven rather than observed.</p>
+<p>The tables below translate the EAG’s data immaturity concerns into concrete modeling issues and maturity checks.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1413,10 +1404,7 @@ window.Quarto = {
 </table>
 </div>
 </div>
-<p>The important point is that the EAG did not apply a simple universal rule such as “follow-up below X months is unacceptable”. The concern comes from the combination of short follow-up, immature OS, and a model that needs to estimate survival far beyond the observed trial period.</p>
-<p>Two judgement points are especially important here.</p>
-<p>First, <strong>median survival</strong> is a maturity signal. If median OS has not been reached in the intervention arm, then fewer than half of patients in that arm have died by the data cut. That is clinically encouraging, but it also means the long-term OS curve is not well observed. The model must infer the later part of OS from limited event data.</p>
-<p>Second, <strong>median follow-up should be interpreted against treatment duration</strong>. Pembrolizumab treatment in this regimen can last for around 2.2 years, but the median follow-up referred to in the committee papers is around 16.3 months. This means the median patient had not yet been followed for as long as the maximum planned active treatment period. From an EAG perspective, that creates uncertainty not only about survival during treatment, but also about what happens after treatment stops.</p>
+<p>In HTA auditing, we evaluate model maturity across four standard dimensions:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1475,9 +1463,9 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="observed-evidence-versus-the-20-year-projection" class="level4" data-number="5.2.3">
-<h4 data-number="5.2.3" class="anchored" data-anchor-id="observed-evidence-versus-the-20-year-projection"><span class="header-section-number">5.2.3</span> Observed Evidence Versus the 20-Year Projection</h4>
-<p>The first technical check is descriptive: how much reconstructed follow-up do we have, and how does it compare with the 20-year projection horizon discussed by the EAG?</p>
+<section id="observed-evidence-vs.-model-horizon" class="level4" data-number="5.2.2">
+<h4 data-number="5.2.2" class="anchored" data-anchor-id="observed-evidence-vs.-model-horizon"><span class="header-section-number">5.2.2</span> Observed Evidence vs.&nbsp;Model Horizon</h4>
+<p>To quantify this, we calculate the proportion of the 20-year (240-month) model horizon that is covered by the trial’s observed period across all 8 curves.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1607,22 +1595,11 @@ window.Quarto = {
 </table>
 </div>
 </div>
-<p>This table is not a threshold test. It only shows scale. The more important question is not whether the ratio is “too high” in isolation, but whether the economic conclusion depends on the extrapolated part of the curve.</p>
-<p>For this portfolio, the table sets up the next two checks:</p>
-<ul>
-<li>where the observed evidence ends and the modelled tail begins;</li>
-<li>whether different plausible parametric curves produce different long-term survival.</li>
-</ul>
+<p>This summary indicates that for curves like dMMR OS, the maximum follow-up observed covers less than 20% of the required model horizon, highlighting that the model’s conclusions are heavily dependent on the extrapolated tails.</p>
 </section>
-<section id="extrapolation-zone-plot" class="level4" data-number="5.2.4">
-<h4 data-number="5.2.4" class="anchored" data-anchor-id="extrapolation-zone-plot"><span class="header-section-number">5.2.4</span> Extrapolation-Zone Plot</h4>
-<p>The next plot turns Issue 3 into a visual modelling problem. It marks:</p>
-<ul>
-<li><strong>16.3 months</strong>: median follow-up referred to in the committee papers;</li>
-<li><strong>24 months</strong>: the EAG’s practical boundary for “2 years+” estimates;</li>
-<li><strong>26.2 months</strong>: approximate maximum active treatment duration based on 30 weeks plus 84 weeks;</li>
-<li><strong>24 months onward</strong>: the region where estimates are increasingly driven by extrapolation.</li>
-</ul>
+<section id="visualizing-the-extrapolation-zone" class="level4" data-number="5.2.3">
+<h4 data-number="5.2.3" class="anchored" data-anchor-id="visualizing-the-extrapolation-zone"><span class="header-section-number">5.2.3</span> Visualizing the Extrapolation Zone</h4>
+<p>The plot below visualizes this data gap for <strong>pMMR OS (pembrolizumab arm)</strong>. The yellow rectangle highlights the model-driven extrapolation zone (beyond 24 months) relative to the trial’s median follow-up (16.3 months) and the maximum active treatment duration (26.2 months).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1737,14 +1714,14 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>The point of this plot is not that the red curve is necessarily wrong. The point is that the area most relevant to 5-, 10-, and 20-year survival is not directly observed in the trial. It is a modelled continuation from early evidence.</p>
+<p>The visualization demonstrates that the area most relevant to cost-effectiveness (the post-treatment tail) lies entirely in the yellow, unobserved region, making it highly dependent on the choice of survival distribution.</p>
 </section>
 </section>
-<section id="parametric-tail-divergence-landmark-predictions" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="parametric-tail-divergence-landmark-predictions"><span class="header-section-number">5.3</span> Parametric Tail Divergence &amp; Landmark Predictions</h3>
+<section id="step-3-quantifying-structural-uncertainty-tail-divergence" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="step-3-quantifying-structural-uncertainty-tail-divergence"><span class="header-section-number">5.3</span> Step 3: Quantifying Structural Uncertainty (Tail Divergence)</h3>
 <section id="distribution-fan-plot" class="level4" data-number="5.3.1">
 <h4 data-number="5.3.1" class="anchored" data-anchor-id="distribution-fan-plot"><span class="header-section-number">5.3.1</span> Distribution Fan Plot</h4>
-<p>A second EAG-style check is to ask whether several distributions fit the observed period reasonably but imply different long-term tails.</p>
+<p>To demonstrate the structural uncertainty of this extrapolation, we plot all seven candidate distributions on the same curve. While they all fit the observed trial period similarly, they diverge massively in the extrapolation zone.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1814,11 +1791,10 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>This is the visual reason why short follow-up matters. The observed KM can look compatible with several parametric shapes, but the long-term tail can differ materially once the model moves beyond the trial data.</p>
 </section>
-<section id="landmark-survival-table" class="level4" data-number="5.3.2">
-<h4 data-number="5.3.2" class="anchored" data-anchor-id="landmark-survival-table"><span class="header-section-number">5.3.2</span> Landmark Survival Table</h4>
-<p>The same point can be expressed numerically. This table compares predicted survival at landmark time points that are far beyond the observed follow-up.</p>
+<section id="landmark-survival-comparisons" class="level4" data-number="5.3.2">
+<h4 data-number="5.3.2" class="anchored" data-anchor-id="landmark-survival-comparisons"><span class="header-section-number">5.3.2</span> Landmark Survival Comparisons</h4>
+<p>This divergence is quantified numerically below, showing the survival estimates projected by each candidate distribution at key clinical landmarks (2, 3, 5, 10, and 20 years).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1935,19 +1911,12 @@ window.Quarto = {
 </table>
 </div>
 </div>
-<p>If the 10-year or 20-year predictions differ meaningfully across distributions, then the model has structural uncertainty. This is not solved by choosing the lowest AIC alone, because AIC mainly assesses fit to the available observed data. It does not prove that the extrapolated tail is clinically plausible.</p>
 </section>
-<section id="appraisal-interpretation" class="level4" data-number="5.3.3">
-<h4 data-number="5.3.3" class="anchored" data-anchor-id="appraisal-interpretation"><span class="header-section-number">5.3.3</span> Appraisal Interpretation</h4>
-<p>This section turns the EAG’s Issue 3 into a reproducible modelling demonstration:</p>
-<ul>
-<li>the EAG’s concern is translated into concrete modelling checks;</li>
-<li>the observed follow-up, 2-year boundary, and 20-year horizon are shown on the same scale;</li>
-<li>alternative distributions show the range of plausible long-term tails;</li>
-<li>landmark predictions quantify how much the tails differ;</li>
-<li>the interpretation links directly to NICE/EAG judgement about survival extrapolation uncertainty.</li>
-</ul>
-<p>The key portfolio message is: short follow-up matters when the cost-effectiveness result depends on survival benefits generated beyond the observed trial period. The issue is not that extrapolation is avoidable; oncology economic models often require extrapolation. The EAG concern is that, with immature OS and limited follow-up, the long-term survival benefit may be driven more by modelling assumptions than by observed trial evidence.</p>
+<section id="lead-modeler-appraisal-synthesis" class="level4" data-number="5.3.3">
+<h4 data-number="5.3.3" class="anchored" data-anchor-id="lead-modeler-appraisal-synthesis"><span class="header-section-number">5.3.3</span> Lead Modeler Appraisal Synthesis</h4>
+<p>The landmark predictions reveal substantial structural uncertainty. For instance, at 20 years (240 months), the log-normal model projects a <strong>30.3%</strong> survival rate, whereas the exponential model projects <strong>0.3%</strong>.</p>
+<p>This highlights why choosing a curve based on statistical fit (AIC/BIC) alone is insufficient. Both log-normal and log-logistic models have very similar statistical fits during the observed trial period, yet they lead to completely different lifetime clinical and economic outcomes.</p>
+<p>In HTA submissions, modelers must justify their choice of extrapolation curve not just on statistical diagnostics, but on <strong>clinical tail plausibility</strong> (e.g., matching projected long-term survival to real-world cancer registries, registry-based mortality statistics, or clinical expert consensus on cure rates).</p>
 </section>
 </section>
 </section>
