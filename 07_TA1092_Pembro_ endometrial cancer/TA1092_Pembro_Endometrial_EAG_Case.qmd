@@ -180,7 +180,14 @@ The EAG identified ten key clinical, methodological, and economic issues in the 
 - Reconstructed pseudo-IPD using the Guyot algorithm.
 :::
 
-This section loads analytical packages, establishes working directories, and imports the patient-level survival data (IPD) reconstructed from digitized KEYNOTE-868 (NRG-GY018) trial curves (PFS and OS for dMMR and pMMR cohorts) using the Guyot et al. iterative algorithm.
+This section initializes the analysis environment and loads the raw clinical inputs. The individual patient-level data (IPD) used throughout this appraisal were reconstructed from the published Kaplan-Meier survival curves in the KEYNOTE-868 (NRG-GY018) trial (Eskander et al., 2023). 
+
+The reconstruction workflow follows a standardized HTA auditing process:
+
+1. **Digitization**: Time-survival coordinates were extracted from the published PFS and OS curves for the mismatch repair deficient (dMMR) and mismatch repair proficient (pMMR) cohorts using high-resolution digitization software.
+2. **IPD Re-creation**: The digital coordinates, along with reported patients-at-risk tables and event counts, were processed using the iterative algorithm proposed by Guyot et al. (2012) to reconstruct patient-level times and censoring indicators.
+3. **Harmonization**: The individual datasets for each endpoint, subgroup, and treatment arm were consolidated into a single long-format database (`survival_ipd_long.csv`).
+4. **Validation**: The reconstructed individual patient data (pseudo-IPD) are summarized and plotted below to confirm structural alignment with the original trial publications prior to fitting parametric survival models.
 
 ```{r workflow-setup}
 #| message: false
