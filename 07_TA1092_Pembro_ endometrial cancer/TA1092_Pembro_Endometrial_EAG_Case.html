@@ -648,138 +648,46 @@ window.Quarto = {
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>pmmr_pfs_pembro_ipd <span class="ot">&lt;-</span> ipd <span class="sc">|&gt;</span></span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(subgroup <span class="sc">==</span> <span class="st">"pMMR"</span>, endpoint <span class="sc">==</span> <span class="st">"PFS"</span>, treatment <span class="sc">==</span> <span class="st">"pembro_chemo"</span>)</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Reconstructed IPD sample sizes (Total N = `r nrow(ipd)`)</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>ipd <span class="sc">|&gt;</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(subgroup, endpoint, treatment, status_label) <span class="sc">|&gt;</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(subgroup, endpoint, treatment, status_label) <span class="sc">|&gt;</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Subgroup"</span>, <span class="st">"Endpoint"</span>, <span class="st">"Treatment Arm"</span>, <span class="st">"Event Status"</span>, <span class="st">"Sample Size (N)"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Reconstructed Kaplan-Meier Curves (Total N = `r nrow(ipd)`)</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>km_data <span class="ot">&lt;-</span> ipd <span class="sc">|&gt;</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_label =</span> <span class="fu">ifelse</span>(treatment <span class="sc">==</span> <span class="st">"pembro_chemo"</span>, <span class="st">"Pembrolizumab + Chemo"</span>, <span class="st">"Placebo + Chemo"</span>)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(subgroup, endpoint, treatment_label) <span class="sc">|&gt;</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_modify</span>(<span class="sc">~</span>{</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    fit <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time_months, status) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> .x)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>      <span class="at">time_months =</span> <span class="fu">c</span>(<span class="dv">0</span>, fit<span class="sc">$</span>time),</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>      <span class="at">survival =</span> <span class="fu">c</span>(<span class="dv">1</span>, fit<span class="sc">$</span>surv)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  }) <span class="sc">|&gt;</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(km_data, <span class="fu">aes</span>(<span class="at">x =</span> time_months, <span class="at">y =</span> survival, <span class="at">color =</span> treatment_label)) <span class="sc">+</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_step</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(endpoint <span class="sc">~</span> subgroup) <span class="sc">+</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Placebo + Chemo"</span> <span class="ot">=</span> <span class="st">"#E69F00"</span>, <span class="st">"Pembrolizumab + Chemo"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>)) <span class="sc">+</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Reconstructed Kaplan-Meier Curves"</span>,</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Faceted by Endpoint (PFS/OS) and Subgroup (dMMR/pMMR) from KEYNOTE-868"</span>,</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Months"</span>,</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Survival Probability"</span>,</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Treatment Arm"</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">10</span>),</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Subgroup</th>
-<th style="text-align: left;">Endpoint</th>
-<th style="text-align: left;">Treatment Arm</th>
-<th style="text-align: left;">Event Status</th>
-<th style="text-align: right;">Sample Size (N)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">censored</td>
-<td style="text-align: right;">54</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">event</td>
-<td style="text-align: right;">59</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">censored</td>
-<td style="text-align: right;">86</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">event</td>
-<td style="text-align: right;">26</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">censored</td>
-<td style="text-align: right;">95</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">event</td>
-<td style="text-align: right;">18</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">censored</td>
-<td style="text-align: right;">104</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">event</td>
-<td style="text-align: right;">8</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">censored</td>
-<td style="text-align: right;">159</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">event</td>
-<td style="text-align: right;">133</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">censored</td>
-<td style="text-align: right;">201</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">PFS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">event</td>
-<td style="text-align: right;">89</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">censored</td>
-<td style="text-align: right;">234</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">placebo_chemo</td>
-<td style="text-align: left;">event</td>
-<td style="text-align: right;">61</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">censored</td>
-<td style="text-align: right;">240</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">pMMR</td>
-<td style="text-align: left;">OS</td>
-<td style="text-align: left;">pembro_chemo</td>
-<td style="text-align: left;">event</td>
-<td style="text-align: right;">53</td>
-</tr>
-</tbody>
-</table>
+<div>
+<figure class="figure">
+<p><img src="TA1092_Pembro_Endometrial_EAG_Case_files/figure-html/workflow-setup-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>

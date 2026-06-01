@@ -218,11 +218,39 @@ ipd <- read_csv(input_path, show_col_types = FALSE) |>
 pmmr_pfs_pembro_ipd <- ipd |>
   filter(subgroup == "pMMR", endpoint == "PFS", treatment == "pembro_chemo")
 
-# Reconstructed IPD sample sizes (Total N = `r nrow(ipd)`)
-ipd |>
-  count(subgroup, endpoint, treatment, status_label) |>
-  arrange(subgroup, endpoint, treatment, status_label) |>
-  kable(col.names = c("Subgroup", "Endpoint", "Treatment Arm", "Event Status", "Sample Size (N)"))
+# Reconstructed Kaplan-Meier Curves (Total N = `r nrow(ipd)`)
+km_data <- ipd |>
+  mutate(
+    treatment_label = ifelse(treatment == "pembro_chemo", "Pembrolizumab + Chemo", "Placebo + Chemo")
+  ) |>
+  group_by(subgroup, endpoint, treatment_label) |>
+  group_modify(~{
+    fit <- survfit(Surv(time_months, status) ~ 1, data = .x)
+    tibble(
+      time_months = c(0, fit$time),
+      survival = c(1, fit$surv)
+    )
+  }) |>
+  ungroup()
+
+ggplot(km_data, aes(x = time_months, y = survival, color = treatment_label)) +
+  geom_step(linewidth = 0.8) +
+  facet_grid(endpoint ~ subgroup) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_color_manual(values = c("Placebo + Chemo" = "#E69F00", "Pembrolizumab + Chemo" = "#0072B2")) +
+  labs(
+    title = "Reconstructed Kaplan-Meier Curves",
+    subtitle = "Faceted by Endpoint (PFS/OS) and Subgroup (dMMR/pMMR) from KEYNOTE-868",
+    x = "Months",
+    y = "Survival Probability",
+    color = "Treatment Arm"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold", size = 10),
+    plot.title = element_text(face = "bold", size = 12)
+  )
 ```
 
 
