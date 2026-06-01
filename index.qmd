@@ -23,6 +23,17 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 ::: {.g-col-12 .g-col-md-6}
 ::: {.card .h-100 .shadow-sm}
 ::: {.card-body}
+<h3 class="card-title">NICE TA1092 (Pembro) Case Study</h3>
+<h6 class="card-subtitle text-muted mb-2">Mock Case — Extrapolation Audit & Spline Sensitivity</h6>
+<p class="card-text">An EAG-style forensic audit of survival extrapolations (standard parametric vs. flexible splines), treatment-effect waning (5-7 years), and curve-crossing capping, using Guyot-reconstructed patient-level data.</p>
+<a href="./07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.qmd" class="stretched-link">View Case Study &rarr;</a>
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
 <h3 class="card-title">NICE TA975 (CAR-T) Case Study</h3>
 <h6 class="card-subtitle text-muted mb-2">Full Submission Replication</h6>
 <p class="card-text">A complete end-to-end reconstruction of a CAR-T therapy appraisal (Tisagenlecleucel). Features state-transition modeling, parametric survival fitting, and ICER calculations via Patient Access Schemes (PAS).</p>
@@ -30,8 +41,6 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 :::
 :::
 :::
-
-
 
 ::: {.g-col-12 .g-col-md-6}
 ::: {.card .h-100 .shadow-sm}
@@ -62,17 +71,6 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 <h6 class="card-subtitle text-muted mb-2">Mock Case — Treatment Effect Waning & Recursive Hazard Chaining</h6>
 <p class="card-text">A synthetic-data deep dive into long-term survival extrapolation in a Partitioned Survival Model. Contrasts Naive HR Switching (the Hazard Cliff) against Recursive Hazard Chaining, with full cost-effectiveness analysis and PSA.</p>
 <a href="./01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.qmd" class="stretched-link">View Case Study &rarr;</a>
-:::
-:::
-:::
-
-::: {.g-col-12 .g-col-md-6}
-::: {.card .h-100 .shadow-sm}
-::: {.card-body}
-<h3 class="card-title">NICE TA1092 (Pembro) Case Study</h3>
-<h6 class="card-subtitle text-muted mb-2">Mock Case — Extrapolation Audit & Spline Sensitivity</h6>
-<p class="card-text">An EAG-style forensic audit of survival extrapolations (standard parametric vs. flexible splines), treatment-effect waning (5-7 years), and curve-crossing capping, using Guyot-reconstructed patient-level data.</p>
-<a href="./07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.qmd" class="stretched-link">View Case Study &rarr;</a>
 :::
 :::
 :::
