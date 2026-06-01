@@ -144,16 +144,14 @@ window.Quarto = {
   <li><a href="#cost-effectiveness-under-aic-selected-standard-parametric-models" id="toc-cost-effectiveness-under-aic-selected-standard-parametric-models" class="nav-link" data-scroll-target="#cost-effectiveness-under-aic-selected-standard-parametric-models"><span class="header-section-number">6</span> Cost-Effectiveness under AIC-Selected Standard Parametric Models</a>
   <ul class="collapse">
   <li><a href="#sec-ce-models-aic" id="toc-sec-ce-models-aic" class="nav-link" data-scroll-target="#sec-ce-models-aic"><span class="header-section-number">6.1</span> Economic Inputs &amp; PSM Engine Setup</a></li>
-  <li><a href="#pmmr-cohort-analysis" id="toc-pmmr-cohort-analysis" class="nav-link" data-scroll-target="#pmmr-cohort-analysis"><span class="header-section-number">6.2</span> pMMR Cohort Analysis</a></li>
-  <li><a href="#dmmr-cohort-analysis" id="toc-dmmr-cohort-analysis" class="nav-link" data-scroll-target="#dmmr-cohort-analysis"><span class="header-section-number">6.3</span> dMMR Cohort Analysis</a></li>
-  <li><a href="#subgroup-synthesis-comparison" id="toc-subgroup-synthesis-comparison" class="nav-link" data-scroll-target="#subgroup-synthesis-comparison"><span class="header-section-number">6.4</span> Subgroup Synthesis &amp; Comparison</a></li>
+  <li><a href="#subgroup-specific-cost-effectiveness-results" id="toc-subgroup-specific-cost-effectiveness-results" class="nav-link" data-scroll-target="#subgroup-specific-cost-effectiveness-results"><span class="header-section-number">6.2</span> Subgroup-Specific Cost-Effectiveness Results</a></li>
+  <li><a href="#subgroup-synthesis-comparison" id="toc-subgroup-synthesis-comparison" class="nav-link" data-scroll-target="#subgroup-synthesis-comparison"><span class="header-section-number">6.3</span> Subgroup Synthesis &amp; Comparison</a></li>
   </ul></li>
   <li><a href="#cost-effectiveness-under-eag-preferred-survival-models" id="toc-cost-effectiveness-under-eag-preferred-survival-models" class="nav-link" data-scroll-target="#cost-effectiveness-under-eag-preferred-survival-models"><span class="header-section-number">7</span> Cost-Effectiveness under EAG-Preferred Survival Models</a>
   <ul class="collapse">
   <li><a href="#spline-and-standard-model-fitting-setup" id="toc-spline-and-standard-model-fitting-setup" class="nav-link" data-scroll-target="#spline-and-standard-model-fitting-setup"><span class="header-section-number">7.1</span> Spline and Standard Model Fitting Setup</a></li>
-  <li><a href="#pmmr-cohort-analysis-1" id="toc-pmmr-cohort-analysis-1" class="nav-link" data-scroll-target="#pmmr-cohort-analysis-1"><span class="header-section-number">7.2</span> pMMR Cohort Analysis</a></li>
-  <li><a href="#dmmr-cohort-analysis-1" id="toc-dmmr-cohort-analysis-1" class="nav-link" data-scroll-target="#dmmr-cohort-analysis-1"><span class="header-section-number">7.3</span> dMMR Cohort Analysis</a></li>
-  <li><a href="#subgroup-synthesis-comparison-1" id="toc-subgroup-synthesis-comparison-1" class="nav-link" data-scroll-target="#subgroup-synthesis-comparison-1"><span class="header-section-number">7.4</span> Subgroup Synthesis &amp; Comparison</a></li>
+  <li><a href="#subgroup-specific-cost-effectiveness-results-1" id="toc-subgroup-specific-cost-effectiveness-results-1" class="nav-link" data-scroll-target="#subgroup-specific-cost-effectiveness-results-1"><span class="header-section-number">7.2</span> Subgroup-Specific Cost-Effectiveness Results</a></li>
+  <li><a href="#subgroup-synthesis-comparison-1" id="toc-subgroup-synthesis-comparison-1" class="nav-link" data-scroll-target="#subgroup-synthesis-comparison-1"><span class="header-section-number">7.3</span> Subgroup Synthesis &amp; Comparison</a></li>
   </ul></li>
   <li><a href="#model-selection-critique-aic-selected-vs.-eag-preferred-models" id="toc-model-selection-critique-aic-selected-vs.-eag-preferred-models" class="nav-link" data-scroll-target="#model-selection-critique-aic-selected-vs.-eag-preferred-models"><span class="header-section-number">8</span> Model Selection Critique: AIC-Selected vs.&nbsp;EAG-Preferred Models</a>
   <ul class="collapse">
@@ -1780,8 +1778,12 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 </div>
 </section>
 </section>
-<section id="pmmr-cohort-analysis" class="level3" data-number="6.2">
-<h3 data-number="6.2" class="anchored" data-anchor-id="pmmr-cohort-analysis"><span class="header-section-number">6.2</span> pMMR Cohort Analysis</h3>
+<section id="subgroup-specific-cost-effectiveness-results" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="subgroup-specific-cost-effectiveness-results"><span class="header-section-number">6.2</span> Subgroup-Specific Cost-Effectiveness Results</h3>
+<p>To evaluate the economic impact of survival curves selected purely on statistical goodness-of-fit, we execute the weekly Partitioned Survival Model (PSM) for both molecular subgroups (pMMR and dMMR). The tables below summarize the AIC-selected survival distributions and the resulting incremental cost-effectiveness outcomes under public list prices.</p>
+<section id="mismatch-repair-proficient-pmmr-cohort" class="level4" data-number="6.2.1">
+<h4 data-number="6.2.1" class="anchored" data-anchor-id="mismatch-repair-proficient-pmmr-cohort"><span class="header-section-number">6.2.1</span> Mismatch Repair Proficient (pMMR) Cohort</h4>
+<p>For the pMMR cohort, the Weibull and Log-logistic distributions represent the best statistical fits for OS and PFS, respectively. The model simulates weekly patient-time over the 35-year horizon to generate cumulative costs and health benefits.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1945,8 +1947,9 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 </div>
 </div>
 </section>
-<section id="dmmr-cohort-analysis" class="level3" data-number="6.3">
-<h3 data-number="6.3" class="anchored" data-anchor-id="dmmr-cohort-analysis"><span class="header-section-number">6.3</span> dMMR Cohort Analysis</h3>
+<section id="mismatch-repair-deficient-dmmr-cohort" class="level4" data-number="6.2.2">
+<h4 data-number="6.2.2" class="anchored" data-anchor-id="mismatch-repair-deficient-dmmr-cohort"><span class="header-section-number">6.2.2</span> Mismatch Repair Deficient (dMMR) Cohort</h4>
+<p>For the dMMR cohort, due to the small sample size and highly immature survival data, simple distributions (such as Exponential and Lognormal) are selected by AIC as the best fit candidates.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2058,8 +2061,9 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 </div>
 </div>
 </section>
-<section id="subgroup-synthesis-comparison" class="level3" data-number="6.4">
-<h3 data-number="6.4" class="anchored" data-anchor-id="subgroup-synthesis-comparison"><span class="header-section-number">6.4</span> Subgroup Synthesis &amp; Comparison</h3>
+</section>
+<section id="subgroup-synthesis-comparison" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="subgroup-synthesis-comparison"><span class="header-section-number">6.3</span> Subgroup Synthesis &amp; Comparison</h3>
 <p>Below, we compare the cost-effectiveness results of the pMMR and dMMR subgroups under the AIC-selected standard parametric distributions.</p>
 <div class="cell">
 <details class="code-fold">
@@ -2464,10 +2468,14 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 </div>
 </section>
 </section>
-<section id="pmmr-cohort-analysis-1" class="level3" data-number="7.2">
-<h3 data-number="7.2" class="anchored" data-anchor-id="pmmr-cohort-analysis-1"><span class="header-section-number">7.2</span> pMMR Cohort Analysis</h3>
-<section id="state-occupancy-with-eag-spline-models" class="level4" data-number="7.2.1">
-<h4 data-number="7.2.1" class="anchored" data-anchor-id="state-occupancy-with-eag-spline-models"><span class="header-section-number">7.2.1</span> State Occupancy with EAG Spline Models</h4>
+<section id="subgroup-specific-cost-effectiveness-results-1" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="subgroup-specific-cost-effectiveness-results-1"><span class="header-section-number">7.2</span> Subgroup-Specific Cost-Effectiveness Results</h3>
+<p>To evaluate the economic implications of the EAG-preferred survival curves, we rerun the weekly Partitioned Survival Model (PSM) for the pMMR and dMMR cohorts. The tables below summarize the health-state occupancy, discounted costs, and QALY outcomes under these alternative, clinical-consensus-driven assumptions.</p>
+<section id="mismatch-repair-proficient-pmmr-cohort-1" class="level4" data-number="7.2.1">
+<h4 data-number="7.2.1" class="anchored" data-anchor-id="mismatch-repair-proficient-pmmr-cohort-1"><span class="header-section-number">7.2.1</span> Mismatch Repair Proficient (pMMR) Cohort</h4>
+</section>
+<section id="state-occupancy-with-eag-spline-models" class="level4" data-number="7.2.2">
+<h4 data-number="7.2.2" class="anchored" data-anchor-id="state-occupancy-with-eag-spline-models"><span class="header-section-number">7.2.2</span> State Occupancy with EAG Spline Models</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2536,8 +2544,8 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 </div>
 </div>
 </section>
-<section id="discounted-costs-and-qalys-eag-spline-models" class="level4" data-number="7.2.2">
-<h4 data-number="7.2.2" class="anchored" data-anchor-id="discounted-costs-and-qalys-eag-spline-models"><span class="header-section-number">7.2.2</span> Discounted Costs and QALYs (EAG Spline Models)</h4>
+<section id="discounted-costs-and-qalys-eag-spline-models" class="level4" data-number="7.2.3">
+<h4 data-number="7.2.3" class="anchored" data-anchor-id="discounted-costs-and-qalys-eag-spline-models"><span class="header-section-number">7.2.3</span> Discounted Costs and QALYs (EAG Spline Models)</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2668,11 +2676,11 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 </div>
 </div>
 </section>
+<section id="mismatch-repair-deficient-dmmr-cohort-1" class="level4" data-number="7.2.4">
+<h4 data-number="7.2.4" class="anchored" data-anchor-id="mismatch-repair-deficient-dmmr-cohort-1"><span class="header-section-number">7.2.4</span> Mismatch Repair Deficient (dMMR) Cohort</h4>
 </section>
-<section id="dmmr-cohort-analysis-1" class="level3" data-number="7.3">
-<h3 data-number="7.3" class="anchored" data-anchor-id="dmmr-cohort-analysis-1"><span class="header-section-number">7.3</span> dMMR Cohort Analysis</h3>
-<section id="state-occupancy-with-eag-preferred-models" class="level4" data-number="7.3.1">
-<h4 data-number="7.3.1" class="anchored" data-anchor-id="state-occupancy-with-eag-preferred-models"><span class="header-section-number">7.3.1</span> State Occupancy with EAG-Preferred Models</h4>
+<section id="state-occupancy-with-eag-preferred-models" class="level4" data-number="7.2.5">
+<h4 data-number="7.2.5" class="anchored" data-anchor-id="state-occupancy-with-eag-preferred-models"><span class="header-section-number">7.2.5</span> State Occupancy with EAG-Preferred Models</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2726,8 +2734,8 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 </div>
 </div>
 </section>
-<section id="discounted-costs-and-qalys" class="level4" data-number="7.3.2">
-<h4 data-number="7.3.2" class="anchored" data-anchor-id="discounted-costs-and-qalys"><span class="header-section-number">7.3.2</span> Discounted Costs and QALYs</h4>
+<section id="discounted-costs-and-qalys" class="level4" data-number="7.2.6">
+<h4 data-number="7.2.6" class="anchored" data-anchor-id="discounted-costs-and-qalys"><span class="header-section-number">7.2.6</span> Discounted Costs and QALYs</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2863,8 +2871,8 @@ Table&nbsp;2: pMMR OS pembro arm: landmark survival predictions by distribution 
 </div>
 </section>
 </section>
-<section id="subgroup-synthesis-comparison-1" class="level3" data-number="7.4">
-<h3 data-number="7.4" class="anchored" data-anchor-id="subgroup-synthesis-comparison-1"><span class="header-section-number">7.4</span> Subgroup Synthesis &amp; Comparison</h3>
+<section id="subgroup-synthesis-comparison-1" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="subgroup-synthesis-comparison-1"><span class="header-section-number">7.3</span> Subgroup Synthesis &amp; Comparison</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>

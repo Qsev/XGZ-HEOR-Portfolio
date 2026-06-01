@@ -991,7 +991,13 @@ discount_factor <- function(week, annual_rate) {
 ```
 
 
-### pMMR Cohort Analysis
+### Subgroup-Specific Cost-Effectiveness Results
+
+To evaluate the economic impact of survival curves selected purely on statistical goodness-of-fit, we execute the weekly Partitioned Survival Model (PSM) for both molecular subgroups (pMMR and dMMR). The tables below summarize the AIC-selected survival distributions and the resulting incremental cost-effectiveness outcomes under public list prices.
+
+#### Mismatch Repair Proficient (pMMR) Cohort
+
+For the pMMR cohort, the Weibull and Log-logistic distributions represent the best statistical fits for OS and PFS, respectively. The model simulates weekly patient-time over the 35-year horizon to generate cumulative costs and health benefits.
 
 ```{r pmmr-aic-state-occupancy}
 psm_pmmr_aic <- best_fits |>
@@ -1089,7 +1095,9 @@ ce_incremental_pmmr_aic |>
 ```
 
 
-### dMMR Cohort Analysis
+#### Mismatch Repair Deficient (dMMR) Cohort
+
+For the dMMR cohort, due to the small sample size and highly immature survival data, simple distributions (such as Exponential and Lognormal) are selected by AIC as the best fit candidates.
 
 ```{r dmmr-aic-state-occupancy}
 psm_dmmr_aic <- best_fits |>
@@ -1280,7 +1288,11 @@ eag_dmmr_fits |>
 ```
 
 
-### pMMR Cohort Analysis
+### Subgroup-Specific Cost-Effectiveness Results
+
+To evaluate the economic implications of the EAG-preferred survival curves, we rerun the weekly Partitioned Survival Model (PSM) for the pMMR and dMMR cohorts. The tables below summarize the health-state occupancy, discounted costs, and QALY outcomes under these alternative, clinical-consensus-driven assumptions.
+
+#### Mismatch Repair Proficient (pMMR) Cohort
 
 #### State Occupancy with EAG Spline Models
 
@@ -1428,7 +1440,7 @@ ce_incremental_pmmr_spline |>
 ```
 
 
-### dMMR Cohort Analysis
+#### Mismatch Repair Deficient (dMMR) Cohort
 
 #### State Occupancy with EAG-Preferred Models
 
