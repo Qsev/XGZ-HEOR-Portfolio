@@ -71,15 +71,16 @@ This project demonstrates a pragmatic, **value-driven scope management strategy*
 | Model type | Three-state PSM |
 | NICE decision tension | Whether extrapolated survival benefit is clinically plausible and cost-effective across molecular subgroups |
 
-### Documents to Abstract
+### Evidence & Appraisal Registry
 
-| Source | Status | Notes to extract |
+To ensure pixel-level traceability, all data inputs, parameters, and clinical evidence mapped in the de novo R replication model are registered against their primary public HTA and clinical sources:
+
+| Source Document | Reference Scope | Key Evidence & Parameters Abstracted |
 |---|---|---|
-| NICE guidance | TODO | Final recommendation, stopping rule, subgroup restrictions |
-| Committee discussion | TODO | Committee reasoning and preferred assumptions |
-| Committee papers | TODO | Company base case, EAG critique, scenario analyses |
-| Company submission | TODO | Survival models, utilities, costs, treatment duration |
-| EAG report | TODO | Concerns, alternative assumptions, exploratory ICERs |
+| **NICE Final Draft Guidance (FDG)** | TA1092, August 2025 | • Clinical recommendation criteria for first-line endometrial cancer.<br>• Definition of the 2-year pembrolizumab treatment stopping rule. |
+| **EAG Evaluation Report & Supplementary Papers** | EAG Report Section 4.2 | • Manufacturer base case parametrics vs. EAG-preferred Royston-Parmar splines.<br>• EAG clinical expert estimates for starting age (67.1 years) and routine monitoring costs. |
+| **Committee Consultation & Consultation Papers** | NICE Committee Papers | • Market shares for subsequent therapies (pembrolizumab + lenvatinib reallocation).<br>• Health state utilities (KEYNOTE-158 and KEYNOTE-B21) and AE management unit costs. |
+| **Pivotal Trial Publication (NEJM)** | KEYNOTE-868 (NRG-GY018) | • Trial protocol, subgroup baseline demographics (mean age 65.4 years).<br>• Subgroup-specific PFS and OS Kaplan-Meier survival curves used for digitization. |
 
 ## My Independent Assessment
 
