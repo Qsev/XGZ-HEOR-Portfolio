@@ -212,6 +212,7 @@ My takeaway is that this is not a main technical replication target at this stag
 | Treatment effect waning | TODO | TODO | Indefinite immunotherapy benefit may overstate long-term gain | TODO |
 | Utility values | TODO | TODO | Utility source can materially affect incremental QALYs | TODO |
 | Starting age | 65.4 years (mean age of dMMR/pMMR pooled cohort in KEYNOTE-868) | Trial population is younger than UK real-world patients (mean age 67.1 years based on Pennington 2016) | Affects background mortality and lifetime QALY potential | Modestly increases ICER (due to higher background mortality truncating long-term QALYs) |
+| Resource use / Monitoring | Standard monitoring costs applied to both arms | Intervention arm requires additional routine safety monitoring (blood tests, thyroid, liver, glucose tests) | Underestimating routine monitoring costs artificially reduces intervention costs | Modestly increases ICER (due to higher treatment monitoring costs in the intervention arm) |
 | Subsequent therapy | TODO | TODO | Can confound OS and influence post-progression costs | TODO |
 
 ### Committee Preferred Assumptions
@@ -225,6 +226,7 @@ My takeaway is that this is not a main technical replication target at this stag
 | Waning assumption | TODO | TODO | TODO | TODO |
 | Utility source | TODO | TODO | TODO | TODO |
 | Starting age | 65.4 years | 67.1 years | 67.1 years | Committee preferred 67.1 years to reflect real-world NHS patients and maintain consistency with TA963 |
+| Resource use / Monitoring | Standard monitoring | Additional routine safety monitoring (EAG clinical expert estimates) | Additional routine safety monitoring | Committee preferred EAG's monitoring frequencies to reflect NHS clinical guidelines for patients on immunotherapy |
 
 ## Technical Replication in R
 
