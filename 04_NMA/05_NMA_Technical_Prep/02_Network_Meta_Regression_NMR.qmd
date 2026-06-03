@@ -814,7 +814,3 @@ This is a classic comparison in HTA audits regarding evidence synthesis:
 3. **The Reality in HTA**:
    - Usually, a manufacturer has IPD for their own trials but only Aggregate Data (AD) extracted from publications for competitor trials. This data asymmetry prevents running a full IPD NMA and leads to the need for population adjustment methods like **MAIC** or **ML-NMR** (which will be covered in files 06 and 08).
 :::
-
-------------------------------------------------------------------------
-
-**Guide Authored by**: Antigravity (Advanced Agentic Coding)

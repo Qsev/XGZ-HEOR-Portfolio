@@ -310,7 +310,3 @@ Based on the Component NMA model, the estimated independent effects of the compo
 - **Component B Effect**: `r round(median(as.matrix(fit_cnma)[, "d[2]"]), 2)` (True: -0.3)
 
 By successfully decomposing the treatments, we can now predict the effect of the combination therapy even if it was never directly compared to placebo in a single trial.
-
-------------------------------------------------------------------------
-
-**Guide Authored by**: Antigravity (Advanced Agentic Coding)

@@ -593,5 +593,4 @@ Standard NMA cannot handle disconnected networks. You must either bridge the gap
 
 Mastering Standard Bayesian NMA requires understanding the interplay between direct and indirect evidence. This minimal case demonstrates that when data forms a loop, consistency must be verified.
 
-**Guide Authored by**: Antigravity (Advanced Agentic Coding)\
 **Methodological Reference**: NICE DSU TSD 2 & 4
