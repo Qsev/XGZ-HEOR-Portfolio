@@ -1,0 +1,82 @@
+---
+title: "TA788 EAG Audit Case: Avelumab Maintenance in Urothelial Cancer"
+subtitle: "Partitioned Survival Modelling, Treatment Effect Capping, and NICE Decision Uncertainty"
+author: "Xiaoge Zhang, PhD"
+date: today
+page-layout: full
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true
+    code-annotations: below
+execute:
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+knitr::opts_chunk$set(
+  fig.width = 10,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+::: {.callout-important icon=false}
+## Public Evidence and Modelling Disclosure
+
+This portfolio case study is based on public NICE TA788 appraisal documents. The future interactive model will use transparent public assumptions and reconstructed modelling logic for educational and methodological demonstration. It will not reproduce the confidential manufacturer model, patient-level trial data, or confidential commercial discount for avelumab.
+:::
+
+## Project Aim
+
+This page will become an interactive EAG-style audit of NICE TA788: avelumab for maintenance treatment of locally advanced or metastatic urothelial cancer after platinum-based chemotherapy.
+
+The intended architecture is a Quarto page with an embedded Shinylive for R application. The static narrative will explain the health technology assessment problem, while the browser-run R/Shiny module will allow users to test how survival extrapolation, treatment effect capping, utilities, and public cost assumptions affect model outputs.
+
+## Decision Problem
+
+| Element | Working abstraction |
+|---|---|
+| Population | Adults with locally advanced or metastatic urothelial cancer whose disease has not progressed after platinum-based chemotherapy |
+| Intervention | Avelumab maintenance treatment |
+| Comparator | Watchful waiting / best supportive care |
+| Key trial | JAVELIN Bladder 100 |
+| Economic model | Three-state partitioned survival model |
+| Health states | Progression-free, progressed disease, death |
+| Core audit question | Are the long-term survival assumptions and treatment effect cap clinically plausible and economically transparent? |
+
+## Planned Interactive Modules
+
+The final page will develop the model in phases:
+
+1. Survival extrapolation sandbox for OS and PFS.
+2. Partitioned survival state occupancy engine.
+3. Treatment effect capping after the avelumab stopping rule.
+4. Utility and cost accumulation.
+5. EAG-style warning checks for structural issues such as PFS exceeding OS.
+6. Scenario comparison between public company-facing assumptions and EAG-preferred assumptions.
+
+## Current Development Status
+
+This placeholder intentionally contains only the public-facing scaffold. The detailed model development notes and evidence extraction are being drafted separately in `TA788_Model_Development_Notes.qmd` before being condensed into this main portfolio page.
+
+## Evidence Base
+
+The Phase 1 fact-finding step has extracted the initial EAG audit parameters from the public NICE TA788 evidence set, including:
+
+- OS extrapolation dispute: company generalised gamma versus ERG log-normal.
+- PFS extrapolation dispute: BICR-assessed PFS versus investigator-assessed PFS and alternative spline models.
+- Treatment effect cap: a 5-year stopping rule with treatment effect capped 1 year after stopping.
+- Base-case utilities: progression-free and progressed disease utility values from JAVELIN Bladder 100 EQ-5D data.
+- Public list price and administration cost assumptions for avelumab.
+
+The next development step is to build the standalone R mathematical engine before embedding it in Shinylive.

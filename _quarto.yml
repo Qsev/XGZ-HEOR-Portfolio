@@ -11,6 +11,7 @@ project:
     - 03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.qmd
     - 01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.qmd
     - 07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.qmd
+    - 08_TA788_Avelumab_Urothelial_Cancer/TA788_Avelumab_EAG_Audit.qmd
     - 00_HTA_LLM_Wiki/README.md
     - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
     - 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
@@ -50,6 +51,8 @@ website:
             text: "PSM: Survival Extrapolation in RRMM"
           - href: 07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.qmd
             text: "NICE TA1092 (Pembro) Case"
+          - href: 08_TA788_Avelumab_Urothelial_Cancer/TA788_Avelumab_EAG_Audit.qmd
+            text: "NICE TA788 (Avelumab) Case"
       - text: "NMA Library"
         menu:
           - href: 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd

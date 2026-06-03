@@ -1,0 +1,175 @@
+---
+title: "TA788 Model Development Notes"
+subtitle: "Detailed EAG Audit Log and R Modelling Build Notes for Avelumab Maintenance"
+author: "Xiaoge Zhang, PhD"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true
+    code-annotations: below
+execute:
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+knitr::opts_chunk$set(
+  fig.width = 10,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+::: {.callout-note icon=false}
+## Purpose of This Working Document
+
+This document is a technical working notebook for building the TA788 Quarto and Shinylive case study. It is deliberately more detailed than the final public-facing page because it records the evidence extraction, modelling logic, and R implementation plan step by step.
+:::
+
+## Phase 1: EAG Audit Log
+
+The first task is not to write R code. The first task is to identify which assumptions matter to the appraisal decision and which assumptions the EAG challenged. In an oncology partitioned survival model, the most decision-sensitive nodes usually sit in survival extrapolation, treatment effect duration, utilities, and drug costs.
+
+The table below records the initial audit findings extracted from the public NICE TA788 appraisal evidence.
+
+| Audit domain | Extracted fact | Source evidence | Why this matters for EAG review |
+|---|---|---|---|
+| OS extrapolation | The company originally preferred a generalised gamma model for both avelumab and watchful waiting / best supportive care. The ERG preferred a log-normal model. | NICE committee papers report that the company selected generalised gamma because 10-year survival predictions aligned with clinical estimates. The ERG stated that log-normal had better fit and more plausible long-term watchful waiting estimates. | Overall survival extrapolation is usually the dominant source of lifetime QALY uncertainty. A more optimistic OS tail can materially reduce the ICER by creating additional survival benefit far beyond observed trial follow-up. |
+| PFS extrapolation | The company used BICR-assessed PFS with a 3-knot normal spline-based model for both arms. The ERG preferred investigator-assessed PFS, using a 3-knot hazard spline for avelumab and a 3-knot odds spline for watchful waiting. | The ERG preferred investigator-assessed PFS because it more closely reflected UK clinical decision-making, including the timing of post-progression therapy initiation. | This is both a statistical and clinical-practice issue. BICR may be cleaner for trial measurement, but investigator assessment may better represent real-world NHS treatment decisions. |
+| Treatment stopping and treatment effect cap | Avelumab is recommended only if treatment stops after 5 years of uninterrupted treatment, or earlier if disease progresses. The treatment effect cap is applied 1 year after stopping, so the cap begins at year 6. | NICE final guidance states that a treatment effect cap 1 year after stopping avelumab should be included in the model. | Immunotherapy models can overstate value if they assume indefinite benefit after treatment discontinuation. NICE committees often require explicit treatment effect duration assumptions when long-term evidence is uncertain. |
+| Implementation of the cap | Beyond the cap time point, the hazard of death for avelumab is set equal to the watchful waiting arm. In modelling terms, the OS hazard ratio becomes 1 after the cap. | The company and ERG agreed after technical engagement that the appropriate implementation was to set avelumab hazards equal to watchful waiting beyond the cap time point. | The model should cap the incremental hazard benefit, not impose an abrupt fall in survival probability. This avoids a biologically impossible discontinuity in the survival curve. |
+| Health-state utilities | Base-case utility values came from JAVELIN Bladder 100 EQ-5D data, with EQ-5D-5L responses crosswalked to EQ-5D-3L. Progression-free utility was 0.772 and post-progression utility was 0.698. | Company evidence reported utility values by progression status: progression-free 0.772 and post-progression 0.698. | In a partitioned survival model, health-state utilities convert state occupancy into QALYs. A higher progression-free utility increases the value of delaying progression. |
+| Alternative utility scenario | Scenario values from NICE TA519 were also considered: progression-free 0.731 and progressed disease 0.641. | The company evidence submission reported TA519-derived scenario utilities for progression-free and progressed patients. | Scenario utilities can test whether the ICER is robust to different health-related quality-of-life sources. |
+| Adverse-event disutility | Grade 3 or higher adverse-event disutilities were included separately, using utility decrements from published literature and adverse-event rates from JAVELIN Bladder 100. | The ERG report noted that adverse events of grade 3 or higher were included separately in the model. | AE disutility is likely small relative to OS/PFS extrapolation, but its transparent inclusion is part of a complete economic model. |
+| Avelumab acquisition cost | Public list price was GBP 768 per 200 mg vial. The model used a flat dose of 800 mg every 2 weeks, requiring four vials and giving GBP 3,072 per dose before confidential discount. | Company evidence reported avelumab as a 200 mg vial, administered as an 800 mg IV infusion every 2 weeks, with a list price of GBP 768 per vial. | Drug acquisition cost is a major driver of incremental cost. The public portfolio model should clearly distinguish public list price from the confidential discounted NHS price. |
+| Commercial arrangement | Avelumab had a patient access scheme or commercial arrangement, but the discount size was commercial in confidence. | NICE final guidance states that the company has a commercial arrangement and that the discount size is confidential. | The public model must not invent the confidential net price. It can use public list price and allow scenario discounts for learning purposes. |
+| Administration cost | Avelumab administration cost was GBP 183.54 per administration, based on outpatient simple parenteral chemotherapy, NHS Reference Cost SB12Z. | Company evidence used GBP 183.54 for a single administration because avelumab is administered once every 14-day cycle over 60 minutes. | Administration costs recur every 2 weeks while patients remain on treatment, so they accumulate materially over the treatment period. |
+
+## Source Register
+
+The initial extraction used the following public NICE TA788 sources:
+
+| Source | Public URL |
+|---|---|
+| Appraisal consultation committee papers | <https://www.nice.org.uk/guidance/ta788/evidence/appraisal-consultation-committee-papers-pdf-11070547309> |
+| Final appraisal determination 1 committee papers | <https://www.nice.org.uk/guidance/ta788/evidence/final-appraisal-determination-1-committee-papers-pdf-11070547310> |
+| Final appraisal determination 2 committee papers | <https://www.nice.org.uk/guidance/ta788/evidence/final-appraisal-determination-2-committee-papers-pdf-11070547311> |
+| Final NICE guidance | <https://www.nice.org.uk/guidance/ta788/resources/avelumab-for-maintenance-treatment-of-locally-advanced-or-metastatic-urothelial-cancer-after-platinumbased-chemotherapy-pdf-82611563554501> |
+
+## Modelling Translation
+
+The audit log must now be translated into model inputs. This section explains how each evidence item becomes an R modelling object.
+
+### Survival Curves
+
+The partitioned survival model needs two survival functions for each arm:
+
+$$S_{\mathrm{PFS}}(t)$$
+
+$$S_{\mathrm{OS}}(t)$$
+
+These curves determine health-state occupancy directly:
+
+$$\pi_{\mathrm{PF}}(t) = S_{\mathrm{PFS}}(t)$$
+
+$$\pi_{\mathrm{PD}}(t) = S_{\mathrm{OS}}(t) - S_{\mathrm{PFS}}(t)$$
+
+$$\pi_{\mathrm{Death}}(t) = 1 - S_{\mathrm{OS}}(t)$$
+
+The essential structural rule is:
+
+$$S_{\mathrm{OS}}(t) \geq S_{\mathrm{PFS}}(t)$$
+
+If this condition is violated, the model has produced a structural failure because a patient cannot be progression-free after death. The future Shiny module should therefore include an automatic warning if PFS exceeds OS at any cycle.
+
+### Treatment Effect Cap
+
+The treatment effect cap is the most important TA788-specific modelling issue for this portfolio case.
+
+The appraisal logic is:
+
+- Avelumab treatment stops at 5 years of uninterrupted treatment.
+- The treatment effect cap is applied 1 year after stopping.
+- Therefore, the cap is applied at year 6.
+- After the cap, the avelumab OS hazard is set equal to the watchful waiting OS hazard.
+- In hazard-ratio terms, the post-cap OS hazard ratio is 1.
+
+This should be coded as a hazard-level operation rather than a survival-level discontinuity. In other words, the model should not suddenly reduce the avelumab survival curve at year 6. Instead, it should propagate survival forward using the watchful waiting hazard after the cap time.
+
+### Utilities
+
+The base-case health-state utility inputs are:
+
+| Health state | Utility |
+|---|---:|
+| Progression-free | 0.772 |
+| Progressed disease | 0.698 |
+
+The initial QALY calculation should use:
+
+$$QALY = \sum_t \left[\pi_{\mathrm{PF}}(t)u_{\mathrm{PF}} + \pi_{\mathrm{PD}}(t)u_{\mathrm{PD}}\right]\Delta t \times d(t)$$
+
+where:
+
+- $\Delta t$ is the cycle length in years.
+- $d(t)$ is the discount factor.
+- $u_{\mathrm{PF}}$ is progression-free utility.
+- $u_{\mathrm{PD}}$ is progressed disease utility.
+
+### Public Cost Inputs
+
+The public list-price cost inputs are:
+
+| Cost item | Value |
+|---|---:|
+| Avelumab vial price | GBP 768 per 200 mg vial |
+| Avelumab flat dose | 800 mg every 2 weeks |
+| Vials per dose | 4 |
+| Drug acquisition cost per dose before discount | GBP 3,072 |
+| Administration cost per dose | GBP 183.54 |
+
+The public model should allow a user-controlled discount scenario, but the default narrative must state that the true NHS discount is confidential.
+
+## Phase 2 Build Plan
+
+The next step is to build clean R functions that are separate from Shiny reactivity.
+
+The first function should generate survival probabilities over a 30-year monthly horizon. The second function should convert PFS and OS survival probabilities into health-state occupancy. The third function should calculate discounted QALYs and costs.
+
+The functions should be written in this order:
+
+1. `make_time_grid()`
+2. `weibull_survival()`
+3. `calculate_state_occupancy()`
+4. `check_pfs_os_consistency()`
+5. `calculate_qalys()`
+6. `calculate_public_costs()`
+
+Only after these functions work independently should they be embedded inside a Shinylive app.
+
+## R Learning Notes
+
+For a new R modeller, the key design principle is to separate mathematical logic from interface logic.
+
+The mathematical engine should not know anything about Shiny inputs such as `input$waning_start` or `input$os_distribution`. It should only accept ordinary R arguments and return ordinary R objects. This makes the model testable in the R console before any user interface is built.
+
+A good function signature for the first partitioned survival calculation may look like this:
+
+```{r function-signature-example, eval=FALSE}
+calculate_state_occupancy <- function(time_months, pfs_survival, os_survival) {
+  # TODO: Check that all input vectors have the same length.
+  # TODO: Calculate progression-free, progressed disease, and death occupancy.
+  # TODO: Return a tidy data frame with one row per model cycle.
+}
+```
+
+The placeholder above is intentionally incomplete. The next development step is to write this function line by line, test it with a simple synthetic example, and verify that each row sums to 1.
