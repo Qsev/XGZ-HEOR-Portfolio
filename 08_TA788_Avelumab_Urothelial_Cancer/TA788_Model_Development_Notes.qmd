@@ -27,15 +27,129 @@ knitr::opts_chunk$set(
   fig.align = "center",
   out.width = "100%"
 )
+
+display_table <- function(data, labels = NULL, digits = 3, caption = NULL) {
+  if (!is.null(labels)) {
+    names(data) <- if_else(
+      names(data) %in% names(labels),
+      labels[names(data)],
+      names(data)
+    )
+  }
+
+  kable(data, digits = digits, caption = caption)
+}
+
+display_labels <- c(
+  arm = "Arm",
+  cycle = "Cycle",
+  time_months = "Month",
+  pfs_survival = "PFS",
+  os_survival = "OS",
+  progression_free = "PF",
+  progressed_disease = "PD",
+  death = "Death",
+  state_sum = "State sum",
+  pfs_exceeds_os = "PFS > OS",
+  monthly_discount_rate = "Monthly disc.",
+  discount_weight = "Disc. weight",
+  undiscounted_utility_months_cycle = "Utility-mo.",
+  discounted_utility_months_cycle = "Disc. utility-mo.",
+  total_undiscounted_qalys = "Undisc. QALYs",
+  total_discounted_qalys = "Disc. QALYs",
+  discounting_reduction = "Disc. reduction",
+  incremental_discounted_qalys = "Incr. QALYs",
+  pfs_shape = "PFS shape",
+  pfs_scale = "PFS scale",
+  os_shape = "OS shape",
+  os_scale = "OS scale",
+  doses_per_cycle = "Doses/cycle",
+  treatment_allowed = "Treatment allowed",
+  treated_proportion = "Treated prop.",
+  drug_cost_cycle = "Drug cost",
+  administration_cost_cycle = "Admin cost",
+  total_public_cost_cycle = "Total cost",
+  discounted_public_cost_cycle = "Disc. cost",
+  total_drug_cost = "Total drug",
+  total_administration_cost = "Total admin",
+  total_public_cost = "Total cost",
+  total_discounted_public_cost = "Disc. cost",
+  incremental_discounted_public_cost = "Incr. cost",
+  preliminary_public_icer = "ICER",
+  ww_os_survival = "WW OS",
+  avelumab_uncapped_os_survival = "Ave OS uncapped",
+  avelumab_capped_os_survival = "Ave OS capped",
+  ww_os_hazard = "WW hazard",
+  avelumab_uncapped_os_hazard = "Ave hazard uncapped",
+  avelumab_capped_os_hazard = "Ave hazard capped",
+  total_discounted_qalys_no_hcc = "QALYs no HCC",
+  total_discounted_qalys_hcc = "QALYs HCC",
+  hcc_qaly_change = "HCC change",
+  incremental_discounted_qalys_no_hcc = "Incr. no HCC",
+  incremental_discounted_qalys_hcc = "Incr. HCC",
+  preliminary_public_icer_hcc = "ICER HCC"
+)
 ```
 
-::: {.callout-note icon=false}
-## Purpose of This Working Document
+```{=html}
+<style>
+details.section-fold {
+  margin: 1.4rem 0;
+}
+
+details.section-fold > summary {
+  align-items: baseline;
+  border-bottom: 1px solid #dee2e6;
+  cursor: pointer;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  list-style: none;
+}
+
+details.section-fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.section-fold > summary::after {
+  color: #6c757d;
+  content: "▸";
+  font-size: 0.9em;
+  padding-left: 0.5rem;
+}
+
+details.section-fold[open] > summary::after {
+  content: "▾";
+}
+
+details.section-fold > summary h2,
+details.section-fold > summary h3 {
+  flex: 1;
+  margin: 0;
+}
+
+table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+table caption {
+  white-space: normal;
+}
+</style>
+```
+
+<details class="section-fold">
+<summary><h2>Purpose of This Working Document</h2></summary>
 
 This document is a technical working notebook for building the TA788 Quarto and Shinylive case study. It is deliberately more detailed than the final public-facing page because it records the evidence extraction, modelling logic, and R implementation plan step by step.
-:::
 
-## Phase 1: EAG Audit Log
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 1: EAG Audit Log</h2></summary>
 
 The first task is not to write R code. The first task is to identify which assumptions matter to the appraisal decision and which assumptions the EAG challenged. In an oncology partitioned survival model, the most decision-sensitive nodes usually sit in survival extrapolation, treatment effect duration, utilities, and drug costs.
 
@@ -54,7 +168,10 @@ The table below records the initial audit findings extracted from the public NIC
 | Commercial arrangement | Avelumab had a patient access scheme or commercial arrangement, but the discount size was commercial in confidence. | NICE final guidance states that the company has a commercial arrangement and that the discount size is confidential. | The public model must not invent the confidential net price. It can use public list price and allow scenario discounts for learning purposes. |
 | Administration cost | Avelumab administration cost was GBP 183.54 per administration, based on outpatient simple parenteral chemotherapy, NHS Reference Cost SB12Z. | Company evidence used GBP 183.54 for a single administration because avelumab is administered once every 14-day cycle over 60 minutes. | Administration costs recur every 2 weeks while patients remain on treatment, so they accumulate materially over the treatment period. |
 
-## Source Register
+</details>
+
+<details class="section-fold">
+<summary><h2>Source Register</h2></summary>
 
 The initial extraction used the following public NICE TA788 sources:
 
@@ -65,7 +182,10 @@ The initial extraction used the following public NICE TA788 sources:
 | Final appraisal determination 2 committee papers | <https://www.nice.org.uk/guidance/ta788/evidence/final-appraisal-determination-2-committee-papers-pdf-11070547311> |
 | Final NICE guidance | <https://www.nice.org.uk/guidance/ta788/resources/avelumab-for-maintenance-treatment-of-locally-advanced-or-metastatic-urothelial-cancer-after-platinumbased-chemotherapy-pdf-82611563554501> |
 
-## Modelling Translation
+</details>
+
+<details class="section-fold">
+<summary><h2>Modelling Translation</h2></summary>
 
 The audit log must now be translated into model inputs. This section explains how each evidence item becomes an R modelling object.
 
@@ -139,7 +259,40 @@ The public list-price cost inputs are:
 
 The public model should allow a user-controlled discount scenario, but the default narrative must state that the true NHS discount is confidential.
 
-## Phase 2 Build Plan
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2 Readiness Checklist</h2></summary>
+
+Before writing the first R functions, the modelling scope must be explicitly controlled. Phase 2 is not intended to reproduce the full confidential company model or generate a final NICE ICER. Its purpose is to build a transparent, testable mathematical engine for a three-state partitioned survival model.
+
+| Readiness item | Status | Modelling implication |
+|---|---|---|
+| Decision problem defined | Complete | The model will compare avelumab maintenance with watchful waiting / best supportive care after non-progression on platinum-based chemotherapy. |
+| Core model structure defined | Complete | The working model will use a three-state partitioned survival model: progression-free, progressed disease, and death. |
+| Public utility inputs identified | Complete | Base-case utility inputs can be set to 0.772 for progression-free disease and 0.698 for progressed disease. |
+| Public drug and administration costs identified | Complete | Public list-price calculations can use GBP 3,072 per avelumab dose and GBP 183.54 per administration. The confidential NHS discount must not be inferred. |
+| Treatment effect cap logic identified | Complete | Avelumab treatment stops at 5 years, with the treatment effect cap applied at year 6 by setting the avelumab OS hazard equal to the watchful waiting OS hazard. |
+| Survival distribution parameters | Not yet extracted | The first R implementation must use clearly labelled synthetic parameters. These parameters are for engine testing only and must not be interpreted as validated TA788 values. |
+| Time-on-treatment and discontinuation assumptions | Not yet extracted | The first cost calculation should either be omitted or kept as a simplified public-cost placeholder until treatment exposure assumptions are extracted. |
+| Monitoring, adverse-event, and post-progression costs | Not yet extracted | These inputs should be listed as evidence gaps and excluded from the first minimal engine test. |
+| Discounting and cycle structure | Working assumption needed | The first engine test should use a 30-year horizon, monthly cycles, and an annual discount rate placeholder. These should be checked against NICE reference-case assumptions before final use. |
+| Shiny integration | Not started | Shiny and Shinylive should wait until the mathematical functions produce stable state occupancies and basic checks in the QMD. |
+
+The immediate coding objective is therefore limited to the survival and occupancy engine:
+
+1. create a monthly time grid;
+2. generate synthetic PFS and OS survival curves;
+3. convert those curves into partitioned survival state occupancy;
+4. verify that each cycle sums to 1;
+5. flag any cycle where PFS exceeds OS.
+
+This scope is deliberately narrow. In an EAG-style audit, a simple engine with explicit assumptions is more credible than a complex interactive model whose parameters are not traceable.
+
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2 Build Plan</h2></summary>
 
 The next step is to build clean R functions that are separate from Shiny reactivity.
 
@@ -156,7 +309,10 @@ The functions should be written in this order:
 
 Only after these functions work independently should they be embedded inside a Shinylive app.
 
-## R Learning Notes
+</details>
+
+<details class="section-fold">
+<summary><h2>R Learning Notes</h2></summary>
 
 For a new R modeller, the key design principle is to separate mathematical logic from interface logic.
 
@@ -173,3 +329,943 @@ calculate_state_occupancy <- function(time_months, pfs_survival, os_survival) {
 ```
 
 The placeholder above is intentionally incomplete. The next development step is to write this function line by line, test it with a simple synthetic example, and verify that each row sums to 1.
+
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2.1: Minimal PSM Engine</h2></summary>
+
+This section builds the smallest useful partitioned survival model engine. The survival parameters below are synthetic and are used only to test the calculation structure. They are not TA788-validated parameters and should not be interpreted as evidence-based JAVELIN Bladder 100 estimates.
+
+The immediate goal is to confirm that the mathematical engine can:
+
+1. create a monthly model time grid;
+2. generate plausible synthetic PFS and OS survival curves;
+3. translate PFS and OS into progression-free, progressed disease, and death state occupancy;
+4. verify that each cycle sums to 1;
+5. flag any structural failure where PFS exceeds OS.
+
+```{r psm-engine-functions}
+check_positive_number <- function(x, name) {
+  if (!is.numeric(x) || length(x) != 1 || is.na(x) || !is.finite(x) || x <= 0) {
+    stop(paste0("`", name, "` must be a single positive finite number."))
+  }
+}
+
+make_time_grid <- function(horizon_years = 30, cycle_length_months = 1) {
+  check_positive_number(horizon_years, "horizon_years")
+  check_positive_number(cycle_length_months, "cycle_length_months")
+
+  horizon_months <- horizon_years * 12
+
+  tibble(
+    cycle = seq(0, horizon_months, by = cycle_length_months),
+    time_months = cycle
+  )
+}
+
+weibull_survival <- function(time_months, shape, scale) {
+  check_positive_number(shape, "shape")
+  check_positive_number(scale, "scale")
+
+  # lower.tail = FALSE returns S(t) = P(T > t), not the cumulative event probability.
+  pweibull(
+    q = time_months,
+    shape = shape,
+    scale = scale,
+    lower.tail = FALSE
+  )
+}
+
+check_same_length <- function(x, expected_length, name) {
+  if (length(x) != expected_length) {
+    stop(paste0("`", name, "` must have length ", expected_length, "."))
+  }
+}
+
+check_btwn01 <- function(x, name) {
+  if (any(x < 0 | x > 1)) {
+    stop(paste0("`", name, "` values must be between 0 and 1."))
+  }
+}
+
+calculate_state_occupancy <- function(time_grid, pfs_survival, os_survival) {
+  if (!all(c("cycle", "time_months") %in% names(time_grid))) {
+    stop("time_grid must contain cycle and time_months columns.")
+  }
+  check_same_length(pfs_survival, nrow(time_grid), "pfs_survival")
+  check_same_length(os_survival, nrow(time_grid), "os_survival")
+
+  check_btwn01(pfs_survival, "pfs_survival")
+  check_btwn01(os_survival, "os_survival")
+
+  time_grid |>
+    mutate(
+      pfs_survival = pfs_survival,
+      os_survival = os_survival,
+      progression_free = pfs_survival,
+      progressed_disease = os_survival - pfs_survival,
+      death = 1 - os_survival,
+      state_sum = progression_free + progressed_disease + death,
+      pfs_exceeds_os = pfs_survival > os_survival
+    )
+}
+```
+
+The first function creates the monthly model calendar. The second function provides a simple Weibull survival generator using base R’s standard Weibull parameterisation. In `pweibull()`, `lower.tail = FALSE` returns the survival probability directly: $S(t) = P(T > t)$. The third function applies the partitioned survival identities directly and stores two audit columns: `state_sum` and `pfs_exceeds_os`.
+
+```{r psm-engine-synthetic-test}
+synthetic_cycle_length_months <- 1
+
+synthetic_time_grid <- make_time_grid(
+  horizon_years = 30,
+  cycle_length_months = synthetic_cycle_length_months
+)
+
+synthetic_pfs <- weibull_survival(
+  time_months = synthetic_time_grid$time_months,
+  shape = 1.15,
+  scale = 35
+)
+
+synthetic_os <- weibull_survival(
+  time_months = synthetic_time_grid$time_months,
+  shape = 1.05,
+  scale = 80
+)
+
+synthetic_state_occupancy <- calculate_state_occupancy(
+  time_grid = synthetic_time_grid,
+  pfs_survival = synthetic_pfs,
+  os_survival = synthetic_os
+)
+
+synthetic_state_occupancy |>
+  select(
+    cycle,
+    time_months,
+    pfs_survival,
+    os_survival,
+    progression_free,
+    progressed_disease,
+    death,
+    state_sum,
+    pfs_exceeds_os
+  ) |>
+  head(10) |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "First 10 cycles of synthetic partitioned survival state occupancy"
+  )
+```
+
+The first ten rows should show three basic features. At cycle 0, both PFS and OS should equal 1, all patients should be progression-free, and no patients should be in progressed disease or death. As time increases, the progression-free state should decline, the death state should rise, and the progressed disease state should represent the gap between OS and PFS.
+
+```{r psm-engine-audit-checks}
+state_sum_check <- synthetic_state_occupancy |>
+  summarise(
+    min_state_sum = min(state_sum),
+    max_state_sum = max(state_sum),
+    max_absolute_deviation_from_one = max(abs(state_sum - 1))
+  )
+
+pfs_os_check <- synthetic_state_occupancy |>
+  summarise(
+    any_pfs_exceeds_os = any(pfs_exceeds_os),
+    number_of_violating_cycles = sum(pfs_exceeds_os)
+  )
+
+audit_check_table <- tibble(
+  Check = c(
+    "State occupancy sums to 1",
+    "No PFS-OS crossing"
+  ),
+  Result = c(
+    paste0(
+      "min = ", round(state_sum_check$min_state_sum, 6),
+      "; max = ", round(state_sum_check$max_state_sum, 6),
+      "; max deviation = ", signif(state_sum_check$max_absolute_deviation_from_one, 3)
+    ),
+    paste0(
+      "any crossing = ", pfs_os_check$any_pfs_exceeds_os,
+      "; violating cycles = ", pfs_os_check$number_of_violating_cycles
+    )
+  )
+)
+
+audit_check_table |>
+  display_table(caption = "Structural audit checks for the synthetic PSM engine")
+```
+
+For this synthetic test to pass, `max_absolute_deviation_from_one` should be effectively zero, `any_pfs_exceeds_os` should be `FALSE`, and `number_of_violating_cycles` should be 0.
+
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2.2: QALY Accumulation</h2></summary>
+
+This section adds the first health economic outcome to the minimal PSM engine: quality-adjusted life years. The calculation uses the public TA788 health-state utility values extracted in Phase 1:
+
+| Health state | Utility |
+|---|---:|
+| Progression-free | 0.772 |
+| Progressed disease | 0.698 |
+
+The calculation below still uses synthetic survival curves from Phase 2.1. Therefore, the resulting QALY total is a test of the calculation engine only, not a TA788 cost-effectiveness result.
+
+```{r qaly-functions}
+add_monthly_discount_weights <- function(model_trace, annual_discount_rate) {
+  if (!"time_months" %in% names(model_trace)) {
+    stop("model_trace must contain a time_months column.")
+  }
+
+  check_btwn01(annual_discount_rate, "annual_discount_rate")
+
+  monthly_discount_rate <- (1 + annual_discount_rate)^(1 / 12) - 1
+
+  model_trace |>
+    mutate(
+      monthly_discount_rate = monthly_discount_rate,
+      discount_weight = 1 / ((1 + monthly_discount_rate)^time_months)
+    )
+}
+
+calculate_qalys <- function(
+  state_occupancy,
+  utility_pf = 0.772,
+  utility_pd = 0.698,
+  annual_discount_rate = 0.035,
+  cycle_length_months
+) {
+  required_columns <- c(
+    "cycle",
+    "time_months",
+    "progression_free",
+    "progressed_disease"
+  )
+
+  if (!all(required_columns %in% names(state_occupancy))) {
+    stop("state_occupancy must contain cycle, time_months, progression_free, and progressed_disease columns.")
+  }
+
+  check_btwn01(utility_pf, "utility_pf")
+  check_btwn01(utility_pd, "utility_pd")
+  check_positive_number(cycle_length_months, "cycle_length_months")
+
+  state_occupancy |>
+    add_monthly_discount_weights(
+      annual_discount_rate = annual_discount_rate
+    ) |>
+    mutate(
+      cycle_length_months = cycle_length_months,
+      undiscounted_utility_months_cycle = (
+        progression_free * utility_pf +
+          progressed_disease * utility_pd
+      ) * cycle_length_months,
+      discounted_utility_months_cycle =
+        undiscounted_utility_months_cycle * discount_weight
+    )
+}
+```
+
+There are two modelling choices to notice here. 
+
+- First, the model keeps the main time scale in months from survival generation through state occupancy and QALY accumulation.
+- Second, the cycle-level calculation first accumulates utility-months, which is easier to read in a monthly model.
+- Third, utility-months are converted into QALYs only in the summary step by dividing the total by 12.
+- Fourth, the annual discount rate is converted into a monthly discount rate through a shared helper function, and discounting is then applied month by month. Half-cycle correction is intentionally deferred to a later section.
+
+```{r qaly-synthetic-test}
+synthetic_qaly_trace <- calculate_qalys(
+  state_occupancy = synthetic_state_occupancy,
+  utility_pf = 0.772,
+  utility_pd = 0.698,
+  annual_discount_rate = 0.035,
+  cycle_length_months = synthetic_cycle_length_months
+)
+
+synthetic_qaly_trace |>
+  select(
+    cycle,
+    time_months,
+    progression_free,
+    progressed_disease,
+    death,
+    monthly_discount_rate,
+    discount_weight,
+    undiscounted_utility_months_cycle,
+    discounted_utility_months_cycle
+  ) |>
+  head(6) |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "First 6 cycles of synthetic QALY accumulation"
+  )
+```
+
+The QALY trace adds one row-level contribution per cycle. In a partitioned survival model, QALYs are accumulated from the living health states only: progression-free and progressed disease. The death state contributes zero utility.
+
+```{r qaly-summary}
+qaly_summary <- synthetic_qaly_trace |>
+  summarise(
+    total_undiscounted_qalys = sum(undiscounted_utility_months_cycle) / 12,
+    total_discounted_qalys = sum(discounted_utility_months_cycle) / 12,
+    discounting_reduction = total_undiscounted_qalys - total_discounted_qalys
+  )
+
+qaly_summary |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Synthetic lifetime QALY summary"
+  )
+```
+
+This summary converts the cycle-level trace into lifetime QALYs for the synthetic single-arm example. The next modelling step will be to add a comparator arm and calculate incremental QALYs.
+
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2.3: Two-arm QALY Comparison</h2></summary>
+
+This section converts the single-arm engine into a minimal two-arm comparison. The parameters below are synthetic. They are designed only to test whether the model can compare an intervention arm with a comparator arm and calculate incremental QALYs.
+
+The two-arm structure is the point at which the model starts to resemble a cost-effectiveness analysis. Costs are still excluded at this stage, so this section calculates incremental QALYs only.
+
+```{r two-arm-model-functions}
+run_single_arm_qaly_model <- function(
+  arm_name,
+  pfs_shape,
+  pfs_scale,
+  os_shape,
+  os_scale,
+  time_grid,
+  utility_pf,
+  utility_pd,
+  annual_discount_rate,
+  cycle_length_months
+) {
+  pfs_survival <- weibull_survival(
+    time_months = time_grid$time_months,
+    shape = pfs_shape,
+    scale = pfs_scale
+  )
+
+  os_survival <- weibull_survival(
+    time_months = time_grid$time_months,
+    shape = os_shape,
+    scale = os_scale
+  )
+
+  state_occupancy <- calculate_state_occupancy(
+    time_grid = time_grid,
+    pfs_survival = pfs_survival,
+    os_survival = os_survival
+  )
+
+  qaly_trace <- calculate_qalys(
+    state_occupancy = state_occupancy,
+    utility_pf = utility_pf,
+    utility_pd = utility_pd,
+    annual_discount_rate = annual_discount_rate,
+    cycle_length_months = cycle_length_months
+  )
+
+  qaly_trace |>
+    mutate(arm = arm_name)
+}
+```
+
+The wrapper function above is deliberately simple. It does not introduce new mathematics. It only sequences the existing functions: generate PFS, generate OS, calculate state occupancy, and accumulate QALYs.
+
+```{r two-arm-synthetic-inputs}
+synthetic_arm_parameters <- tibble(
+  arm = c("Watchful waiting", "Avelumab maintenance"),
+  pfs_shape = c(1.20, 1.15),
+  pfs_scale = c(26, 35),
+  os_shape = c(1.10, 1.05),
+  os_scale = c(55, 80)
+)
+
+synthetic_arm_parameters |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Synthetic two-arm survival parameters for engine testing"
+  )
+```
+
+The intervention arm uses lower synthetic scale parameters, so it is expected to have slower PFS and OS decline than the watchful waiting arm. These values are not fitted to JAVELIN Bladder 100 and should not be interpreted as TA788 evidence.
+
+```{r two-arm-run-qaly-model}
+watchful_waiting_trace <- run_single_arm_qaly_model(
+  arm_name = "Watchful waiting",
+  pfs_shape = 1.20,
+  pfs_scale = 26,
+  os_shape = 1.10,
+  os_scale = 55,
+  time_grid = synthetic_time_grid,
+  utility_pf = 0.772,
+  utility_pd = 0.698,
+  annual_discount_rate = 0.035,
+  cycle_length_months = synthetic_cycle_length_months
+)
+
+avelumab_trace <- run_single_arm_qaly_model(
+  arm_name = "Avelumab maintenance",
+  pfs_shape = 1.15,
+  pfs_scale = 35,
+  os_shape = 1.05,
+  os_scale = 80,
+  time_grid = synthetic_time_grid,
+  utility_pf = 0.772,
+  utility_pd = 0.698,
+  annual_discount_rate = 0.035,
+  cycle_length_months = synthetic_cycle_length_months
+)
+
+two_arm_qaly_trace <- bind_rows(
+  watchful_waiting_trace,
+  avelumab_trace
+)
+
+two_arm_qaly_summary <- two_arm_qaly_trace |>
+  group_by(arm) |>
+  summarise(
+    total_undiscounted_qalys = sum(undiscounted_utility_months_cycle) / 12,
+    total_discounted_qalys = sum(discounted_utility_months_cycle) / 12,
+    .groups = "drop"
+  ) |>
+  mutate(
+    incremental_discounted_qalys = total_discounted_qalys -
+      total_discounted_qalys[arm == "Watchful waiting"]
+  )
+
+two_arm_qaly_summary |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Synthetic two-arm QALY comparison"
+  )
+```
+
+The incremental discounted QALY column shows the additional health benefit generated by the synthetic avelumab maintenance arm compared with synthetic watchful waiting. This is not yet an ICER because incremental costs have not been added.
+
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2.4: Public Cost Accumulation</h2></summary>
+
+This section adds a minimal public-cost engine. It uses public TA788 cost inputs only and is intended to test the calculation structure, not to reproduce the confidential company model.
+
+The public inputs are:
+
+| Cost input | Value |
+|---|---:|
+| Avelumab drug acquisition cost | GBP 3,072 per dose |
+| Avelumab administration cost | GBP 183.54 per administration |
+| Dosing frequency | Once every 14 days |
+| Confidential NHS discount | Not modelled in this section |
+
+At this stage, avelumab costs are applied to the progression-free proportion of the cohort. This is a simplifying assumption for engine testing. The 5-year stopping rule, time-on-treatment evidence, treatment discontinuation, monitoring costs, adverse-event costs, and post-progression costs are not yet included.
+
+```{r public-cost-functions}
+calculate_public_costs <- function(
+  model_trace,
+  arm_name,
+  cycle_length_months,
+  drug_cost_per_dose = 3072,
+  administration_cost_per_dose = 183.54,
+  dosing_interval_days = 14,
+  annual_discount_rate = 0.035,
+  treatment_stop_months = Inf
+) {
+  required_columns <- c(
+    "arm",
+    "time_months",
+    "progression_free"
+  )
+
+  if (!all(required_columns %in% names(model_trace))) {
+    stop("model_trace must contain arm, time_months, and progression_free columns.")
+  }
+
+  check_positive_number(cycle_length_months, "cycle_length_months")
+  check_positive_number(drug_cost_per_dose, "drug_cost_per_dose")
+  check_positive_number(administration_cost_per_dose, "administration_cost_per_dose")
+  check_positive_number(dosing_interval_days, "dosing_interval_days")
+  if (!is.infinite(treatment_stop_months)) {
+    check_positive_number(treatment_stop_months, "treatment_stop_months")
+  }
+
+  days_per_month <- 365.25 / 12
+  doses_per_month <- days_per_month / dosing_interval_days
+
+  model_trace |>
+    add_monthly_discount_weights(
+      annual_discount_rate = annual_discount_rate
+    ) |>
+    mutate(
+      doses_per_cycle = doses_per_month * cycle_length_months,
+      treatment_allowed = arm == arm_name & time_months <= treatment_stop_months,
+      treated_proportion = if_else(treatment_allowed, progression_free, 0),
+      drug_cost_cycle = if_else(
+        arm == arm_name,
+        treated_proportion * doses_per_cycle * drug_cost_per_dose,
+        0
+      ),
+      administration_cost_cycle = if_else(
+        arm == arm_name,
+        treated_proportion * doses_per_cycle * administration_cost_per_dose,
+        0
+      ),
+      total_public_cost_cycle = drug_cost_cycle + administration_cost_cycle,
+      discounted_public_cost_cycle = total_public_cost_cycle * discount_weight
+    )
+}
+```
+
+This function uses the same month-by-month discounting logic as the QALY function. The dosing frequency is converted into an approximate monthly number of doses using `365.25 / 12 / 14`, which gives the average number of 14-day administrations per month.
+
+```{r public-cost-run}
+two_arm_cost_trace <- calculate_public_costs(
+  model_trace = two_arm_qaly_trace,
+  arm_name = "Avelumab maintenance",
+  cycle_length_months = synthetic_cycle_length_months,
+  drug_cost_per_dose = 3072,
+  administration_cost_per_dose = 183.54,
+  dosing_interval_days = 14,
+  annual_discount_rate = 0.035
+)
+
+two_arm_cost_trace |>
+  select(
+    arm,
+    cycle,
+    time_months,
+    progression_free,
+    doses_per_cycle,
+    drug_cost_cycle,
+    administration_cost_cycle,
+    discounted_public_cost_cycle
+  ) |>
+  head(8) |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "First 8 cycles of public-cost accumulation"
+  )
+```
+
+```{r public-cost-summary}
+two_arm_cost_summary <- two_arm_cost_trace |>
+  group_by(arm) |>
+  summarise(
+    total_drug_cost = sum(drug_cost_cycle),
+    total_administration_cost = sum(administration_cost_cycle),
+    total_public_cost = sum(total_public_cost_cycle),
+    total_discounted_public_cost = sum(discounted_public_cost_cycle),
+    .groups = "drop"
+  ) |>
+  mutate(
+    incremental_discounted_public_cost = total_discounted_public_cost -
+      total_discounted_public_cost[arm == "Watchful waiting"]
+  )
+
+two_arm_cost_summary |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Synthetic public-cost summary"
+  )
+```
+
+The watchful waiting arm has zero public treatment cost in this minimal engine because background disease management, monitoring, adverse events, and post-progression therapy costs have not yet been added.
+
+```{r preliminary-icer-summary}
+preliminary_icer_summary <- two_arm_qaly_summary |>
+  select(arm, total_discounted_qalys, incremental_discounted_qalys) |>
+  left_join(
+    two_arm_cost_summary |>
+      select(
+        arm,
+        total_discounted_public_cost,
+        incremental_discounted_public_cost
+      ),
+    by = "arm"
+  ) |>
+  mutate(
+    preliminary_public_icer = incremental_discounted_public_cost /
+      incremental_discounted_qalys
+  )
+
+preliminary_icer_summary |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Preliminary synthetic ICER using public avelumab treatment costs only"
+  )
+```
+
+This ICER is intentionally labelled preliminary. It excludes the confidential avelumab discount and several standard cost categories, so it should be read only as a check that the cost and QALY engines can be connected.
+
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2.5: Treatment Stopping Rule for Cost Exposure</h2></summary>
+
+This section applies the public TA788 treatment stopping rule to cost exposure. NICE TA788 recommends avelumab only if treatment is stopped after 5 years of uninterrupted treatment or earlier if disease progresses. In the current simplified engine, progression is represented by progression-free state occupancy, so the additional stopping rule is implemented as a maximum treatment duration of 60 months.
+
+This is a cost-exposure rule only. It does not yet implement the separate treatment effect cap for OS, which occurs 1 year after stopping treatment.
+
+```{r stopping-rule-cost-run}
+ta788_treatment_stop_months <- 60
+
+two_arm_cost_trace_with_stopping <- calculate_public_costs(
+  model_trace = two_arm_qaly_trace,
+  arm_name = "Avelumab maintenance",
+  cycle_length_months = synthetic_cycle_length_months,
+  drug_cost_per_dose = 3072,
+  administration_cost_per_dose = 183.54,
+  dosing_interval_days = 14,
+  annual_discount_rate = 0.035,
+  treatment_stop_months = ta788_treatment_stop_months
+)
+
+two_arm_cost_trace_with_stopping |>
+  filter(arm == "Avelumab maintenance", time_months %in% c(58, 59, 60, 61, 62)) |>
+  select(
+    arm,
+    time_months,
+    progression_free,
+    treatment_allowed,
+    treated_proportion,
+    drug_cost_cycle,
+    administration_cost_cycle,
+    discounted_public_cost_cycle
+  ) |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Cost exposure around the 60-month stopping rule"
+  )
+```
+
+The table above is a structural check. Costs are still applied at month 60, but they stop after month 60. This is a simple monthly-cycle representation of the 5-year treatment stopping rule.
+
+```{r stopping-rule-cost-summary}
+two_arm_cost_summary_with_stopping <- two_arm_cost_trace_with_stopping |>
+  group_by(arm) |>
+  summarise(
+    total_drug_cost = sum(drug_cost_cycle),
+    total_administration_cost = sum(administration_cost_cycle),
+    total_public_cost = sum(total_public_cost_cycle),
+    total_discounted_public_cost = sum(discounted_public_cost_cycle),
+    .groups = "drop"
+  ) |>
+  mutate(
+    incremental_discounted_public_cost = total_discounted_public_cost -
+      total_discounted_public_cost[arm == "Watchful waiting"]
+  )
+
+two_arm_cost_summary_with_stopping |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Synthetic public-cost summary with 5-year stopping rule"
+  )
+```
+
+```{r stopping-rule-icer-summary}
+preliminary_icer_with_stopping <- two_arm_qaly_summary |>
+  select(arm, total_discounted_qalys, incremental_discounted_qalys) |>
+  left_join(
+    two_arm_cost_summary_with_stopping |>
+      select(
+        arm,
+        total_discounted_public_cost,
+        incremental_discounted_public_cost
+      ),
+    by = "arm"
+  ) |>
+  mutate(
+    preliminary_public_icer = incremental_discounted_public_cost /
+      incremental_discounted_qalys
+  )
+
+preliminary_icer_with_stopping |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Preliminary synthetic ICER with 5-year avelumab cost stopping rule"
+  )
+```
+
+Adding the stopping rule reduces treatment costs but does not change QALYs in this section. That is intentional: the cost stopping rule and the OS treatment effect cap are separate assumptions in the appraisal.
+
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2.6: OS Treatment Effect Cap</h2></summary>
+
+This section implements the TA788 treatment effect cap at the hazard level. The cost stopping rule ends avelumab treatment at 5 years. The treatment effect cap is applied 1 year later, at 6 years, by setting the avelumab OS hazard equal to the watchful waiting OS hazard.
+
+The key modelling distinction is that the treatment effect is capped abruptly at the hazard level, but the avelumab survival curve remains continuous. The model should not impose a sudden drop in survival probability at the cap time.
+
+```{r treatment-effect-cap-functions}
+survival_to_monthly_hazard <- function(survival_probabilities) {
+  if (!is.numeric(survival_probabilities) || any(is.na(survival_probabilities))) {
+    stop("survival_probabilities must be a numeric vector without missing values.")
+  }
+
+  if (any(survival_probabilities < 0 | survival_probabilities > 1)) {
+    stop("survival_probabilities must contain values between 0 and 1.")
+  }
+
+  survival_lag <- lag(survival_probabilities)
+
+  monthly_hazard <- -log(survival_probabilities / survival_lag)
+  monthly_hazard[1] <- 0
+  monthly_hazard
+}
+
+reconstruct_survival_from_hazard <- function(monthly_hazard) {
+  if (!is.numeric(monthly_hazard) || any(is.na(monthly_hazard))) {
+    stop("monthly_hazard must be a numeric vector without missing values.")
+  }
+
+  if (any(monthly_hazard < 0)) {
+    stop("monthly_hazard cannot contain negative values.")
+  }
+
+  exp(-cumsum(monthly_hazard))
+}
+```
+
+The first helper converts survival probabilities into monthly discrete hazards. The second helper reconstructs a continuous survival curve from monthly hazards. Together, they let the model modify hazards after the cap time without directly forcing a discontinuous survival drop.
+
+```{r treatment-effect-cap-construct-os}
+ta788_treatment_effect_cap_months <- 72
+
+ww_os_survival <- weibull_survival(
+  time_months = synthetic_time_grid$time_months,
+  shape = 1.10,
+  scale = 55
+)
+
+avelumab_uncapped_os_survival <- weibull_survival(
+  time_months = synthetic_time_grid$time_months,
+  shape = 1.05,
+  scale = 80
+)
+
+ww_os_hazard <- survival_to_monthly_hazard(ww_os_survival)
+avelumab_uncapped_os_hazard <- survival_to_monthly_hazard(avelumab_uncapped_os_survival)
+
+avelumab_capped_os_hazard <- if_else(
+  synthetic_time_grid$time_months <= ta788_treatment_effect_cap_months,
+  avelumab_uncapped_os_hazard,
+  ww_os_hazard
+)
+
+avelumab_capped_os_survival <- reconstruct_survival_from_hazard(
+  monthly_hazard = avelumab_capped_os_hazard
+)
+
+treatment_effect_cap_check <- tibble(
+  time_months = synthetic_time_grid$time_months,
+  ww_os_survival = ww_os_survival,
+  avelumab_uncapped_os_survival = avelumab_uncapped_os_survival,
+  avelumab_capped_os_survival = avelumab_capped_os_survival,
+  ww_os_hazard = ww_os_hazard,
+  avelumab_uncapped_os_hazard = avelumab_uncapped_os_hazard,
+  avelumab_capped_os_hazard = avelumab_capped_os_hazard
+)
+
+treatment_effect_cap_check |>
+  filter(time_months %in% c(70, 71, 72, 73, 74)) |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "OS hazard and survival around the 72-month treatment effect cap"
+  )
+```
+
+The check table should show that after month 72 the capped avelumab OS hazard equals the watchful waiting OS hazard. The capped avelumab OS survival remains continuous because it is reconstructed recursively from the capped hazard sequence.
+
+```{r treatment-effect-cap-qaly-impact}
+avelumab_capped_state_occupancy <- calculate_state_occupancy(
+  time_grid = synthetic_time_grid,
+  pfs_survival = weibull_survival(
+    time_months = synthetic_time_grid$time_months,
+    shape = 1.15,
+    scale = 35
+  ),
+  os_survival = avelumab_capped_os_survival
+)
+
+avelumab_capped_qaly_trace <- calculate_qalys(
+  state_occupancy = avelumab_capped_state_occupancy,
+  utility_pf = 0.772,
+  utility_pd = 0.698,
+  annual_discount_rate = 0.035,
+  cycle_length_months = synthetic_cycle_length_months
+) |>
+  mutate(arm = "Avelumab maintenance with OS cap")
+
+two_arm_qaly_summary_with_os_cap <- bind_rows(
+  watchful_waiting_trace,
+  avelumab_capped_qaly_trace
+) |>
+  group_by(arm) |>
+  summarise(
+    total_undiscounted_qalys = sum(undiscounted_utility_months_cycle) / 12,
+    total_discounted_qalys = sum(discounted_utility_months_cycle) / 12,
+    .groups = "drop"
+  ) |>
+  mutate(
+    incremental_discounted_qalys = total_discounted_qalys -
+      total_discounted_qalys[arm == "Watchful waiting"]
+  )
+
+two_arm_qaly_summary_with_os_cap |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Synthetic two-arm QALY comparison with OS treatment effect cap"
+  )
+```
+
+The OS treatment effect cap reduces the modelled QALY benefit because the avelumab arm no longer retains an indefinite OS hazard advantage after year 6. This is the survival-benefit counterpart to the cost stopping rule, but it is implemented separately.
+
+```{r treatment-effect-cap-icer-impact}
+cost_summary_for_os_cap <- two_arm_cost_summary_with_stopping |>
+  mutate(
+    arm = if_else(
+      arm == "Avelumab maintenance",
+      "Avelumab maintenance with OS cap",
+      arm
+    )
+  )
+
+preliminary_icer_with_stopping_and_os_cap <- two_arm_qaly_summary_with_os_cap |>
+  select(arm, total_discounted_qalys, incremental_discounted_qalys) |>
+  left_join(
+    cost_summary_for_os_cap |>
+      select(
+        arm,
+        total_discounted_public_cost,
+        incremental_discounted_public_cost
+      ),
+    by = "arm"
+  ) |>
+  mutate(
+    preliminary_public_icer = incremental_discounted_public_cost /
+      incremental_discounted_qalys
+  )
+
+preliminary_icer_with_stopping_and_os_cap |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Preliminary synthetic ICER with 5-year cost stopping and year-6 OS treatment effect cap"
+  )
+```
+
+This final table combines the cost stopping rule with the OS treatment effect cap. It still excludes confidential pricing, monitoring costs, adverse-event costs, post-progression costs, and real TA788 survival parameters.
+
+</details>
+
+<details class="section-fold">
+<summary><h2>Phase 2.7: Half-Cycle Correction for QALYs</h2></summary>
+
+This section adds a basic half-cycle correction for QALYs. In a cycle-based model, patients do not usually transition exactly at the beginning or end of a cycle. The half-cycle correction approximates this by giving half weight to the first and last cycles, while giving full weight to all cycles in between.
+
+This section applies half-cycle correction to QALYs only. Drug acquisition and administration costs are not adjusted here because those costs are event-like treatment costs linked to dosing. Cost half-cycle correction can be considered later if the model adds broader monthly disease management costs.
+
+```{r half-cycle-functions}
+add_half_cycle_weights <- function(model_trace) {
+  required_columns <- c("arm", "cycle")
+
+  if (!all(required_columns %in% names(model_trace))) {
+    stop("model_trace must contain arm and cycle columns.")
+  }
+
+  model_trace |>
+    group_by(arm) |>
+    arrange(cycle, .by_group = TRUE) |>
+    mutate(
+      half_cycle_weight = if_else(
+        row_number() == 1 | row_number() == n(),
+        0.5,
+        1
+      )
+    ) |>
+    ungroup()
+}
+```
+
+The function above creates a simple weight column. For each arm, the first and final cycles receive a weight of 0.5. All other cycles receive a weight of 1.
+
+```{r half-cycle-qaly-summary}
+two_arm_qaly_trace_with_os_cap <- bind_rows(
+  watchful_waiting_trace,
+  avelumab_capped_qaly_trace
+)
+
+two_arm_qaly_hcc_summary <- two_arm_qaly_trace_with_os_cap |>
+  add_half_cycle_weights() |>
+  group_by(arm) |>
+  summarise(
+    total_discounted_qalys_no_hcc = sum(discounted_utility_months_cycle) / 12,
+    total_discounted_qalys_hcc =
+      sum(discounted_utility_months_cycle * half_cycle_weight) / 12,
+    hcc_qaly_change = total_discounted_qalys_hcc - total_discounted_qalys_no_hcc,
+    .groups = "drop"
+  ) |>
+  mutate(
+    incremental_discounted_qalys_no_hcc = total_discounted_qalys_no_hcc -
+      total_discounted_qalys_no_hcc[arm == "Watchful waiting"],
+    incremental_discounted_qalys_hcc = total_discounted_qalys_hcc -
+      total_discounted_qalys_hcc[arm == "Watchful waiting"]
+  )
+
+two_arm_qaly_hcc_summary |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Synthetic QALY comparison with half-cycle correction"
+  )
+```
+
+The half-cycle correction changes the numerical integration of QALYs. It does not change the underlying survival curves, utilities, or treatment effect cap logic.
+
+```{r half-cycle-icer-summary}
+preliminary_icer_with_hcc <- two_arm_qaly_hcc_summary |>
+  select(arm, incremental_discounted_qalys_hcc) |>
+  left_join(
+    cost_summary_for_os_cap |>
+      select(
+        arm,
+        incremental_discounted_public_cost
+      ),
+    by = "arm"
+  ) |>
+  mutate(
+    preliminary_public_icer_hcc = incremental_discounted_public_cost /
+      incremental_discounted_qalys_hcc
+  )
+
+preliminary_icer_with_hcc |>
+  display_table(
+    labels = display_labels,
+    digits = 3,
+    caption = "Preliminary synthetic ICER with QALY half-cycle correction"
+  )
+```
+
+This table updates the preliminary ICER using HCC-adjusted QALYs while keeping the same 5-year cost stopping rule and year-6 OS treatment effect cap.
+
+</details>
