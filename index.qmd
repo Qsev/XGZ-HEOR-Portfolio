@@ -186,14 +186,3 @@ Methodological guidelines and implementation templates for causal inference, con
 :::
 :::
 
----
-
-## 🛠️ Tech Stack & Methodologies
-
-<div class="tech-stack-container">
-  <span class="badge bg-primary rounded-pill px-3 py-2 me-2 mb-2 fs-6">R (HEEMOD, multinma, tidyverse)</span>
-  <span class="badge bg-danger rounded-pill px-3 py-2 me-2 mb-2 fs-6">Stan / Bayesian Inference</span>
-  <span class="badge bg-success rounded-pill px-3 py-2 me-2 mb-2 fs-6">Excel (VBA / PowerQuery)</span>
-  <span class="badge bg-secondary rounded-pill px-3 py-2 me-2 mb-2 fs-6">NICE DSU TSD Guidelines</span>
-  <span class="badge bg-dark rounded-pill px-3 py-2 me-2 mb-2 fs-6">SuperLearner / TMLE</span>
-</div>
