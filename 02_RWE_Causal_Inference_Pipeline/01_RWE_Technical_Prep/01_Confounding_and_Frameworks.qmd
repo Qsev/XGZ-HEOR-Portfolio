@@ -69,7 +69,8 @@ ps <- 1 / (1 + exp(-logit_ps))
 treatment <- rbinom(n, size = 1, prob = ps)
 
 # Outcome model (Survival time in months)
-survival <- round(42 + 5.0 * treatment - 0.45 * age - 6.0 * ecog + rnorm(n, mean = 0, sd = 1.5))
+survival <- round(42 + 5.0 * treatment - 0.45 * age - 6.0 * ecog + 
+                    rnorm(n, mean = 0, sd = 1.5))
 survival[survival < 1] <- 1
 
 cohort <- data.frame(
@@ -144,14 +145,11 @@ $$\mu_0 = \text{Mean survival of Standard Care group}$$
 In our generated cohort of 100 patients, the naive mean survivals are computed as:
 
 * **Treated (Drug X)**: $\mu_1 = `r round(mean(cohort$survival[cohort$treatment == 1]), 2)` \text{ Months}$
-* **Standard Care (Control)**: $\mu_0 = `r round(mean(cohort$survival[cohort$treatment == 0]), 2)` \text{ Months}$
+* **Standard Care (Control)** : $\mu_0 = `r round(mean(cohort$survival[cohort$treatment == 0]), 2)` \text{ Months}$
 
 $$\text{Naive Difference} = \mu_1 - \mu_0 = `r round(mean(cohort$survival[cohort$treatment == 1]), 2)` - `r round(mean(cohort$survival[cohort$treatment == 0]), 2)` = `r round(mean(cohort$survival[cohort$treatment == 1]) - mean(cohort$survival[cohort$treatment == 0]), 2)` \text{ Months}$$
 
 The crude analysis incorrectly concludes that Drug X reduces survival by **`r abs(round(mean(cohort$survival[cohort$treatment == 1]) - mean(cohort$survival[cohort$treatment == 0]), 2))` months**. A HTA submission based on this raw comparison would result in immediate rejection.
-
-
-
 
 ## Baseline Audit: Quantifying Imbalance
 
@@ -195,7 +193,7 @@ HTA guidelines (NICE, FDA, ISPOR) reject this practice because using $p$-values 
 
 The baseline audit using SMDs reveals a fundamental challenge: our treatment and control cohorts are highly unbalanced (e.g., older, sicker patients are systematically channeled into the Drug X group). To resolve this sample imbalance, we must reconstruct a balanced clinical scenario where the treatment and control groups have comparable baseline characteristics—mimicking the balance achieved in a randomized controlled trial (RCT). 
 
-To achieve this group comparability, we must adjust for the confounding covariates (Age and ECOG). Why do we need the **Propensity Score** as the tool to achieve this balance, rather than simply matching patients directly on their covariates?
+To achieve this group comparability, we must **adjust for the confounding covariates** (Age and ECOG). Why do we need the **Propensity Score** as the tool to achieve this balance, rather than simply matching patients directly on their covariates?
 
 1. **The Curse of Dimensionality in Multi-Dimensional Balance**: In real-world HEOR studies, we typically control for dozens of baseline confounders (e.g., demographics, comorbidities, clinical markers, and prior therapies). If we attempt to find matches with the exact same combination of all baseline covariates (Exact Matching), the probability of finding a match drops to near zero as the number of covariates increases. This results in the exclusion of most patients, severely reducing sample size and statistical power.
 2. **Propensity Score as a Dimensionality Reduction Tool**: Rosenbaum and Rubin (1983) proved that the propensity score—the conditional probability of receiving treatment given baseline covariates, $e(X) = P(D = 1 \mid X)$—is a *balancing score*. Conditionally on the propensity score, the distribution of all baseline covariates is mathematically guaranteed to be independent of treatment assignment. 
@@ -229,7 +227,7 @@ Once we have estimated a propensity score for every patient, we use these scores
    * **Without Replacement**: Once a control patient is matched, they are removed from the pool and cannot be matched again. This is order-dependent but ensures independent observations, making downstream variance and survival calculations straightforward.
    * **With Replacement**: A control patient can be matched to multiple treated patients. This reduces bias (controls are always matched to their closest matches) but increases variance and requires complex weighting in downstream analyses.
 
-### The Positivity (Common Support) Assumption
+### The Positivity (Common Support) Assumption {.unnumbered}
 
 For matching to be methodologically valid, we must satisfy the **Positivity Assumption** (also known as the **Common Support Constraint**). This assumption dictates that every patient in the population must have a non-zero probability of receiving either treatment:
 

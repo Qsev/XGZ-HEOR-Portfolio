@@ -1,0 +1,2852 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Xiaoge Zhang, PhD">
+<meta name="dcterms.date" content="2026-06-04">
+
+<title>TA788 Model Development Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="TA788_Model_Development_Notes_files/libs/clipboard/clipboard.min.js"></script>
+<script src="TA788_Model_Development_Notes_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="TA788_Model_Development_Notes_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="TA788_Model_Development_Notes_files/libs/quarto-html/popper.min.js"></script>
+<script src="TA788_Model_Development_Notes_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="TA788_Model_Development_Notes_files/libs/quarto-html/anchor.min.js"></script>
+<link href="TA788_Model_Development_Notes_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="TA788_Model_Development_Notes_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="TA788_Model_Development_Notes_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="TA788_Model_Development_Notes_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="TA788_Model_Development_Notes_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#survival-curves" id="toc-survival-curves" class="nav-link active" data-scroll-target="#survival-curves"><span class="header-section-number">0.1</span> Survival Curves</a></li>
+  <li><a href="#treatment-effect-cap" id="toc-treatment-effect-cap" class="nav-link" data-scroll-target="#treatment-effect-cap"><span class="header-section-number">0.2</span> Treatment Effect Cap</a></li>
+  <li><a href="#utilities" id="toc-utilities" class="nav-link" data-scroll-target="#utilities"><span class="header-section-number">0.3</span> Utilities</a></li>
+  <li><a href="#public-cost-inputs" id="toc-public-cost-inputs" class="nav-link" data-scroll-target="#public-cost-inputs"><span class="header-section-number">0.4</span> Public Cost Inputs</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">TA788 Model Development Notes</h1>
+<p class="subtitle lead">Detailed EAG Audit Log and R Modelling Build Notes for Avelumab Maintenance</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xiaoge Zhang, PhD </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 4, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<style>
+details.section-fold {
+  margin: 1.4rem 0;
+}
+
+details.section-fold > summary {
+  align-items: baseline;
+  border-bottom: 1px solid #dee2e6;
+  cursor: pointer;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  list-style: none;
+}
+
+details.section-fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.section-fold > summary::after {
+  color: #6c757d;
+  content: "▸";
+  font-size: 0.9em;
+  padding-left: 0.5rem;
+}
+
+details.section-fold[open] > summary::after {
+  content: "▾";
+}
+
+details.section-fold > summary h2,
+details.section-fold > summary h3 {
+  flex: 1;
+  margin: 0;
+}
+
+table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+table caption {
+  white-space: normal;
+}
+</style>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Purpose of This Working Document
+</h2>
+</summary>
+<p>This document is a technical working notebook for building the TA788 Quarto and Shinylive case study. It is deliberately more detailed than the final public-facing page because it records the evidence extraction, modelling logic, and R implementation plan step by step.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 1: EAG Audit Log
+</h2>
+</summary>
+<p>The first task is not to write R code. The first task is to identify which assumptions matter to the appraisal decision and which assumptions the EAG challenged. In an oncology partitioned survival model, the most decision-sensitive nodes usually sit in survival extrapolation, treatment effect duration, utilities, and drug costs.</p>
+<p>The table below records the initial audit findings extracted from the public NICE TA788 appraisal evidence.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Audit domain</th>
+<th>Extracted fact</th>
+<th>Source evidence</th>
+<th>Why this matters for EAG review</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>OS extrapolation</td>
+<td>The company originally preferred a generalised gamma model for both avelumab and watchful waiting / best supportive care. The ERG preferred a log-normal model.</td>
+<td>NICE committee papers report that the company selected generalised gamma because 10-year survival predictions aligned with clinical estimates. The ERG stated that log-normal had better fit and more plausible long-term watchful waiting estimates.</td>
+<td>Overall survival extrapolation is usually the dominant source of lifetime QALY uncertainty. A more optimistic OS tail can materially reduce the ICER by creating additional survival benefit far beyond observed trial follow-up.</td>
+</tr>
+<tr class="even">
+<td>PFS extrapolation</td>
+<td>The company used BICR-assessed PFS with a 3-knot normal spline-based model for both arms. The ERG preferred investigator-assessed PFS, using a 3-knot hazard spline for avelumab and a 3-knot odds spline for watchful waiting.</td>
+<td>The ERG preferred investigator-assessed PFS because it more closely reflected UK clinical decision-making, including the timing of post-progression therapy initiation.</td>
+<td>This is both a statistical and clinical-practice issue. BICR may be cleaner for trial measurement, but investigator assessment may better represent real-world NHS treatment decisions.</td>
+</tr>
+<tr class="odd">
+<td>Treatment stopping and treatment effect cap</td>
+<td>Avelumab is recommended only if treatment stops after 5 years of uninterrupted treatment, or earlier if disease progresses. The treatment effect cap is applied 1 year after stopping, so the cap begins at year 6.</td>
+<td>NICE final guidance states that a treatment effect cap 1 year after stopping avelumab should be included in the model.</td>
+<td>Immunotherapy models can overstate value if they assume indefinite benefit after treatment discontinuation. NICE committees often require explicit treatment effect duration assumptions when long-term evidence is uncertain.</td>
+</tr>
+<tr class="even">
+<td>Implementation of the cap</td>
+<td>Beyond the cap time point, the hazard of death for avelumab is set equal to the watchful waiting arm. In modelling terms, the OS hazard ratio becomes 1 after the cap.</td>
+<td>The company and ERG agreed after technical engagement that the appropriate implementation was to set avelumab hazards equal to watchful waiting beyond the cap time point.</td>
+<td>The model should cap the incremental hazard benefit, not impose an abrupt fall in survival probability. This avoids a biologically impossible discontinuity in the survival curve.</td>
+</tr>
+<tr class="odd">
+<td>Health-state utilities</td>
+<td>Base-case utility values came from JAVELIN Bladder 100 EQ-5D data, with EQ-5D-5L responses crosswalked to EQ-5D-3L. Progression-free utility was 0.772 and post-progression utility was 0.698.</td>
+<td>Company evidence reported utility values by progression status: progression-free 0.772 and post-progression 0.698.</td>
+<td>In a partitioned survival model, health-state utilities convert state occupancy into QALYs. A higher progression-free utility increases the value of delaying progression.</td>
+</tr>
+<tr class="even">
+<td>Alternative utility scenario</td>
+<td>Scenario values from NICE TA519 were also considered: progression-free 0.731 and progressed disease 0.641.</td>
+<td>The company evidence submission reported TA519-derived scenario utilities for progression-free and progressed patients.</td>
+<td>Scenario utilities can test whether the ICER is robust to different health-related quality-of-life sources.</td>
+</tr>
+<tr class="odd">
+<td>Adverse-event disutility</td>
+<td>Grade 3 or higher adverse-event disutilities were included separately, using utility decrements from published literature and adverse-event rates from JAVELIN Bladder 100.</td>
+<td>The ERG report noted that adverse events of grade 3 or higher were included separately in the model.</td>
+<td>AE disutility is likely small relative to OS/PFS extrapolation, but its transparent inclusion is part of a complete economic model.</td>
+</tr>
+<tr class="even">
+<td>Avelumab acquisition cost</td>
+<td>Public list price was GBP 768 per 200 mg vial. The model used a flat dose of 800 mg every 2 weeks, requiring four vials and giving GBP 3,072 per dose before confidential discount.</td>
+<td>Company evidence reported avelumab as a 200 mg vial, administered as an 800 mg IV infusion every 2 weeks, with a list price of GBP 768 per vial.</td>
+<td>Drug acquisition cost is a major driver of incremental cost. The public portfolio model should clearly distinguish public list price from the confidential discounted NHS price.</td>
+</tr>
+<tr class="odd">
+<td>Commercial arrangement</td>
+<td>Avelumab had a patient access scheme or commercial arrangement, but the discount size was commercial in confidence.</td>
+<td>NICE final guidance states that the company has a commercial arrangement and that the discount size is confidential.</td>
+<td>The public model must not invent the confidential net price. It can use public list price and allow scenario discounts for learning purposes.</td>
+</tr>
+<tr class="even">
+<td>Administration cost</td>
+<td>Avelumab administration cost was GBP 183.54 per administration, based on outpatient simple parenteral chemotherapy, NHS Reference Cost SB12Z.</td>
+<td>Company evidence used GBP 183.54 for a single administration because avelumab is administered once every 14-day cycle over 60 minutes.</td>
+<td>Administration costs recur every 2 weeks while patients remain on treatment, so they accumulate materially over the treatment period.</td>
+</tr>
+</tbody>
+</table>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Source Register
+</h2>
+</summary>
+<p>The initial extraction used the following public NICE TA788 sources:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Source</th>
+<th>Public URL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Appraisal consultation committee papers</td>
+<td><a href="https://www.nice.org.uk/guidance/ta788/evidence/appraisal-consultation-committee-papers-pdf-11070547309" class="uri">https://www.nice.org.uk/guidance/ta788/evidence/appraisal-consultation-committee-papers-pdf-11070547309</a></td>
+</tr>
+<tr class="even">
+<td>Final appraisal determination 1 committee papers</td>
+<td><a href="https://www.nice.org.uk/guidance/ta788/evidence/final-appraisal-determination-1-committee-papers-pdf-11070547310" class="uri">https://www.nice.org.uk/guidance/ta788/evidence/final-appraisal-determination-1-committee-papers-pdf-11070547310</a></td>
+</tr>
+<tr class="odd">
+<td>Final appraisal determination 2 committee papers</td>
+<td><a href="https://www.nice.org.uk/guidance/ta788/evidence/final-appraisal-determination-2-committee-papers-pdf-11070547311" class="uri">https://www.nice.org.uk/guidance/ta788/evidence/final-appraisal-determination-2-committee-papers-pdf-11070547311</a></td>
+</tr>
+<tr class="even">
+<td>Final NICE guidance</td>
+<td><a href="https://www.nice.org.uk/guidance/ta788/resources/avelumab-for-maintenance-treatment-of-locally-advanced-or-metastatic-urothelial-cancer-after-platinumbased-chemotherapy-pdf-82611563554501" class="uri">https://www.nice.org.uk/guidance/ta788/resources/avelumab-for-maintenance-treatment-of-locally-advanced-or-metastatic-urothelial-cancer-after-platinumbased-chemotherapy-pdf-82611563554501</a></td>
+</tr>
+</tbody>
+</table>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Modelling Translation
+</h2>
+</summary>
+<p>The audit log must now be translated into model inputs. This section explains how each evidence item becomes an R modelling object.</p>
+<section id="survival-curves" class="level3" data-number="0.1">
+<h3 data-number="0.1" class="anchored" data-anchor-id="survival-curves"><span class="header-section-number">0.1</span> Survival Curves</h3>
+<p>The partitioned survival model needs two survival functions for each arm:</p>
+<p><span class="math display">\[S_{\mathrm{PFS}}(t)\]</span></p>
+<p><span class="math display">\[S_{\mathrm{OS}}(t)\]</span></p>
+<p>These curves determine health-state occupancy directly:</p>
+<p><span class="math display">\[\pi_{\mathrm{PF}}(t) = S_{\mathrm{PFS}}(t)\]</span></p>
+<p><span class="math display">\[\pi_{\mathrm{PD}}(t) = S_{\mathrm{OS}}(t) - S_{\mathrm{PFS}}(t)\]</span></p>
+<p><span class="math display">\[\pi_{\mathrm{Death}}(t) = 1 - S_{\mathrm{OS}}(t)\]</span></p>
+<p>The essential structural rule is:</p>
+<p><span class="math display">\[S_{\mathrm{OS}}(t) \geq S_{\mathrm{PFS}}(t)\]</span></p>
+<p>If this condition is violated, the model has produced a structural failure because a patient cannot be progression-free after death. The future Shiny module should therefore include an automatic warning if PFS exceeds OS at any cycle.</p>
+</section>
+<section id="treatment-effect-cap" class="level3" data-number="0.2">
+<h3 data-number="0.2" class="anchored" data-anchor-id="treatment-effect-cap"><span class="header-section-number">0.2</span> Treatment Effect Cap</h3>
+<p>The treatment effect cap is the most important TA788-specific modelling issue for this portfolio case.</p>
+<p>The appraisal logic is:</p>
+<ul>
+<li>Avelumab treatment stops at 5 years of uninterrupted treatment.</li>
+<li>The treatment effect cap is applied 1 year after stopping.</li>
+<li>Therefore, the cap is applied at year 6.</li>
+<li>After the cap, the avelumab OS hazard is set equal to the watchful waiting OS hazard.</li>
+<li>In hazard-ratio terms, the post-cap OS hazard ratio is 1.</li>
+</ul>
+<p>This should be coded as a hazard-level operation rather than a survival-level discontinuity. In other words, the model should not suddenly reduce the avelumab survival curve at year 6. Instead, it should propagate survival forward using the watchful waiting hazard after the cap time.</p>
+</section>
+<section id="utilities" class="level3" data-number="0.3">
+<h3 data-number="0.3" class="anchored" data-anchor-id="utilities"><span class="header-section-number">0.3</span> Utilities</h3>
+<p>The base-case health-state utility inputs are:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Health state</th>
+<th style="text-align: right;">Utility</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Progression-free</td>
+<td style="text-align: right;">0.772</td>
+</tr>
+<tr class="even">
+<td>Progressed disease</td>
+<td style="text-align: right;">0.698</td>
+</tr>
+</tbody>
+</table>
+<p>The initial QALY calculation should use:</p>
+<p><span class="math display">\[QALY = \sum_t \left[\pi_{\mathrm{PF}}(t)u_{\mathrm{PF}} + \pi_{\mathrm{PD}}(t)u_{\mathrm{PD}}\right]\Delta t \times d(t)\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\Delta t\)</span> is the cycle length in years.</li>
+<li><span class="math inline">\(d(t)\)</span> is the discount factor.</li>
+<li><span class="math inline">\(u_{\mathrm{PF}}\)</span> is progression-free utility.</li>
+<li><span class="math inline">\(u_{\mathrm{PD}}\)</span> is progressed disease utility.</li>
+</ul>
+</section>
+<section id="public-cost-inputs" class="level3" data-number="0.4">
+<h3 data-number="0.4" class="anchored" data-anchor-id="public-cost-inputs"><span class="header-section-number">0.4</span> Public Cost Inputs</h3>
+<p>The public list-price cost inputs are:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Cost item</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Avelumab vial price</td>
+<td style="text-align: right;">GBP 768 per 200 mg vial</td>
+</tr>
+<tr class="even">
+<td>Avelumab flat dose</td>
+<td style="text-align: right;">800 mg every 2 weeks</td>
+</tr>
+<tr class="odd">
+<td>Vials per dose</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td>Drug acquisition cost per dose before discount</td>
+<td style="text-align: right;">GBP 3,072</td>
+</tr>
+<tr class="odd">
+<td>Administration cost per dose</td>
+<td style="text-align: right;">GBP 183.54</td>
+</tr>
+</tbody>
+</table>
+<p>The public model should allow a user-controlled discount scenario, but the default narrative must state that the true NHS discount is confidential.</p>
+</section></details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2 Readiness Checklist
+</h2>
+</summary>
+<p>Before writing the first R functions, the modelling scope must be explicitly controlled. Phase 2 is not intended to reproduce the full confidential company model or generate a final NICE ICER. Its purpose is to build a transparent, testable mathematical engine for a three-state partitioned survival model.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Readiness item</th>
+<th>Status</th>
+<th>Modelling implication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Decision problem defined</td>
+<td>Complete</td>
+<td>The model will compare avelumab maintenance with watchful waiting / best supportive care after non-progression on platinum-based chemotherapy.</td>
+</tr>
+<tr class="even">
+<td>Core model structure defined</td>
+<td>Complete</td>
+<td>The working model will use a three-state partitioned survival model: progression-free, progressed disease, and death.</td>
+</tr>
+<tr class="odd">
+<td>Public utility inputs identified</td>
+<td>Complete</td>
+<td>Base-case utility inputs can be set to 0.772 for progression-free disease and 0.698 for progressed disease.</td>
+</tr>
+<tr class="even">
+<td>Public drug and administration costs identified</td>
+<td>Complete</td>
+<td>Public list-price calculations can use GBP 3,072 per avelumab dose and GBP 183.54 per administration. The confidential NHS discount must not be inferred.</td>
+</tr>
+<tr class="odd">
+<td>Treatment effect cap logic identified</td>
+<td>Complete</td>
+<td>Avelumab treatment stops at 5 years, with the treatment effect cap applied at year 6 by setting the avelumab OS hazard equal to the watchful waiting OS hazard.</td>
+</tr>
+<tr class="even">
+<td>Survival distribution parameters</td>
+<td>Not yet extracted</td>
+<td>The first R implementation must use clearly labelled synthetic parameters. These parameters are for engine testing only and must not be interpreted as validated TA788 values.</td>
+</tr>
+<tr class="odd">
+<td>Time-on-treatment and discontinuation assumptions</td>
+<td>Not yet extracted</td>
+<td>The first cost calculation should either be omitted or kept as a simplified public-cost placeholder until treatment exposure assumptions are extracted.</td>
+</tr>
+<tr class="even">
+<td>Monitoring, adverse-event, and post-progression costs</td>
+<td>Not yet extracted</td>
+<td>These inputs should be listed as evidence gaps and excluded from the first minimal engine test.</td>
+</tr>
+<tr class="odd">
+<td>Discounting and cycle structure</td>
+<td>Working assumption needed</td>
+<td>The first engine test should use a 30-year horizon, monthly cycles, and an annual discount rate placeholder. These should be checked against NICE reference-case assumptions before final use.</td>
+</tr>
+<tr class="even">
+<td>Shiny integration</td>
+<td>Not started</td>
+<td>Shiny and Shinylive should wait until the mathematical functions produce stable state occupancies and basic checks in the QMD.</td>
+</tr>
+</tbody>
+</table>
+<p>The immediate coding objective is therefore limited to the survival and occupancy engine:</p>
+<ol type="1">
+<li>create a monthly time grid;</li>
+<li>generate synthetic PFS and OS survival curves;</li>
+<li>convert those curves into partitioned survival state occupancy;</li>
+<li>verify that each cycle sums to 1;</li>
+<li>flag any cycle where PFS exceeds OS.</li>
+</ol>
+<p>This scope is deliberately narrow. In an EAG-style audit, a simple engine with explicit assumptions is more credible than a complex interactive model whose parameters are not traceable.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2 Build Plan
+</h2>
+</summary>
+<p>The next step is to build clean R functions that are separate from Shiny reactivity.</p>
+<p>The first function should generate survival probabilities over a 30-year monthly horizon. The second function should convert PFS and OS survival probabilities into health-state occupancy. The third function should calculate discounted QALYs and costs.</p>
+<p>The functions should be written in this order:</p>
+<ol type="1">
+<li><code>make_time_grid()</code></li>
+<li><code>weibull_survival()</code></li>
+<li><code>calculate_state_occupancy()</code></li>
+<li><code>check_pfs_os_consistency()</code></li>
+<li><code>calculate_qalys()</code></li>
+<li><code>calculate_public_costs()</code></li>
+</ol>
+<p>Only after these functions work independently should they be embedded inside a Shinylive app.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+R Learning Notes
+</h2>
+</summary>
+<p>For a new R modeller, the key design principle is to separate mathematical logic from interface logic.</p>
+<p>The mathematical engine should not know anything about Shiny inputs such as <code>input$waning_start</code> or <code>input$os_distribution</code>. It should only accept ordinary R arguments and return ordinary R objects. This makes the model testable in the R console before any user interface is built.</p>
+<p>A good function signature for the first partitioned survival calculation may look like this:</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>calculate_state_occupancy <span class="ot">&lt;-</span> <span class="cf">function</span>(time_months, pfs_survival, os_survival) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># </span><span class="al">TODO</span><span class="co">: Check that all input vectors have the same length.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># </span><span class="al">TODO</span><span class="co">: Calculate progression-free, progressed disease, and death occupancy.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># </span><span class="al">TODO</span><span class="co">: Return a tidy data frame with one row per model cycle.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The placeholder above is intentionally incomplete. The next development step is to write this function line by line, test it with a simple synthetic example, and verify that each row sums to 1.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2.1: Minimal PSM Engine
+</h2>
+</summary>
+<p>This section builds the smallest useful partitioned survival model engine. The survival parameters below are synthetic and are used only to test the calculation structure. They are not TA788-validated parameters and should not be interpreted as evidence-based JAVELIN Bladder 100 estimates.</p>
+<p>The immediate goal is to confirm that the mathematical engine can:</p>
+<ol type="1">
+<li>create a monthly model time grid;</li>
+<li>generate plausible synthetic PFS and OS survival curves;</li>
+<li>translate PFS and OS into progression-free, progressed disease, and death state occupancy;</li>
+<li>verify that each cycle sums to 1;</li>
+<li>flag any structural failure where PFS exceeds OS.</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>check_positive_number <span class="ot">&lt;-</span> <span class="cf">function</span>(x, name) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.numeric</span>(x) <span class="sc">||</span> <span class="fu">length</span>(x) <span class="sc">!=</span> <span class="dv">1</span> <span class="sc">||</span> <span class="fu">is.na</span>(x) <span class="sc">||</span> <span class="sc">!</span><span class="fu">is.finite</span>(x) <span class="sc">||</span> x <span class="sc">&lt;=</span> <span class="dv">0</span>) {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="fu">paste0</span>(<span class="st">"`"</span>, name, <span class="st">"` must be a single positive finite number."</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>make_time_grid <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">horizon_years =</span> <span class="dv">30</span>, <span class="at">cycle_length_months =</span> <span class="dv">1</span>) {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(horizon_years, <span class="st">"horizon_years"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(cycle_length_months, <span class="st">"cycle_length_months"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  horizon_months <span class="ot">&lt;-</span> horizon_years <span class="sc">*</span> <span class="dv">12</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">cycle =</span> <span class="fu">seq</span>(<span class="dv">0</span>, horizon_months, <span class="at">by =</span> cycle_length_months),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_months =</span> cycle</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>weibull_survival <span class="ot">&lt;-</span> <span class="cf">function</span>(time_months, shape, scale) {</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(shape, <span class="st">"shape"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(scale, <span class="st">"scale"</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># lower.tail = FALSE returns S(t) = P(T &gt; t), not the cumulative event probability.</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pweibull</span>(</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">q =</span> time_months,</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> shape,</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">scale =</span> scale,</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower.tail =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>check_same_length <span class="ot">&lt;-</span> <span class="cf">function</span>(x, expected_length, name) {</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(x) <span class="sc">!=</span> expected_length) {</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="fu">paste0</span>(<span class="st">"`"</span>, name, <span class="st">"` must have length "</span>, expected_length, <span class="st">"."</span>))</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>check_btwn01 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, name) {</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">any</span>(x <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">|</span> x <span class="sc">&gt;</span> <span class="dv">1</span>)) {</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="fu">paste0</span>(<span class="st">"`"</span>, name, <span class="st">"` values must be between 0 and 1."</span>))</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>calculate_state_occupancy <span class="ot">&lt;-</span> <span class="cf">function</span>(time_grid, pfs_survival, os_survival) {</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(<span class="fu">c</span>(<span class="st">"cycle"</span>, <span class="st">"time_months"</span>) <span class="sc">%in%</span> <span class="fu">names</span>(time_grid))) {</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"time_grid must contain cycle and time_months columns."</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_same_length</span>(pfs_survival, <span class="fu">nrow</span>(time_grid), <span class="st">"pfs_survival"</span>)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_same_length</span>(os_survival, <span class="fu">nrow</span>(time_grid), <span class="st">"os_survival"</span>)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_btwn01</span>(pfs_survival, <span class="st">"pfs_survival"</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_btwn01</span>(os_survival, <span class="st">"os_survival"</span>)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>  time_grid <span class="sc">|&gt;</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>      <span class="at">pfs_survival =</span> pfs_survival,</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>      <span class="at">os_survival =</span> os_survival,</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>      <span class="at">progression_free =</span> pfs_survival,</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>      <span class="at">progressed_disease =</span> os_survival <span class="sc">-</span> pfs_survival,</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>      <span class="at">death =</span> <span class="dv">1</span> <span class="sc">-</span> os_survival,</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>      <span class="at">state_sum =</span> progression_free <span class="sc">+</span> progressed_disease <span class="sc">+</span> death,</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>      <span class="at">pfs_exceeds_os =</span> pfs_survival <span class="sc">&gt;</span> os_survival</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The first function creates the monthly model calendar. The second function provides a simple Weibull survival generator using base R’s standard Weibull parameterisation. In <code>pweibull()</code>, <code>lower.tail = FALSE</code> returns the survival probability directly: <span class="math inline">\(S(t) = P(T &gt; t)\)</span>. The third function applies the partitioned survival identities directly and stores two audit columns: <code>state_sum</code> and <code>pfs_exceeds_os</code>.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>synthetic_cycle_length_months <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>synthetic_time_grid <span class="ot">&lt;-</span> <span class="fu">make_time_grid</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">horizon_years =</span> <span class="dv">30</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cycle_length_months =</span> synthetic_cycle_length_months</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>synthetic_pfs <span class="ot">&lt;-</span> <span class="fu">weibull_survival</span>(</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_months =</span> synthetic_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape =</span> <span class="fl">1.15</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="dv">35</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>synthetic_os <span class="ot">&lt;-</span> <span class="fu">weibull_survival</span>(</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_months =</span> synthetic_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape =</span> <span class="fl">1.05</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="dv">80</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>synthetic_state_occupancy <span class="ot">&lt;-</span> <span class="fu">calculate_state_occupancy</span>(</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_grid =</span> synthetic_time_grid,</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">pfs_survival =</span> synthetic_pfs,</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">os_survival =</span> synthetic_os</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>synthetic_state_occupancy <span class="sc">|&gt;</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    cycle,</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    time_months,</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    pfs_survival,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    os_survival,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    progression_free,</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    progressed_disease,</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    death,</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    state_sum,</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    pfs_exceeds_os</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"First 10 cycles of synthetic partitioned survival state occupancy"</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>First 10 cycles of synthetic partitioned survival state occupancy</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Cycle</th>
+<th style="text-align: right;">Month</th>
+<th style="text-align: right;">PFS</th>
+<th style="text-align: right;">OS</th>
+<th style="text-align: right;">PF</th>
+<th style="text-align: right;">PD</th>
+<th style="text-align: right;">Death</th>
+<th style="text-align: right;">State sum</th>
+<th style="text-align: left;">PFS &gt; OS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.983</td>
+<td style="text-align: right;">0.990</td>
+<td style="text-align: right;">0.983</td>
+<td style="text-align: right;">0.007</td>
+<td style="text-align: right;">0.010</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.963</td>
+<td style="text-align: right;">0.979</td>
+<td style="text-align: right;">0.963</td>
+<td style="text-align: right;">0.016</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.942</td>
+<td style="text-align: right;">0.969</td>
+<td style="text-align: right;">0.942</td>
+<td style="text-align: right;">0.026</td>
+<td style="text-align: right;">0.031</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.921</td>
+<td style="text-align: right;">0.958</td>
+<td style="text-align: right;">0.921</td>
+<td style="text-align: right;">0.037</td>
+<td style="text-align: right;">0.042</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.899</td>
+<td style="text-align: right;">0.947</td>
+<td style="text-align: right;">0.899</td>
+<td style="text-align: right;">0.048</td>
+<td style="text-align: right;">0.053</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.877</td>
+<td style="text-align: right;">0.936</td>
+<td style="text-align: right;">0.877</td>
+<td style="text-align: right;">0.060</td>
+<td style="text-align: right;">0.064</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0.855</td>
+<td style="text-align: right;">0.925</td>
+<td style="text-align: right;">0.855</td>
+<td style="text-align: right;">0.071</td>
+<td style="text-align: right;">0.075</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0.833</td>
+<td style="text-align: right;">0.915</td>
+<td style="text-align: right;">0.833</td>
+<td style="text-align: right;">0.082</td>
+<td style="text-align: right;">0.085</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0.811</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0.811</td>
+<td style="text-align: right;">0.093</td>
+<td style="text-align: right;">0.096</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The first ten rows should show three basic features. At cycle 0, both PFS and OS should equal 1, all patients should be progression-free, and no patients should be in progressed disease or death. As time increases, the progression-free state should decline, the death state should rise, and the progressed disease state should represent the gap between OS and PFS.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>state_sum_check <span class="ot">&lt;-</span> synthetic_state_occupancy <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_state_sum =</span> <span class="fu">min</span>(state_sum),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_state_sum =</span> <span class="fu">max</span>(state_sum),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_absolute_deviation_from_one =</span> <span class="fu">max</span>(<span class="fu">abs</span>(state_sum <span class="sc">-</span> <span class="dv">1</span>))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>pfs_os_check <span class="ot">&lt;-</span> synthetic_state_occupancy <span class="sc">|&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">any_pfs_exceeds_os =</span> <span class="fu">any</span>(pfs_exceeds_os),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">number_of_violating_cycles =</span> <span class="fu">sum</span>(pfs_exceeds_os)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>audit_check_table <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">Check =</span> <span class="fu">c</span>(</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"State occupancy sums to 1"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"No PFS-OS crossing"</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">Result =</span> <span class="fu">c</span>(</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>      <span class="st">"min = "</span>, <span class="fu">round</span>(state_sum_check<span class="sc">$</span>min_state_sum, <span class="dv">6</span>),</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="st">"; max = "</span>, <span class="fu">round</span>(state_sum_check<span class="sc">$</span>max_state_sum, <span class="dv">6</span>),</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="st">"; max deviation = "</span>, <span class="fu">signif</span>(state_sum_check<span class="sc">$</span>max_absolute_deviation_from_one, <span class="dv">3</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="st">"any crossing = "</span>, pfs_os_check<span class="sc">$</span>any_pfs_exceeds_os,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>      <span class="st">"; violating cycles = "</span>, pfs_os_check<span class="sc">$</span>number_of_violating_cycles</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>audit_check_table <span class="sc">|&gt;</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(<span class="at">caption =</span> <span class="st">"Structural audit checks for the synthetic PSM engine"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Structural audit checks for the synthetic PSM engine</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Check</th>
+<th style="text-align: left;">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">State occupancy sums to 1</td>
+<td style="text-align: left;">min = 1; max = 1; max deviation = 1.11e-16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No PFS-OS crossing</td>
+<td style="text-align: left;">any crossing = FALSE; violating cycles = 0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>For this synthetic test to pass, <code>max_absolute_deviation_from_one</code> should be effectively zero, <code>any_pfs_exceeds_os</code> should be <code>FALSE</code>, and <code>number_of_violating_cycles</code> should be 0.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2.2: QALY Accumulation
+</h2>
+</summary>
+<p>This section adds the first health economic outcome to the minimal PSM engine: quality-adjusted life years. The calculation uses the public TA788 health-state utility values extracted in Phase 1:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Health state</th>
+<th style="text-align: right;">Utility</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Progression-free</td>
+<td style="text-align: right;">0.772</td>
+</tr>
+<tr class="even">
+<td>Progressed disease</td>
+<td style="text-align: right;">0.698</td>
+</tr>
+</tbody>
+</table>
+<p>The calculation below still uses synthetic survival curves from Phase 2.1. Therefore, the resulting QALY total is a test of the calculation engine only, not a TA788 cost-effectiveness result.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>add_monthly_discount_weights <span class="ot">&lt;-</span> <span class="cf">function</span>(model_trace, annual_discount_rate) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="st">"time_months"</span> <span class="sc">%in%</span> <span class="fu">names</span>(model_trace)) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"model_trace must contain a time_months column."</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_btwn01</span>(annual_discount_rate, <span class="st">"annual_discount_rate"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  monthly_discount_rate <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> annual_discount_rate)<span class="sc">^</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">12</span>) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  model_trace <span class="sc">|&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">monthly_discount_rate =</span> monthly_discount_rate,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">discount_weight =</span> <span class="dv">1</span> <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> monthly_discount_rate)<span class="sc">^</span>time_months)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>calculate_qalys <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  state_occupancy,</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pf =</span> <span class="fl">0.772</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pd =</span> <span class="fl">0.698</span>,</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">annual_discount_rate =</span> <span class="fl">0.035</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  cycle_length_months</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>) {</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  required_columns <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cycle"</span>,</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"time_months"</span>,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progression_free"</span>,</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progressed_disease"</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(required_columns <span class="sc">%in%</span> <span class="fu">names</span>(state_occupancy))) {</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"state_occupancy must contain cycle, time_months, progression_free, and progressed_disease columns."</span>)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_btwn01</span>(utility_pf, <span class="st">"utility_pf"</span>)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_btwn01</span>(utility_pd, <span class="st">"utility_pd"</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(cycle_length_months, <span class="st">"cycle_length_months"</span>)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  state_occupancy <span class="sc">|&gt;</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_monthly_discount_weights</span>(</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>      <span class="at">annual_discount_rate =</span> annual_discount_rate</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>      <span class="at">cycle_length_months =</span> cycle_length_months,</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>      <span class="at">undiscounted_utility_months_cycle =</span> (</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        progression_free <span class="sc">*</span> utility_pf <span class="sc">+</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>          progressed_disease <span class="sc">*</span> utility_pd</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">*</span> cycle_length_months,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>      <span class="at">discounted_utility_months_cycle =</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>        undiscounted_utility_months_cycle <span class="sc">*</span> discount_weight</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>There are two modelling choices to notice here.</p>
+<ul>
+<li>First, the model keeps the main time scale in months from survival generation through state occupancy and QALY accumulation.</li>
+<li>Second, the cycle-level calculation first accumulates utility-months, which is easier to read in a monthly model.</li>
+<li>Third, utility-months are converted into QALYs only in the summary step by dividing the total by 12.</li>
+<li>Fourth, the annual discount rate is converted into a monthly discount rate through a shared helper function, and discounting is then applied month by month. Half-cycle correction is intentionally deferred to a later section.</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>synthetic_qaly_trace <span class="ot">&lt;-</span> <span class="fu">calculate_qalys</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">state_occupancy =</span> synthetic_state_occupancy,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pf =</span> <span class="fl">0.772</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pd =</span> <span class="fl">0.698</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">annual_discount_rate =</span> <span class="fl">0.035</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cycle_length_months =</span> synthetic_cycle_length_months</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>synthetic_qaly_trace <span class="sc">|&gt;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    cycle,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    time_months,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    progression_free,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    progressed_disease,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    death,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    monthly_discount_rate,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    discount_weight,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    undiscounted_utility_months_cycle,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    discounted_utility_months_cycle</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">6</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"First 6 cycles of synthetic QALY accumulation"</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>First 6 cycles of synthetic QALY accumulation</caption>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 16%">
+<col style="width: 14%">
+<col style="width: 13%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Cycle</th>
+<th style="text-align: right;">Month</th>
+<th style="text-align: right;">PF</th>
+<th style="text-align: right;">PD</th>
+<th style="text-align: right;">Death</th>
+<th style="text-align: right;">Monthly disc.</th>
+<th style="text-align: right;">Disc. weight</th>
+<th style="text-align: right;">Utility-mo.</th>
+<th style="text-align: right;">Disc. utility-mo.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.772</td>
+<td style="text-align: right;">0.772</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.983</td>
+<td style="text-align: right;">0.007</td>
+<td style="text-align: right;">0.010</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">0.997</td>
+<td style="text-align: right;">0.764</td>
+<td style="text-align: right;">0.762</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.963</td>
+<td style="text-align: right;">0.016</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">0.994</td>
+<td style="text-align: right;">0.755</td>
+<td style="text-align: right;">0.751</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.942</td>
+<td style="text-align: right;">0.026</td>
+<td style="text-align: right;">0.031</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">0.991</td>
+<td style="text-align: right;">0.746</td>
+<td style="text-align: right;">0.739</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.921</td>
+<td style="text-align: right;">0.037</td>
+<td style="text-align: right;">0.042</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">0.989</td>
+<td style="text-align: right;">0.737</td>
+<td style="text-align: right;">0.728</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.899</td>
+<td style="text-align: right;">0.048</td>
+<td style="text-align: right;">0.053</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">0.986</td>
+<td style="text-align: right;">0.728</td>
+<td style="text-align: right;">0.717</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The QALY trace adds one row-level contribution per cycle. In a partitioned survival model, QALYs are accumulated from the living health states only: progression-free and progressed disease. The death state contributes zero utility.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>qaly_summary <span class="ot">&lt;-</span> synthetic_qaly_trace <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_undiscounted_qalys =</span> <span class="fu">sum</span>(undiscounted_utility_months_cycle) <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_discounted_qalys =</span> <span class="fu">sum</span>(discounted_utility_months_cycle) <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">discounting_reduction =</span> total_undiscounted_qalys <span class="sc">-</span> total_discounted_qalys</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>qaly_summary <span class="sc">|&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Synthetic lifetime QALY summary"</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Synthetic lifetime QALY summary</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Undisc. QALYs</th>
+<th style="text-align: right;">Disc. QALYs</th>
+<th style="text-align: right;">Disc. reduction</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">4.77</td>
+<td style="text-align: right;">3.967</td>
+<td style="text-align: right;">0.803</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This summary converts the cycle-level trace into lifetime QALYs for the synthetic single-arm example. The next modelling step will be to add a comparator arm and calculate incremental QALYs.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2.3: Two-arm QALY Comparison
+</h2>
+</summary>
+<p>This section converts the single-arm engine into a minimal two-arm comparison. The parameters below are synthetic. They are designed only to test whether the model can compare an intervention arm with a comparator arm and calculate incremental QALYs.</p>
+<p>The two-arm structure is the point at which the model starts to resemble a cost-effectiveness analysis. Costs are still excluded at this stage, so this section calculates incremental QALYs only.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>run_single_arm_qaly_model <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  arm_name,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  pfs_shape,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  pfs_scale,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  os_shape,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  os_scale,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  time_grid,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  utility_pf,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  utility_pd,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  annual_discount_rate,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  cycle_length_months</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>) {</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  pfs_survival <span class="ot">&lt;-</span> <span class="fu">weibull_survival</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_months =</span> time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> pfs_shape,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">scale =</span> pfs_scale</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  os_survival <span class="ot">&lt;-</span> <span class="fu">weibull_survival</span>(</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_months =</span> time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> os_shape,</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">scale =</span> os_scale</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  state_occupancy <span class="ot">&lt;-</span> <span class="fu">calculate_state_occupancy</span>(</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_grid =</span> time_grid,</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">pfs_survival =</span> pfs_survival,</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">os_survival =</span> os_survival</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  qaly_trace <span class="ot">&lt;-</span> <span class="fu">calculate_qalys</span>(</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">state_occupancy =</span> state_occupancy,</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">utility_pf =</span> utility_pf,</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">utility_pd =</span> utility_pd,</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">annual_discount_rate =</span> annual_discount_rate,</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">cycle_length_months =</span> cycle_length_months</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  qaly_trace <span class="sc">|&gt;</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">arm =</span> arm_name)</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The wrapper function above is deliberately simple. It does not introduce new mathematics. It only sequences the existing functions: generate PFS, generate OS, calculate state occupancy, and accumulate QALYs.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>synthetic_arm_parameters <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">arm =</span> <span class="fu">c</span>(<span class="st">"Watchful waiting"</span>, <span class="st">"Avelumab maintenance"</span>),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">pfs_shape =</span> <span class="fu">c</span>(<span class="fl">1.20</span>, <span class="fl">1.15</span>),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">pfs_scale =</span> <span class="fu">c</span>(<span class="dv">26</span>, <span class="dv">35</span>),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">os_shape =</span> <span class="fu">c</span>(<span class="fl">1.10</span>, <span class="fl">1.05</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">os_scale =</span> <span class="fu">c</span>(<span class="dv">55</span>, <span class="dv">80</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>synthetic_arm_parameters <span class="sc">|&gt;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Synthetic two-arm survival parameters for engine testing"</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Synthetic two-arm survival parameters for engine testing</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">PFS shape</th>
+<th style="text-align: right;">PFS scale</th>
+<th style="text-align: right;">OS shape</th>
+<th style="text-align: right;">OS scale</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">1.20</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">1.10</td>
+<td style="text-align: right;">55</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">1.15</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">1.05</td>
+<td style="text-align: right;">80</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The intervention arm uses lower synthetic scale parameters, so it is expected to have slower PFS and OS decline than the watchful waiting arm. These values are not fitted to JAVELIN Bladder 100 and should not be interpreted as TA788 evidence.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>watchful_waiting_trace <span class="ot">&lt;-</span> <span class="fu">run_single_arm_qaly_model</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">arm_name =</span> <span class="st">"Watchful waiting"</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">pfs_shape =</span> <span class="fl">1.20</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">pfs_scale =</span> <span class="dv">26</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">os_shape =</span> <span class="fl">1.10</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">os_scale =</span> <span class="dv">55</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_grid =</span> synthetic_time_grid,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pf =</span> <span class="fl">0.772</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pd =</span> <span class="fl">0.698</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">annual_discount_rate =</span> <span class="fl">0.035</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">cycle_length_months =</span> synthetic_cycle_length_months</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>avelumab_trace <span class="ot">&lt;-</span> <span class="fu">run_single_arm_qaly_model</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">arm_name =</span> <span class="st">"Avelumab maintenance"</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">pfs_shape =</span> <span class="fl">1.15</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">pfs_scale =</span> <span class="dv">35</span>,</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">os_shape =</span> <span class="fl">1.05</span>,</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">os_scale =</span> <span class="dv">80</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_grid =</span> synthetic_time_grid,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pf =</span> <span class="fl">0.772</span>,</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pd =</span> <span class="fl">0.698</span>,</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">annual_discount_rate =</span> <span class="fl">0.035</span>,</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">cycle_length_months =</span> synthetic_cycle_length_months</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>two_arm_qaly_trace <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  watchful_waiting_trace,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  avelumab_trace</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>two_arm_qaly_summary <span class="ot">&lt;-</span> two_arm_qaly_trace <span class="sc">|&gt;</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_undiscounted_qalys =</span> <span class="fu">sum</span>(undiscounted_utility_months_cycle) <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_discounted_qalys =</span> <span class="fu">sum</span>(discounted_utility_months_cycle) <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_discounted_qalys =</span> total_discounted_qalys <span class="sc">-</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>      total_discounted_qalys[arm <span class="sc">==</span> <span class="st">"Watchful waiting"</span>]</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>two_arm_qaly_summary <span class="sc">|&gt;</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Synthetic two-arm QALY comparison"</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Synthetic two-arm QALY comparison</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Undisc. QALYs</th>
+<th style="text-align: right;">Disc. QALYs</th>
+<th style="text-align: right;">Incr. QALYs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">4.770</td>
+<td style="text-align: right;">3.967</td>
+<td style="text-align: right;">1.085</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">3.269</td>
+<td style="text-align: right;">2.882</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The incremental discounted QALY column shows the additional health benefit generated by the synthetic avelumab maintenance arm compared with synthetic watchful waiting. This is not yet an ICER because incremental costs have not been added.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2.4: Public Cost Accumulation
+</h2>
+</summary>
+<p>This section adds a minimal public-cost engine. It uses public TA788 cost inputs only and is intended to test the calculation structure, not to reproduce the confidential company model.</p>
+<p>The public inputs are:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Cost input</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Avelumab drug acquisition cost</td>
+<td style="text-align: right;">GBP 3,072 per dose</td>
+</tr>
+<tr class="even">
+<td>Avelumab administration cost</td>
+<td style="text-align: right;">GBP 183.54 per administration</td>
+</tr>
+<tr class="odd">
+<td>Dosing frequency</td>
+<td style="text-align: right;">Once every 14 days</td>
+</tr>
+<tr class="even">
+<td>Confidential NHS discount</td>
+<td style="text-align: right;">Not modelled in this section</td>
+</tr>
+</tbody>
+</table>
+<p>At this stage, avelumab costs are applied to the progression-free proportion of the cohort. This is a simplifying assumption for engine testing. The 5-year stopping rule, time-on-treatment evidence, treatment discontinuation, monitoring costs, adverse-event costs, and post-progression costs are not yet included.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>calculate_public_costs <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  model_trace,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  arm_name,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  cycle_length_months,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">drug_cost_per_dose =</span> <span class="dv">3072</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">administration_cost_per_dose =</span> <span class="fl">183.54</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dosing_interval_days =</span> <span class="dv">14</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">annual_discount_rate =</span> <span class="fl">0.035</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment_stop_months =</span> <span class="cn">Inf</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>) {</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  required_columns <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"arm"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"time_months"</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progression_free"</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(required_columns <span class="sc">%in%</span> <span class="fu">names</span>(model_trace))) {</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"model_trace must contain arm, time_months, and progression_free columns."</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(cycle_length_months, <span class="st">"cycle_length_months"</span>)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(drug_cost_per_dose, <span class="st">"drug_cost_per_dose"</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(administration_cost_per_dose, <span class="st">"administration_cost_per_dose"</span>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_positive_number</span>(dosing_interval_days, <span class="st">"dosing_interval_days"</span>)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.infinite</span>(treatment_stop_months)) {</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">check_positive_number</span>(treatment_stop_months, <span class="st">"treatment_stop_months"</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  days_per_month <span class="ot">&lt;-</span> <span class="fl">365.25</span> <span class="sc">/</span> <span class="dv">12</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>  doses_per_month <span class="ot">&lt;-</span> days_per_month <span class="sc">/</span> dosing_interval_days</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  model_trace <span class="sc">|&gt;</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_monthly_discount_weights</span>(</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">annual_discount_rate =</span> annual_discount_rate</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>      <span class="at">doses_per_cycle =</span> doses_per_month <span class="sc">*</span> cycle_length_months,</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">treatment_allowed =</span> arm <span class="sc">==</span> arm_name <span class="sc">&amp;</span> time_months <span class="sc">&lt;=</span> treatment_stop_months,</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">treated_proportion =</span> <span class="fu">if_else</span>(treatment_allowed, progression_free, <span class="dv">0</span>),</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>      <span class="at">drug_cost_cycle =</span> <span class="fu">if_else</span>(</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>        arm <span class="sc">==</span> arm_name,</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>        treated_proportion <span class="sc">*</span> doses_per_cycle <span class="sc">*</span> drug_cost_per_dose,</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>        <span class="dv">0</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>      <span class="at">administration_cost_cycle =</span> <span class="fu">if_else</span>(</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>        arm <span class="sc">==</span> arm_name,</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>        treated_proportion <span class="sc">*</span> doses_per_cycle <span class="sc">*</span> administration_cost_per_dose,</span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>        <span class="dv">0</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>      <span class="at">total_public_cost_cycle =</span> drug_cost_cycle <span class="sc">+</span> administration_cost_cycle,</span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>      <span class="at">discounted_public_cost_cycle =</span> total_public_cost_cycle <span class="sc">*</span> discount_weight</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>This function uses the same month-by-month discounting logic as the QALY function. The dosing frequency is converted into an approximate monthly number of doses using <code>365.25 / 12 / 14</code>, which gives the average number of 14-day administrations per month.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>two_arm_cost_trace <span class="ot">&lt;-</span> <span class="fu">calculate_public_costs</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_trace =</span> two_arm_qaly_trace,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">arm_name =</span> <span class="st">"Avelumab maintenance"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cycle_length_months =</span> synthetic_cycle_length_months,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">drug_cost_per_dose =</span> <span class="dv">3072</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">administration_cost_per_dose =</span> <span class="fl">183.54</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dosing_interval_days =</span> <span class="dv">14</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">annual_discount_rate =</span> <span class="fl">0.035</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>two_arm_cost_trace <span class="sc">|&gt;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    arm,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    cycle,</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    time_months,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    progression_free,</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    doses_per_cycle,</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    drug_cost_cycle,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    administration_cost_cycle,</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    discounted_public_cost_cycle</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">8</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"First 8 cycles of public-cost accumulation"</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>First 8 cycles of public-cost accumulation</caption>
+<colgroup>
+<col style="width: 21%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Cycle</th>
+<th style="text-align: right;">Month</th>
+<th style="text-align: right;">PF</th>
+<th style="text-align: right;">Doses/cycle</th>
+<th style="text-align: right;">Drug cost</th>
+<th style="text-align: right;">Admin cost</th>
+<th style="text-align: right;">Disc. cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">2.174</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.980</td>
+<td style="text-align: right;">2.174</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.955</td>
+<td style="text-align: right;">2.174</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.928</td>
+<td style="text-align: right;">2.174</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.900</td>
+<td style="text-align: right;">2.174</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.871</td>
+<td style="text-align: right;">2.174</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.842</td>
+<td style="text-align: right;">2.174</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0.813</td>
+<td style="text-align: right;">2.174</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>two_arm_cost_summary <span class="ot">&lt;-</span> two_arm_cost_trace <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_drug_cost =</span> <span class="fu">sum</span>(drug_cost_cycle),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_administration_cost =</span> <span class="fu">sum</span>(administration_cost_cycle),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_public_cost =</span> <span class="fu">sum</span>(total_public_cost_cycle),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_discounted_public_cost =</span> <span class="fu">sum</span>(discounted_public_cost_cycle),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_discounted_public_cost =</span> total_discounted_public_cost <span class="sc">-</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>      total_discounted_public_cost[arm <span class="sc">==</span> <span class="st">"Watchful waiting"</span>]</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>two_arm_cost_summary <span class="sc">|&gt;</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Synthetic public-cost summary"</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Synthetic public-cost summary</caption>
+<colgroup>
+<col style="width: 27%">
+<col style="width: 14%">
+<col style="width: 15%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Total drug</th>
+<th style="text-align: right;">Total admin</th>
+<th style="text-align: right;">Total cost</th>
+<th style="text-align: right;">Disc. cost</th>
+<th style="text-align: right;">Incr. cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">225816</td>
+<td style="text-align: right;">13491.62</td>
+<td style="text-align: right;">239307.6</td>
+<td style="text-align: right;">220947.8</td>
+<td style="text-align: right;">220947.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The watchful waiting arm has zero public treatment cost in this minimal engine because background disease management, monitoring, adverse events, and post-progression therapy costs have not yet been added.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>preliminary_icer_summary <span class="ot">&lt;-</span> two_arm_qaly_summary <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, total_discounted_qalys, incremental_discounted_qalys) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    two_arm_cost_summary <span class="sc">|&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        arm,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        total_discounted_public_cost,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        incremental_discounted_public_cost</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"arm"</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">preliminary_public_icer =</span> incremental_discounted_public_cost <span class="sc">/</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>      incremental_discounted_qalys</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>preliminary_icer_summary <span class="sc">|&gt;</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Preliminary synthetic ICER using public avelumab treatment costs only"</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Preliminary synthetic ICER using public avelumab treatment costs only</caption>
+<colgroup>
+<col style="width: 27%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Disc. QALYs</th>
+<th style="text-align: right;">Incr. QALYs</th>
+<th style="text-align: right;">Disc. cost</th>
+<th style="text-align: right;">Incr. cost</th>
+<th style="text-align: right;">ICER</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">3.967</td>
+<td style="text-align: right;">1.085</td>
+<td style="text-align: right;">220947.8</td>
+<td style="text-align: right;">220947.8</td>
+<td style="text-align: right;">203695.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">2.882</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This ICER is intentionally labelled preliminary. It excludes the confidential avelumab discount and several standard cost categories, so it should be read only as a check that the cost and QALY engines can be connected.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2.5: Treatment Stopping Rule for Cost Exposure
+</h2>
+</summary>
+<p>This section applies the public TA788 treatment stopping rule to cost exposure. NICE TA788 recommends avelumab only if treatment is stopped after 5 years of uninterrupted treatment or earlier if disease progresses. In the current simplified engine, progression is represented by progression-free state occupancy, so the additional stopping rule is implemented as a maximum treatment duration of 60 months.</p>
+<p>This is a cost-exposure rule only. It does not yet implement the separate treatment effect cap for OS, which occurs 1 year after stopping treatment.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ta788_treatment_stop_months <span class="ot">&lt;-</span> <span class="dv">60</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>two_arm_cost_trace_with_stopping <span class="ot">&lt;-</span> <span class="fu">calculate_public_costs</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_trace =</span> two_arm_qaly_trace,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">arm_name =</span> <span class="st">"Avelumab maintenance"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cycle_length_months =</span> synthetic_cycle_length_months,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">drug_cost_per_dose =</span> <span class="dv">3072</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">administration_cost_per_dose =</span> <span class="fl">183.54</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">dosing_interval_days =</span> <span class="dv">14</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">annual_discount_rate =</span> <span class="fl">0.035</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment_stop_months =</span> ta788_treatment_stop_months</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>two_arm_cost_trace_with_stopping <span class="sc">|&gt;</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(arm <span class="sc">==</span> <span class="st">"Avelumab maintenance"</span>, time_months <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">58</span>, <span class="dv">59</span>, <span class="dv">60</span>, <span class="dv">61</span>, <span class="dv">62</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    arm,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    time_months,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    progression_free,</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    treatment_allowed,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    treated_proportion,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    drug_cost_cycle,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    administration_cost_cycle,</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    discounted_public_cost_cycle</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Cost exposure around the 60-month stopping rule"</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Cost exposure around the 60-month stopping rule</caption>
+<colgroup>
+<col style="width: 21%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 18%">
+<col style="width: 14%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Month</th>
+<th style="text-align: right;">PF</th>
+<th style="text-align: left;">Treatment allowed</th>
+<th style="text-align: right;">Treated prop.</th>
+<th style="text-align: right;">Drug cost</th>
+<th style="text-align: right;">Admin cost</th>
+<th style="text-align: right;">Disc. cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">0.167</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.167</td>
+<td style="text-align: right;">1117.812</td>
+<td style="text-align: right;">66.785</td>
+<td style="text-align: right;">1003.134</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">0.162</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.162</td>
+<td style="text-align: right;">1078.838</td>
+<td style="text-align: right;">64.456</td>
+<td style="text-align: right;">965.387</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">0.156</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.156</td>
+<td style="text-align: right;">1041.128</td>
+<td style="text-align: right;">62.203</td>
+<td style="text-align: right;">928.976</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">0.150</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">0.145</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The table above is a structural check. Costs are still applied at month 60, but they stop after month 60. This is a simple monthly-cycle representation of the 5-year treatment stopping rule.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>two_arm_cost_summary_with_stopping <span class="ot">&lt;-</span> two_arm_cost_trace_with_stopping <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_drug_cost =</span> <span class="fu">sum</span>(drug_cost_cycle),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_administration_cost =</span> <span class="fu">sum</span>(administration_cost_cycle),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_public_cost =</span> <span class="fu">sum</span>(total_public_cost_cycle),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_discounted_public_cost =</span> <span class="fu">sum</span>(discounted_public_cost_cycle),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_discounted_public_cost =</span> total_discounted_public_cost <span class="sc">-</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>      total_discounted_public_cost[arm <span class="sc">==</span> <span class="st">"Watchful waiting"</span>]</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>two_arm_cost_summary_with_stopping <span class="sc">|&gt;</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Synthetic public-cost summary with 5-year stopping rule"</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Synthetic public-cost summary with 5-year stopping rule</caption>
+<colgroup>
+<col style="width: 27%">
+<col style="width: 14%">
+<col style="width: 15%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Total drug</th>
+<th style="text-align: right;">Total admin</th>
+<th style="text-align: right;">Total cost</th>
+<th style="text-align: right;">Disc. cost</th>
+<th style="text-align: right;">Incr. cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">198508.4</td>
+<td style="text-align: right;">11860.1</td>
+<td style="text-align: right;">210368.5</td>
+<td style="text-align: right;">198292.7</td>
+<td style="text-align: right;">198292.7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>preliminary_icer_with_stopping <span class="ot">&lt;-</span> two_arm_qaly_summary <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, total_discounted_qalys, incremental_discounted_qalys) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    two_arm_cost_summary_with_stopping <span class="sc">|&gt;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        arm,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        total_discounted_public_cost,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        incremental_discounted_public_cost</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"arm"</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">preliminary_public_icer =</span> incremental_discounted_public_cost <span class="sc">/</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>      incremental_discounted_qalys</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>preliminary_icer_with_stopping <span class="sc">|&gt;</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Preliminary synthetic ICER with 5-year avelumab cost stopping rule"</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Preliminary synthetic ICER with 5-year avelumab cost stopping rule</caption>
+<colgroup>
+<col style="width: 27%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Disc. QALYs</th>
+<th style="text-align: right;">Incr. QALYs</th>
+<th style="text-align: right;">Disc. cost</th>
+<th style="text-align: right;">Incr. cost</th>
+<th style="text-align: right;">ICER</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance</td>
+<td style="text-align: right;">3.967</td>
+<td style="text-align: right;">1.085</td>
+<td style="text-align: right;">198292.7</td>
+<td style="text-align: right;">198292.7</td>
+<td style="text-align: right;">182809.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">2.882</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Adding the stopping rule reduces treatment costs but does not change QALYs in this section. That is intentional: the cost stopping rule and the OS treatment effect cap are separate assumptions in the appraisal.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2.6: OS Treatment Effect Cap
+</h2>
+</summary>
+<p>This section implements the TA788 treatment effect cap at the hazard level. The cost stopping rule ends avelumab treatment at 5 years. The treatment effect cap is applied 1 year later, at 6 years, by setting the avelumab OS hazard equal to the watchful waiting OS hazard.</p>
+<p>The key modelling distinction is that the treatment effect is capped abruptly at the hazard level, but the avelumab survival curve remains continuous. The model should not impose a sudden drop in survival probability at the cap time.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>survival_to_monthly_hazard <span class="ot">&lt;-</span> <span class="cf">function</span>(survival_probabilities) {</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.numeric</span>(survival_probabilities) <span class="sc">||</span> <span class="fu">any</span>(<span class="fu">is.na</span>(survival_probabilities))) {</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"survival_probabilities must be a numeric vector without missing values."</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">any</span>(survival_probabilities <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">|</span> survival_probabilities <span class="sc">&gt;</span> <span class="dv">1</span>)) {</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"survival_probabilities must contain values between 0 and 1."</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  survival_lag <span class="ot">&lt;-</span> <span class="fu">lag</span>(survival_probabilities)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  monthly_hazard <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(survival_probabilities <span class="sc">/</span> survival_lag)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  monthly_hazard[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  monthly_hazard</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>reconstruct_survival_from_hazard <span class="ot">&lt;-</span> <span class="cf">function</span>(monthly_hazard) {</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.numeric</span>(monthly_hazard) <span class="sc">||</span> <span class="fu">any</span>(<span class="fu">is.na</span>(monthly_hazard))) {</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"monthly_hazard must be a numeric vector without missing values."</span>)</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">any</span>(monthly_hazard <span class="sc">&lt;</span> <span class="dv">0</span>)) {</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"monthly_hazard cannot contain negative values."</span>)</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">exp</span>(<span class="sc">-</span><span class="fu">cumsum</span>(monthly_hazard))</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The first helper converts survival probabilities into monthly discrete hazards. The second helper reconstructs a continuous survival curve from monthly hazards. Together, they let the model modify hazards after the cap time without directly forcing a discontinuous survival drop.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>ta788_treatment_effect_cap_months <span class="ot">&lt;-</span> <span class="dv">72</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>ww_os_survival <span class="ot">&lt;-</span> <span class="fu">weibull_survival</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_months =</span> synthetic_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape =</span> <span class="fl">1.10</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="dv">55</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>avelumab_uncapped_os_survival <span class="ot">&lt;-</span> <span class="fu">weibull_survival</span>(</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_months =</span> synthetic_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape =</span> <span class="fl">1.05</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="dv">80</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>ww_os_hazard <span class="ot">&lt;-</span> <span class="fu">survival_to_monthly_hazard</span>(ww_os_survival)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>avelumab_uncapped_os_hazard <span class="ot">&lt;-</span> <span class="fu">survival_to_monthly_hazard</span>(avelumab_uncapped_os_survival)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>avelumab_capped_os_hazard <span class="ot">&lt;-</span> <span class="fu">if_else</span>(</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  synthetic_time_grid<span class="sc">$</span>time_months <span class="sc">&lt;=</span> ta788_treatment_effect_cap_months,</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  avelumab_uncapped_os_hazard,</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  ww_os_hazard</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>avelumab_capped_os_survival <span class="ot">&lt;-</span> <span class="fu">reconstruct_survival_from_hazard</span>(</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">monthly_hazard =</span> avelumab_capped_os_hazard</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>treatment_effect_cap_check <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_months =</span> synthetic_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">ww_os_survival =</span> ww_os_survival,</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">avelumab_uncapped_os_survival =</span> avelumab_uncapped_os_survival,</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">avelumab_capped_os_survival =</span> avelumab_capped_os_survival,</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">ww_os_hazard =</span> ww_os_hazard,</span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">avelumab_uncapped_os_hazard =</span> avelumab_uncapped_os_hazard,</span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">avelumab_capped_os_hazard =</span> avelumab_capped_os_hazard</span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>treatment_effect_cap_check <span class="sc">|&gt;</span></span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_months <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">70</span>, <span class="dv">71</span>, <span class="dv">72</span>, <span class="dv">73</span>, <span class="dv">74</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"OS hazard and survival around the 72-month treatment effect cap"</span></span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>OS hazard and survival around the 72-month treatment effect cap</caption>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 11%">
+<col style="width: 22%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Month</th>
+<th style="text-align: right;">WW OS</th>
+<th style="text-align: right;">Ave OS uncapped</th>
+<th style="text-align: right;">Ave OS capped</th>
+<th style="text-align: right;">WW hazard</th>
+<th style="text-align: right;">Ave hazard uncapped</th>
+<th style="text-align: right;">Ave hazard capped</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">0.271</td>
+<td style="text-align: right;">0.419</td>
+<td style="text-align: right;">0.419</td>
+<td style="text-align: right;">0.020</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.013</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">71</td>
+<td style="text-align: right;">0.266</td>
+<td style="text-align: right;">0.414</td>
+<td style="text-align: right;">0.414</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.013</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">0.261</td>
+<td style="text-align: right;">0.408</td>
+<td style="text-align: right;">0.408</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.013</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">73</td>
+<td style="text-align: right;">0.255</td>
+<td style="text-align: right;">0.403</td>
+<td style="text-align: right;">0.400</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.021</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">0.250</td>
+<td style="text-align: right;">0.398</td>
+<td style="text-align: right;">0.392</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.021</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The check table should show that after month 72 the capped avelumab OS hazard equals the watchful waiting OS hazard. The capped avelumab OS survival remains continuous because it is reconstructed recursively from the capped hazard sequence.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>avelumab_capped_state_occupancy <span class="ot">&lt;-</span> <span class="fu">calculate_state_occupancy</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_grid =</span> synthetic_time_grid,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">pfs_survival =</span> <span class="fu">weibull_survival</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_months =</span> synthetic_time_grid<span class="sc">$</span>time_months,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="fl">1.15</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">scale =</span> <span class="dv">35</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">os_survival =</span> avelumab_capped_os_survival</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>avelumab_capped_qaly_trace <span class="ot">&lt;-</span> <span class="fu">calculate_qalys</span>(</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">state_occupancy =</span> avelumab_capped_state_occupancy,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pf =</span> <span class="fl">0.772</span>,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">utility_pd =</span> <span class="fl">0.698</span>,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">annual_discount_rate =</span> <span class="fl">0.035</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">cycle_length_months =</span> synthetic_cycle_length_months</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">arm =</span> <span class="st">"Avelumab maintenance with OS cap"</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>two_arm_qaly_summary_with_os_cap <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  watchful_waiting_trace,</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>  avelumab_capped_qaly_trace</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_undiscounted_qalys =</span> <span class="fu">sum</span>(undiscounted_utility_months_cycle) <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_discounted_qalys =</span> <span class="fu">sum</span>(discounted_utility_months_cycle) <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_discounted_qalys =</span> total_discounted_qalys <span class="sc">-</span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>      total_discounted_qalys[arm <span class="sc">==</span> <span class="st">"Watchful waiting"</span>]</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>two_arm_qaly_summary_with_os_cap <span class="sc">|&gt;</span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Synthetic two-arm QALY comparison with OS treatment effect cap"</span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Synthetic two-arm QALY comparison with OS treatment effect cap</caption>
+<colgroup>
+<col style="width: 46%">
+<col style="width: 19%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Undisc. QALYs</th>
+<th style="text-align: right;">Disc. QALYs</th>
+<th style="text-align: right;">Incr. QALYs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance with OS cap</td>
+<td style="text-align: right;">4.142</td>
+<td style="text-align: right;">3.586</td>
+<td style="text-align: right;">0.703</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">3.269</td>
+<td style="text-align: right;">2.882</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The OS treatment effect cap reduces the modelled QALY benefit because the avelumab arm no longer retains an indefinite OS hazard advantage after year 6. This is the survival-benefit counterpart to the cost stopping rule, but it is implemented separately.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>cost_summary_for_os_cap <span class="ot">&lt;-</span> two_arm_cost_summary_with_stopping <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">arm =</span> <span class="fu">if_else</span>(</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>      arm <span class="sc">==</span> <span class="st">"Avelumab maintenance"</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Avelumab maintenance with OS cap"</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>      arm</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>preliminary_icer_with_stopping_and_os_cap <span class="ot">&lt;-</span> two_arm_qaly_summary_with_os_cap <span class="sc">|&gt;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, total_discounted_qalys, incremental_discounted_qalys) <span class="sc">|&gt;</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    cost_summary_for_os_cap <span class="sc">|&gt;</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>        arm,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>        total_discounted_public_cost,</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>        incremental_discounted_public_cost</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"arm"</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">preliminary_public_icer =</span> incremental_discounted_public_cost <span class="sc">/</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>      incremental_discounted_qalys</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>preliminary_icer_with_stopping_and_os_cap <span class="sc">|&gt;</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Preliminary synthetic ICER with 5-year cost stopping and year-6 OS treatment effect cap"</span></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Preliminary synthetic ICER with 5-year cost stopping and year-6 OS treatment effect cap</caption>
+<colgroup>
+<col style="width: 37%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Disc. QALYs</th>
+<th style="text-align: right;">Incr. QALYs</th>
+<th style="text-align: right;">Disc. cost</th>
+<th style="text-align: right;">Incr. cost</th>
+<th style="text-align: right;">ICER</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance with OS cap</td>
+<td style="text-align: right;">3.586</td>
+<td style="text-align: right;">0.703</td>
+<td style="text-align: right;">198292.7</td>
+<td style="text-align: right;">198292.7</td>
+<td style="text-align: right;">281992.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">2.882</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This final table combines the cost stopping rule with the OS treatment effect cap. It still excludes confidential pricing, monitoring costs, adverse-event costs, post-progression costs, and real TA788 survival parameters.</p>
+</details>
+<details class="section-fold">
+<summary>
+<h2 class="anchored">
+Phase 2.7: Half-Cycle Correction for QALYs
+</h2>
+</summary>
+<p>This section adds a basic half-cycle correction for QALYs. In a cycle-based model, patients do not usually transition exactly at the beginning or end of a cycle. The half-cycle correction approximates this by giving half weight to the first and last cycles, while giving full weight to all cycles in between.</p>
+<p>This section applies half-cycle correction to QALYs only. Drug acquisition and administration costs are not adjusted here because those costs are event-like treatment costs linked to dosing. Cost half-cycle correction can be considered later if the model adds broader monthly disease management costs.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>add_half_cycle_weights <span class="ot">&lt;-</span> <span class="cf">function</span>(model_trace) {</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  required_columns <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"arm"</span>, <span class="st">"cycle"</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(required_columns <span class="sc">%in%</span> <span class="fu">names</span>(model_trace))) {</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"model_trace must contain arm and cycle columns."</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  model_trace <span class="sc">|&gt;</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(cycle, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">half_cycle_weight =</span> <span class="fu">if_else</span>(</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">row_number</span>() <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> <span class="fu">row_number</span>() <span class="sc">==</span> <span class="fu">n</span>(),</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        <span class="dv">1</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The function above creates a simple weight column. For each arm, the first and final cycles receive a weight of 0.5. All other cycles receive a weight of 1.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>two_arm_qaly_trace_with_os_cap <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  watchful_waiting_trace,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  avelumab_capped_qaly_trace</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>two_arm_qaly_hcc_summary <span class="ot">&lt;-</span> two_arm_qaly_trace_with_os_cap <span class="sc">|&gt;</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_half_cycle_weights</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">|&gt;</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_discounted_qalys_no_hcc =</span> <span class="fu">sum</span>(discounted_utility_months_cycle) <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_discounted_qalys_hcc =</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sum</span>(discounted_utility_months_cycle <span class="sc">*</span> half_cycle_weight) <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">hcc_qaly_change =</span> total_discounted_qalys_hcc <span class="sc">-</span> total_discounted_qalys_no_hcc,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_discounted_qalys_no_hcc =</span> total_discounted_qalys_no_hcc <span class="sc">-</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>      total_discounted_qalys_no_hcc[arm <span class="sc">==</span> <span class="st">"Watchful waiting"</span>],</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">incremental_discounted_qalys_hcc =</span> total_discounted_qalys_hcc <span class="sc">-</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>      total_discounted_qalys_hcc[arm <span class="sc">==</span> <span class="st">"Watchful waiting"</span>]</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>two_arm_qaly_hcc_summary <span class="sc">|&gt;</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Synthetic QALY comparison with half-cycle correction"</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Synthetic QALY comparison with half-cycle correction</caption>
+<colgroup>
+<col style="width: 36%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">QALYs no HCC</th>
+<th style="text-align: right;">QALYs HCC</th>
+<th style="text-align: right;">HCC change</th>
+<th style="text-align: right;">Incr. no HCC</th>
+<th style="text-align: right;">Incr. HCC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance with OS cap</td>
+<td style="text-align: right;">3.586</td>
+<td style="text-align: right;">3.553</td>
+<td style="text-align: right;">-0.032</td>
+<td style="text-align: right;">0.703</td>
+<td style="text-align: right;">0.703</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">2.882</td>
+<td style="text-align: right;">2.850</td>
+<td style="text-align: right;">-0.032</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The half-cycle correction changes the numerical integration of QALYs. It does not change the underlying survival curves, utilities, or treatment effect cap logic.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>preliminary_icer_with_hcc <span class="ot">&lt;-</span> two_arm_qaly_hcc_summary <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, incremental_discounted_qalys_hcc) <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    cost_summary_for_os_cap <span class="sc">|&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>        arm,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        incremental_discounted_public_cost</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"arm"</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">preliminary_public_icer_hcc =</span> incremental_discounted_public_cost <span class="sc">/</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>      incremental_discounted_qalys_hcc</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>preliminary_icer_with_hcc <span class="sc">|&gt;</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display_table</span>(</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> display_labels,</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Preliminary synthetic ICER with QALY half-cycle correction"</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Preliminary synthetic ICER with QALY half-cycle correction</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">Incr. HCC</th>
+<th style="text-align: right;">Incr. cost</th>
+<th style="text-align: right;">ICER HCC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avelumab maintenance with OS cap</td>
+<td style="text-align: right;">0.703</td>
+<td style="text-align: right;">198292.7</td>
+<td style="text-align: right;">281992.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Watchful waiting</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This table updates the preliminary ICER using HCC-adjusted QALYs while keeping the same 5-year cost stopping rule and year-6 OS treatment effect cap.</p>
+</details>
+
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

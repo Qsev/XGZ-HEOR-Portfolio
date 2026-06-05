@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Xiaoge Zhang, PhD">
-<meta name="dcterms.date" content="2026-06-01">
+<meta name="dcterms.date" content="2026-06-04">
 
 <title>NICE RWE Framework &amp; Confounding by Indication – HEOR Technical Portfolio</title>
 <style>
@@ -186,6 +186,10 @@ window.Quarto = {
     <a class="dropdown-item" href="../../07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.html">
  <span class="dropdown-text">NICE TA1092 (Pembro) Case</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../08_TA788_Avelumab_Urothelial_Cancer/TA788_Avelumab_EAG_Audit.html">
+ <span class="dropdown-text">NICE TA788 (Avelumab) Case</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -319,7 +323,7 @@ window.Quarto = {
   <li><a href="#propensity-score-matching-the-common-support-constraint" id="toc-propensity-score-matching-the-common-support-constraint" class="nav-link" data-scroll-target="#propensity-score-matching-the-common-support-constraint"><span class="header-section-number">5</span> Propensity Score Matching &amp; The Common Support Constraint</a>
   <ul class="collapse">
   <li><a href="#the-mechanics-of-propensity-score-matching-psm" id="toc-the-mechanics-of-propensity-score-matching-psm" class="nav-link" data-scroll-target="#the-mechanics-of-propensity-score-matching-psm">The Mechanics of Propensity Score Matching (PSM)</a></li>
-  <li><a href="#the-positivity-common-support-assumption" id="toc-the-positivity-common-support-assumption" class="nav-link" data-scroll-target="#the-positivity-common-support-assumption"><span class="header-section-number">5.1</span> The Positivity (Common Support) Assumption</a></li>
+  <li><a href="#the-positivity-common-support-assumption" id="toc-the-positivity-common-support-assumption" class="nav-link" data-scroll-target="#the-positivity-common-support-assumption">The Positivity (Common Support) Assumption</a></li>
   <li><a href="#post-matching-analysis-workflow-estimating-the-treatment-effect" id="toc-post-matching-analysis-workflow-estimating-the-treatment-effect" class="nav-link" data-scroll-target="#post-matching-analysis-workflow-estimating-the-treatment-effect">Post-Matching Analysis Workflow: Estimating the Treatment Effect</a></li>
   </ul></li>
   <li><a href="#r-implementation-quantitative-audit-modeling-pipeline" id="toc-r-implementation-quantitative-audit-modeling-pipeline" class="nav-link" data-scroll-target="#r-implementation-quantitative-audit-modeling-pipeline"><span class="header-section-number">6</span> R Implementation: Quantitative Audit &amp; Modeling Pipeline</a>
@@ -357,7 +361,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 1, 2026</p>
+      <p class="date">June 4, 2026</p>
     </div>
   </div>
   
@@ -428,16 +432,17 @@ window.Quarto = {
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> ps)</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Outcome model (Survival time in months)</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>survival <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">42</span> <span class="sc">+</span> <span class="fl">5.0</span> <span class="sc">*</span> treatment <span class="sc">-</span> <span class="fl">0.45</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">6.0</span> <span class="sc">*</span> ecog <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">1.5</span>))</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>survival[survival <span class="sc">&lt;</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>cohort <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">patient_id =</span> <span class="dv">1</span><span class="sc">:</span>n,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">age        =</span> age,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">ecog       =</span> ecog,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment  =</span> treatment,</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">survival   =</span> survival</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>survival <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">42</span> <span class="sc">+</span> <span class="fl">5.0</span> <span class="sc">*</span> treatment <span class="sc">-</span> <span class="fl">0.45</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">6.0</span> <span class="sc">*</span> ecog <span class="sc">+</span> </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">1.5</span>))</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>survival[survival <span class="sc">&lt;</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>cohort <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">patient_id =</span> <span class="dv">1</span><span class="sc">:</span>n,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">age        =</span> age,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">ecog       =</span> ecog,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment  =</span> treatment,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">survival   =</span> survival</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>Instead of displaying all 100 individual patient records, the baseline demographic and clinical characteristics of the cohort are summarized below. This table represents the starting raw dataset generated for this causal analysis:</p>
@@ -536,7 +541,7 @@ window.Quarto = {
 <p>In our generated cohort of 100 patients, the naive mean survivals are computed as:</p>
 <ul>
 <li><strong>Treated (Drug X)</strong>: <span class="math inline">\(\mu_1 = 5.95 \text{ Months}\)</span></li>
-<li><strong>Standard Care (Control)</strong>: <span class="math inline">\(\mu_0 = 8.5 \text{ Months}\)</span></li>
+<li><strong>Standard Care (Control)</strong> : <span class="math inline">\(\mu_0 = 8.5 \text{ Months}\)</span></li>
 </ul>
 <p><span class="math display">\[\text{Naive Difference} = \mu_1 - \mu_0 = 5.95 - 8.5 = -2.55 \text{ Months}\]</span></p>
 <p>The crude analysis incorrectly concludes that Drug X reduces survival by <strong>2.55 months</strong>. A HTA submission based on this raw comparison would result in immediate rejection.</p>
@@ -603,7 +608,7 @@ window.Quarto = {
 <section id="from-imbalance-to-causal-adjustment-the-role-of-propensity-scores" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="from-imbalance-to-causal-adjustment-the-role-of-propensity-scores">From Imbalance to Causal Adjustment: The Role of Propensity Scores</h3>
 <p>The baseline audit using SMDs reveals a fundamental challenge: our treatment and control cohorts are highly unbalanced (e.g., older, sicker patients are systematically channeled into the Drug X group). To resolve this sample imbalance, we must reconstruct a balanced clinical scenario where the treatment and control groups have comparable baseline characteristics—mimicking the balance achieved in a randomized controlled trial (RCT).</p>
-<p>To achieve this group comparability, we must adjust for the confounding covariates (Age and ECOG). Why do we need the <strong>Propensity Score</strong> as the tool to achieve this balance, rather than simply matching patients directly on their covariates?</p>
+<p>To achieve this group comparability, we must <strong>adjust for the confounding covariates</strong> (Age and ECOG). Why do we need the <strong>Propensity Score</strong> as the tool to achieve this balance, rather than simply matching patients directly on their covariates?</p>
 <ol type="1">
 <li><strong>The Curse of Dimensionality in Multi-Dimensional Balance</strong>: In real-world HEOR studies, we typically control for dozens of baseline confounders (e.g., demographics, comorbidities, clinical markers, and prior therapies). If we attempt to find matches with the exact same combination of all baseline covariates (Exact Matching), the probability of finding a match drops to near zero as the number of covariates increases. This results in the exclusion of most patients, severely reducing sample size and statistical power.</li>
 <li><strong>Propensity Score as a Dimensionality Reduction Tool</strong>: Rosenbaum and Rubin (1983) proved that the propensity score—the conditional probability of receiving treatment given baseline covariates, <span class="math inline">\(e(X) = P(D = 1 \mid X)\)</span>—is a <em>balancing score</em>. Conditionally on the propensity score, the distribution of all baseline covariates is mathematically guaranteed to be independent of treatment assignment.</li>
@@ -637,8 +642,8 @@ window.Quarto = {
 </ul></li>
 </ol>
 </section>
-<section id="the-positivity-common-support-assumption" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="the-positivity-common-support-assumption"><span class="header-section-number">5.1</span> The Positivity (Common Support) Assumption</h3>
+<section id="the-positivity-common-support-assumption" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="the-positivity-common-support-assumption">The Positivity (Common Support) Assumption</h3>
 <p>For matching to be methodologically valid, we must satisfy the <strong>Positivity Assumption</strong> (also known as the <strong>Common Support Constraint</strong>). This assumption dictates that every patient in the population must have a non-zero probability of receiving either treatment:</p>
 <p><span class="math display">\[0 &lt; P(D = 1 \mid X) &lt; 1\]</span></p>
 <p>Graphically, this means that the distribution of propensity scores for the treated and control cohorts must share a region of <strong>overlap (common support)</strong>. If there is no overlap for a certain range of propensity scores, it means patients in that range can only receive one treatment but not the other under clinical practice, making comparison impossible.</p>
