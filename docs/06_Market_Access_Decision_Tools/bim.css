@@ -41,7 +41,7 @@
   padding: 1.3rem 1.4rem; margin-bottom: 1.4rem;
 }
 .bim-panel-title { margin: 0 0 0.35rem; font-size: 1.06rem; letter-spacing: -0.01em; }
-.bim-panel-note { margin: 0 0 1rem; color: var(--muted); font-size: 0.88rem; max-width: 78ch; }
+.bim-panel-note { margin: 0 0 1rem; color: var(--muted); font-size: 0.88rem; }
 .bim-callout {
   margin: 1rem 0 0; padding: 0.75rem 0.9rem; background: var(--soft);
   border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0;
@@ -49,7 +49,7 @@
 }
 .bim-note-box {
   margin: 1.1rem 0 0; padding: 0.85rem 1rem; background: #fdfaf3;
-  border: 1px solid #ecdcbb; border-radius: 8px; font-size: 0.85rem; max-width: 92ch;
+  border: 1px solid #ecdcbb; border-radius: 8px; font-size: 0.85rem;
 }
 .bim-note-box strong { color: #7a5514; }
 
@@ -102,6 +102,7 @@
 .bim-axis-label { font-size: 11px; fill: var(--muted); }
 .bim-axis-sub { font-size: 10px; fill: var(--muted); }
 .bim-tornado-label { font-size: 11.5px; fill: var(--ink); }
+.bim-seg-label { font-size: 10.5px; font-weight: 600; pointer-events: none; }
 .bim-net-dot { fill: #172033; stroke: #fff; stroke-width: 2; }
 .bim-legend { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; margin-top: 0.6rem; font-size: 0.76rem; color: var(--muted); }
 .bim-legend-item { display: inline-flex; align-items: center; }
@@ -134,9 +135,14 @@
 /* ---- details ---- */
 .bim-details { margin-top: 1rem; border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 0.9rem; }
 .bim-details summary { cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--blue); }
-.bim-build-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.9rem; margin-top: 0.9rem; }
+.bim-build-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.9rem 1.2rem; margin-top: 0.9rem; }
+.bim-build-item { min-width: 0; }
 .bim-build-item h5 { margin: 0 0 0.3rem; font-size: 0.84rem; }
-.bim-build-item code { display: block; font-size: 0.74rem; background: var(--soft); padding: 0.4rem 0.5rem; border-radius: 6px; margin-bottom: 0.35rem; }
+.bim-build-item code {
+  display: block; font-size: 0.72rem; line-height: 1.45;
+  background: var(--soft); padding: 0.45rem 0.55rem; border-radius: 6px; margin-bottom: 0.35rem;
+  white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;
+}
 .bim-build-item p { margin: 0; font-size: 0.78rem; color: var(--muted); }
 
 /* ---- narrow screens ---- */

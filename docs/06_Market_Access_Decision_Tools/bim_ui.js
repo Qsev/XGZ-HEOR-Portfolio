@@ -17,9 +17,25 @@
   const NON_VEN = RID.filter(r => !P.regimens.find(x => x.id === r).ven);
   const LABEL = Object.fromEntries(P.regimens.map(r => [r.id, r.label]));
   const IS_VEN = Object.fromEntries(P.regimens.map(r => [r.id, r.ven]));
-  const COLOR = { AZA: "#4a7fb5", DE: "#6b9bc9", LDC: "#93b7dc", BSC: "#c3d4e6",
-                  VEN_AZA: "#b7791f", VEN_DE: "#cf9a3f", VEN_LDC: "#e0bc80" };
-  const CCOLOR = ["#2f6fbd", "#4a7fb5", "#6b9bc9", "#2f8f6b", "#93b7dc", "#57a487"];
+  /* Categorical palette, fixed order, never cycled. Validated for stacked
+     adjacent pairs: worst CVD deltaE 9.1, worst normal-vision deltaE 19.6.
+     Three slots fall below 3:1 against the surface, so every segment large
+     enough to hold one carries a direct label - identity is never colour alone. */
+  const CAT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7"];
+  const COLOR  = Object.fromEntries(RID.map((r, i) => [r, CAT[i]]));
+  const CCOLOR = CAT.slice(0, 6);
+  const SHORT  = { AZA: "AZA", DE: "DEC", LDC: "LDAC", BSC: "BSC",
+                   VEN_AZA: "VEN+AZA", VEN_DE: "VEN+DEC", VEN_LDC: "VEN+LDAC" };
+  const SHORT_C = { drug: "Drug", administration: "Admin", adverseEvents: "AEs",
+                    hospitalisation: "Hospital", monitoring: "Monitor", transfusion: "Transfusion" };
+  /* on-fill ink: white on dark fills, near-black on light ones */
+  function inkOn(hex) {
+    const ch = i => { const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+                      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    const L = 0.2126 * ch(1) + 0.7152 * ch(3) + 0.0722 * ch(5);
+    return L > 0.42 ? "#141414" : "#ffffff";
+  }
+  const GAP = 2;   /* surface gap between stacked segments */
   const YEARS = ["y1", "y2", "y3"];
 
   const fmt0 = n => Math.round(n).toLocaleString("en-GB");
@@ -286,9 +302,15 @@
         const v = N * (c.shares[r] || 0) / 100;
         if (v <= 0) return;
         const h = v / maxY * ph, y = m.t + ph - (acc / maxY * ph) - h;
-        const rect = sv("rect", { x: cx - bw / 2, y: y, width: bw, height: Math.max(0, h), fill: COLOR[r] });
+        const drawn = Math.max(0, h - GAP);
+        const rect = sv("rect", { x: cx - bw / 2, y: y, width: bw, height: drawn,
+                                  fill: COLOR[r], rx: 1 });
         rect.appendChild(sv("title", {}, LABEL[r] + ": " + v.toFixed(1) + " patients (" + pct1(c.shares[r] || 0) + ")"));
-        svg.appendChild(rect); acc += v;
+        svg.appendChild(rect);
+        if (drawn >= 15) svg.appendChild(sv("text", { x: cx, y: y + drawn / 2 + 4,
+          "text-anchor": "middle", class: "bim-seg-label", fill: inkOn(COLOR[r]) },
+          SHORT[r] + "  " + Math.round(v)));
+        acc += v;
       });
       svg.appendChild(sv("text", { x: cx, y: H - m.b + 18, class: "bim-axis-label",
                                    "text-anchor": "middle" }, names[ci]));
@@ -449,9 +471,14 @@
         const h = Math.abs(v) / span * ph;
         let yy;
         if (v > 0) { yy = yOf(accP + v); accP += v; } else { yy = yOf(accN); accN += v; }
-        const rect = sv("rect", { x: cx - bw / 2, y: yy, width: bw, height: Math.max(0, h), fill: CCOLOR[ki] });
+        const top = yy + (v > 0 ? GAP : 0), drawn = Math.max(0, h - GAP);
+        const rect = sv("rect", { x: cx - bw / 2, y: top, width: bw, height: drawn,
+                                  fill: CCOLOR[ki], rx: 1 });
         rect.appendChild(sv("title", {}, E.COMPONENT_LABELS[k] + ": " + money(v)));
         svg.appendChild(rect);
+        if (drawn >= 16) svg.appendChild(sv("text", { x: cx, y: top + drawn / 2 + 4,
+          "text-anchor": "middle", class: "bim-seg-label", fill: inkOn(CCOLOR[ki]) },
+          SHORT_C[k]));
       });
       svg.appendChild(sv("circle", { cx: cx, cy: yOf(y.impact.total), r: 5, class: "bim-net-dot" }));
       svg.appendChild(sv("text", { x: cx, y: H - m.b + 18, class: "bim-axis-label",
@@ -518,10 +545,10 @@
                                    "text-anchor": "end" }, r.label));
       const mid = Math.min(Math.max(o.basePMPM, a), b);
       const lowBar = sv("rect", { x: xOf(a), y: y + 5, width: Math.max(1, xOf(mid) - xOf(a)),
-                                  height: rh - 12, fill: "#2f8f6b", opacity: 0.85 });
+                                  height: rh - 12, fill: "#2a78d6" });
       lowBar.appendChild(sv("title", {}, r.label + " −25% → " + pmpmFmt(r.low)));
       const hiBar = sv("rect", { x: xOf(mid), y: y + 5, width: Math.max(1, xOf(b) - xOf(mid)),
-                                 height: rh - 12, fill: "#b7791f", opacity: 0.85 });
+                                 height: rh - 12, fill: "#eb6834" });
       hiBar.appendChild(sv("title", {}, r.label + " +25% → " + pmpmFmt(r.high)));
       svg.appendChild(lowBar); svg.appendChild(hiBar);
       svg.appendChild(sv("text", { x: xOf(b) + 8, y: y + rh / 2 + 4, class: "bim-axis-sub" },
