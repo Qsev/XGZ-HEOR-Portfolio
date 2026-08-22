@@ -187,3 +187,59 @@
   .bim-fun-gauge { order: 4; grid-column: 1 / -1; }
   .bim-headline strong { font-size: 1.15rem; }
 }
+
+/* ---- panel 3: efficacy, derivation, bridge ---- */
+.bim-sub-title { margin: 1.6rem 0 0.4rem; font-size: 0.95rem; letter-spacing: -0.01em; }
+.bim-sub-title:first-of-type { margin-top: 0.6rem; }
+.bim-drives { font-size: 0.78rem; color: var(--muted); }
+.bim-dir { font-size: 0.72rem; padding: 0.1rem 0.45rem; border-radius: 999px; white-space: nowrap; }
+.bim-dir-up   { background: #fdeee6; color: #9c4318; }
+.bim-dir-down { background: #e6f5ee; color: #14664a; }
+.bim-dir-none { background: #eeeef1; color: #5f6b7a; }
+.bim-row-unused td { background: #fafafb; color: var(--muted); font-style: italic; }
+.bim-eff-dot {
+  display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 50%;
+  background: #eda100; vertical-align: baseline;
+}
+
+.bim-picker { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.7rem 0 1rem; }
+.bim-pick-btn {
+  border: 1px solid var(--border); background: #fff; color: var(--muted);
+  border-radius: 999px; padding: 0.3rem 0.75rem; font-size: 0.78rem;
+  font-family: inherit; cursor: pointer;
+}
+.bim-pick-btn:hover { border-color: var(--blue); color: var(--blue); }
+.bim-pick-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+
+.bim-deriv { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 0.8rem; }
+.bim-deriv-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 0.85rem; min-width: 0; }
+.bim-deriv-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 0.4rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+}
+.bim-deriv-name { font-size: 0.85rem; font-weight: 600; }
+.bim-deriv-total { font-variant-numeric: tabular-nums; font-weight: 600; }
+.bim-deriv-none { margin: 0; font-size: 0.76rem; color: var(--muted); font-style: italic; }
+.bim-deriv-part { margin-bottom: 0.55rem; }
+.bim-deriv-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.15rem; }
+.bim-deriv-expr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem; }
+.bim-deriv-term {
+  display: inline-flex; flex-direction: column; line-height: 1.15;
+  padding: 0.15rem 0.4rem; background: var(--soft); border-radius: 5px;
+  border: 1px solid transparent;
+}
+.bim-deriv-term.efficacy { background: #fdf6e6; border-color: #f0dcae; }
+.bim-deriv-num { font-size: 0.79rem; font-variant-numeric: tabular-nums; font-weight: 600; }
+.bim-deriv-unit { font-size: 0.6rem; color: var(--muted); }
+.bim-deriv-term.efficacy .bim-deriv-unit { color: #8a5a12; }
+.bim-deriv-op { font-size: 0.75rem; color: var(--muted); }
+.bim-deriv-res { font-size: 0.82rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.bim-bridge-wrap { margin-top: 1.4rem; }
+.bim-bridge-val { font-size: 11px; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.bim-bridge-cause { font-size: 9.5px; fill: var(--muted); font-style: italic; }
+.bim-bridge-net-label { font-size: 12px; fill: var(--ink); font-weight: 700; }
+
+@media (max-width: 640px) {
+  .bim-deriv { grid-template-columns: 1fr; }
+}

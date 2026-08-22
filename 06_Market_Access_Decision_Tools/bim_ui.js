@@ -375,14 +375,64 @@
   }
 
   /* ---- panel 3: per-patient cost ---------------------------------------- */
+  let costPick = "VEN_AZA";
+  const COMPARATOR = { VEN_AZA: "AZA", VEN_DE: "DE", VEN_LDC: "LDC" };
+
   function buildCost() {
     const w = el("section", { class: "bim-panel" });
     w.appendChild(el("h3", { class: "bim-panel-title", text: "3 · Cost per patient per year" }));
     w.appendChild(el("p", { class: "bim-panel-note", html:
-      "Six components, built bottom-up from published quantities and unit costs. " +
-      "<strong>The payer switch acts here and only here:</strong> drug prices are ex-factory and identical " +
-      "under both perspectives, so only the healthcare resource lines move when you switch." }));
+      "Six components, each a product of quantities and unit costs. " +
+      "<strong>The payer switch acts here and only here:</strong> drug prices are ex-factory and " +
+      "identical under both perspectives, so only the healthcare resource lines move." }));
 
+    /* -- 3a. the efficacy inputs, and what each one drives ------------------ */
+    w.appendChild(el("h4", { class: "bim-sub-title", text: "Where efficacy enters" }));
+    w.appendChild(el("p", { class: "bim-panel-note", html:
+      "Four parameters carry the clinical evidence into the cost, and they pull in opposite " +
+      "directions. This is the whole mechanism of the budget impact: venetoclax is taken for " +
+      "longer and causes more adverse events, but recovers blood counts sooner and achieves " +
+      "transfusion independence more often." }));
+    const effTbl = el("table", { class: "bim-table" });
+    const eh = el("tr", {});
+    ["Efficacy or safety input", "Drives", "Direction"].forEach(t => eh.appendChild(el("th", { text: t })));
+    P.regimens.forEach(r => eh.appendChild(el("th", { class: "num", text: SHORT[r.id] })));
+    effTbl.appendChild(el("thead", {}, [eh]));
+    const eb = el("tbody", {});
+    const effRows = [
+      ["Mean duration of active treatment", "Drug acquisition · Administration", "longer → costlier", "up",
+       r => { const v = P.treatmentCycles.active[r]; return v ? v.toFixed(2) : "—"; }],
+      ["Time to blood count recovery", "Hospitalisation", "faster → cheaper", "down",
+       r => { const v = P.efficacy.bloodCountRecoveryCycles[r]; return v ? v.toFixed(2) : "—"; }],
+      ["Transfusion independence", "Blood transfusions", "higher → cheaper", "down",
+       r => { const v = P.efficacy.transfusionIndependence[r]; return v ? v.toFixed(1) + "%" : "—"; }],
+      ["Febrile neutropenia incidence", "Adverse events", "higher → costlier", "up",
+       r => { const v = P.aeIncidence.febrileNeutropenia[r]; return v ? v.toFixed(1) + "%" : "—"; }],
+      ["Complete remission", "nothing", "not used by the model", "none",
+       r => { const v = P.efficacy.completeRemission[r]; return v ? v.toFixed(1) + "%" : "—"; }]
+    ];
+    effRows.forEach(([name, drives, dir, arrow, get]) => {
+      const tr = el("tr", { class: arrow === "none" ? "bim-row-unused" : "" });
+      tr.appendChild(el("td", { text: name }));
+      tr.appendChild(el("td", { class: "bim-drives", text: drives }));
+      tr.appendChild(el("td", {}, [el("span", { class: "bim-dir bim-dir-" + arrow, text: dir })]));
+      P.regimens.forEach(r => tr.appendChild(el("td", { class: "num", text: get(r.id) })));
+      eb.appendChild(tr);
+    });
+    effTbl.appendChild(eb);
+    w.appendChild(el("div", { class: "bim-table-wrap" }, [effTbl]));
+    w.appendChild(el("div", { class: "bim-note-box", html:
+      "<strong>Complete remission is in the parameter table and does no work.</strong> It is the " +
+      "headline clinical result — 66.4% against 27.8% for venetoclax plus azacitidine — and the " +
+      "model never reads it. That is not an oversight to fix; it is what a budget impact model is. " +
+      "Cost responds to how long treatment runs, how many hospital days a patient needs and how " +
+      "much blood product they consume. Whether remission was achieved only matters here through " +
+      "those three channels. A cost-effectiveness model, which values health outcomes, would use " +
+      "it directly — which is the clearest way to see why the two model types are not " +
+      "interchangeable." }));
+
+    /* -- 3b. the summary table --------------------------------------------- */
+    w.appendChild(el("h4", { class: "bim-sub-title", text: "Cost per patient, by component" }));
     const tbl = el("table", { class: "bim-table" });
     const h = el("tr", {});
     h.appendChild(el("th", { text: "Regimen" }));
@@ -393,32 +443,29 @@
     tbl.appendChild(body);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [tbl]));
 
-    const det = el("details", { class: "bim-details" });
-    det.appendChild(el("summary", { text: "How each component is built" }));
-    const g = el("div", { class: "bim-build-grid" });
-    [["Drug acquisition", "cost per cycle × active cycles + (13.04 − active cycles) × $698",
-      "S2 Table. Deliberately not a frozen annual total: treatment duration is the leading sensitivity driver in the source, and it can only move the result if drug cost is a function of it. Rebuilds every published annual total to within 0.09%."],
-     ["Administration", "active cycles × administration days per cycle × IV or SC unit cost",
-      "Table 3. Venetoclax is oral and carries no administration cost."],
-     ["Adverse events", "Σ (event incidence × unit cost)",
-      "Table 1 × Table 3. Neutropenia is priced at $0 in Table 3 because its management already sits inside hospitalisation — charging it again would double-count."],
-     ["Hospitalisation", "time to blood count recovery × 28 days × neutropenic room cost per day",
-      "Table 1 × Table 3."],
-     ["Monitoring", "resource use per cycle × 13.04 cycles × unit cost, plus annual marrow procedures",
-      "S3 Table × Table 3. Venetoclax regimens take extra chemistry panels in cycle 1 for tumour lysis monitoring."],
-     ["Blood transfusions", "(1 − transfusion independence) × 13.04 cycles × (3 red cell + 5 platelet units)",
-      "Table 1 × S4 Table × Table 3."]
-    ].forEach(([t, f, n]) => {
-      const it = el("div", { class: "bim-build-item" });
-      it.appendChild(el("h5", { text: t }));
-      it.appendChild(el("code", { text: f }));
-      it.appendChild(el("p", { text: n }));
-      g.appendChild(it);
+    /* -- 3c. full derivation for one regimen -------------------------------- */
+    w.appendChild(el("h4", { class: "bim-sub-title", text: "The arithmetic, in full" }));
+    w.appendChild(el("p", { class: "bim-panel-note", html:
+      "Pick a regimen. Every factor below is the value the model actually multiplied — this is " +
+      "generated from the calculation itself, not transcribed alongside it. Factors carrying " +
+      "clinical evidence are marked <span class='bim-eff-dot'></span>." }));
+    const picker = el("div", { class: "bim-picker" });
+    const pickBtns = {};
+    P.regimens.forEach(r => {
+      const b = el("button", { type: "button", class: "bim-pick-btn", text: r.label });
+      b.addEventListener("click", () => { costPick = r.id; update(); });
+      pickBtns[r.id] = b; picker.appendChild(b);
     });
-    det.appendChild(g);
-    w.appendChild(det);
+    w.appendChild(picker);
+    const deriv = el("div", { class: "bim-deriv" });
+    w.appendChild(deriv);
+
+    /* -- 3d. efficacy bridge ------------------------------------------------ */
+    const bridgeWrap = el("div", { class: "bim-bridge-wrap" });
+    w.appendChild(bridgeWrap);
 
     return { node: w, update() {
+      /* summary table */
       clear(body);
       RID.forEach(r => {
         const c = E.perPatientCost(P, r, S.perspective);
@@ -431,7 +478,118 @@
         tr.appendChild(el("td", { class: "num strong", text: money(c.total) }));
         body.appendChild(tr);
       });
+
+      /* derivation */
+      Object.keys(pickBtns).forEach(k =>
+        pickBtns[k].className = "bim-pick-btn" + (k === costPick ? " active" : ""));
+      clear(deriv);
+      const d = E.costDetail(P, costPick, S.perspective);
+      E.COMPONENTS.forEach(k => {
+        const comp = d.components[k];
+        const card = el("div", { class: "bim-deriv-card" });
+        const head = el("div", { class: "bim-deriv-head" });
+        head.appendChild(el("span", { class: "bim-deriv-name", text: E.COMPONENT_LABELS[k] }));
+        head.appendChild(el("span", { class: "bim-deriv-total", text: money(comp.value) }));
+        card.appendChild(head);
+        if (!comp.parts.length) {
+          const why = (k === "administration")
+            ? "Best supportive care involves no drug administration."
+            : (k === "hospitalisation")
+            ? "Table 1 reports no time to blood count recovery for this regimen, so the model "
+              + "assigns zero neutropenic-room cost. This is one of the three stated assumptions "
+              + "and it understates the comparator arm."
+            : (k === "adverseEvents")
+            ? "Table 1 has no adverse event column for this regimen, so the model assigns zero — "
+              + "a stated assumption, and one that flatters the comparator."
+            : "No cost arises under this component for this regimen.";
+          card.appendChild(el("p", { class: "bim-deriv-none", text: why }));
+        }
+        comp.parts.forEach(part => {
+          const row = el("div", { class: "bim-deriv-part" });
+          row.appendChild(el("div", { class: "bim-deriv-label", text: part.label }));
+          const expr = el("div", { class: "bim-deriv-expr" });
+          part.terms.forEach((t, i) => {
+            if (i) expr.appendChild(el("span", { class: "bim-deriv-op", text: "×" }));
+            const term = el("span", { class: "bim-deriv-term" + (t.efficacy ? " efficacy" : "") ,
+                                      title: t.label });
+            term.appendChild(el("span", { class: "bim-deriv-num",
+              text: t.unit === "$" ? money(t.value)
+                  : t.unit === "share" ? (t.value * 100).toFixed(1) + "%"
+                  : (Math.round(t.value * 100) / 100).toLocaleString("en-GB") }));
+            term.appendChild(el("span", { class: "bim-deriv-unit",
+              text: t.unit === "$" || t.unit === "share" ? t.label : t.unit }));
+            expr.appendChild(term);
+          });
+          expr.appendChild(el("span", { class: "bim-deriv-op", text: "=" }));
+          expr.appendChild(el("span", { class: "bim-deriv-res", text: money(part.product) }));
+          row.appendChild(expr);
+          card.appendChild(row);
+        });
+        deriv.appendChild(card);
+      });
+
+      /* efficacy bridge: VEN regimen against its own comparator */
+      clear(bridgeWrap);
+      const venId = IS_VEN[costPick] ? costPick
+                  : Object.keys(COMPARATOR).find(v => COMPARATOR[v] === costPick);
+      if (venId) {
+        const compId = COMPARATOR[venId];
+        bridgeWrap.appendChild(el("h4", { class: "bim-sub-title",
+          text: "What the clinical difference is worth: " + LABEL[venId] + " against " + LABEL[compId] }));
+        bridgeWrap.appendChild(el("p", { class: "bim-panel-note", html:
+          "The same patient, treated two ways. Each bar is one component of the per-patient cost " +
+          "difference, annotated with the efficacy parameter that produced it. This is the " +
+          "mechanism behind every number in the budget impact table." }));
+        bridgeWrap.appendChild(bridge(venId, compId));
+      }
     } };
+  }
+
+  const BRIDGE_CAUSE = {
+    drug: "longer treatment duration",
+    administration: "longer treatment duration",
+    adverseEvents: "higher event rates",
+    hospitalisation: "faster blood count recovery",
+    monitoring: "extra tumour lysis panels",
+    transfusion: "higher transfusion independence"
+  };
+
+  function bridge(venId, compId) {
+    const a = E.perPatientCost(P, venId, S.perspective);
+    const b = E.perPatientCost(P, compId, S.perspective);
+    const rows = E.COMPONENTS.map(k => ({ k, delta: a[k] - b[k] }))
+      .filter(r => Math.abs(r.delta) > 0.5)
+      .sort((x, y) => Math.abs(y.delta) - Math.abs(x.delta));
+    const net = a.total - b.total;
+    const maxAbs = Math.max(...rows.map(r => Math.abs(r.delta)), Math.abs(net)) || 1;
+
+    const W = 720, rh = 34, m = { t: 10, r: 12, b: 34, l: 220 };
+    const H = m.t + (rows.length + 1) * rh + m.b;
+    const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "bim-svg",
+                            preserveAspectRatio: "xMidYMid meet" });
+    const pw = W - m.l - m.r, zero = m.l + pw / 2;
+    const xOf = v => zero + v / maxAbs * (pw / 2 - 60);
+    svg.appendChild(sv("line", { x1: zero, x2: zero, y1: m.t, y2: H - m.b + 4, class: "bim-zero" }));
+
+    rows.concat([{ k: "net", delta: net }]).forEach((r, i) => {
+      const y = m.t + i * rh, isNet = r.k === "net";
+      const x0 = Math.min(zero, xOf(r.delta)), wBar = Math.abs(xOf(r.delta) - zero);
+      svg.appendChild(sv("text", { x: m.l - 12, y: y + rh / 2 + 4,
+        class: isNet ? "bim-bridge-net-label" : "bim-tornado-label", "text-anchor": "end" },
+        isNet ? "Net difference per patient" : E.COMPONENT_LABELS[r.k]));
+      const rect = sv("rect", { x: x0, y: y + 6, width: Math.max(2, wBar), height: rh - 16,
+        fill: isNet ? "#4a3aa7" : (r.delta > 0 ? "#eb6834" : "#1baf7a"), rx: 1 });
+      rect.appendChild(sv("title", {}, (isNet ? "Net" : E.COMPONENT_LABELS[r.k]) + ": " + money(r.delta)));
+      svg.appendChild(rect);
+      const tx = r.delta > 0 ? xOf(r.delta) + 8 : xOf(r.delta) - 8;
+      svg.appendChild(sv("text", { x: tx, y: y + rh / 2 + 4, class: "bim-bridge-val",
+        "text-anchor": r.delta > 0 ? "start" : "end" }, money(r.delta)));
+      if (!isNet) svg.appendChild(sv("text", { x: m.l - 12, y: y + rh / 2 + 15,
+        class: "bim-bridge-cause", "text-anchor": "end" }, BRIDGE_CAUSE[r.k] || ""));
+    });
+    svg.appendChild(sv("text", { x: zero, y: H - 10, class: "bim-axis-label",
+      "text-anchor": "middle" }, "← cheaper with venetoclax    |    costlier with venetoclax →"));
+    return svg;
   }
 
   /* ---- panel 4: budget impact -------------------------------------------- */
