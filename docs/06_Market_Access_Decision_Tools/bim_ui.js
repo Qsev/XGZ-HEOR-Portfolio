@@ -791,13 +791,21 @@
     w.appendChild(el("h3", { class: "bim-panel-title", text: "6 · Reconciliation against the publication" }));
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "Where the rebuild lands against Table 4, at base-case settings and for the selected " +
-      "perspective. Four of the six components come straight from published quantities. Two carry " +
-      "estimated parameters, and the distinction between that and fitting the answer is set out below." }));
+      "perspective. <strong>Read the right-hand block, not the left.</strong> A budget impact model " +
+      "reports the difference between the two worlds, so that is what has to reconcile — and a " +
+      "component can be well out on level while its difference is close, because the same structural " +
+      "error sits in both worlds and cancels in the subtraction. Administration is the clearest case " +
+      "here: 44% low on level, within 5% on the difference." }));
     const tbl = el("table", { class: "bim-table" });
+    const h1 = el("tr", {});
+    h1.appendChild(el("th", { text: "" }));
+    h1.appendChild(el("th", { class: "num", colspan: 3, text: "Level, without venetoclax" }));
+    h1.appendChild(el("th", { class: "num impact-col", colspan: 3, text: "Difference between the two worlds, year 3" }));
     const h = el("tr", {});
-    ["", "Rebuilt", "Published", "Difference"].forEach(t =>
-      h.appendChild(el("th", { class: t ? "num" : "", text: t })));
-    tbl.appendChild(el("thead", {}, [h]));
+    h.appendChild(el("th", { text: "" }));
+    ["Rebuilt", "Published", "Δ"].forEach(t => h.appendChild(el("th", { class: "num", text: t })));
+    ["Rebuilt", "Published", "Δ"].forEach(t => h.appendChild(el("th", { class: "num impact-col", text: t })));
+    tbl.appendChild(el("thead", {}, [h1, h]));
     const body = el("tbody", {});
     tbl.appendChild(body);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [tbl]));
@@ -826,20 +834,36 @@
       const base = E.budgetImpact(P, { perspective: S.perspective });
       const pub = P.published;
       clear(body);
-      const row = (label, ours, published, cls) => {
-        const tr = el("tr", { class: cls || "" });
-        tr.appendChild(el("td", { text: label }));
-        tr.appendChild(el("td", { class: "num", text: money(ours) }));
-        tr.appendChild(el("td", { class: "num", text: money(published) }));
+      const pctCell = (ours, published, extraClass) => {
         const d = (ours - published) / Math.abs(published) * 100;
-        tr.appendChild(el("td", { class: "num " + (Math.abs(d) < 10 ? "pos" : "neg"),
-                                  text: (d >= 0 ? "+" : "") + d.toFixed(1) + "%" }));
-        body.appendChild(tr);
+        return el("td", { class: "num " + (extraClass || "") + " " + (Math.abs(d) < 10 ? "pos" : "neg"),
+                          text: (d >= 0 ? "+" : "") + d.toFixed(0) + "%" });
       };
-      E.COMPONENTS.forEach(k => row("Without VEN · " + E.COMPONENT_LABELS[k],
-        base.without.components[k], pub.withoutVEN[S.perspective][k]));
-      base.years.forEach(y => row("Budget impact · year " + y.year,
-        y.impact.total, pub.budgetImpactTotal[S.perspective][y.key], "bim-row-total"));
+      E.COMPONENTS.forEach(k => {
+        const tr = el("tr", {});
+        tr.appendChild(el("td", { text: E.COMPONENT_LABELS[k] }));
+        const ol = base.without.components[k], pl = pub.withoutVEN[S.perspective][k];
+        tr.appendChild(el("td", { class: "num", text: money(ol) }));
+        tr.appendChild(el("td", { class: "num", text: money(pl) }));
+        tr.appendChild(pctCell(ol, pl));
+        const od = base.years[2].impact[k];
+        const pd = pub.withVEN[S.perspective].y3[k] - pub.withoutVEN[S.perspective][k];
+        tr.appendChild(el("td", { class: "num impact-col", text: money(od) }));
+        tr.appendChild(el("td", { class: "num impact-col", text: money(pd) }));
+        tr.appendChild(pctCell(od, pd, "impact-col"));
+        body.appendChild(tr);
+      });
+      const tr = el("tr", { class: "bim-row-total" });
+      tr.appendChild(el("td", { text: "Total" }));
+      const ot = base.without.components.total, pt = pub.withoutVEN[S.perspective].total;
+      tr.appendChild(el("td", { class: "num", text: money(ot) }));
+      tr.appendChild(el("td", { class: "num", text: money(pt) }));
+      tr.appendChild(pctCell(ot, pt));
+      const oi = base.years[2].impact.total, pi = pub.budgetImpactTotal[S.perspective].y3;
+      tr.appendChild(el("td", { class: "num impact-col", text: money(oi) }));
+      tr.appendChild(el("td", { class: "num impact-col", text: money(pi) }));
+      tr.appendChild(pctCell(oi, pi, "impact-col"));
+      body.appendChild(tr);
     } };
   }
 
