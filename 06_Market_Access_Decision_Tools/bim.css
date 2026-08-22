@@ -85,13 +85,25 @@
 .bim-control input[type="range"], .bim-share-row input[type="range"] { width: 100%; margin: 0.3rem 0 0.15rem; accent-color: var(--blue); }
 
 /* ---- funnel ---- */
-.bim-funnel { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; }
-.bim-funnel-step { position: relative; background: var(--soft); border-radius: 6px; overflow: hidden; }
-.bim-funnel-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #dce8f6, #b9d2ec); }
-.bim-funnel-text { position: relative; display: flex; align-items: baseline; gap: 0.7rem; padding: 0.5rem 0.8rem; }
-.bim-funnel-text strong { font-variant-numeric: tabular-nums; min-width: 5.5rem; }
-.bim-funnel-text span { font-size: 0.86rem; }
-.bim-funnel-text em { font-style: normal; font-size: 0.76rem; color: var(--muted); margin-left: auto; }
+.bim-funnel { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.bim-fun-row {
+  display: grid; grid-template-columns: 7.5rem 12rem 1fr 7rem;
+  align-items: center; gap: 0.9rem;
+  padding: 0.5rem 0.8rem; border-radius: 6px;
+}
+.bim-fun-row:nth-child(odd) { background: var(--soft); }
+.bim-fun-start { background: #eef4fb !important; border-left: 3px solid var(--blue); }
+.bim-fun-op { font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bim-fun-gauge { min-width: 0; }
+.bim-fun-track { height: 7px; background: #e3e9f0; border-radius: 4px; overflow: hidden; }
+.bim-fun-fill { height: 100%; background: #2a78d6; border-radius: 4px; transition: width 90ms linear; }
+.bim-fun-rate .bim-fun-fill { background: #1baf7a; }
+.bim-fun-scale { display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
+.bim-fun-label { display: flex; flex-direction: column; min-width: 0; }
+.bim-fun-name { font-size: 0.86rem; }
+.bim-fun-note { font-size: 0.72rem; color: var(--muted); }
+.bim-fun-value { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.bim-fun-start .bim-fun-value { font-size: 1.05rem; }
 
 /* ---- market share ---- */
 .bim-share-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.1rem; }
@@ -166,7 +178,10 @@
   .bim-topbar { position: static; flex-direction: column; align-items: flex-start; }
   .bim-panel { padding: 1rem 0.85rem; }
   .bim-share-grid { grid-template-columns: 1fr; }
-  .bim-funnel-text { flex-wrap: wrap; gap: 0.3rem 0.6rem; }
-  .bim-funnel-text em { margin-left: 0; width: 100%; }
+  .bim-fun-row { grid-template-columns: 1fr auto; gap: 0.2rem 0.6rem; }
+  .bim-fun-op { order: 1; }
+  .bim-fun-value { order: 2; }
+  .bim-fun-label { order: 3; }
+  .bim-fun-gauge { order: 4; grid-column: 1 / -1; }
   .bim-headline strong { font-size: 1.15rem; }
 }

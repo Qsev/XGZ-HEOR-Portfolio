@@ -184,14 +184,38 @@
     return { node: w, update(res) {
       funnelInputs.forEach(f => { f.val.textContent = f.fmt(S[f.key]); f.input.value = S[f.key]; });
       clear(steps);
-      const top = res.funnel.steps[0].value;
       res.funnel.steps.forEach(s => {
-        const bar = el("div", { class: "bim-funnel-step" });
-        bar.appendChild(el("div", { class: "bim-funnel-fill",
-          style: "width:" + Math.max(6, (s.value / top) * 100) + "%" }));
-        bar.appendChild(el("div", { class: "bim-funnel-text", html:
-          "<strong>" + fmt0(s.value) + "</strong><span>" + s.label + "</span><em>" + s.note + "</em>" }));
-        steps.appendChild(bar);
+        const row = el("div", { class: "bim-fun-row bim-fun-" + s.kind });
+
+        /* the operator that produced this step */
+        row.appendChild(el("div", { class: "bim-fun-op", text: s.op || "" }));
+
+        /* the gauge. A share is drawn as a proportion of 100%; a rate is drawn
+           against its own labelled range, because it is not a proportion of
+           anything and must not be read as one. */
+        const gauge = el("div", { class: "bim-fun-gauge" });
+        if (s.kind !== "start") {
+          const pos = s.kind === "share"
+            ? s.frac * 100
+            : (s.frac - s.min) / (s.max - s.min) * 100;
+          const track = el("div", { class: "bim-fun-track" });
+          track.appendChild(el("div", { class: "bim-fun-fill",
+            style: "width:" + Math.max(0, Math.min(100, pos)) + "%" }));
+          gauge.appendChild(track);
+          gauge.appendChild(el("div", { class: "bim-fun-scale", html:
+            s.kind === "share"
+              ? "<span>0%</span><span>100%</span>"
+              : "<span>" + s.min + "</span><span>per 100,000</span><span>" + s.max + "</span>" }));
+        }
+        row.appendChild(gauge);
+
+        row.appendChild(el("div", { class: "bim-fun-label" }, [
+          el("span", { class: "bim-fun-name", text: s.label }),
+          el("span", { class: "bim-fun-note", text: s.note })
+        ]));
+        row.appendChild(el("div", { class: "bim-fun-value",
+          text: s.value >= 1000 ? fmt0(s.value) : s.value.toFixed(1) }));
+        steps.appendChild(row);
       });
       note.innerHTML = "Target population <strong>" + res.targetPopulation.toFixed(1) +
         "</strong> patients per year; the publication rounds this to 129. Note what the base case " +

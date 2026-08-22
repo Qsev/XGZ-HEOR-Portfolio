@@ -46,11 +46,22 @@
       aged65plus: aged65,
       incidentCases: incident,
       targetPopulation: target,
+      /* Each step is tagged by the KIND of quantity that produces it. Two of
+         these filters are proportions and one is an incidence rate; drawing all
+         three as one bar length was the original defect — a funnel spanning
+         five orders of magnitude cannot be read on a single linear scale. */
       steps: [
-        { label: "Covered population",             value: pop,      note: "third-party payer membership" },
-        { label: "Aged 65 years or over",          value: aged65,   note: p65 + "% of members" },
-        { label: "Incident AML cases",             value: incident, note: inc + " per 100,000" },
-        { label: "Unfit for intensive chemotherapy", value: target, note: unfit + "% of incident cases" }
+        { kind: "start", label: "Covered population", value: pop,
+          note: "third-party payer membership" },
+        { kind: "share", label: "Aged 65 years or over", value: aged65,
+          op: "x " + p65 + "%", frac: p65 / 100, min: 5, max: 100,
+          note: "share of members" },
+        { kind: "rate",  label: "Incident AML cases", value: incident,
+          op: "x " + inc + " per 100,000", frac: inc, min: 5, max: 40,
+          note: "annual incidence in the 65+ population" },
+        { kind: "share", label: "Unfit for intensive chemotherapy", value: target,
+          op: "x " + unfit + "%", frac: unfit / 100, min: 20, max: 100,
+          note: "share of incident cases" }
       ]
     };
   }
