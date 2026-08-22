@@ -72,3 +72,6 @@ Rplots.pdf
 jags_output.txt
 stan_output.txt
 synthetic_rwd_generator.txt
+
+# Local-only AI prompts / working notes (never publish)
+**/_LOCAL_*
