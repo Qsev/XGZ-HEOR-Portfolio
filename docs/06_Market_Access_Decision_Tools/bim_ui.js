@@ -505,7 +505,7 @@
             ? "Best supportive care involves no drug administration."
             : (k === "hospitalisation")
             ? "Table 1 reports no time to blood count recovery for this regimen, so the model "
-              + "assigns zero neutropenic-room cost. This is one of the three stated assumptions "
+              + "assigns zero neutropenic-room cost. This is one of the two stated assumptions "
               + "and it understates the comparator arm."
             : (k === "adverseEvents")
             ? "Table 1 has no adverse event column for this regimen, so the model assigns zero — "
@@ -874,7 +874,9 @@
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "The question a reviewer actually asks is not which table a number sits in — it is <em>which trial, " +
       "which expert process, which price list</em>. Each input below names its upstream source first; the " +
-      "table number follows only as a locator for checking this replication against the paper." }));
+      "table number follows only as a locator for checking this replication against the paper. " +
+      "Two assumptions remain, both listed as such; dosing schedules that the source reports " +
+      "inconsistently are settled against the regulatory labels rather than guessed." }));
 
     const rows = [
       ["Covered population", "1,000,000 (hypothetical payer)", "studyDesign", "Table 4"],
@@ -897,7 +899,8 @@
       ["Transfusion rate of use", "3 red cell + 5 platelet units per cycle", "delphi", "S4 Table"],
       ["Exchange rate", "1 USD = 76.18 ARS, Sept 2020", "bcra", "Methods"],
       ["Sensitivity range", "±25%", "dsaMethod", "Methods"],
-      ["Administration route", "AZA/LDAC subcutaneous · DEC intravenous · VEN oral", "assumption", "Methods"],
+      ["Administration route", "AZA/LDAC subcutaneous · DEC intravenous · VEN oral", ["smpcVenclyxto", "rebuild"], "Table 4"],
+      ["Dosing days per cycle", "AZA 7 · DEC 5 · LDAC 10", ["smpcVenclyxto", "smpcDacogen", "wei2020"], "SmPC / VIALE-C"],
       ["Best supportive care adverse events", "zero", "assumption", "Table 1"],
       ["Best supportive care annual drug cost", "13.04 × $698 = $9,102", "assumption", "Table 2"]
     ];
@@ -926,6 +929,7 @@
     const list = el("div", { class: "bim-source-list" });
     const used = new Set(rows.flatMap(r => [].concat(r[2])));
     const order = ["Phase 3 trial", "Phase 1b/2 trial", "Phase 1b trial", "Observational, Argentina",
+                   "Regulatory label (SmPC)",
                    "Registry / official statistics", "Census / official statistics", "Central bank",
                    "National price database", "Unit cost database", "Micro-costing",
                    "Expert elicitation", "Manufacturer projection", "Literature review",

@@ -62,6 +62,10 @@ const BIM_PARAMS = {
       full: "Practical guidance on handling parameter uncertainty in budget impact analysis, and on one-way sensitivity analysis, cited by the source publication as the basis for its +/-25% deterministic range.", ref: "[33], [34]" },
     indec: { type: "Census / official statistics", short: "INDEC census; PAMI affiliate register",
       full: "National Institute of Statistics and Censuses (INDEC) census population structure, and the affiliate register of PAMI, the national social health insurance fund for retired workers, used for the age-structure scenarios.", ref: "[18], [35]" },
+    smpcVenclyxto: { type: "Regulatory label (SmPC)", short: "Venclyxto SmPC (EMA)",
+      full: "European Medicines Agency summary of product characteristics for Venclyxto (venetoclax). Specifies the ramp-up schedule and, for the combinations, that azacitidine is given at 75 mg/m2 on days 1-7 and decitabine at 20 mg/m2 intravenously on days 1-5 of each 28-day cycle. The EU label does not carry a low-dose cytarabine combination." },
+    smpcDacogen: { type: "Regulatory label (SmPC)", short: "Dacogen SmPC (EMA)",
+      full: "European Medicines Agency summary of product characteristics for Dacogen (decitabine): 20 mg/m2 by intravenous infusion over 1 hour, repeated daily for 5 consecutive days, cycle repeated every 4 weeks." },
     litReview: { type: "Literature review", short: "Trial safety data, expert-validated",
       full: "Adverse event probabilities taken from the regimen trials listed above; the associated resource use identified by literature review and validated by a local clinical expert." },
     studyDesign: { type: "Study design convention", short: "Source study design",
@@ -292,11 +296,26 @@ const BIM_PARAMS = {
     note: "Transfusions accrue for the part of the year a patient is not transfusion-independent."
   },
 
-  /* -- 11. Administration route ---------------------------------------------- */
+  /* -- 11. Administration route and schedule --------------------------------
+     Dosing days are not a modelling choice — they are in the labels. Checking
+     them settles a contradiction in the source: Table 2 gives decitabine days
+     1-10 and low-dose cytarabine days 1-5, while S2 Table gives decitabine 5
+     days and LDAC 10. The labels and the pivotal trial agree with S2, so
+     Table 2 has those two rows transposed.                                    */
   administrationRoute: {
     AZA: "SC", DE: "IV", LDC: "SC", BSC: "none",
     VEN_AZA: "SC", VEN_DE: "IV", VEN_LDC: "SC",
-    src: "Assumption from the licensed routes: azacitidine and LDAC subcutaneous, decitabine intravenous, venetoclax oral. The publication states only that IV therapy is hospitalised for the first two cycles and that SC is costed as a home nursing visit.", from: "assumption", at: "Methods"
+    src: "Azacitidine and LDAC subcutaneous, decitabine intravenous, venetoclax oral. The azacitidine label permits either intravenous or subcutaneous administration; subcutaneous is the only reading consistent with the published totals, since costing it intravenously would put azacitidine alone at $845,460 against a published administration total of $193,294.",
+    from: ["smpcVenclyxto", "rebuild"], at: "Table 4"
+  },
+  administrationDaysPerCycle: {
+    AZA:     { value: 7,  src: "Azacitidine 75 mg/m2 on days 1-7 of each 28-day cycle", from: "smpcVenclyxto", at: "SmPC posology" },
+    DE:      { value: 5,  src: "Decitabine 20 mg/m2 intravenously on days 1-5 of each 28-day cycle. Table 2 of the source says days 1-10 and is contradicted by both labels and by S2 Table.", from: "smpcDacogen", at: "SmPC posology" },
+    LDC:     { value: 10, src: "Low-dose cytarabine 20 mg/m2 subcutaneously on days 1-10 of each 28-day cycle, as given in VIALE-C. Table 2 of the source says days 1-5 and is contradicted by the trial and by S2 Table.", from: "wei2020", at: "VIALE-C protocol" },
+    VEN_AZA: { value: 7,  src: "Azacitidine partner schedule; venetoclax itself is oral and incurs no administration cost", from: "smpcVenclyxto", at: "SmPC posology" },
+    VEN_DE:  { value: 5,  src: "Decitabine partner schedule; venetoclax itself is oral", from: "smpcVenclyxto", at: "SmPC posology" },
+    VEN_LDC: { value: 10, src: "Low-dose cytarabine partner schedule; venetoclax itself is oral", from: "wei2020", at: "VIALE-C protocol" },
+    BSC:     { value: 0,  src: "No drug administration under best supportive care", from: "rebuild", at: "—" }
   },
 
   /* -- 12. Sensitivity analysis ---------------------------------------------- */

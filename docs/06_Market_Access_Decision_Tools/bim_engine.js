@@ -158,8 +158,10 @@
             { label: "Remaining cycles in the year", value: postActive, unit: "cycles", efficacy: true },
             { label: "BSC cost per cycle", value: bscRate, unit: "$" }] }] };
 
-    /* administration — venetoclax is oral and carries none */
-    const daysPerCycle = { AZA: 7, DE: 5, LDC: 10, VEN_AZA: 7, VEN_DE: 5, VEN_LDC: 10, BSC: 0 };
+    /* administration — venetoclax is oral and carries none. Dosing days come
+       from the parameter file, where they are sourced to the labels.          */
+    const daysPerCycle = Object.fromEntries(Object.entries(P.administrationDaysPerCycle)
+      .map(([k, v]) => [k, v.value]));
     const route = P.administrationRoute[regimen];
     const admUnit = route === "IV" ? U.ivAdministration[perspective]
                   : route === "SC" ? U.scAdministration[perspective] : 0;
