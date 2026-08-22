@@ -29,20 +29,36 @@
   const clone = (o) => JSON.parse(JSON.stringify(o));
   const ids   = (P) => P.regimens.map(r => r.id);
 
-  /* -- 1. Epidemiology funnel ---------------------------------------------- */
-  function funnel(P, o) {
+  /* -- 1. Epidemiology funnel ----------------------------------------------
+     yearIndex is 0-based. The source model holds the population static across
+     the whole horizon. growthPct compounds the ELIGIBLE population year on year
+     and is an extension beyond the source, defaulting to zero.
+
+     It is applied to the eligible population rather than to membership on
+     purpose. Membership is a normalising convention here — results are reported
+     per 1,000,000 covered lives — and growing it would scale the absolute budget
+     and the PMPM denominator together, leaving PMPM unchanged. What actually
+     moves the answer is that the 65+ segment carrying all of the disease risk
+     grows faster than the membership it sits inside. That is the ageing effect,
+     and it raises both the absolute budget and the PMPM.                      */
+  function funnel(P, o, yearIndex) {
     o = o || {};
+    const y     = yearIndex || 0;
     const pop   = o.coveredPopulation ?? P.epidemiology.coveredPopulation.value;
     const inc   = o.incidence65plus   ?? P.epidemiology.incidence65plus.value;
     const unfit = o.pctUnfitIntensive ?? P.epidemiology.pctUnfitIntensive.value;
-    const p65   = o.pct65plus         ?? P.epidemiology.pct65plus.value;
+    const g     = (o.growthPct ?? 0) / 100;
+    const p65   = o.pct65plus ?? P.epidemiology.pct65plus.value;
 
+    const growth = Math.pow(1 + g, y);
     const aged65 = pop * (p65 / 100);
     const incident = aged65 * (inc / 100000);
-    const target = incident * (unfit / 100);
+    const target = incident * (unfit / 100) * growth;
 
     return {
       coveredPopulation: pop,
+      pct65plus: p65,
+      growthFactor: growth,
       aged65plus: aged65,
       incidentCases: incident,
       targetPopulation: target,
@@ -59,10 +75,17 @@
         { kind: "rate",  label: "Incident AML cases", value: incident,
           op: "x " + inc + " per 100,000", frac: inc, min: 5, max: 40,
           note: "annual incidence in the 65+ population" },
-        { kind: "share", label: "Unfit for intensive chemotherapy", value: target,
+        { kind: "share", label: "Unfit for intensive chemotherapy",
+          value: incident * (unfit / 100),
           op: "x " + unfit + "%", frac: unfit / 100, min: 20, max: 100,
           note: "share of incident cases" }
-      ]
+      ].concat(g ? [{ kind: "growth", label: "Eligible population, final year",
+          /* display row: the funnel itself shows year 1, so this projects the
+             eligible population to the end of the horizon. */
+          value: incident * (unfit / 100) * Math.pow(1 + g, P.meta.horizonYears.value - 1),
+          op: (g > 0 ? "x +" : "x ") + (g * 100).toFixed(1) + "% / yr",
+          note: "compounded to year " + P.meta.horizonYears.value
+                + " — an extension beyond the source, which holds the population constant" }] : [])
     };
   }
 
@@ -182,27 +205,33 @@
   function budgetImpact(P, o) {
     o = o || {};
     const perspective = o.perspective || "socsec";
-    const f = funnel(P, o);
-    const N = f.targetPopulation;
-    const rid = ids(P);
-
     const without = o.sharesWithout || P.marketShare.withoutVEN;
     const withV   = o.sharesWith    || P.marketShare.withVEN;
 
-    const base = scenarioCost(P, without, N, perspective);
+    /* Both worlds must be evaluated on the SAME population in a given year,
+       otherwise population growth would leak into the difference and be read
+       as budget impact. The funnel is therefore resolved once per year and
+       used for both scenarios of that year. */
     const years = ["y1", "y2", "y3"].map((y, i) => {
-      const proj = scenarioCost(P, withV[y], N, perspective);
+      const fy = funnel(P, o, i);
+      const Ny = fy.targetPopulation;
+      const base = scenarioCost(P, without, Ny, perspective);
+      const proj = scenarioCost(P, withV[y], Ny, perspective);
       const impact = {};
       COMPONENTS.forEach(k => impact[k] = proj.components[k] - base.components[k]);
       impact.total = proj.components.total - base.components.total;
       return {
-        year: i + 1, key: y,
+        year: i + 1, key: y, funnel: fy, targetPopulation: Ny,
         without: base, with: proj, impact,
-        pmpm: impact.total / f.coveredPopulation / 12
+        pmpm: impact.total / fy.coveredPopulation / 12
       };
     });
 
-    return { funnel: f, perspective, targetPopulation: N, without: base, years,
+    const f = years[0].funnel;
+    return { funnel: f, perspective, targetPopulation: years[0].targetPopulation,
+             populationByYear: years.map(y => y.targetPopulation),
+             populationGrows: Math.abs(o.growthPct || 0) > 1e-9,
+             without: years[0].without, years,
              cumulative: years.reduce((s, y) => s + y.impact.total, 0) };
   }
 

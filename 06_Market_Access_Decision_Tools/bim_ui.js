@@ -50,6 +50,7 @@
     incidence65plus:   P.epidemiology.incidence65plus.value,
     pctUnfitIntensive: P.epidemiology.pctUnfitIntensive.value,
     pct65plus:         P.epidemiology.pct65plus.value,
+    growthPct:         P.epidemiology.eligibleGrowthPct.value,
     sharesWithout: Object.fromEntries(RID.map(r => [r, P.marketShare.withoutVEN[r] || 0])),
     sharesWith: Object.fromEntries(YEARS.map(y =>
       [y, Object.fromEntries(RID.map(r => [r, P.marketShare.withVEN[y][r] || 0]))]))
@@ -106,6 +107,7 @@
       perspective: S.perspective,
       coveredPopulation: S.coveredPopulation, incidence65plus: S.incidence65plus,
       pctUnfitIntensive: S.pctUnfitIntensive, pct65plus: S.pct65plus,
+      growthPct: S.growthPct,
       sharesWithout: S.sharesWithout, sharesWith: S.sharesWith
     });
   }
@@ -162,7 +164,9 @@
      { key: "incidence65plus", label: "AML incidence, aged 65+", min: 5, max: 40, step: 0.1,
        fmt: v => v.toFixed(1) + " / 100,000", prm: P.epidemiology.incidence65plus },
      { key: "pctUnfitIntensive", label: "Unfit for intensive chemotherapy", min: 20, max: 100, step: 1,
-       fmt: v => v + "%", prm: P.epidemiology.pctUnfitIntensive }
+       fmt: v => v + "%", prm: P.epidemiology.pctUnfitIntensive },
+     { key: "growthPct", label: "Eligible population growth", min: -2, max: 6, step: 0.5,
+       fmt: v => (v > 0 ? "+" : "") + v + "% / year", prm: P.epidemiology.eligibleGrowthPct }
     ].forEach(d => {
       const row = el("div", { class: "bim-control" });
       const lab = el("label", {});
@@ -194,7 +198,7 @@
            against its own labelled range, because it is not a proportion of
            anything and must not be read as one. */
         const gauge = el("div", { class: "bim-fun-gauge" });
-        if (s.kind !== "start") {
+        if (s.kind === "share" || s.kind === "rate") {
           const pos = s.kind === "share"
             ? s.frac * 100
             : (s.frac - s.min) / (s.max - s.min) * 100;
@@ -218,10 +222,16 @@
         steps.appendChild(row);
       });
       note.innerHTML = "Target population <strong>" + res.targetPopulation.toFixed(1) +
-        "</strong> patients per year; the publication rounds this to 129. Note what the base case " +
+        "</strong> patients in year 1; the publication rounds this to 129. Note what the base case " +
         "implies: the 65+ incidence rate is applied to the entire covered population, so default " +
         "membership is 100% aged 65 or over. Table 5's age-structure scenarios scale linearly from " +
-        "here, which is how that reading was confirmed.";
+        "here, which is how that reading was confirmed." +
+        (res.populationGrows
+          ? " <br><strong>Growth is switched on</strong>, so the eligible population runs " +
+            res.populationByYear.map(n => n.toFixed(1)).join(" → ") +
+            " across the horizon. The source holds it constant; at 0% this model does too."
+          : " The population is held constant across all three years, exactly as in the source — " +
+            "no growth, no ageing trajectory, and no carry-over of patients between budget years.");
     } };
   }
 
@@ -281,8 +291,9 @@
     w.appendChild(chart);
 
     return { node: w, update(res) {
-      const cols = [{ k: "without", shares: S.sharesWithout }]
-        .concat(YEARS.map(y => ({ k: y, shares: S.sharesWith[y] })));
+      const cols = [{ k: "without", shares: S.sharesWithout, n: res.years[0].targetPopulation }]
+        .concat(YEARS.map((y, i) => ({ k: y, shares: S.sharesWith[y],
+                                       n: res.years[i].targetPopulation })));
       cols.forEach(c => {
         Object.keys(shareInputs[c.k]).forEach(r => {
           const v = c.shares[r] || 0;
@@ -327,7 +338,7 @@
     const W = 720, H = 260, m = { t: 14, r: 12, b: 44, l: 46 };
     const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "bim-svg",
                             preserveAspectRatio: "xMidYMid meet" });
-    const N = res.targetPopulation, maxY = Math.max(1, N);
+    const maxY = Math.max(1, ...cols.map(c => c.n));
     const pw = W - m.l - m.r, ph = H - m.t - m.b, bw = pw / cols.length * 0.56;
     [0, 0.25, 0.5, 0.75, 1].forEach(f => {
       const y = m.t + ph * (1 - f);
@@ -336,8 +347,10 @@
                                    "text-anchor": "end" }, fmt0(maxY * f)));
     });
     const names = ["Without", "With · Y1", "With · Y2", "With · Y3"];
+    const varies = new Set(cols.map(c => Math.round(c.n * 10))).size > 1;
     cols.forEach((c, ci) => {
       const cx = m.l + pw / cols.length * (ci + 0.5);
+      const N = c.n;
       let acc = 0;
       RID.forEach(r => {
         const v = N * (c.shares[r] || 0) / 100;
@@ -356,7 +369,7 @@
       svg.appendChild(sv("text", { x: cx, y: H - m.b + 18, class: "bim-axis-label",
                                    "text-anchor": "middle" }, names[ci]));
       svg.appendChild(sv("text", { x: cx, y: H - m.b + 34, class: "bim-axis-sub",
-                                   "text-anchor": "middle" }, fmt0(N) + " patients"));
+        "text-anchor": "middle" }, (varies ? N.toFixed(1) : fmt0(N)) + " patients"));
     });
     return svg;
   }
@@ -461,16 +474,19 @@
       cards.appendChild(cum);
 
       clear(thead); clear(body);
+      const grows = res.populationGrows;
       const h = el("tr", {});
       h.appendChild(el("th", { text: "Cost component" }));
-      h.appendChild(el("th", { class: "num", text: "Without VEN" }));
+      if (grows) res.years.forEach(y => h.appendChild(el("th", { class: "num", text: "Without VEN · Y" + y.year })));
+      else h.appendChild(el("th", { class: "num", text: "Without VEN" }));
       res.years.forEach(y => h.appendChild(el("th", { class: "num", text: "With VEN · Y" + y.year })));
       res.years.forEach(y => h.appendChild(el("th", { class: "num impact-col", text: "Impact · Y" + y.year })));
       thead.appendChild(h);
       E.COMPONENTS.concat("total").forEach(k => {
         const tr = el("tr", { class: k === "total" ? "bim-row-total" : "" });
         tr.appendChild(el("td", { text: k === "total" ? "Total" : E.COMPONENT_LABELS[k] }));
-        tr.appendChild(el("td", { class: "num", text: money(res.without.components[k]) }));
+        if (grows) res.years.forEach(y => tr.appendChild(el("td", { class: "num", text: money(y.without.components[k]) })));
+        else tr.appendChild(el("td", { class: "num", text: money(res.without.components[k]) }));
         res.years.forEach(y => tr.appendChild(el("td", { class: "num", text: money(y.with.components[k]) })));
         res.years.forEach(y => {
           const v = y.impact[k];
@@ -546,6 +562,7 @@
         perspective: S.perspective,
         coveredPopulation: S.coveredPopulation, incidence65plus: S.incidence65plus,
         pctUnfitIntensive: S.pctUnfitIntensive, pct65plus: S.pct65plus,
+        growthPct: S.growthPct,
         sharesWithout: S.sharesWithout, sharesWith: S.sharesWith
       });
       clear(holder);
