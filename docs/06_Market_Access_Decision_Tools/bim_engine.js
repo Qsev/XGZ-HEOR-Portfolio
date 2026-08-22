@@ -122,8 +122,12 @@
        Table 3 because its management already sits inside hospitalisation.     */
     let adverseEvents = 0;
     Object.keys(P.aeIncidence).forEach(k => {
-      if (k === "src") return;
-      adverseEvents += (P.aeIncidence[k][regimen] / 100) * U["ae_" + k][perspective];
+      /* iterate only keys that name an actual event, i.e. ones with a matching
+         unit cost. Provenance keys (src, from, at) sit alongside the data and
+         must not be walked as if they were events. */
+      const unit = U["ae_" + k];
+      if (!unit || typeof P.aeIncidence[k][regimen] !== "number") return;
+      adverseEvents += (P.aeIncidence[k][regimen] / 100) * unit[perspective];
     });
 
     /* hospitalisation: neutropenic room days, driven by blood count recovery  */

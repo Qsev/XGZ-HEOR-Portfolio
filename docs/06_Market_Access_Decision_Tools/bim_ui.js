@@ -74,11 +74,28 @@
     if (text !== undefined) n.textContent = text;
     return n;
   }
-  function src(text) {
-    const kind = /^Assumption/.test(text) ? "assumption"
-               : /^Derived|^Calibrated/.test(text) ? "derived" : "published";
-    return el("span", { class: "bim-src bim-src-" + kind, title: text,
-                        text: text.split("—")[0].trim() });
+  /* Provenance chip. What a reviewer asks is which trial, which expert process,
+     which price list — so the upstream source leads and the table number is a
+     secondary locator for checking the replication. */
+  function kindOf(sourceKey) {
+    const s = P.sources[sourceKey];
+    if (!s) return "published";
+    if (s.type === "Assumption") return "assumption";
+    if (/^Derived/.test(s.type)) return "derived";
+    return "published";
+  }
+  function chip(prm) {
+    const keys = [].concat(prm.from || []);
+    const first = P.sources[keys[0]];
+    const label = first ? first.short : String(prm.src || "").split("—")[0].trim();
+    const extra = keys.length > 1 ? " +" + (keys.length - 1) : "";
+    const tip = keys.map(k => P.sources[k] && (P.sources[k].type + ": " + P.sources[k].full
+                  + (P.sources[k].ref ? "  " + P.sources[k].ref : ""))).filter(Boolean).join("\n\n")
+              + (prm.src ? "\n\n" + prm.src : "");
+    const n = el("span", { class: "bim-src bim-src-" + kindOf(keys[0]), title: tip.trim() });
+    n.appendChild(el("span", { text: label + extra }));
+    if (prm.at) n.appendChild(el("span", { class: "bim-src-at", text: prm.at }));
+    return n;
   }
   function swatch(c) { return el("span", { class: "bim-swatch", style: "background:" + c }); }
   const clear = n => { while (n.firstChild) n.removeChild(n.firstChild); };
@@ -106,7 +123,7 @@
       btns[k] = b; grp.appendChild(b);
     });
     left.appendChild(grp);
-    left.appendChild(src("Table 3 — IECS unit cost database, priced separately for each perspective"));
+    left.appendChild(chip(P.unitCosts));
     bar.appendChild(left);
 
     const right = el("div", { class: "bim-topbar-right" });
@@ -139,13 +156,13 @@
 
     const controls = el("div", { class: "bim-controls" });
     [{ key: "coveredPopulation", label: "Covered population", min: 100000, max: 5000000, step: 50000,
-       fmt: fmt0, src: P.epidemiology.coveredPopulation.src },
+       fmt: fmt0, prm: P.epidemiology.coveredPopulation },
      { key: "pct65plus", label: "Members aged 65 or over", min: 5, max: 100, step: 1,
-       fmt: v => v + "%", src: P.epidemiology.pct65plus.src },
+       fmt: v => v + "%", prm: P.epidemiology.pct65plus },
      { key: "incidence65plus", label: "AML incidence, aged 65+", min: 5, max: 40, step: 0.1,
-       fmt: v => v.toFixed(1) + " / 100,000", src: P.epidemiology.incidence65plus.src },
+       fmt: v => v.toFixed(1) + " / 100,000", prm: P.epidemiology.incidence65plus },
      { key: "pctUnfitIntensive", label: "Unfit for intensive chemotherapy", min: 20, max: 100, step: 1,
-       fmt: v => v + "%", src: P.epidemiology.pctUnfitIntensive.src }
+       fmt: v => v + "%", prm: P.epidemiology.pctUnfitIntensive }
     ].forEach(d => {
       const row = el("div", { class: "bim-control" });
       const lab = el("label", {});
@@ -153,7 +170,7 @@
       lab.appendChild(el("span", { text: d.label })); lab.appendChild(val);
       const input = el("input", { type: "range", min: d.min, max: d.max, step: d.step, value: S[d.key] });
       input.addEventListener("input", () => { S[d.key] = parseFloat(input.value); update(); });
-      row.appendChild(lab); row.appendChild(input); row.appendChild(src(d.src));
+      row.appendChild(lab); row.appendChild(input); row.appendChild(chip(d.prm));
       controls.appendChild(row);
       funnelInputs.push({ key: d.key, input, val, fmt: d.fmt });
     });
@@ -609,43 +626,82 @@
   /* ---- panel 7: provenance (static) --------------------------------------- */
   function buildProvenance() {
     const w = el("section", { class: "bim-panel" });
-    w.appendChild(el("h3", { class: "bim-panel-title", text: "7 · Parameter provenance" }));
-    w.appendChild(el("p", { class: "bim-panel-note", text:
-      "Every input carries a source tag: a table number in the publication, an arithmetic derivation from one, or an explicit assumption. There are three assumptions and they are listed as such." }));
+    w.appendChild(el("h3", { class: "bim-panel-title", text: "7 · Where every input comes from" }));
+    w.appendChild(el("p", { class: "bim-panel-note", html:
+      "The question a reviewer actually asks is not which table a number sits in — it is <em>which trial, " +
+      "which expert process, which price list</em>. Each input below names its upstream source first; the " +
+      "table number follows only as a locator for checking this replication against the paper." }));
+
     const rows = [
-      ["Covered population", "1,000,000", "Table 4"],
-      ["AML incidence, aged 65+", "20.1 per 100,000", "Table 1"],
-      ["Unfit for intensive chemotherapy", "64%", "Table 1"],
-      ["Members aged 65 or over", "100% in the base case", "Derived — implied by the funnel; confirmed against Table 5"],
-      ["Market share, without venetoclax", "AZA 58.5 · DE 11.5 · LDC 11.4 · BSC 18.6", "S1 Table"],
-      ["Market share, with venetoclax", "VEN+AZA 20.6 → 35.0 → 38.4", "S1 Table, transposition corrected against S7 Table"],
-      ["Drug cost per cycle", "AZA $14,966 · VEN+AZA $16,827 · BSC $698", "S2 Table"],
-      ["Active treatment duration", "3.76 to 10.98 cycles", "Table 1"],
-      ["Post-active duration", "13.04 − active cycles", "Derived — matches S2 Table to 0.01 cycles"],
-      ["Healthcare resource unit costs", "priced for both perspectives", "Table 3"],
-      ["Monitoring resource use", "per cycle and per year", "S3 Table"],
-      ["Transfusion rate", "3 red cell + 5 platelet units per cycle", "S4 Table"],
-      ["Adverse event incidence", "six events, by regimen", "Table 1"],
-      ["Neutropenia unit cost", "$0 under both perspectives", "Table 3 — already inside hospitalisation"],
-      ["Sensitivity range", "±25%", "Methods — 95% CI where reported, otherwise ±25%"],
-      ["Administration route", "AZA/LDC subcutaneous · DE intravenous · VEN oral", "Assumption — licensed routes; the source states only the costing rule"],
-      ["Best supportive care adverse events", "zero", "Assumption — Table 1 has no BSC column"],
-      ["Best supportive care annual drug cost", "13.04 × $698 = $9,102", "Assumption — no BSC row in Table 2; 6.1% below the figure implied by Table 4"]
+      ["Covered population", "1,000,000 (hypothetical payer)", "studyDesign", "Table 4"],
+      ["Members aged 65 or over", "100% in the base case", "rebuild", "Table 5"],
+      ["AML incidence, aged 65+", "20.1 per 100,000", "seer", "Table 1"],
+      ["Unfit for intensive chemotherapy", "64%", ["dombret2015", "melaOsorio2019"], "Table 1"],
+      ["Age-structure scenarios", "5% to 78% aged 65+", "indec", "Table 5"],
+      ["Market share, both worlds", "VEN+AZA 0 → 20.6 → 35.0 → 38.4%", ["manufacturer", "delphi"], "S1 Table"],
+      ["Drug prices", "ex-factory, Sept 2020", "alfabeta", "Table 2 / S2 Table"],
+      ["Best supportive care cost", "$698 per cycle", "microcosting", "S2 Table footnote"],
+      ["Active treatment duration", "3.76 to 10.98 cycles", ["dombret2015", "kantarjian2012", "dinardo2020", "pollyea2018", "wei2019", "wei2020"], "Table 1"],
+      ["Post-active duration", "13.04 − active cycles", "rebuild", "S2 Table"],
+      ["Complete remission", "10.7% to 74.2%", ["dinardo2020", "wei2020"], "Table 1"],
+      ["Time to blood count recovery", "2.04 to 6.74 cycles", ["dombret2015", "kantarjian2012"], "Table 1"],
+      ["Transfusion independence", "16.7% to 59.8%", ["dinardo2020", "wei2019"], "Table 1"],
+      ["Adverse event incidence", "six events, by regimen", "litReview", "Table 1"],
+      ["Healthcare resource unit costs", "priced for both sectors", "iecsCosts", "Table 3"],
+      ["Neutropenia unit cost", "$0 — inside hospitalisation", "iecsCosts", "Table 3"],
+      ["Monitoring resource use", "per cycle and per year", "delphi", "S3 Table"],
+      ["Transfusion rate of use", "3 red cell + 5 platelet units per cycle", "delphi", "S4 Table"],
+      ["Exchange rate", "1 USD = 76.18 ARS, Sept 2020", "bcra", "Methods"],
+      ["Sensitivity range", "±25%", "dsaMethod", "Methods"],
+      ["Administration route", "AZA/LDAC subcutaneous · DEC intravenous · VEN oral", "assumption", "Methods"],
+      ["Best supportive care adverse events", "zero", "assumption", "Table 1"],
+      ["Best supportive care annual drug cost", "13.04 × $698 = $9,102", "assumption", "Table 2"]
     ];
     const tbl = el("table", { class: "bim-table" });
     const h = el("tr", {});
-    ["Parameter", "Value", "Source"].forEach(t => h.appendChild(el("th", { text: t })));
+    ["Parameter", "Value", "Upstream source", "Type", "Locator in the paper"]
+      .forEach(t => h.appendChild(el("th", { text: t })));
     tbl.appendChild(el("thead", {}, [h]));
     const b = el("tbody", {});
-    rows.forEach(([a, c, d]) => {
-      const tr = el("tr", { class: /^Assumption/.test(d) ? "bim-row-assumption" : "" });
-      tr.appendChild(el("td", { text: a }));
-      tr.appendChild(el("td", { text: c }));
-      tr.appendChild(el("td", {}, [src(d)]));
+    rows.forEach(([name, value, from, at]) => {
+      const keys = [].concat(from);
+      const s0 = P.sources[keys[0]];
+      const tr = el("tr", { class: keys[0] === "assumption" ? "bim-row-assumption" : "" });
+      tr.appendChild(el("td", { text: name }));
+      tr.appendChild(el("td", { text: value }));
+      tr.appendChild(el("td", {}, [chip({ from: from, src: s0 ? s0.full : "" })]));
+      tr.appendChild(el("td", { class: "bim-src-type", text: s0 ? s0.type : "" }));
+      tr.appendChild(el("td", { class: "bim-src-loc", text: at }));
       b.appendChild(tr);
     });
     tbl.appendChild(b);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [tbl]));
+
+    const det = el("details", { class: "bim-details" });
+    det.appendChild(el("summary", { text: "Sources in full" }));
+    const list = el("div", { class: "bim-source-list" });
+    const used = new Set(rows.flatMap(r => [].concat(r[2])));
+    const order = ["Phase 3 trial", "Phase 1b/2 trial", "Phase 1b trial", "Observational, Argentina",
+                   "Registry / official statistics", "Census / official statistics", "Central bank",
+                   "National price database", "Unit cost database", "Micro-costing",
+                   "Expert elicitation", "Manufacturer projection", "Literature review",
+                   "Method guidance", "Study design convention", "Derived in this rebuild", "Assumption"];
+    const groups = {};
+    used.forEach(k => { const s = P.sources[k]; if (!s) return;
+      (groups[s.type] = groups[s.type] || []).push(s); });
+    order.filter(t => groups[t]).forEach(t => {
+      const g = el("div", { class: "bim-source-group" });
+      g.appendChild(el("h5", { text: t }));
+      groups[t].forEach(s => {
+        const it = el("p", {});
+        it.appendChild(el("strong", { text: s.short + (s.ref ? " " + s.ref : "") }));
+        it.appendChild(el("span", { text: " — " + s.full }));
+        g.appendChild(it);
+      });
+      list.appendChild(g);
+    });
+    det.appendChild(list);
+    w.appendChild(det);
     return { node: w, update() {} };
   }
 

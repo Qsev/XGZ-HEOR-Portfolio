@@ -55,10 +55,25 @@
 
 /* ---- provenance chips ---- */
 .bim-src {
-  display: inline-block; font-size: 0.68rem; letter-spacing: 0.02em;
-  padding: 0.1rem 0.42rem; border-radius: 999px; white-space: nowrap;
-  border: 1px solid transparent; cursor: help;
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.68rem; letter-spacing: 0.02em;
+  padding: 0.12rem 0.45rem; border-radius: 999px;
+  border: 1px solid transparent; cursor: help; max-width: 100%;
 }
+.bim-src > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* the table number is a locator, deliberately subordinate to the source */
+.bim-src-at {
+  font-size: 0.62rem; opacity: 0.72; padding-left: 0.3rem;
+  border-left: 1px solid currentColor; white-space: nowrap; flex: none;
+}
+.bim-src-type { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+.bim-src-loc  { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+.bim-source-list { margin-top: 0.9rem; display: grid; gap: 0.9rem; }
+.bim-source-group h5 { margin: 0 0 0.3rem; font-size: 0.78rem; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--muted); }
+.bim-source-group p { margin: 0 0 0.3rem; font-size: 0.78rem; line-height: 1.5; }
+.bim-source-group strong { color: var(--ink); }
+.bim-source-group span { color: var(--muted); }
 .bim-src-published  { background: #eaf1fa; color: #22548f; border-color: #cfe0f3; }
 .bim-src-derived    { background: #eaf5f0; color: #1f6b50; border-color: #c9e6da; }
 .bim-src-assumption { background: #fdf1e3; color: #8a5a12; border-color: #f0dcc0; }
