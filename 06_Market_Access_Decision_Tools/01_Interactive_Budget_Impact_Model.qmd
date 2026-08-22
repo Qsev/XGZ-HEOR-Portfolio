@@ -71,10 +71,21 @@ spreadsheet would hide:
 - **Drug cost had to be rebuilt as a function of treatment duration**, not taken as a fixed annual
   total. Duration is the leading sensitivity driver in the source; with a frozen annual cost it
   cannot move the result at all, and the sensitivity analysis would be theatre.
-- **Calibrating to force agreement made the answer worse.** Correcting each cost component to
-  match the published levels distorts the difference between the two worlds — which is the only
-  quantity a budget impact model reports. The rebuild is left uncalibrated and the residual is
-  shown.
+- **The mechanism behind hospitalisation is in the questionnaire, not the paper.** The main text
+  never says how hospital days are derived. The Delphi questionnaire in the supplementary material
+  asks the panel for days per cycle separately for patients who do and do not achieve complete
+  remission, on the stated assumption that failing to reach remission means progression, and
+  progression means admissions. So the headline clinical result reaches the budget through hospital
+  days. An earlier version of this rebuild drove hospitalisation from time to blood count recovery
+  instead — an invention with no documentary basis, which left the component at less than half the
+  published figure.
+- **Two kinds of calibration, and only one of them is legitimate.** Scaling whole cost components
+  to match published levels was tested and rejected: it distorts the difference between the two
+  worlds, which is the only quantity a budget impact model reports. Estimating individual
+  parameters the source uses but never publishes — the panel's returned hospital days, the
+  effective duration of transfusion independence — against all the published totals including the
+  difference is a different thing, and it is what the rebuild does. The estimates land close to the
+  questionnaire's own suggested values, which a wrong structure would not produce.
 
 ```{=html}
 <link rel="stylesheet" href="bim.css">
@@ -153,9 +164,13 @@ ICERs — this is a budget impact model, and mixing the two questions is a commo
 neither. Costs are US dollars at 2020 prices with no inflation adjustment, following the source's
 stated reasoning for excluding it under high inflation.
 
-### What does not reconcile
+### What reconciles, and what does not
 
-Administration and hospitalisation do not rebuild to the published figures, because the unit costs
-they depend on are not reported. The gap is quantified in the reconciliation panel rather than
-closed by fitting, for the reason given there: correcting the levels distorts the difference, and
-the difference is the only quantity a budget impact model reports.
+Drug acquisition, adverse events, hospitalisation and transfusions rebuild to within 0.3% of the
+published figures, and the year-3 budget impact lands within 0.1% under both payer perspectives.
+Two components do not. Administration is about 45% low, because the source costs later-cycle
+administration at a daily hospital stay whose unit cost it never reports. Monitoring is about 12%
+low for reasons not traceable to any published quantity. Together they are 0.5% of total spend.
+Both are shown in the reconciliation panel rather than closed by fitting — the distinction being
+that estimating an unpublished parameter inside a documented structure is legitimate, while scaling
+a component until the total agrees is not.

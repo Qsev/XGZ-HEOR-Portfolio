@@ -400,16 +400,16 @@
     effTbl.appendChild(el("thead", {}, [eh]));
     const eb = el("tbody", {});
     const effRows = [
-      ["Mean duration of active treatment", "Drug acquisition · Administration", "longer → costlier", "up",
+      ["Complete remission (CR/CRi)", "Hospitalisation", "higher → cheaper", "down",
+       r => { const v = P.efficacy.completeRemission[r]; return v ? v.toFixed(1) + "%" : "—"; }],
+      ["Mean duration of active treatment", "Drug acquisition · Administration · Hospitalisation", "longer → costlier", "up",
        r => { const v = P.treatmentCycles.active[r]; return v ? v.toFixed(2) : "—"; }],
-      ["Time to blood count recovery", "Hospitalisation", "faster → cheaper", "down",
-       r => { const v = P.efficacy.bloodCountRecoveryCycles[r]; return v ? v.toFixed(2) : "—"; }],
       ["Transfusion independence", "Blood transfusions", "higher → cheaper", "down",
        r => { const v = P.efficacy.transfusionIndependence[r]; return v ? v.toFixed(1) + "%" : "—"; }],
       ["Febrile neutropenia incidence", "Adverse events", "higher → costlier", "up",
        r => { const v = P.aeIncidence.febrileNeutropenia[r]; return v ? v.toFixed(1) + "%" : "—"; }],
-      ["Complete remission", "nothing", "not used by the model", "none",
-       r => { const v = P.efficacy.completeRemission[r]; return v ? v.toFixed(1) + "%" : "—"; }]
+      ["Time to blood count recovery", "nothing", "reported but not used", "none",
+       r => { const v = P.efficacy.bloodCountRecoveryCycles[r]; return v ? v.toFixed(2) : "—"; }]
     ];
     effRows.forEach(([name, drives, dir, arrow, get]) => {
       const tr = el("tr", { class: arrow === "none" ? "bim-row-unused" : "" });
@@ -422,14 +422,21 @@
     effTbl.appendChild(eb);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [effTbl]));
     w.appendChild(el("div", { class: "bim-note-box", html:
-      "<strong>Complete remission is in the parameter table and does no work.</strong> It is the " +
-      "headline clinical result — 66.4% against 27.8% for venetoclax plus azacitidine — and the " +
-      "model never reads it. That is not an oversight to fix; it is what a budget impact model is. " +
-      "Cost responds to how long treatment runs, how many hospital days a patient needs and how " +
-      "much blood product they consume. Whether remission was achieved only matters here through " +
-      "those three channels. A cost-effectiveness model, which values health outcomes, would use " +
-      "it directly — which is the clearest way to see why the two model types are not " +
-      "interchangeable." }));
+      "<strong>Complete remission is the switch on hospitalisation, and finding that took reading " +
+      "the Delphi questionnaire.</strong> The main paper never states how hospital days are " +
+      "derived. The questionnaire in the supplementary material does: it asks the panel for days " +
+      "per 28-day cycle separately for patients who do and do not achieve CR/CRi, on the stated " +
+      "assumption that failing to achieve remission means the disease is progressing and " +
+      "progression means admissions. Suggested values are 20 days per cycle for everyone in cycles " +
+      "1 and 2, then 2 days if in remission against 15 if not, rising to 20 in the post-active " +
+      "period on best supportive care. So the headline clinical result — 66.4% against 27.8% for " +
+      "venetoclax plus azacitidine — reaches the budget through hospital days. " +
+      "Note what this displaced: time to blood count recovery is reported in Table 1 and, on this " +
+      "reading, does no work at all. An earlier version of this rebuild used it to drive hospital " +
+      "days, which was an invention with no documentary basis and left hospitalisation at less than " +
+      "half the published figure. Switching to the documented mechanism, and estimating the day " +
+      "counts the panel returned but the paper never printed, brings hospitalisation to within 0.1% " +
+      "and the year-3 budget impact to within 0.1% under both perspectives." }));
 
     /* -- 3b. the summary table --------------------------------------------- */
     w.appendChild(el("h4", { class: "bim-sub-title", text: "Cost per patient, by component" }));
@@ -448,7 +455,9 @@
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "Pick a regimen. Every factor below is the value the model actually multiplied — this is " +
       "generated from the calculation itself, not transcribed alongside it. Factors carrying " +
-      "clinical evidence are marked <span class='bim-eff-dot'></span>." }));
+      "clinical evidence are marked <span class='bim-eff-dot'></span>, and factors estimated " +
+      "against the published totals rather than read from the source are marked " +
+      "<span class='bim-cal-dot'></span>." }));
     const picker = el("div", { class: "bim-picker" });
     const pickBtns = {};
     P.regimens.forEach(r => {
@@ -510,14 +519,15 @@
           const expr = el("div", { class: "bim-deriv-expr" });
           part.terms.forEach((t, i) => {
             if (i) expr.appendChild(el("span", { class: "bim-deriv-op", text: "×" }));
-            const term = el("span", { class: "bim-deriv-term" + (t.efficacy ? " efficacy" : "") ,
-                                      title: t.label });
+            const term = el("span", { class: "bim-deriv-term"
+                + (t.efficacy ? " efficacy" : "") + (t.calibrated ? " calibrated" : ""),
+              title: t.label + (t.calibrated ? " — estimated against the published totals, not a published value" : "") });
             term.appendChild(el("span", { class: "bim-deriv-num",
               text: t.unit === "$" ? money(t.value)
                   : t.unit === "share" ? (t.value * 100).toFixed(1) + "%"
                   : (Math.round(t.value * 100) / 100).toLocaleString("en-GB") }));
             term.appendChild(el("span", { class: "bim-deriv-unit",
-              text: t.unit === "$" || t.unit === "share" ? t.label : t.unit }));
+              text: t.unit === "$" || t.unit === "share" || t.unit === "factor" ? t.label : t.unit }));
             expr.appendChild(term);
           });
           expr.appendChild(el("span", { class: "bim-deriv-op", text: "=" }));
@@ -549,7 +559,7 @@
     drug: "longer treatment duration",
     administration: "longer treatment duration",
     adverseEvents: "higher event rates",
-    hospitalisation: "faster blood count recovery",
+    hospitalisation: "higher remission rate, fewer admitted days",
     monitoring: "extra tumour lysis panels",
     transfusion: "higher transfusion independence"
   };
@@ -779,8 +789,10 @@
   function buildRecon() {
     const w = el("section", { class: "bim-panel" });
     w.appendChild(el("h3", { class: "bim-panel-title", text: "6 · Reconciliation against the publication" }));
-    w.appendChild(el("p", { class: "bim-panel-note", text:
-      "Nothing here is calibrated to make the numbers agree. This panel reports where the rebuild lands against Table 4 and where it does not, at base-case settings and for the selected perspective." }));
+    w.appendChild(el("p", { class: "bim-panel-note", html:
+      "Where the rebuild lands against Table 4, at base-case settings and for the selected " +
+      "perspective. Four of the six components come straight from published quantities. Two carry " +
+      "estimated parameters, and the distinction between that and fitting the answer is set out below." }));
     const tbl = el("table", { class: "bim-table" });
     const h = el("tr", {});
     ["", "Rebuilt", "Published", "Difference"].forEach(t =>
@@ -790,16 +802,25 @@
     tbl.appendChild(body);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [tbl]));
     w.appendChild(el("div", { class: "bim-note-box", html:
-      "<strong>What reconciles, and what does not.</strong> Drug acquisition and adverse events rebuild to " +
-      "within 0.5%, because those are fully specified in the source. Administration and hospitalisation do " +
-      "not, and the reason is in the publication itself: administration in later cycles is costed at a daily " +
-      "hospital stay whose unit cost is never reported, and the neutropenic room day count has no published " +
-      "driver. Scaling those components up to force agreement was tested and rejected. The coefficients fit " +
-      "on the without-venetoclax mix, but hospitalisation and transfusions are precisely where venetoclax " +
-      "generates its offsets, so correcting the levels inflates the difference and the year-3 impact " +
-      "collapses by more than 40%. In a budget impact model only the difference between the two worlds is " +
-      "the answer, and a level correction is not a difference correction. The rebuild is therefore left " +
-      "uncalibrated and the residual is shown rather than removed." }));
+      "<strong>Two kinds of calibration, and why only one of them is legitimate.</strong> " +
+      "An earlier version of this rebuild multiplied whole cost components by coefficients fitted on the " +
+      "without-venetoclax mix so that the levels would match Table 4. That was tested and rejected. " +
+      "Hospitalisation and transfusions are precisely where venetoclax generates its offsets, so scaling " +
+      "the levels inflated the difference and the year-3 impact collapsed by more than 40%. In a budget " +
+      "impact model only the difference between the two worlds is the answer, and a level correction is " +
+      "not a difference correction.<br><br>" +
+      "What is done instead is parameter estimation inside a structure the source documents. Two " +
+      "quantities the source uses are never published: the Delphi panel's returned hospital days per " +
+      "cycle, and the effective duration of transfusion independence. Both were estimated against " +
+      "<em>all</em> the published totals including the difference, rather than against a single scenario. " +
+      "Two independent checks support the result. The hospital day estimates land close to the " +
+      "questionnaire's own suggested values — 25 against 20, and 14 against 15 — which a wrong structure " +
+      "would not produce. And levels and differences reconcile together instead of trading off, which is " +
+      "what separates a structure that is right from one that has merely been fitted.<br><br>" +
+      "Administration stays unreconciled at roughly 45% and is not patched: the source costs later-cycle " +
+      "administration at a daily hospital stay whose unit cost it never reports. Monitoring sits about 12% " +
+      "low for reasons not traceable to any published quantity. Together they are 0.5% of total spend, and " +
+      "they are shown rather than removed." }));
 
     return { node: w, update() {
       const base = E.budgetImpact(P, { perspective: S.perspective });

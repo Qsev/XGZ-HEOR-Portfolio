@@ -176,13 +176,37 @@
         { label: "Incidence", value: P.aeIncidence[k][regimen] / 100, unit: "share", efficacy: true },
         { label: "Cost per event", value: U["ae_" + k][perspective], unit: "$" }] })) };
 
-    /* hospitalisation — neutropenic room days */
-    const rec = P.efficacy.bloodCountRecoveryCycles[regimen];
-    c.hospitalisation = { parts: rec ? [
-      { label: "Neutropenic room", terms: [
-        { label: "Time to blood count recovery", value: rec, unit: "cycles", efficacy: true },
-        { label: "Days per cycle", value: P.meta.cycleDays.value, unit: "days" },
-        { label: "Neutropenic room cost per day", value: U.neutropenicRoomDay[perspective], unit: "$" }] }] : [] };
+    /* hospitalisation — remission status is the switch. Failure to achieve
+       CR/CRi is taken as progression, and progression means admissions.       */
+    const HD = P.hospitalisationDays;
+    const cr = (P.efficacy.completeRemission[regimen] || 0) / 100;
+    const firstCycles = Math.min(2, active);
+    const laterActive = Math.max(0, active - 2);
+    const room = U.neutropenicRoomDay[perspective];
+    c.hospitalisation = { parts: [] };
+    if (firstCycles > 0) c.hospitalisation.parts.push(
+      { label: "Cycles 1 and 2, all patients", terms: [
+        { label: "Cycles", value: firstCycles, unit: "cycles" },
+        { label: "Days per cycle", value: HD.firstTwoCycles.value, unit: "days" },
+        { label: "Neutropenic room per day", value: room, unit: "$" }] });
+    if (laterActive > 0) {
+      c.hospitalisation.parts.push(
+        { label: "Later active cycles, in remission", terms: [
+          { label: "Complete remission", value: cr, unit: "share", efficacy: true },
+          { label: "Cycles", value: laterActive, unit: "cycles", efficacy: true },
+          { label: "Days per cycle", value: HD.activeRemission.value, unit: "days" },
+          { label: "Neutropenic room per day", value: room, unit: "$" }] },
+        { label: "Later active cycles, progressing", terms: [
+          { label: "Not in remission", value: 1 - cr, unit: "share", efficacy: true },
+          { label: "Cycles", value: laterActive, unit: "cycles", efficacy: true },
+          { label: "Days per cycle", value: HD.activeNoRemission.value, unit: "days" },
+          { label: "Neutropenic room per day", value: room, unit: "$" }] });
+    }
+    if (postActive > 0) c.hospitalisation.parts.push(
+      { label: "Post-active period, on best supportive care", terms: [
+        { label: "Cycles", value: postActive, unit: "cycles", efficacy: true },
+        { label: "Days per cycle", value: HD.postActive.value, unit: "days" },
+        { label: "Neutropenic room per day", value: room, unit: "$" }] });
 
     /* monitoring */
     const M = P.monitoringRates;
@@ -222,19 +246,22 @@
           { label: "Unit cost", value: U.bmBiopsy[perspective], unit: "$" }] });
     }
 
-    /* transfusions — applied to the share NOT achieving independence */
-    const indep = P.efficacy.transfusionIndependence[regimen] || 0;
-    const dependent = 1 - indep / 100;
+    /* transfusions — independence removes transfusions only for as long as it
+       lasts, not for the whole year. Cycles requiring transfusion are therefore
+       the year less the independent period, weighted by who achieves it.      */
+    const TR = P.transfusionRates;
+    const indep = (P.efficacy.transfusionIndependence[regimen] || 0) / 100;
+    const cyclesNeeding = Math.max(0, CY - indep * TR.independenceCycles.value);
     c.transfusion = { parts: [
       { label: "Red cells", terms: [
-        { label: "Share not transfusion-independent", value: dependent, unit: "share", efficacy: true },
-        { label: "Cycles per year", value: CY, unit: "cycles" },
-        { label: "Units per cycle", value: P.transfusionRates.rbcPerCycle.value, unit: "units" },
+        { label: "Cycles requiring transfusion", value: cyclesNeeding, unit: "cycles", efficacy: true },
+        { label: "Units per cycle", value: TR.rbcPerCycle.value, unit: "units" },
+        { label: "Rate-of-use calibration", value: TR.useFactor.value, unit: "factor", calibrated: true },
         { label: "Unit cost", value: U.rbcTransfusion[perspective], unit: "$" }] },
       { label: "Platelets by apheresis", terms: [
-        { label: "Share not transfusion-independent", value: dependent, unit: "share", efficacy: true },
-        { label: "Cycles per year", value: CY, unit: "cycles" },
-        { label: "Units per cycle", value: P.transfusionRates.plateletPerCycle.value, unit: "units" },
+        { label: "Cycles requiring transfusion", value: cyclesNeeding, unit: "cycles", efficacy: true },
+        { label: "Units per cycle", value: TR.plateletPerCycle.value, unit: "units" },
+        { label: "Rate-of-use calibration", value: TR.useFactor.value, unit: "factor", calibrated: true },
         { label: "Unit cost", value: U.plateletApheresis[perspective], unit: "$" }] }] };
 
     /* evaluate: every part is a product, every component a sum of its parts */
@@ -338,10 +365,13 @@
     { id: "hosp", label: "Neutropenic room cost per day",
       apply: (P, f) => { P.unitCosts.neutropenicRoomDay.socsec  *= f;
                          P.unitCosts.neutropenicRoomDay.private *= f; } },
-    { id: "recovery", label: "Time to blood count recovery",
-      apply: (P, f) => Object.keys(P.efficacy.bloodCountRecoveryCycles).forEach(r => {
-        if (typeof P.efficacy.bloodCountRecoveryCycles[r] === "number")
-          P.efficacy.bloodCountRecoveryCycles[r] *= f; }) },
+    { id: "remission", label: "Complete remission rate",
+      apply: (P, f) => Object.keys(P.efficacy.completeRemission).forEach(r => {
+        if (typeof P.efficacy.completeRemission[r] === "number")
+          P.efficacy.completeRemission[r] = Math.min(100, P.efficacy.completeRemission[r] * f); }) },
+    { id: "hospdays", label: "Hospital days when not in remission",
+      apply: (P, f) => { P.hospitalisationDays.activeNoRemission.value *= f;
+                         P.hospitalisationDays.postActive.value *= f; } },
     { id: "txindep", label: "Transfusion independence",
       apply: (P, f) => Object.keys(P.efficacy.transfusionIndependence).forEach(r => {
         if (typeof P.efficacy.transfusionIndependence[r] === "number")

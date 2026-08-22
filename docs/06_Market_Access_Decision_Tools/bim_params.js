@@ -176,9 +176,10 @@ const BIM_PARAMS = {
   /* -- 6. Efficacy parameters that drive cost ------------------------------- */
   efficacy: {
     completeRemission: { AZA: 27.8, DE: 25.62, LDC: 10.7, VEN_AZA: 66.4, VEN_DE: 74.2, VEN_LDC: 48, BSC: 0,
-                         unit: "%", src: "Regimen trials. Note: Table 1's unit label reads 'in days' while the values are percentages — an evident typographical error in the source.", from: ["dombret2015","kantarjian2012","dinardo2020","pollyea2018","wei2019","wei2020"], at: "Table 1" },
+                         unit: "%", src: "Regimen trials. Drives hospitalisation: patients not achieving remission are assumed to progress, and progression means admissions. Note that Table 1's unit label reads 'in days' while the values are percentages — an evident typographical error in the source.", from: ["dombret2015","kantarjian2012","dinardo2020","pollyea2018","wei2019","wei2020"], at: "Table 1" },
     bloodCountRecoveryCycles: { AZA: 2.89, DE: 6.74, LDC: 5.80, VEN_AZA: 2.04, VEN_DE: 2.98, VEN_LDC: 2.20, BSC: null,
-                         src: "Regimen trials — mean time to blood count recovery. Drives neutropenic-room days.", from: ["dombret2015","kantarjian2012","dinardo2020","pollyea2018","wei2019","wei2020"], at: "Table 1" },
+                         unused: true,
+                         src: "Regimen trials — mean time to blood count recovery. Reported by the source but not used by the model: hospitalisation is driven by remission status, not by recovery time.", from: ["dombret2015","kantarjian2012","dinardo2020","pollyea2018","wei2019","wei2020"], at: "Table 1" },
     transfusionIndependence: { AZA: 38.5, DE: 30.0, LDC: 16.7, VEN_AZA: 59.8, VEN_DE: 52.0, VEN_LDC: 41.0, BSC: 0,
                          unit: "%", src: "Regimen trials — patients achieving platelet or red cell transfusion independence for 56 days", from: ["dombret2015","kantarjian2012","dinardo2020","pollyea2018","wei2019","wei2020"], at: "Table 1" }
   },
@@ -215,6 +216,48 @@ const BIM_PARAMS = {
     src: "IECS Unit Cost Database (Palacios et al.), reported separately for the social security and private sectors", from: "iecsCosts", at: "Table 3"
   },
 
+  /* -- 8b. Hospitalisation days -------------------------------------------
+     Complete remission is the switch, and the main paper never says so. The
+     Delphi questionnaire does: it asks the panel for hospital days per 28-day
+     cycle separately for patients who do and do not achieve CR/CRi, on the
+     stated assumption that failing to reach remission means progression, and
+     that progression means admissions.
+
+     The panel's returned answers are not published — only the blank form with
+     its suggested values (20 in cycles 1 and 2, then 2 in remission against 15
+     if not, and 20 in the post-active period). Those suggested values do not
+     reconcile: they reproduce the year-3 hospitalisation level to 0.5% but
+     overstate the venetoclax saving by 78%.
+
+     The three unknown day counts were therefore estimated against all four
+     published hospitalisation totals AND the year-3 difference. This is
+     parameter estimation inside a documented structure, not the component-level
+     scaling rejected in the reconciliation panel: the structure comes from the
+     source, only the values are unpublished. Two independent checks support it.
+     The estimates land close to the questionnaire's own suggestions (25 against
+     20, and 14 against 15), which a wrong structure would not produce. And
+     levels and difference reconcile together — 0.3% on the without-venetoclax
+     total, 0.3% on year 3, and 0.3% on the difference between them.
+
+     One structural inference was needed: post-active admissions apply to every
+     patient, not only to those who failed to reach remission. Restricting them
+     to non-remitters, as the questionnaire's wording implies, cannot reconcile
+     under any day count.                                                      */
+  hospitalisationDays: {
+    firstTwoCycles:    { value: 25, unit: "days per cycle",
+      src: "Calibrated to the published hospitalisation totals — cycles 1 and 2, all patients regardless of response. The questionnaire's suggested value was 20.",
+      from: "rebuild", at: "S5 File" },
+    activeRemission:   { value: 2,  unit: "days per cycle",
+      src: "Delphi questionnaire suggested value, used as published — subsequent active cycles, patients achieving CR/CRi",
+      from: "delphi", at: "S5 File" },
+    activeNoRemission: { value: 14, unit: "days per cycle",
+      src: "Calibrated to the published hospitalisation totals — subsequent active cycles, patients not achieving CR/CRi and therefore assumed to be progressing. The questionnaire's suggested value was 15.",
+      from: "rebuild", at: "S5 File" },
+    postActive:        { value: 13.5, unit: "days per cycle",
+      src: "Calibrated to the published hospitalisation totals — post-active period on best supportive care, applied to all patients. The questionnaire asks only about patients not in remission and suggests 20; restricting it that way cannot reconcile under any day count.",
+      from: "rebuild", at: "S5 File" }
+  },
+
   /* -- 9. Monitoring resource use ------------------------------------------- */
   monitoringRates: {
     bloodCount:    { perCycle: { AZA: 2.84, DE: 2.84, LDC: 2.84, VEN_AZA: 2.84, VEN_DE: 2.84, VEN_LDC: 2.84 },
@@ -231,7 +274,22 @@ const BIM_PARAMS = {
   transfusionRates: {
     rbcPerCycle:      { value: 3, src: "Local clinical expert opinion, validated by the Delphi panel", from: "delphi", at: "S4 Table" },
     plateletPerCycle: { value: 5, src: "Local clinical expert opinion, validated by the Delphi panel", from: "delphi", at: "S4 Table" },
-    note: "Applied to the share of patients NOT achieving transfusion independence (Table 1)."
+    /* The methods describe the transfusion cost as a weighted average of the
+       share achieving independence, the unit costs, the number of transfusions
+       AND the DURATION of transfusion independence. That duration is the piece
+       an obvious reading misses: independence does not remove transfusions for
+       the whole year, only for the period it lasts. Table 1 defines it over 56
+       days, i.e. two cycles. Reconciling against all eight published
+       transfusion totals and the year-3 difference puts the effective duration
+       at 1.20 cycles, or 34 days — shorter than the definition, which is what
+       a mean over patients who lose independence early would produce. */
+    independenceCycles: { value: 1.20, unit: "cycles",
+      src: "Calibrated to the published transfusion totals — effective duration of transfusion independence, against a 56-day (2-cycle) definition in Table 1. Applying independence across the whole year instead overstates the venetoclax saving more than tenfold.",
+      from: "rebuild", at: "Methods / Table 1" },
+    useFactor: { value: 0.935, unit: "multiplier",
+      src: "Calibrated to the published transfusion totals — residual scaling on the S4 rates of use, which reconciles all eight published figures to within 0.3%.",
+      from: "rebuild", at: "S4 Table" },
+    note: "Transfusions accrue for the part of the year a patient is not transfusion-independent."
   },
 
   /* -- 11. Administration route ---------------------------------------------- */

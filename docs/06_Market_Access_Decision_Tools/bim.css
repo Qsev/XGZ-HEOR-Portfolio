@@ -197,10 +197,12 @@
 .bim-dir-down { background: #e6f5ee; color: #14664a; }
 .bim-dir-none { background: #eeeef1; color: #5f6b7a; }
 .bim-row-unused td { background: #fafafb; color: var(--muted); font-style: italic; }
-.bim-eff-dot {
+.bim-eff-dot, .bim-cal-dot {
   display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 50%;
-  background: #eda100; vertical-align: baseline;
+  vertical-align: baseline;
 }
+.bim-eff-dot { background: #eda100; }
+.bim-cal-dot { background: #4a3aa7; }
 
 .bim-picker { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.7rem 0 1rem; }
 .bim-pick-btn {
@@ -229,6 +231,8 @@
   border: 1px solid transparent;
 }
 .bim-deriv-term.efficacy { background: #fdf6e6; border-color: #f0dcae; }
+.bim-deriv-term.calibrated { background: #f1eefb; border-color: #d5cbf0; }
+.bim-deriv-term.calibrated .bim-deriv-unit { color: #4a3aa7; }
 .bim-deriv-num { font-size: 0.79rem; font-variant-numeric: tabular-nums; font-weight: 600; }
 .bim-deriv-unit { font-size: 0.6rem; color: var(--muted); }
 .bim-deriv-term.efficacy .bim-deriv-unit { color: #8a5a12; }

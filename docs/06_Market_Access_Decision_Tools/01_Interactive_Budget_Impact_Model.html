@@ -310,7 +310,8 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li><strong>The published supplement contradicts itself.</strong> S1 Table and S7 Table assign the venetoclax + decitabine and venetoclax + LDAC market shares in opposite order. Reconciling each against the drug costs in Table 4 settles it, and the model follows the assignment that reproduces the published spend.</li>
 <li><strong>Drug cost had to be rebuilt as a function of treatment duration</strong>, not taken as a fixed annual total. Duration is the leading sensitivity driver in the source; with a frozen annual cost it cannot move the result at all, and the sensitivity analysis would be theatre.</li>
-<li><strong>Calibrating to force agreement made the answer worse.</strong> Correcting each cost component to match the published levels distorts the difference between the two worlds — which is the only quantity a budget impact model reports. The rebuild is left uncalibrated and the residual is shown.</li>
+<li><strong>The mechanism behind hospitalisation is in the questionnaire, not the paper.</strong> The main text never says how hospital days are derived. The Delphi questionnaire in the supplementary material asks the panel for days per cycle separately for patients who do and do not achieve complete remission, on the stated assumption that failing to reach remission means progression, and progression means admissions. So the headline clinical result reaches the budget through hospital days. An earlier version of this rebuild drove hospitalisation from time to blood count recovery instead — an invention with no documentary basis, which left the component at less than half the published figure.</li>
+<li><strong>Two kinds of calibration, and only one of them is legitimate.</strong> Scaling whole cost components to match published levels was tested and rejected: it distorts the difference between the two worlds, which is the only quantity a budget impact model reports. Estimating individual parameters the source uses but never publishes — the panel’s returned hospital days, the effective duration of transfusion independence — against all the published totals including the difference is a different thing, and it is what the rebuild does. The estimates land close to the questionnaire’s own suggested values, which a wrong structure would not produce.</li>
 </ul>
 <link rel="stylesheet" href="bim.css">
 <div id="bim-app"></div>
@@ -344,9 +345,9 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="scope-held-to-the-source">Scope held to the source</h3>
 <p>Three years, 28-day cycles, deterministic, no probabilistic sensitivity analysis. No QALYs or ICERs — this is a budget impact model, and mixing the two questions is a common way of answering neither. Costs are US dollars at 2020 prices with no inflation adjustment, following the source’s stated reasoning for excluding it under high inflation.</p>
 </section>
-<section id="what-does-not-reconcile" class="level3">
-<h3 class="anchored" data-anchor-id="what-does-not-reconcile">What does not reconcile</h3>
-<p>Administration and hospitalisation do not rebuild to the published figures, because the unit costs they depend on are not reported. The gap is quantified in the reconciliation panel rather than closed by fitting, for the reason given there: correcting the levels distorts the difference, and the difference is the only quantity a budget impact model reports.</p>
+<section id="what-reconciles-and-what-does-not" class="level3">
+<h3 class="anchored" data-anchor-id="what-reconciles-and-what-does-not">What reconciles, and what does not</h3>
+<p>Drug acquisition, adverse events, hospitalisation and transfusions rebuild to within 0.3% of the published figures, and the year-3 budget impact lands within 0.1% under both payer perspectives. Two components do not. Administration is about 45% low, because the source costs later-cycle administration at a daily hospital stay whose unit cost it never reports. Monitoring is about 12% low for reasons not traceable to any published quantity. Together they are 0.5% of total spend. Both are shown in the reconciliation panel rather than closed by fitting — the distinction being that estimating an unpublished parameter inside a documented structure is legitimate, while scaling a component until the total agrees is not.</p>
 
 
 </section>
