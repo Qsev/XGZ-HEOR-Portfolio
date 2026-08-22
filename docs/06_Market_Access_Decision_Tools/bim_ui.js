@@ -152,7 +152,7 @@
   const funnelInputs = [];
   function buildFunnel() {
     const w = el("section", { class: "bim-panel" });
-    w.appendChild(el("h3", { class: "bim-panel-title", text: "1 · Epidemiology funnel" }));
+    w.appendChild(el("h3", { class: "bim-panel-title", text: "2 · Epidemiology funnel" }));
     w.appendChild(el("p", { class: "bim-panel-note", text:
       "From covered lives to patients eligible for treatment. Every step is an assumption a payer can challenge, so every step is exposed." }));
 
@@ -241,7 +241,7 @@
   const shareSums   = {};
   function buildShare() {
     const w = el("section", { class: "bim-panel" });
-    w.appendChild(el("h3", { class: "bim-panel-title", text: "2 · Market share — the two worlds" }));
+    w.appendChild(el("h3", { class: "bim-panel-title", text: "3 · Market share — the two worlds" }));
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "A budget impact model is the world <em>with</em> the new therapy minus the world <em>without</em> it. " +
       "Without this layer there is only one world and no budget impact at all. Drag any share: the rest of " +
@@ -376,11 +376,10 @@
 
   /* ---- panel 3: per-patient cost ---------------------------------------- */
   let costPick = "VEN_AZA";
-  const COMPARATOR = { VEN_AZA: "AZA", VEN_DE: "DE", VEN_LDC: "LDC" };
 
   function buildCost() {
     const w = el("section", { class: "bim-panel" });
-    w.appendChild(el("h3", { class: "bim-panel-title", text: "3 · Cost per patient per year" }));
+    w.appendChild(el("h3", { class: "bim-panel-title", text: "4 · Cost per patient per year" }));
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "Six components, each a product of quantities and unit costs. " +
       "<strong>The payer switch acts here and only here:</strong> drug prices are ex-factory and " +
@@ -397,6 +396,7 @@
     const eh = el("tr", {});
     ["Efficacy or safety input", "Drives", "Direction"].forEach(t => eh.appendChild(el("th", { text: t })));
     P.regimens.forEach(r => eh.appendChild(el("th", { class: "num", text: SHORT[r.id] })));
+    eh.appendChild(el("th", { class: "num impact-col", text: "Worth per patient" }));
     effTbl.appendChild(el("thead", {}, [eh]));
     const eb = el("tbody", {});
     const effRows = [
@@ -411,16 +411,34 @@
       ["Time to blood count recovery", "nothing", "reported but not used", "none",
        r => { const v = P.efficacy.bloodCountRecoveryCycles[r]; return v ? v.toFixed(2) : "—"; }]
     ];
-    effRows.forEach(([name, drives, dir, arrow, get]) => {
+    /* what each efficacy parameter is worth, in money: the per-patient cost
+       difference on the component it drives, venetoclax + azacitidine against
+       azacitidine alone. This is the link from clinical evidence to budget. */
+    const WORTH = { drug: ["drug", "administration"], hosp: ["hospitalisation"],
+                    transf: ["transfusion"], ae: ["adverseEvents"], none: [] };
+    const worthOf = keys => {
+      if (!keys.length) return "—";
+      const a = E.perPatientCost(P, "VEN_AZA", S.perspective);
+      const b = E.perPatientCost(P, "AZA", S.perspective);
+      return money(keys.reduce((t, k) => t + a[k] - b[k], 0));
+    };
+    const WORTH_KEY = ["hosp", "drug", "transf", "ae", "none"];
+    effRows.forEach(([name, drives, dir, arrow, get], i) => {
       const tr = el("tr", { class: arrow === "none" ? "bim-row-unused" : "" });
       tr.appendChild(el("td", { text: name }));
       tr.appendChild(el("td", { class: "bim-drives", text: drives }));
       tr.appendChild(el("td", {}, [el("span", { class: "bim-dir bim-dir-" + arrow, text: dir })]));
       P.regimens.forEach(r => tr.appendChild(el("td", { class: "num", text: get(r.id) })));
+      tr.appendChild(el("td", { class: "num impact-col", text: worthOf(WORTH[WORTH_KEY[i]]) }));
       eb.appendChild(tr);
     });
     effTbl.appendChild(eb);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [effTbl]));
+    w.appendChild(el("p", { class: "bim-panel-note", html:
+      "The last column prices each channel: the per-patient cost difference on the component that " +
+      "parameter drives, venetoclax plus azacitidine against azacitidine alone. Those six figures " +
+      "multiplied by the patients in each arm, summed, and differenced between the two worlds are " +
+      "the budget impact at the top of this page — there is nothing else in it." }));
     w.appendChild(el("div", { class: "bim-note-box", html:
       "<strong>Complete remission is the switch on hospitalisation, and finding that took reading " +
       "the Delphi questionnaire.</strong> The main paper never states how hospital days are " +
@@ -468,10 +486,6 @@
     w.appendChild(picker);
     const deriv = el("div", { class: "bim-deriv" });
     w.appendChild(deriv);
-
-    /* -- 3d. efficacy bridge ------------------------------------------------ */
-    const bridgeWrap = el("div", { class: "bim-bridge-wrap" });
-    w.appendChild(bridgeWrap);
 
     return { node: w, update() {
       /* summary table */
@@ -528,6 +542,7 @@
                   : (Math.round(t.value * 100) / 100).toLocaleString("en-GB") }));
             term.appendChild(el("span", { class: "bim-deriv-unit",
               text: t.unit === "$" || t.unit === "share" || t.unit === "factor" ? t.label : t.unit }));
+            if (t.src) term.appendChild(el("span", { class: "bim-deriv-src", text: t.src }));
             expr.appendChild(term);
           });
           expr.appendChild(el("span", { class: "bim-deriv-op", text: "=" }));
@@ -538,74 +553,13 @@
         deriv.appendChild(card);
       });
 
-      /* efficacy bridge: VEN regimen against its own comparator */
-      clear(bridgeWrap);
-      const venId = IS_VEN[costPick] ? costPick
-                  : Object.keys(COMPARATOR).find(v => COMPARATOR[v] === costPick);
-      if (venId) {
-        const compId = COMPARATOR[venId];
-        bridgeWrap.appendChild(el("h4", { class: "bim-sub-title",
-          text: "What the clinical difference is worth: " + LABEL[venId] + " against " + LABEL[compId] }));
-        bridgeWrap.appendChild(el("p", { class: "bim-panel-note", html:
-          "The same patient, treated two ways. Each bar is one component of the per-patient cost " +
-          "difference, annotated with the efficacy parameter that produced it. This is the " +
-          "mechanism behind every number in the budget impact table." }));
-        bridgeWrap.appendChild(bridge(venId, compId));
-      }
     } };
-  }
-
-  const BRIDGE_CAUSE = {
-    drug: "longer treatment duration",
-    administration: "longer treatment duration",
-    adverseEvents: "higher event rates",
-    hospitalisation: "higher remission rate, fewer admitted days",
-    monitoring: "extra tumour lysis panels",
-    transfusion: "higher transfusion independence"
-  };
-
-  function bridge(venId, compId) {
-    const a = E.perPatientCost(P, venId, S.perspective);
-    const b = E.perPatientCost(P, compId, S.perspective);
-    const rows = E.COMPONENTS.map(k => ({ k, delta: a[k] - b[k] }))
-      .filter(r => Math.abs(r.delta) > 0.5)
-      .sort((x, y) => Math.abs(y.delta) - Math.abs(x.delta));
-    const net = a.total - b.total;
-    const maxAbs = Math.max(...rows.map(r => Math.abs(r.delta)), Math.abs(net)) || 1;
-
-    const W = 720, rh = 34, m = { t: 10, r: 12, b: 34, l: 220 };
-    const H = m.t + (rows.length + 1) * rh + m.b;
-    const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "bim-svg",
-                            preserveAspectRatio: "xMidYMid meet" });
-    const pw = W - m.l - m.r, zero = m.l + pw / 2;
-    const xOf = v => zero + v / maxAbs * (pw / 2 - 60);
-    svg.appendChild(sv("line", { x1: zero, x2: zero, y1: m.t, y2: H - m.b + 4, class: "bim-zero" }));
-
-    rows.concat([{ k: "net", delta: net }]).forEach((r, i) => {
-      const y = m.t + i * rh, isNet = r.k === "net";
-      const x0 = Math.min(zero, xOf(r.delta)), wBar = Math.abs(xOf(r.delta) - zero);
-      svg.appendChild(sv("text", { x: m.l - 12, y: y + rh / 2 + 4,
-        class: isNet ? "bim-bridge-net-label" : "bim-tornado-label", "text-anchor": "end" },
-        isNet ? "Net difference per patient" : E.COMPONENT_LABELS[r.k]));
-      const rect = sv("rect", { x: x0, y: y + 6, width: Math.max(2, wBar), height: rh - 16,
-        fill: isNet ? "#4a3aa7" : (r.delta > 0 ? "#eb6834" : "#1baf7a"), rx: 1 });
-      rect.appendChild(sv("title", {}, (isNet ? "Net" : E.COMPONENT_LABELS[r.k]) + ": " + money(r.delta)));
-      svg.appendChild(rect);
-      const tx = r.delta > 0 ? xOf(r.delta) + 8 : xOf(r.delta) - 8;
-      svg.appendChild(sv("text", { x: tx, y: y + rh / 2 + 4, class: "bim-bridge-val",
-        "text-anchor": r.delta > 0 ? "start" : "end" }, money(r.delta)));
-      if (!isNet) svg.appendChild(sv("text", { x: m.l - 12, y: y + rh / 2 + 15,
-        class: "bim-bridge-cause", "text-anchor": "end" }, BRIDGE_CAUSE[r.k] || ""));
-    });
-    svg.appendChild(sv("text", { x: zero, y: H - 10, class: "bim-axis-label",
-      "text-anchor": "middle" }, "← cheaper with venetoclax    |    costlier with venetoclax →"));
-    return svg;
   }
 
   /* ---- panel 4: budget impact -------------------------------------------- */
   function buildImpact() {
     const w = el("section", { class: "bim-panel" });
-    w.appendChild(el("h3", { class: "bim-panel-title", text: "4 · Budget impact" }));
+    w.appendChild(el("h3", { class: "bim-panel-title", text: "1 · Budget impact" }));
     const cards = el("div", { class: "bim-cards" });
     w.appendChild(cards);
 
@@ -788,7 +742,7 @@
   /* ---- panel 6: reconciliation ------------------------------------------- */
   function buildRecon() {
     const w = el("section", { class: "bim-panel" });
-    w.appendChild(el("h3", { class: "bim-panel-title", text: "6 · Reconciliation against the publication" }));
+    w.appendChild(el("h3", { class: "bim-panel-title", text: "7 · Reconciliation against the publication" }));
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "Where the rebuild lands against Table 4, at base-case settings and for the selected " +
       "perspective. <strong>Read the right-hand block, not the left.</strong> A budget impact model " +
@@ -870,7 +824,7 @@
   /* ---- panel 7: provenance (static) --------------------------------------- */
   function buildProvenance() {
     const w = el("section", { class: "bim-panel" });
-    w.appendChild(el("h3", { class: "bim-panel-title", text: "7 · Where every input comes from" }));
+    w.appendChild(el("h3", { class: "bim-panel-title", text: "6 · Where every input comes from" }));
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "The question a reviewer actually asks is not which table a number sits in — it is <em>which trial, " +
       "which expert process, which price list</em>. Each input below names its upstream source first; the " +
@@ -954,8 +908,10 @@
   }
 
   /* ---- assemble ----------------------------------------------------------- */
-  const panels = [buildTopBar(), buildFunnel(), buildShare(), buildCost(),
-                  buildImpact(), buildOwsa(), buildRecon(), buildProvenance()];
+  /* Budget impact leads. A payer-facing model answers the question first and
+     shows the layers underneath it; the replication checks belong at the end. */
+  const panels = [buildTopBar(), buildImpact(), buildFunnel(), buildShare(), buildCost(),
+                  buildOwsa(), buildProvenance(), buildRecon()];
   const shell = el("div", { class: "bim-shell" });
   panels.forEach(p => shell.appendChild(p.node));
   app.appendChild(shell);

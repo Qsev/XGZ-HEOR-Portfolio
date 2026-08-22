@@ -12,6 +12,30 @@ format:
     self-contained: false
 ---
 
+## The question
+
+A cost-effectiveness model asks whether a therapy is worth its price. A budget impact model asks a
+narrower and more immediate question: **can this payer afford to adopt it, and when does the money
+move?**
+
+The answer is a subtraction — the world **with** the new therapy, minus the world **without** it —
+and that subtraction is the whole model. Both worlds must be built on the same population, the same
+horizon and the same cost categories, and only then differenced. Without an explicit market share
+layer there is only one world and no budget impact at all.
+
+The tool below models coverage of venetoclax combinations for previously untreated acute myeloid
+leukaemia in patients unfit for intensive chemotherapy, over three years, for two kinds of
+third-party payer. It reads top-down: the budget impact first, then the population, adoption and
+cost assumptions that produce it, then what happens when each of them is challenged.
+
+```{=html}
+<link rel="stylesheet" href="bim.css">
+<div id="bim-app"></div>
+<script src="bim_params.js"></script>
+<script src="bim_engine.js"></script>
+<script src="bim_ui.js"></script>
+```
+
 ::: {.callout-important icon=false}
 ## Source and status
 
@@ -32,82 +56,35 @@ Every input carries a source tag — a table number, a stated derivation, or an 
 assumption. There are three assumptions and they are labelled as such.
 :::
 
-## What a budget impact model actually is
+## How this was built
 
-A cost-effectiveness model asks whether a therapy is worth its price. A budget impact model
-asks a narrower and more immediate question: **can this payer afford to adopt it, and when
-does the money move?**
+The model reconstructs a published budget impact analysis from its parameters rather than restating
+its results, so that every input is visible and every calculation can be checked against the source.
+Three files, no server, no build step, no dependencies: `bim_params.js` holds every parameter with
+its source and no logic, `bim_engine.js` holds the calculation with no interface code, and
+`bim_ui.js` renders. A reviewer auditing the model opens the parameter file and checks it against
+the paper — the same thing they would ask to do with a spreadsheet, and rarely can.
 
-The answer is a subtraction:
+Three things surfaced during the reconstruction that a spreadsheet would have hidden.
 
-> the world **with** the new therapy, minus the world **without** it
+**The published supplement contradicts itself, in two places.** S1 Table and S7 Table assign the
+venetoclax + decitabine and venetoclax + LDAC market shares in opposite order, and Table 2 and S2
+Table disagree on the dosing days for decitabine and low-dose cytarabine. The first was settled by
+reconciling each reading against the drug costs in Table 4; the second against the regulatory
+labels, which give decitabine five days and low-dose cytarabine ten.
 
-That subtraction is the whole model. It is also where most of the difficulty sits, because the
-two worlds must be built on the same population, the same time horizon and the same cost
-categories, and only then differenced. Without an explicit market share layer there is only one
-world and no budget impact at all — which is why that layer, not the headline number, is the
-part worth inspecting first.
+**The mechanism behind hospitalisation is in the questionnaire, not the paper.** The main text never
+says how hospital days are derived. The Delphi questionnaire in the supplementary material asks the
+panel for days per cycle separately for patients who do and do not achieve complete remission, on
+the stated assumption that failing to reach remission means progression, and progression means
+admissions. That is how the headline clinical result reaches the budget.
 
-## The rebuild
-
-The tool below reconstructs the published model from its parameters rather than restating its
-results. Seven layers, in the order a reviewer would work through them:
-
-1. the **epidemiology funnel**, from covered lives to treatable patients
-2. **market share** in both worlds, year by year — the layer that makes it a budget impact model
-3. **cost per patient per year**, in six components, built bottom-up
-4. **budget impact**, annual and cumulative, with per-member-per-month
-5. **one-way sensitivity analysis**, against the published tornado
-6. **reconciliation** with the published results, including where it does not agree
-7. **provenance** for every parameter
-
-Three things surfaced during the rebuild that are worth naming, because they are the parts a
-spreadsheet would hide:
-
-- **The published supplement contradicts itself.** S1 Table and S7 Table assign the venetoclax +
-  decitabine and venetoclax + LDAC market shares in opposite order. Reconciling each against the
-  drug costs in Table 4 settles it, and the model follows the assignment that reproduces the
-  published spend.
-- **Drug cost had to be rebuilt as a function of treatment duration**, not taken as a fixed annual
-  total. Duration is the leading sensitivity driver in the source; with a frozen annual cost it
-  cannot move the result at all, and the sensitivity analysis would be theatre.
-- **The mechanism behind hospitalisation is in the questionnaire, not the paper.** The main text
-  never says how hospital days are derived. The Delphi questionnaire in the supplementary material
-  asks the panel for days per cycle separately for patients who do and do not achieve complete
-  remission, on the stated assumption that failing to reach remission means progression, and
-  progression means admissions. So the headline clinical result reaches the budget through hospital
-  days. An earlier version of this rebuild drove hospitalisation from time to blood count recovery
-  instead — an invention with no documentary basis, which left the component at less than half the
-  published figure.
-- **Two kinds of calibration, and only one of them is legitimate.** Scaling whole cost components
-  to match published levels was tested and rejected: it distorts the difference between the two
-  worlds, which is the only quantity a budget impact model reports. Estimating individual
-  parameters the source uses but never publishes — the panel's returned hospital days, the
-  effective duration of transfusion independence — against all the published totals including the
-  difference is a different thing, and it is what the rebuild does. The estimates land close to the
-  questionnaire's own suggested values, which a wrong structure would not produce.
-
-```{=html}
-<link rel="stylesheet" href="bim.css">
-<div id="bim-app"></div>
-<script src="bim_params.js"></script>
-<script src="bim_engine.js"></script>
-<script src="bim_ui.js"></script>
-```
-
-## Technical notes
-
-The tool is a static page: three JavaScript files, no server, no build step, no dependencies.
-The separation is deliberate and is part of the point.
-
-- `bim_params.js` — every parameter, each with a source tag. No logic.
-- `bim_engine.js` — pure calculation. No DOM, no globals, parameters passed in, so the
-  sensitivity analysis perturbs a copy rather than the base case.
-- `bim_ui.js` — rendering and event binding only.
-
-A reviewer who wants to audit the model does not need to read the interface code. They open the
-parameter file and check it against the paper — which is the same thing they would ask to do
-with a spreadsheet, and rarely can.
+**Two kinds of calibration, and only one of them is legitimate.** Scaling whole cost components to
+match published levels distorts the difference between the two worlds, which is the only quantity a
+budget impact model reports. Estimating individual parameters that the source uses but never
+publishes — the panel's returned hospital days, the effective duration of transfusion independence —
+against all the published totals including the difference is a different thing, and it is what this
+model does. The estimates land close to the questionnaire's own suggested values.
 
 ## Limitations
 

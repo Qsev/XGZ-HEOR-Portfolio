@@ -267,6 +267,16 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="the-question" class="level2">
+<h2 class="anchored" data-anchor-id="the-question">The question</h2>
+<p>A cost-effectiveness model asks whether a therapy is worth its price. A budget impact model asks a narrower and more immediate question: <strong>can this payer afford to adopt it, and when does the money move?</strong></p>
+<p>The answer is a subtraction — the world <strong>with</strong> the new therapy, minus the world <strong>without</strong> it — and that subtraction is the whole model. Both worlds must be built on the same population, the same horizon and the same cost categories, and only then differenced. Without an explicit market share layer there is only one world and no budget impact at all.</p>
+<p>The tool below models coverage of venetoclax combinations for previously untreated acute myeloid leukaemia in patients unfit for intensive chemotherapy, over three years, for two kinds of third-party payer. It reads top-down: the budget impact first, then the population, adoption and cost assumptions that produce it, then what happens when each of them is challenged.</p>
+<link rel="stylesheet" href="bim.css">
+<div id="bim-app"></div>
+<script src="bim_params.js"></script>
+<script src="bim_engine.js"></script>
+<script src="bim_ui.js"></script>
 <div class="callout callout-style-default callout-important no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -285,49 +295,14 @@ ul.task-list li input[type="checkbox"] {
 <p>Every input carries a source tag — a table number, a stated derivation, or an explicit assumption. There are three assumptions and they are labelled as such.</p>
 </div>
 </div>
-<section id="what-a-budget-impact-model-actually-is" class="level2">
-<h2 class="anchored" data-anchor-id="what-a-budget-impact-model-actually-is">What a budget impact model actually is</h2>
-<p>A cost-effectiveness model asks whether a therapy is worth its price. A budget impact model asks a narrower and more immediate question: <strong>can this payer afford to adopt it, and when does the money move?</strong></p>
-<p>The answer is a subtraction:</p>
-<blockquote class="blockquote">
-<p>the world <strong>with</strong> the new therapy, minus the world <strong>without</strong> it</p>
-</blockquote>
-<p>That subtraction is the whole model. It is also where most of the difficulty sits, because the two worlds must be built on the same population, the same time horizon and the same cost categories, and only then differenced. Without an explicit market share layer there is only one world and no budget impact at all — which is why that layer, not the headline number, is the part worth inspecting first.</p>
 </section>
-<section id="the-rebuild" class="level2">
-<h2 class="anchored" data-anchor-id="the-rebuild">The rebuild</h2>
-<p>The tool below reconstructs the published model from its parameters rather than restating its results. Seven layers, in the order a reviewer would work through them:</p>
-<ol type="1">
-<li>the <strong>epidemiology funnel</strong>, from covered lives to treatable patients</li>
-<li><strong>market share</strong> in both worlds, year by year — the layer that makes it a budget impact model</li>
-<li><strong>cost per patient per year</strong>, in six components, built bottom-up</li>
-<li><strong>budget impact</strong>, annual and cumulative, with per-member-per-month</li>
-<li><strong>one-way sensitivity analysis</strong>, against the published tornado</li>
-<li><strong>reconciliation</strong> with the published results, including where it does not agree</li>
-<li><strong>provenance</strong> for every parameter</li>
-</ol>
-<p>Three things surfaced during the rebuild that are worth naming, because they are the parts a spreadsheet would hide:</p>
-<ul>
-<li><strong>The published supplement contradicts itself.</strong> S1 Table and S7 Table assign the venetoclax + decitabine and venetoclax + LDAC market shares in opposite order. Reconciling each against the drug costs in Table 4 settles it, and the model follows the assignment that reproduces the published spend.</li>
-<li><strong>Drug cost had to be rebuilt as a function of treatment duration</strong>, not taken as a fixed annual total. Duration is the leading sensitivity driver in the source; with a frozen annual cost it cannot move the result at all, and the sensitivity analysis would be theatre.</li>
-<li><strong>The mechanism behind hospitalisation is in the questionnaire, not the paper.</strong> The main text never says how hospital days are derived. The Delphi questionnaire in the supplementary material asks the panel for days per cycle separately for patients who do and do not achieve complete remission, on the stated assumption that failing to reach remission means progression, and progression means admissions. So the headline clinical result reaches the budget through hospital days. An earlier version of this rebuild drove hospitalisation from time to blood count recovery instead — an invention with no documentary basis, which left the component at less than half the published figure.</li>
-<li><strong>Two kinds of calibration, and only one of them is legitimate.</strong> Scaling whole cost components to match published levels was tested and rejected: it distorts the difference between the two worlds, which is the only quantity a budget impact model reports. Estimating individual parameters the source uses but never publishes — the panel’s returned hospital days, the effective duration of transfusion independence — against all the published totals including the difference is a different thing, and it is what the rebuild does. The estimates land close to the questionnaire’s own suggested values, which a wrong structure would not produce.</li>
-</ul>
-<link rel="stylesheet" href="bim.css">
-<div id="bim-app"></div>
-<script src="bim_params.js"></script>
-<script src="bim_engine.js"></script>
-<script src="bim_ui.js"></script>
-</section>
-<section id="technical-notes" class="level2">
-<h2 class="anchored" data-anchor-id="technical-notes">Technical notes</h2>
-<p>The tool is a static page: three JavaScript files, no server, no build step, no dependencies. The separation is deliberate and is part of the point.</p>
-<ul>
-<li><code>bim_params.js</code> — every parameter, each with a source tag. No logic.</li>
-<li><code>bim_engine.js</code> — pure calculation. No DOM, no globals, parameters passed in, so the sensitivity analysis perturbs a copy rather than the base case.</li>
-<li><code>bim_ui.js</code> — rendering and event binding only.</li>
-</ul>
-<p>A reviewer who wants to audit the model does not need to read the interface code. They open the parameter file and check it against the paper — which is the same thing they would ask to do with a spreadsheet, and rarely can.</p>
+<section id="how-this-was-built" class="level2">
+<h2 class="anchored" data-anchor-id="how-this-was-built">How this was built</h2>
+<p>The model reconstructs a published budget impact analysis from its parameters rather than restating its results, so that every input is visible and every calculation can be checked against the source. Three files, no server, no build step, no dependencies: <code>bim_params.js</code> holds every parameter with its source and no logic, <code>bim_engine.js</code> holds the calculation with no interface code, and <code>bim_ui.js</code> renders. A reviewer auditing the model opens the parameter file and checks it against the paper — the same thing they would ask to do with a spreadsheet, and rarely can.</p>
+<p>Three things surfaced during the reconstruction that a spreadsheet would have hidden.</p>
+<p><strong>The published supplement contradicts itself, in two places.</strong> S1 Table and S7 Table assign the venetoclax + decitabine and venetoclax + LDAC market shares in opposite order, and Table 2 and S2 Table disagree on the dosing days for decitabine and low-dose cytarabine. The first was settled by reconciling each reading against the drug costs in Table 4; the second against the regulatory labels, which give decitabine five days and low-dose cytarabine ten.</p>
+<p><strong>The mechanism behind hospitalisation is in the questionnaire, not the paper.</strong> The main text never says how hospital days are derived. The Delphi questionnaire in the supplementary material asks the panel for days per cycle separately for patients who do and do not achieve complete remission, on the stated assumption that failing to reach remission means progression, and progression means admissions. That is how the headline clinical result reaches the budget.</p>
+<p><strong>Two kinds of calibration, and only one of them is legitimate.</strong> Scaling whole cost components to match published levels distorts the difference between the two worlds, which is the only quantity a budget impact model reports. Estimating individual parameters that the source uses but never publishes — the panel’s returned hospital days, the effective duration of transfusion independence — against all the published totals including the difference is a different thing, and it is what this model does. The estimates land close to the questionnaire’s own suggested values.</p>
 </section>
 <section id="limitations" class="level2">
 <h2 class="anchored" data-anchor-id="limitations">Limitations</h2>

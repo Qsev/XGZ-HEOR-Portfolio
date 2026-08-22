@@ -235,6 +235,9 @@
 .bim-deriv-term.calibrated .bim-deriv-unit { color: #4a3aa7; }
 .bim-deriv-num { font-size: 0.79rem; font-variant-numeric: tabular-nums; font-weight: 600; }
 .bim-deriv-unit { font-size: 0.6rem; color: var(--muted); }
+.bim-deriv-src { font-size: 0.56rem; color: #8a93a0; letter-spacing: 0.01em; margin-top: 1px; }
+.bim-deriv-term.efficacy .bim-deriv-src { color: #a08248; }
+.bim-deriv-term.calibrated .bim-deriv-src { color: #6f63b8; }
 .bim-deriv-term.efficacy .bim-deriv-unit { color: #8a5a12; }
 .bim-deriv-op { font-size: 0.75rem; color: var(--muted); }
 .bim-deriv-res { font-size: 0.82rem; font-weight: 600; font-variant-numeric: tabular-nums; }
