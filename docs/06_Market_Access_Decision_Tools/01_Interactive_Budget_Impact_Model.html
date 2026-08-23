@@ -356,27 +356,28 @@ ul.task-list li input[type="checkbox"] {
 </svg>
 <p class="sch-note">The layers below follow this diagram, with the budget impact first.</p>
 </div>
-
-<div class="no-row-height column-margin column-container"><div class="">
-<p><strong>A contradiction in the source, and how it was settled.</strong> S1 Table gives venetoclax + decitabine 14.5% of the market and venetoclax + LDAC 9.6%. S7 Table gives those same two regimens 12 and 19 patients — the opposite assignment. Reconciled against the drug costs in Table 4, S7’s version reproduces published spend to within 0.35–1.3% and S1’s is out by 3.7–5.2%. The two rows of S1 Table appear to be transposed; the model follows S7.</p>
-</div></div><p>Each block below is one layer of that diagram, in order. The budget impact comes first because that is the answer; everything under it is the justification.</p>
+<p>Each block below is one layer of that diagram, in order. The budget impact comes first because that is the answer; everything under it is the justification.</p>
 <div class="column-screen-inset">
 <!-- ?v= is a cache-busting token. Bump it whenever these files change:
      Quarto does not fingerprint page assets, so a returning visitor would
      otherwise keep a stale stylesheet or engine and see a broken page. -->
-<link rel="stylesheet" href="bim.css?v=2026-08-23c">
+<link rel="stylesheet" href="bim.css?v=2026-08-23d">
 <div id="bim-app"></div>
-<script src="bim_params.js?v=2026-08-23c"></script>
-<script src="bim_engine.js?v=2026-08-23c"></script>
-<script src="bim_ui.js?v=2026-08-23c"></script>
+<script src="bim_params.js?v=2026-08-23d"></script>
+<script src="bim_engine.js?v=2026-08-23d"></script>
+<script src="bim_ui.js?v=2026-08-23d"></script>
 </div>
 </section>
-<section id="how-this-was-built" class="level2">
+<section id="how-this-was-built" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="how-this-was-built">How this was built</h2>
 <p>The model reconstructs a published budget impact analysis from its parameters rather than restating its results, so that every input is visible and every calculation can be checked against the source. Three files, no server, no build step, no dependencies: <code>bim_params.js</code> holds every parameter with its source and no logic, <code>bim_engine.js</code> holds the calculation with no interface code, and <code>bim_ui.js</code> renders. A reviewer auditing the model opens the parameter file and checks it against the paper — the same thing they would ask to do with a spreadsheet, and rarely can.</p>
 <p>Three things surfaced during the reconstruction that a spreadsheet would have hidden.</p>
-<p><strong>The published supplement contradicts itself, in two places.</strong> S1 Table and S7 Table assign the venetoclax + decitabine and venetoclax + LDAC market shares in opposite order, and Table 2 and S2 Table disagree on the dosing days for decitabine and low-dose cytarabine. The first was settled by reconciling each reading against the drug costs in Table 4; the second against the regulatory labels, which give decitabine five days and low-dose cytarabine ten.</p>
-<p><strong>The mechanism behind hospitalisation is in the questionnaire, not the paper.</strong> The main text never says how hospital days are derived. The Delphi questionnaire in the supplementary material asks the panel for days per cycle separately for patients who do and do not achieve complete remission, on the stated assumption that failing to reach remission means progression, and progression means admissions. That is how the headline clinical result reaches the budget.</p>
+<p><strong>The published supplement contradicts itself, in two places.</strong> S1 Table and S7 Table assign the venetoclax + decitabine and venetoclax + LDAC market shares in opposite order, and Table 2 and S2 Table disagree on the dosing days for decitabine and low-dose cytarabine. Neither can be resolved by choosing the more plausible reading; both were settled against a third source.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><strong>Settling the market share rows.</strong> S1 Table gives venetoclax + decitabine 14.5% of the market and venetoclax + LDAC 9.6%; S7 Table gives those same two regimens 12 and 19 patients, the opposite assignment. Reconciled against the drug costs in Table 4, S7’s version reproduces published spend to within 0.35–1.3% and S1’s is out by 3.7–5.2%. The two rows of S1 Table appear to be transposed.</p>
+<p><strong>Settling the dosing days.</strong> The EMA label for decitabine gives five consecutive days per 28-day cycle, and VIALE-C gave low-dose cytarabine on days 1–10 — matching S2 Table, not Table 2.</p>
+</div></div><p><strong>The mechanism behind hospitalisation is in the questionnaire, not the paper.</strong> The main text never says how hospital days are derived. The Delphi questionnaire in the supplementary material asks the panel for days per cycle separately for patients who do and do not achieve complete remission, on the stated assumption that failing to reach remission means progression, and progression means admissions. That is how the headline clinical result reaches the budget.</p>
 <p><strong>Two kinds of calibration, and only one of them is legitimate.</strong> Scaling whole cost components to match published levels distorts the difference between the two worlds, which is the only quantity a budget impact model reports. Estimating individual parameters that the source uses but never publishes — the panel’s returned hospital days, the effective duration of transfusion independence — against all the published totals including the difference is a different thing, and it is what this model does. The estimates land close to the questionnaire’s own suggested values.</p>
 </section>
 <section id="limitations" class="level2">

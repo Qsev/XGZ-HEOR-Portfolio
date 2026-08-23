@@ -329,7 +329,7 @@
   }
 
   function patientChart(res, cols) {
-    const W = 720, H = 260, m = { t: 14, r: 12, b: 44, l: 46 };
+    const W = 720, H = 280, m = { t: 14, r: 12, b: 44, l: 46 };
     const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "bim-svg",
                             preserveAspectRatio: "xMidYMid meet" });
     const maxY = Math.max(1, ...cols.map(c => c.n));
@@ -345,6 +345,7 @@
     cols.forEach((c, ci) => {
       const cx = m.l + pw / cols.length * (ci + 0.5);
       const N = c.n;
+      const outside = [];
       let acc = 0;
       RID.forEach(r => {
         const v = N * (c.shares[r] || 0) / 100;
@@ -355,10 +356,24 @@
                                   fill: COLOR[r], rx: 1 });
         rect.appendChild(sv("title", {}, LABEL[r] + ": " + v.toFixed(1) + " patients (" + pct1(c.shares[r] || 0) + ")"));
         svg.appendChild(rect);
-        if (drawn >= 15) svg.appendChild(sv("text", { x: cx, y: y + drawn / 2 + 4,
-          "text-anchor": "middle", class: "bim-seg-label", fill: inkOn(COLOR[r]) },
-          SHORT[r] + "  " + Math.round(v)));
+        /* a segment too short to hold its label gets one outside the bar, so a
+           small arm is never left unlabelled — colour alone must not carry it */
+        if (drawn >= 15) {
+          svg.appendChild(sv("text", { x: cx, y: y + drawn / 2 + 4,
+            "text-anchor": "middle", class: "bim-seg-label", fill: inkOn(COLOR[r]) },
+            SHORT[r] + "  " + Math.round(v)));
+        } else if (v > 0) {
+          outside.push({ y: y + drawn / 2 + 3.5, text: SHORT[r] + " " + Math.round(v) });
+        }
         acc += v;
+      });
+      /* stack the outside labels downwards so they never overlap */
+      outside.sort((a, b) => a.y - b.y).forEach((o, i, arr) => {
+        if (i && o.y - arr[i - 1].y < 11) o.y = arr[i - 1].y + 11;
+        svg.appendChild(sv("line", { x1: cx + bw / 2 + 1, x2: cx + bw / 2 + 5,
+          y1: o.y - 3.5, y2: o.y - 3.5, class: "bim-seg-leader" }));
+        svg.appendChild(sv("text", { x: cx + bw / 2 + 8, y: o.y,
+          class: "bim-seg-label bim-seg-out" }, o.text));
       });
       svg.appendChild(sv("text", { x: cx, y: H - m.b + 18, class: "bim-axis-label",
                                    "text-anchor": "middle" }, names[ci]));
@@ -463,6 +478,8 @@
       "<span class='bim-kind bim-kind-estimated'>estimated</span> because the source uses it but " +
       "never prints it, or <span class='bim-kind bim-kind-derived'>derived</span> by arithmetic on " +
       "the others." }));
+    const derivBox = el("details", { class: "bim-details" });
+    derivBox.appendChild(el("summary", { text: "Show the full arithmetic for one regimen" }));
     const picker = el("div", { class: "bim-picker" });
     const pickBtns = {};
     P.regimens.forEach(r => {
@@ -470,9 +487,10 @@
       b.addEventListener("click", () => { costPick = r.id; update(); });
       pickBtns[r.id] = b; picker.appendChild(b);
     });
-    w.appendChild(picker);
+    derivBox.appendChild(picker);
     const deriv = el("div", { class: "bim-deriv" });
-    w.appendChild(deriv);
+    derivBox.appendChild(deriv);
+    w.appendChild(derivBox);
 
     return { node: w, update() {
       /* summary table */

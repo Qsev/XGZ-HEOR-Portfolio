@@ -289,3 +289,6 @@
 .sch-out-t { font-size: 13.5px; font-weight: 600; fill: #ffffff; }
 .sch-note { text-align: center; font-size: 0.78rem; color: #5f6b7a; margin: 0.5rem 0 0; }
 
+
+.bim-seg-out { fill: #3d4855; }
+.bim-seg-leader { stroke: #8a93a0; stroke-width: 1; }
