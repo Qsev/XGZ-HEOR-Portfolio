@@ -581,6 +581,20 @@
                              .concat([[null, "— net impact, marked on each bar"]])));
     w.appendChild(chart);
 
+    const fig = el("div", { class: "bim-chart" });
+    fig.appendChild(el("h4", { class: "bim-chart-title",
+      text: "The published headline figure, rebuilt beside it" }));
+    fig.appendChild(el("p", { class: "bim-chart-sub", html:
+      "Per-member-per-month budget impact by year and payer perspective — the only result figure in " +
+      "the source. Published values are read from Table 4 divided by 1,000,000 members over 12 " +
+      "months, which reproduces the figure's own labels exactly. Base-case settings, so this does " +
+      "not move with the controls above." }));
+    const figHolder = el("div", {});
+    fig.appendChild(figHolder);
+    fig.appendChild(legend([["#2a78d6", "This rebuild"], ["#eb6834", "Published"]]));
+    w.appendChild(fig);
+
+
     return { node: w, update(res) {
       clear(cards);
       res.years.forEach(y => {
@@ -617,6 +631,8 @@
 
       clear(holder);
       holder.appendChild(impactChart(res));
+      clear(figHolder);
+      figHolder.appendChild(pmpmFigure());
     } };
   }
 
@@ -767,39 +783,7 @@
     tbl.appendChild(body);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [tbl]));
 
-    const fig = el("div", { class: "bim-chart" });
-    fig.appendChild(el("h4", { class: "bim-chart-title",
-      text: "The published headline figure, rebuilt beside it" }));
-    fig.appendChild(el("p", { class: "bim-chart-sub", html:
-      "Per-member-per-month budget impact by year and payer perspective — the only result figure in " +
-      "the source. Published values are read from Table 4 divided by 1,000,000 members over 12 " +
-      "months, which reproduces the figure's own labels exactly. Base-case settings, so this does " +
-      "not move with the controls above." }));
-    const figHolder = el("div", {});
-    fig.appendChild(figHolder);
-    fig.appendChild(legend([["#2a78d6", "This rebuild"], ["#eb6834", "Published"]]));
-    w.appendChild(fig);
 
-    w.appendChild(el("div", { class: "bim-note-box", html:
-      "<strong>Two kinds of calibration, and why only one of them is legitimate.</strong> " +
-      "An earlier version of this rebuild multiplied whole cost components by coefficients fitted on the " +
-      "without-venetoclax mix so that the levels would match Table 4. That was tested and rejected. " +
-      "Hospitalisation and transfusions are precisely where venetoclax generates its offsets, so scaling " +
-      "the levels inflated the difference and the year-3 impact collapsed by more than 40%. In a budget " +
-      "impact model only the difference between the two worlds is the answer, and a level correction is " +
-      "not a difference correction.<br><br>" +
-      "What is done instead is parameter estimation inside a structure the source documents. Two " +
-      "quantities the source uses are never published: the Delphi panel's returned hospital days per " +
-      "cycle, and the effective duration of transfusion independence. Both were estimated against " +
-      "<em>all</em> the published totals including the difference, rather than against a single scenario. " +
-      "Two independent checks support the result. The hospital day estimates land close to the " +
-      "questionnaire's own suggested values — 25 against 20, and 14 against 15 — which a wrong structure " +
-      "would not produce. And levels and differences reconcile together instead of trading off, which is " +
-      "what separates a structure that is right from one that has merely been fitted.<br><br>" +
-      "Administration stays unreconciled at roughly 45% and is not patched: the source costs later-cycle " +
-      "administration at a daily hospital stay whose unit cost it never reports. Monitoring sits about 12% " +
-      "low for reasons not traceable to any published quantity. Together they are 0.5% of total spend, and " +
-      "they are shown rather than removed." }));
 
     return { node: w, update() {
       const base = E.budgetImpact(P, { perspective: S.perspective });
@@ -810,9 +794,6 @@
         return el("td", { class: "num " + (extraClass || "") + " " + (Math.abs(d) < 10 ? "pos" : "neg"),
                           text: (d >= 0 ? "+" : "") + d.toFixed(0) + "%" });
       };
-      clear(figHolder);
-      figHolder.appendChild(pmpmFigure());
-
       E.COMPONENTS.forEach(k => {
         const tr = el("tr", {});
         tr.appendChild(el("td", { text: E.COMPONENT_LABELS[k] }));
