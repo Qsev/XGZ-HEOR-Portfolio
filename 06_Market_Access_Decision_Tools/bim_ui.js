@@ -539,13 +539,14 @@
         head.appendChild(el("span", { class: "bim-deriv-total", text: money(comp.value) }));
         card.appendChild(head);
 
+        /* Only two component-and-regimen pairs are ever empty: best supportive
+           care has no drug administration, and Table 1 gives it no adverse
+           event column. Everything else has at least one line. */
         if (!comp.parts.length) {
           const why = (k === "administration")
             ? "Best supportive care involves no drug administration."
-            : (k === "hospitalisation")
-            ? "Table 1 reports no remission rate for this regimen, so no admitted days are costed — a stated assumption that understates the comparator arm."
             : (k === "adverseEvents")
-            ? "Table 1 has no adverse event column for this regimen, so the model costs none — a stated assumption that flatters the comparator."
+            ? "Table 1 has no adverse event column for best supportive care, so the model costs none — a stated assumption that flatters the comparator arm."
             : "No cost arises under this component for this regimen.";
           card.appendChild(el("p", { class: "bim-deriv-none", text: why }));
         }
