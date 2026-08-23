@@ -92,12 +92,47 @@
     const tip = keys.map(k => P.sources[k] && (P.sources[k].type + ": " + P.sources[k].full
                   + (P.sources[k].ref ? "  " + P.sources[k].ref : ""))).filter(Boolean).join("\n\n")
               + (prm.src ? "\n\n" + prm.src : "");
-    const n = el("span", { class: "bim-src bim-src-" + kindOf(keys[0]), title: tip.trim() });
+    const n = el("span", { class: "bim-src bim-src-" + kindOf(keys[0]),
+      tabindex: "0", role: "note", "data-tip": tip.trim(), "aria-label": tip.trim() });
     n.appendChild(el("span", { text: label + extra }));
     if (prm.at) n.appendChild(el("span", { class: "bim-src-at", text: prm.at }));
     return n;
   }
   function swatch(c) { return el("span", { class: "bim-swatch", style: "background:" + c }); }
+
+  /* Hover card for the provenance chips. The native title tooltip waits about a
+     second before appearing — long enough that a reader gives up — and it is
+     clipped by the scrolling table wrappers. This one is instant, and lives on
+     <body> so nothing can crop it. */
+  const tipEl = el("div", { class: "bim-tip", role: "tooltip", "aria-hidden": "true" });
+  document.body.appendChild(tipEl);
+  let tipFor = null;
+  function showTip(target) {
+    const text = target.getAttribute("data-tip");
+    if (!text) return;
+    tipFor = target;
+    tipEl.textContent = text;
+    tipEl.classList.add("on");
+    const r = target.getBoundingClientRect();
+    const w = Math.min(360, window.innerWidth - 24);
+    tipEl.style.width = w + "px";
+    let left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+    const below = r.bottom + 6;
+    const fitsBelow = below + tipEl.offsetHeight < window.innerHeight - 8;
+    tipEl.style.left = left + "px";
+    tipEl.style.top = (fitsBelow ? below : r.top - tipEl.offsetHeight - 6) + "px";
+  }
+  function hideTip() { tipFor = null; tipEl.classList.remove("on"); }
+  document.addEventListener("mouseover", e => {
+    const t = e.target.closest && e.target.closest(".bim-src[data-tip]");
+    if (t) showTip(t); else if (tipFor && !e.target.closest(".bim-tip")) hideTip();
+  });
+  document.addEventListener("focusin", e => {
+    const t = e.target.closest && e.target.closest(".bim-src[data-tip]");
+    if (t) showTip(t); else hideTip();
+  });
+  window.addEventListener("scroll", hideTip, true);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") hideTip(); });
   const clear = n => { while (n.firstChild) n.removeChild(n.firstChild); };
 
   /* current engine result, recomputed on every change */
