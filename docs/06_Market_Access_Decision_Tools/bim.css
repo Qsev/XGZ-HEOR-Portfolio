@@ -318,3 +318,7 @@
   .bim-tip.on { transform: none; }
 }
 
+
+.bim-pyr-sub { font-weight: 400 !important; font-size: 0.66rem !important; text-transform: none;
+  letter-spacing: 0; font-style: italic; }
+.bim-row-published td { color: var(--muted); border-bottom: 1.5px solid var(--border); }
