@@ -515,7 +515,10 @@
 
         comp.parts.forEach(part => {
           const block = el("div", { class: "bim-deriv-part" });
-          block.appendChild(el("div", { class: "bim-deriv-label", text: part.label }));
+          const lab = el("div", { class: "bim-deriv-label" });
+          lab.appendChild(el("span", { text: part.label }));
+          lab.appendChild(el("span", { class: "bim-deriv-subtotal", text: money(part.product) }));
+          block.appendChild(lab);
           const t = el("table", { class: "bim-deriv-table" });
           const tb = el("tbody", {});
           part.terms.forEach((term, i) => {
@@ -535,11 +538,6 @@
             tr.appendChild(prov);
             tb.appendChild(tr);
           });
-          const sum = el("tr", { class: "res" });
-          sum.appendChild(el("td", { class: "op", text: "=" }));
-          sum.appendChild(el("td", { class: "fac", colspan: 2, text: part.label }));
-          sum.appendChild(el("td", { class: "val strong", text: money(part.product) }));
-          tb.appendChild(sum);
           t.appendChild(tb);
           block.appendChild(t);
           card.appendChild(block);

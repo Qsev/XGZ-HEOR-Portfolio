@@ -4,6 +4,13 @@ project:
   resources:
     - CV/Xiaoge_Zhang_PhD_Health_Economist_CV.pdf
     - CNAME
+    # Declared explicitly: these are referenced with a ?v= cache-busting token,
+    # which stops Quarto recognising them as local assets and silently skips
+    # copying them into docs/. Without this the page would ship stale JS and CSS.
+    - 06_Market_Access_Decision_Tools/bim.css
+    - 06_Market_Access_Decision_Tools/bim_params.js
+    - 06_Market_Access_Decision_Tools/bim_engine.js
+    - 06_Market_Access_Decision_Tools/bim_ui.js
   render:
     - index.qmd
     - 05_TA975_CAR-T_Case/TA975_Mock_Case.qmd

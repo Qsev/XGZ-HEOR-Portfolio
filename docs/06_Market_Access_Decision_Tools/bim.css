@@ -239,7 +239,12 @@
 .bim-deriv-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 0.95rem; }
 .bim-deriv-part { margin-bottom: 0.9rem; }
 .bim-deriv-part:last-child { margin-bottom: 0; }
-.bim-deriv-label { font-size: 0.76rem; font-weight: 600; color: var(--ink); margin-bottom: 0.25rem; }
+.bim-deriv-label {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 0.8rem;
+  font-size: 0.76rem; font-weight: 600; color: var(--ink);
+  margin-bottom: 0.25rem; padding-bottom: 0.2rem; border-bottom: 1px solid var(--border);
+}
+.bim-deriv-subtotal { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .bim-deriv-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
 .bim-deriv-table td { padding: 0.22rem 0.4rem; border-bottom: 1px solid #eef1f5; vertical-align: baseline; }
 .bim-deriv-table tr:last-child td { border-bottom: 0; }
@@ -250,8 +255,6 @@
 .bim-deriv-table td.prov { width: 46%; }
 .bim-deriv-table tr.efficacy   { background: #fdfaf2; }
 .bim-deriv-table tr.calibrated { background: #f6f4fc; }
-.bim-deriv-table tr.res td { border-top: 1.5px solid var(--border); padding-top: 0.35rem; }
-.bim-deriv-table tr.res td.fac { color: var(--muted); font-style: italic; }
 .bim-kind {
   display: inline-block; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em;
   padding: 0.05rem 0.35rem; border-radius: 3px; margin-right: 0.4rem; vertical-align: 1px;
