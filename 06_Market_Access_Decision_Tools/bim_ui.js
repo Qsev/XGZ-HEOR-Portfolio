@@ -50,7 +50,6 @@
     incidence65plus:   P.epidemiology.incidence65plus.value,
     pctUnfitIntensive: P.epidemiology.pctUnfitIntensive.value,
     pct65plus:         P.epidemiology.pct65plus.value,
-    growthPct:         P.epidemiology.eligibleGrowthPct.value,
     sharesWithout: Object.fromEntries(RID.map(r => [r, P.marketShare.withoutVEN[r] || 0])),
     sharesWith: Object.fromEntries(YEARS.map(y =>
       [y, Object.fromEntries(RID.map(r => [r, P.marketShare.withVEN[y][r] || 0]))]))
@@ -107,7 +106,6 @@
       perspective: S.perspective,
       coveredPopulation: S.coveredPopulation, incidence65plus: S.incidence65plus,
       pctUnfitIntensive: S.pctUnfitIntensive, pct65plus: S.pct65plus,
-      growthPct: S.growthPct,
       sharesWithout: S.sharesWithout, sharesWith: S.sharesWith
     });
   }
@@ -164,9 +162,7 @@
      { key: "incidence65plus", label: "AML incidence, aged 65+", min: 5, max: 40, step: 0.1,
        fmt: v => v.toFixed(1) + " / 100,000", prm: P.epidemiology.incidence65plus },
      { key: "pctUnfitIntensive", label: "Unfit for intensive chemotherapy", min: 20, max: 100, step: 1,
-       fmt: v => v + "%", prm: P.epidemiology.pctUnfitIntensive },
-     { key: "growthPct", label: "Eligible population growth", min: -2, max: 6, step: 0.5,
-       fmt: v => (v > 0 ? "+" : "") + v + "% / year", prm: P.epidemiology.eligibleGrowthPct }
+       fmt: v => v + "%", prm: P.epidemiology.pctUnfitIntensive }
     ].forEach(d => {
       const row = el("div", { class: "bim-control" });
       const lab = el("label", {});
@@ -225,13 +221,9 @@
         "</strong> patients in year 1; the publication rounds this to 129. Note what the base case " +
         "implies: the 65+ incidence rate is applied to the entire covered population, so default " +
         "membership is 100% aged 65 or over. Table 5's age-structure scenarios scale linearly from " +
-        "here, which is how that reading was confirmed." +
-        (res.populationGrows
-          ? " <br><strong>Growth is switched on</strong>, so the eligible population runs " +
-            res.populationByYear.map(n => n.toFixed(1)).join(" → ") +
-            " across the horizon. The source holds it constant; at 0% this model does too."
-          : " The population is held constant across all three years, exactly as in the source — " +
-            "no growth, no ageing trajectory, and no carry-over of patients between budget years.");
+        "here, which is how that reading was confirmed. The population is held constant across " +
+        "all three years, exactly as in the source — no growth, no ageing trajectory, and no " +
+        "carry-over of patients between budget years.";
     } };
   }
 
@@ -605,19 +597,16 @@
       cards.appendChild(cum);
 
       clear(thead); clear(body);
-      const grows = res.populationGrows;
       const h = el("tr", {});
       h.appendChild(el("th", { text: "Cost component" }));
-      if (grows) res.years.forEach(y => h.appendChild(el("th", { class: "num", text: "Without VEN · Y" + y.year })));
-      else h.appendChild(el("th", { class: "num", text: "Without VEN" }));
+      h.appendChild(el("th", { class: "num", text: "Without VEN" }));
       res.years.forEach(y => h.appendChild(el("th", { class: "num", text: "With VEN · Y" + y.year })));
       res.years.forEach(y => h.appendChild(el("th", { class: "num impact-col", text: "Impact · Y" + y.year })));
       thead.appendChild(h);
       E.COMPONENTS.concat("total").forEach(k => {
         const tr = el("tr", { class: k === "total" ? "bim-row-total" : "" });
         tr.appendChild(el("td", { text: k === "total" ? "Total" : E.COMPONENT_LABELS[k] }));
-        if (grows) res.years.forEach(y => tr.appendChild(el("td", { class: "num", text: money(y.without.components[k]) })));
-        else tr.appendChild(el("td", { class: "num", text: money(res.without.components[k]) }));
+        tr.appendChild(el("td", { class: "num", text: money(res.without.components[k]) }));
         res.years.forEach(y => tr.appendChild(el("td", { class: "num", text: money(y.with.components[k]) })));
         res.years.forEach(y => {
           const v = y.impact[k];
@@ -699,7 +688,6 @@
         perspective: S.perspective,
         coveredPopulation: S.coveredPopulation, incidence65plus: S.incidence65plus,
         pctUnfitIntensive: S.pctUnfitIntensive, pct65plus: S.pct65plus,
-        growthPct: S.growthPct,
         sharesWithout: S.sharesWithout, sharesWith: S.sharesWith
       });
       clear(holder);

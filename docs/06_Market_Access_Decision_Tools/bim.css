@@ -98,8 +98,6 @@
 .bim-fun-track { height: 7px; background: #e3e9f0; border-radius: 4px; overflow: hidden; }
 .bim-fun-fill { height: 100%; background: #2a78d6; border-radius: 4px; transition: width 90ms linear; }
 .bim-fun-rate .bim-fun-fill { background: #1baf7a; }
-.bim-fun-growth { background: #fdf6ea !important; border-left: 3px solid #eb6834; }
-.bim-fun-growth .bim-fun-op { color: #8a5a12; font-weight: 600; }
 .bim-fun-scale { display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
 .bim-fun-label { display: flex; flex-direction: column; min-width: 0; }
 .bim-fun-name { font-size: 0.86rem; }

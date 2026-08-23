@@ -97,9 +97,6 @@ const BIM_PARAMS = {
     pct65plus        : { value: 100, unit: "%",
                          src: "Derived: the base case applies the 65+ incidence to the whole covered population, so membership is implicitly 100% aged 65+. Confirmed because Table 5 PMPM scales linearly with this share (78% x base 0.136 = 0.106 vs published 0.105).", from: "rebuild", at: "Table 5" },
     pyramidScenarios : { value: [5, 10, 15, 20, 78], unit: "% aged 65+", src: "INDEC census age structure and the PAMI retiree fund affiliate register", from: "indec", at: "Table 5" },
-    eligibleGrowthPct: { value: 0, unit: "% per year",
-      src: "Extension beyond the source, default 0% — at which the model reproduces the publication exactly. The source holds the population static over the horizon and does not list this among its limitations, although the ISPOR budget impact good practice guidance it cites (Sullivan et al.) asks that the changing size and composition of the population be reflected. Over three years the effect is material here because the entire target population sits in the 65+ segment, which grows faster than the membership containing it.",
-      from: "assumption", at: "not in the source" },
     targetPopulation : { value: 129, unit: "patients per year",
                          src: "Derived: 1,000,000 x 20.1/100,000 x 64% = 129, matching the S7 Table total", from: "rebuild", at: "S7 Table" }
   },

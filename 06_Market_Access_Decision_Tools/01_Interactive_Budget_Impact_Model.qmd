@@ -126,11 +126,11 @@ is the answer; everything under it is the justification.
 <!-- ?v= is a cache-busting token. Bump it whenever these files change:
      Quarto does not fingerprint page assets, so a returning visitor would
      otherwise keep a stale stylesheet or engine and see a broken page. -->
-<link rel="stylesheet" href="bim.css?v=2026-08-23g">
+<link rel="stylesheet" href="bim.css?v=2026-08-23h">
 <div id="bim-app"></div>
-<script src="bim_params.js?v=2026-08-23g"></script>
-<script src="bim_engine.js?v=2026-08-23g"></script>
-<script src="bim_ui.js?v=2026-08-23g"></script>
+<script src="bim_params.js?v=2026-08-23h"></script>
+<script src="bim_engine.js?v=2026-08-23h"></script>
+<script src="bim_ui.js?v=2026-08-23h"></script>
 ```
 :::
 
@@ -212,14 +212,6 @@ cohort's whole cost to its year of diagnosis therefore flattens the ramp: the re
 pressure is more back-loaded than the model shows. This is the difference between costing each
 incident cohort in full and costing only what falls inside the budget year, and it is the second
 that answers a payer's cash-flow question.
-
-The **eligible population growth** control is the one extension beyond the source. At its default
-of 0% the model reproduces the publication exactly. It is worth having because the ISPOR budget
-impact guidance the source itself cites asks that the changing size and composition of the
-population be reflected, and here the entire target population sits in the 65+ segment, which
-grows faster than the membership containing it. Growth is applied to the eligible population
-rather than to membership deliberately: membership is a normalising convention, and growing it
-would scale the budget and the per-member denominator together, leaving PMPM unchanged.
 
 ### Scope held to the source
 
