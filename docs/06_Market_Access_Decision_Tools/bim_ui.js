@@ -436,14 +436,12 @@
        in it would be a dash. */
     const EFF_REGIMENS = P.regimens.filter(r => r.id !== "BSC");
     EFF_REGIMENS.forEach(r => eh.appendChild(el("th", { class: "num", text: SHORT[r.id] })));
-    eh.appendChild(el("th", { class: "num impact-col", html:
-      "Worth per patient<br><span class='bim-th-sub'>VEN+AZA vs AZA</span>" }));
     effTbl.appendChild(el("thead", {}, [eh]));
     const eb = el("tbody", {});
     const effRows = [
       ["Complete remission (CR/CRi)", "Hospitalisation", "higher → cheaper", "down",
        r => { const v = P.efficacy.completeRemission[r]; return v ? v.toFixed(1) + "%" : "—"; }],
-      ["Mean duration of active treatment", "Drug acquisition · Administration", "longer → costlier", "up",
+      ["Mean duration of active treatment", "Drug acquisition · Administration · Hospitalisation", "longer → costlier", "up",
        r => { const v = P.treatmentCycles.active[r]; return v ? v.toFixed(2) : "—"; }],
       ["Transfusion independence", "Blood transfusions", "higher → cheaper", "down",
        r => { const v = P.efficacy.transfusionIndependence[r]; return v ? v.toFixed(1) + "%" : "—"; }],
@@ -452,36 +450,16 @@
       ["Time to blood count recovery", "nothing", "reported but not used", "none",
        r => { const v = P.efficacy.bloodCountRecoveryCycles[r]; return v ? v.toFixed(2) : "—"; }]
     ];
-    /* what each efficacy parameter is worth, in money: the per-patient cost
-       difference on the component it drives, venetoclax + azacitidine against
-       azacitidine alone. This is the link from clinical evidence to budget. */
-    const WORTH = { drug: ["drug", "administration"], hosp: ["hospitalisation"],
-                    transf: ["transfusion"], ae: ["adverseEvents"], none: [] };
-    const worthOf = keys => {
-      if (!keys.length) return "—";
-      const a = E.perPatientCost(P, "VEN_AZA", S.perspective);
-      const b = E.perPatientCost(P, "AZA", S.perspective);
-      return money(keys.reduce((t, k) => t + a[k] - b[k], 0));
-    };
-    const WORTH_KEY = ["hosp", "drug", "transf", "ae", "none"];
-    effRows.forEach(([name, drives, dir, arrow, get], i) => {
+    effRows.forEach(([name, drives, dir, arrow, get]) => {
       const tr = el("tr", { class: arrow === "none" ? "bim-row-unused" : "" });
       tr.appendChild(el("td", { text: name }));
       tr.appendChild(el("td", { class: "bim-drives", text: drives }));
       tr.appendChild(el("td", {}, [el("span", { class: "bim-dir bim-dir-" + arrow, text: dir })]));
       EFF_REGIMENS.forEach(r => tr.appendChild(el("td", { class: "num", text: get(r.id) })));
-      tr.appendChild(el("td", { class: "num impact-col", text: worthOf(WORTH[WORTH_KEY[i]]) }));
       eb.appendChild(tr);
     });
     effTbl.appendChild(eb);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [effTbl]));
-    w.appendChild(el("p", { class: "bim-panel-note", html:
-      "The last column prices each channel — the per-patient cost difference on the component that " +
-      "parameter drives, for venetoclax plus azacitidine against azacitidine alone. Multiply those " +
-      "by the patients in each arm and difference the two worlds, and you have the budget impact at " +
-      "the top of this page. There is nothing else in it.<br>" +
-      "Hospitalisation responds to both remission and treatment duration, and is counted once, under " +
-      "remission — so the column shows what each channel contributes, not four figures to add up." }));
     w.appendChild(el("div", { class: "bim-note-box", html:
       "<strong>Complete remission drives hospitalisation.</strong> The main paper never says how " +
       "hospital days are derived; the Delphi questionnaire does. It asks the panel for days per " +
