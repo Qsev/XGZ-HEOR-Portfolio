@@ -1,6 +1,6 @@
 ---
-title: "A Budget Impact Model for Venetoclax in Acute Myeloid Leukaemia, Rebuilt from the Published Source"
-subtitle: "A showcase demonstration of how a budget impact model is structured, layer by layer — built to be read, not to be delivered"
+title: "Rebuilding a Published Budget Impact Model: Venetoclax in Acute Myeloid Leukaemia"
+subtitle: "A replication of Palacios et al. 2024, not a model of my own — built to show how a budget impact model is put together, layer by layer"
 author: "Xiaoge Zhang, PhD"
 date: today
 page-layout: article

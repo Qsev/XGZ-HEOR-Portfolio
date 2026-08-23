@@ -94,7 +94,7 @@ website:
       - text: "Market Access Tools"
         menu:
           - href: 06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.qmd
-            text: "BIM: Venetoclax in AML"
+            text: "BIM rebuild: Venetoclax in AML"
       - text: "Methodology Wiki"
         href: 00_HTA_LLM_Wiki/README.md
     right:
