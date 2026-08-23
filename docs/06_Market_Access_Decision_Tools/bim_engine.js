@@ -137,6 +137,31 @@
      Complete remission is reported by the source but does no work anywhere in
      the model: cost responds to how long treatment runs and how much hospital
      and blood product a patient needs, not to whether remission was achieved. */
+  /* Provenance kinds carried by every factor:
+       published  — a value printed in the source publication
+       expert     — elicited from the modified Delphi panel
+       estimated  — not published anywhere; fitted to the published totals
+       derived    — arithmetic on the above                                   */
+  const SRC = {
+    price:    { kind: "published", from: "Alfa Beta national price list, Sept 2020", at: "S2 Table" },
+    trial:    { kind: "published", from: "Pivotal trial for this regimen",           at: "Table 1" },
+    safety:   { kind: "published", from: "Pivotal trial safety data",                at: "Table 1" },
+    iecs:     { kind: "published", from: "IECS unit cost database",                  at: "Table 3" },
+    label:    { kind: "published", from: "Regulatory label / pivotal trial protocol", at: "SmPC" },
+    micro:    { kind: "published", from: "Micro-costing by local clinical experts",  at: "S2 footnote" },
+    delphiMon:{ kind: "expert",    from: "Modified Delphi panel, six onco-haematologists", at: "S3 Table" },
+    delphiTx: { kind: "expert",    from: "Local expert, validated by the Delphi panel",    at: "S4 Table" },
+    delphiHosp:{kind: "expert",    from: "Delphi questionnaire — structure and this value", at: "S5 File" },
+    estHosp:  { kind: "estimated", from: "Panel's answer never published; fitted to the published hospitalisation totals", at: "S5 File" },
+    estTx:    { kind: "estimated", from: "Fitted to the published transfusion totals",      at: "Methods" },
+    year:     { kind: "derived",   from: "365 days / 28-day cycle",                          at: "" },
+    postAct:  { kind: "derived",   from: "Cycles in the year minus active cycles",           at: "" },
+    laterAct: { kind: "derived",   from: "Active cycles minus the first two",                at: "" },
+    txCycles: { kind: "derived",   from: "Year minus the period of transfusion independence", at: "" }
+  };
+  const T = (label, value, unit, key, extra) =>
+    Object.assign({ label, value, unit }, SRC[key], extra || {});
+
   function costDetail(P, regimen, perspective) {
     const U  = P.unitCosts;
     const CY = P.meta.cyclesPerYear.value;
@@ -148,18 +173,17 @@
     /* drug acquisition */
     c.drug = regimen === "BSC"
       ? { parts: [{ label: "Best supportive care, whole year", terms: [
-            { label: "BSC cost per cycle", value: bscRate, unit: "$", src: "S2 Table" },
-            { label: "Cycles per year", value: CY, unit: "cycles", src: "365 / 28" }] }] }
+            T("BSC cost per cycle", bscRate, "$", "micro"),
+            T("Cycles per year", CY, "cycles", "year")] }] }
       : { parts: [
           { label: "Active treatment", terms: [
-            { label: "Drug cost per cycle", value: P.drugCostPerCycle[regimen].value, unit: "$", src: "S2 Table" },
-            { label: "Mean duration of active treatment", value: active, unit: "cycles", efficacy: true, src: "Table 1, regimen trials" }] },
-          { label: "Post-active period", terms: [
-            { label: "Remaining cycles in the year", value: postActive, unit: "cycles", efficacy: true, src: "13.04 minus active" },
-            { label: "BSC cost per cycle", value: bscRate, unit: "$", src: "S2 Table" }] }] };
+            T("Drug cost per cycle", P.drugCostPerCycle[regimen].value, "$", "price"),
+            T("Mean duration of active treatment", active, "cycles", "trial", { efficacy: true })] },
+          { label: "Post-active period, on best supportive care", terms: [
+            T("Remaining cycles in the year", postActive, "cycles", "postAct", { efficacy: true }),
+            T("BSC cost per cycle", bscRate, "$", "micro")] }] };
 
-    /* administration — venetoclax is oral and carries none. Dosing days come
-       from the parameter file, where they are sourced to the labels.          */
+    /* administration — venetoclax is oral and carries none */
     const daysPerCycle = Object.fromEntries(Object.entries(P.administrationDaysPerCycle)
       .map(([k, v]) => [k, v.value]));
     const route = P.administrationRoute[regimen];
@@ -167,20 +191,18 @@
                   : route === "SC" ? U.scAdministration[perspective] : 0;
     c.administration = { parts: (active && daysPerCycle[regimen]) ? [
       { label: route + " administration", terms: [
-        { label: "Mean duration of active treatment", value: active, unit: "cycles", efficacy: true, src: "Table 1, regimen trials" },
-        { label: "Administration days per cycle", value: daysPerCycle[regimen], unit: "days",
-          src: (P.administrationDaysPerCycle[regimen] || {}).at || "label" },
-        { label: route + " administration cost", value: admUnit, unit: "$", src: "Table 3" }] }] : [] };
+        T("Mean duration of active treatment", active, "cycles", "trial", { efficacy: true }),
+        T("Administration days per cycle", daysPerCycle[regimen], "days", "label"),
+        T(route + " administration cost", admUnit, "$", "iecs")] }] : [] };
 
     /* adverse events — one line per event */
     c.adverseEvents = { parts: Object.keys(P.aeIncidence).filter(k =>
         U["ae_" + k] && typeof P.aeIncidence[k][regimen] === "number" && P.aeIncidence[k][regimen] > 0)
       .map(k => ({ label: k.replace(/([A-Z])/g, " $1").toLowerCase(), terms: [
-        { label: "Incidence", value: P.aeIncidence[k][regimen] / 100, unit: "share", efficacy: true, src: "Table 1" },
-        { label: "Cost per event", value: U["ae_" + k][perspective], unit: "$", src: "Table 3" }] })) };
+        T("Incidence", P.aeIncidence[k][regimen] / 100, "share", "safety", { efficacy: true }),
+        T("Cost per event", U["ae_" + k][perspective], "$", "iecs")] })) };
 
-    /* hospitalisation — remission status is the switch. Failure to achieve
-       CR/CRi is taken as progression, and progression means admissions.       */
+    /* hospitalisation — remission status is the switch */
     const HD = P.hospitalisationDays;
     const cr = (P.efficacy.completeRemission[regimen] || 0) / 100;
     const firstCycles = Math.min(2, active);
@@ -188,86 +210,87 @@
     const room = U.neutropenicRoomDay[perspective];
     c.hospitalisation = { parts: [] };
     if (firstCycles > 0) c.hospitalisation.parts.push(
-      { label: "Cycles 1 and 2, all patients", terms: [
-        { label: "Cycles", value: firstCycles, unit: "cycles", src: "S5 File" },
-        { label: "Days per cycle", value: HD.firstTwoCycles.value, unit: "days", calibrated: true, src: "estimated" },
-        { label: "Neutropenic room per day", value: room, unit: "$", src: "Table 3" }] });
+      { label: "Cycles 1 and 2 — every patient is admitted for treatment", terms: [
+        T("Cycles", firstCycles, "cycles", "delphiHosp"),
+        T("Days per cycle", HD.firstTwoCycles.value, "days", "estHosp", { calibrated: true }),
+        T("Neutropenic room per day", room, "$", "iecs")] });
     if (laterActive > 0) {
       c.hospitalisation.parts.push(
-        { label: "Later active cycles, in remission", terms: [
-          { label: "Complete remission", value: cr, unit: "share", efficacy: true, src: "Table 1, regimen trials" },
-          { label: "Cycles", value: laterActive, unit: "cycles", efficacy: true, src: "Table 1 minus 2" },
-          { label: "Days per cycle", value: HD.activeRemission.value, unit: "days", src: "S5 File" },
-          { label: "Neutropenic room per day", value: room, unit: "$", src: "Table 3" }] },
-        { label: "Later active cycles, progressing", terms: [
-          { label: "Not in remission", value: 1 - cr, unit: "share", efficacy: true, src: "Table 1, regimen trials" },
-          { label: "Cycles", value: laterActive, unit: "cycles", efficacy: true, src: "Table 1 minus 2" },
-          { label: "Days per cycle", value: HD.activeNoRemission.value, unit: "days", calibrated: true, src: "estimated" },
-          { label: "Neutropenic room per day", value: room, unit: "$", src: "Table 3" }] });
+        { label: "Later active cycles — patients in remission", terms: [
+          T("Achieving complete remission", cr, "share", "trial", { efficacy: true }),
+          T("Cycles", laterActive, "cycles", "laterAct", { efficacy: true }),
+          T("Days per cycle", HD.activeRemission.value, "days", "delphiHosp"),
+          T("Neutropenic room per day", room, "$", "iecs")] },
+        { label: "Later active cycles — patients progressing", terms: [
+          T("Not achieving remission", 1 - cr, "share", "trial", { efficacy: true }),
+          T("Cycles", laterActive, "cycles", "laterAct", { efficacy: true }),
+          T("Days per cycle", HD.activeNoRemission.value, "days", "estHosp", { calibrated: true }),
+          T("Neutropenic room per day", room, "$", "iecs")] });
     }
     if (postActive > 0) c.hospitalisation.parts.push(
       { label: "Post-active period, on best supportive care", terms: [
-        { label: "Cycles", value: postActive, unit: "cycles", efficacy: true, src: "13.04 minus active" },
-        { label: "Days per cycle", value: HD.postActive.value, unit: "days", calibrated: true, src: "estimated" },
-        { label: "Neutropenic room per day", value: room, unit: "$", src: "Table 3" }] });
+        T("Cycles", postActive, "cycles", "postAct", { efficacy: true }),
+        T("Days per cycle", HD.postActive.value, "days", "estHosp", { calibrated: true }),
+        T("Neutropenic room per day", room, "$", "iecs")] });
 
     /* monitoring */
     const M = P.monitoringRates;
     c.monitoring = { parts: [] };
     if (regimen === "BSC") {
       c.monitoring.parts = [
-        { label: "Blood count", terms: [{ label: "Per year", value: M.bloodCount.perYear.BSC, unit: "tests", src: "S3 Table" },
-          { label: "Unit cost", value: U.bloodCount[perspective], unit: "$", src: "Table 3" }] },
-        { label: "Chemistry panel", terms: [{ label: "Per year", value: M.chemicalPanel.perYear.BSC, unit: "panels", src: "S3 Table" },
-          { label: "Unit cost", value: U.chemicalPanel[perspective], unit: "$", src: "Table 3" }] },
-        { label: "Marrow aspiration", terms: [{ label: "Per year", value: M.bmAspiration.perYear.BSC, unit: "procedures", src: "S3 Table" },
-          { label: "Unit cost", value: U.bmAspiration[perspective], unit: "$", src: "Table 3" }] },
-        { label: "Marrow biopsy", terms: [{ label: "Per year", value: M.bmBiopsy.perYear.BSC, unit: "procedures", src: "S3 Table" },
-          { label: "Unit cost", value: U.bmBiopsy[perspective], unit: "$", src: "Table 3" }] }];
+        { label: "Blood count", terms: [
+          T("Per year", M.bloodCount.perYear.BSC, "tests", "delphiMon"),
+          T("Unit cost", U.bloodCount[perspective], "$", "iecs")] },
+        { label: "Chemistry panel", terms: [
+          T("Per year", M.chemicalPanel.perYear.BSC, "panels", "delphiMon"),
+          T("Unit cost", U.chemicalPanel[perspective], "$", "iecs")] },
+        { label: "Marrow aspiration", terms: [
+          T("Per year", M.bmAspiration.perYear.BSC, "procedures", "delphiMon"),
+          T("Unit cost", U.bmAspiration[perspective], "$", "iecs")] },
+        { label: "Marrow biopsy", terms: [
+          T("Per year", M.bmBiopsy.perYear.BSC, "procedures", "delphiMon"),
+          T("Unit cost", U.bmBiopsy[perspective], "$", "iecs")] }];
     } else {
       const base = M.chemicalPanel.perCycle[regimen];
       const first = M.chemicalPanel.firstCycleExtra[regimen] ?? base;
       c.monitoring.parts = [
         { label: "Blood count", terms: [
-          { label: "Per cycle", value: M.bloodCount.perCycle[regimen], unit: "tests", src: "S3 Table" },
-          { label: "Cycles per year", value: CY, unit: "cycles", src: "365 / 28" },
-          { label: "Unit cost", value: U.bloodCount[perspective], unit: "$", src: "Table 3" }] },
+          T("Per cycle", M.bloodCount.perCycle[regimen], "tests", "delphiMon"),
+          T("Cycles per year", CY, "cycles", "year"),
+          T("Unit cost", U.bloodCount[perspective], "$", "iecs")] },
         { label: "Chemistry panel, routine", terms: [
-          { label: "Per cycle", value: base, unit: "panels", src: "S3 Table" },
-          { label: "Cycles per year", value: CY, unit: "cycles", src: "365 / 28" },
-          { label: "Unit cost", value: U.chemicalPanel[perspective], unit: "$", src: "Table 3" }] }];
+          T("Per cycle", base, "panels", "delphiMon"),
+          T("Cycles per year", CY, "cycles", "year"),
+          T("Unit cost", U.chemicalPanel[perspective], "$", "iecs")] }];
       if (first !== base) c.monitoring.parts.push(
-        { label: "Chemistry panel, extra in cycle 1 for tumour lysis", terms: [
-          { label: "Additional panels", value: first - base, unit: "panels", src: "S3 Table" },
-          { label: "Unit cost", value: U.chemicalPanel[perspective], unit: "$", src: "Table 3" }] });
+        { label: "Chemistry panel, extra in cycle 1 for tumour lysis monitoring", terms: [
+          T("Additional panels", first - base, "panels", "delphiMon"),
+          T("Unit cost", U.chemicalPanel[perspective], "$", "iecs")] });
       c.monitoring.parts.push(
         { label: "Marrow aspiration", terms: [
-          { label: "Per year", value: M.bmAspiration.perYear[regimen], unit: "procedures", src: "S3 Table" },
-          { label: "Unit cost", value: U.bmAspiration[perspective], unit: "$", src: "Table 3" }] },
+          T("Per year", M.bmAspiration.perYear[regimen], "procedures", "delphiMon"),
+          T("Unit cost", U.bmAspiration[perspective], "$", "iecs")] },
         { label: "Marrow biopsy", terms: [
-          { label: "Per year", value: M.bmBiopsy.perYear[regimen], unit: "procedures", src: "S3 Table" },
-          { label: "Unit cost", value: U.bmBiopsy[perspective], unit: "$", src: "Table 3" }] });
+          T("Per year", M.bmBiopsy.perYear[regimen], "procedures", "delphiMon"),
+          T("Unit cost", U.bmBiopsy[perspective], "$", "iecs")] });
     }
 
-    /* transfusions — independence removes transfusions only for as long as it
-       lasts, not for the whole year. Cycles requiring transfusion are therefore
-       the year less the independent period, weighted by who achieves it.      */
+    /* transfusions */
     const TR = P.transfusionRates;
     const indep = (P.efficacy.transfusionIndependence[regimen] || 0) / 100;
     const cyclesNeeding = Math.max(0, CY - indep * TR.independenceCycles.value);
     c.transfusion = { parts: [
       { label: "Red cells", terms: [
-        { label: "Cycles requiring transfusion", value: cyclesNeeding, unit: "cycles", efficacy: true, src: "Table 1, independence" },
-        { label: "Units per cycle", value: TR.rbcPerCycle.value, unit: "units", src: "S4 Table" },
-        { label: "Rate-of-use calibration", value: TR.useFactor.value, unit: "factor", calibrated: true, src: "estimated" },
-        { label: "Unit cost", value: U.rbcTransfusion[perspective], unit: "$", src: "Table 3" }] },
+        T("Cycles requiring transfusion", cyclesNeeding, "cycles", "txCycles", { efficacy: true }),
+        T("Units per cycle", TR.rbcPerCycle.value, "units", "delphiTx"),
+        T("Rate-of-use calibration", TR.useFactor.value, "factor", "estTx", { calibrated: true }),
+        T("Unit cost", U.rbcTransfusion[perspective], "$", "iecs")] },
       { label: "Platelets by apheresis", terms: [
-        { label: "Cycles requiring transfusion", value: cyclesNeeding, unit: "cycles", efficacy: true, src: "Table 1, independence" },
-        { label: "Units per cycle", value: TR.plateletPerCycle.value, unit: "units", src: "S4 Table" },
-        { label: "Rate-of-use calibration", value: TR.useFactor.value, unit: "factor", calibrated: true, src: "estimated" },
-        { label: "Unit cost", value: U.plateletApheresis[perspective], unit: "$", src: "Table 3" }] }] };
+        T("Cycles requiring transfusion", cyclesNeeding, "cycles", "txCycles", { efficacy: true }),
+        T("Units per cycle", TR.plateletPerCycle.value, "units", "delphiTx"),
+        T("Rate-of-use calibration", TR.useFactor.value, "factor", "estTx", { calibrated: true }),
+        T("Unit cost", U.plateletApheresis[perspective], "$", "iecs")] }] };
 
-    /* evaluate: every part is a product, every component a sum of its parts */
     let total = 0;
     COMPONENTS.forEach(k => {
       c[k].parts.forEach(p => { p.product = p.terms.reduce((a, t) => a * t.value, 1); });

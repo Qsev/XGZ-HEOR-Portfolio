@@ -224,23 +224,6 @@
 .bim-deriv-none { margin: 0; font-size: 0.76rem; color: var(--muted); font-style: italic; }
 .bim-deriv-part { margin-bottom: 0.55rem; }
 .bim-deriv-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.15rem; }
-.bim-deriv-expr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem; }
-.bim-deriv-term {
-  display: inline-flex; flex-direction: column; line-height: 1.15;
-  padding: 0.15rem 0.4rem; background: var(--soft); border-radius: 5px;
-  border: 1px solid transparent;
-}
-.bim-deriv-term.efficacy { background: #fdf6e6; border-color: #f0dcae; }
-.bim-deriv-term.calibrated { background: #f1eefb; border-color: #d5cbf0; }
-.bim-deriv-term.calibrated .bim-deriv-unit { color: #4a3aa7; }
-.bim-deriv-num { font-size: 0.79rem; font-variant-numeric: tabular-nums; font-weight: 600; }
-.bim-deriv-unit { font-size: 0.6rem; color: var(--muted); }
-.bim-deriv-src { font-size: 0.56rem; color: #8a93a0; letter-spacing: 0.01em; margin-top: 1px; }
-.bim-deriv-term.efficacy .bim-deriv-src { color: #a08248; }
-.bim-deriv-term.calibrated .bim-deriv-src { color: #6f63b8; }
-.bim-deriv-term.efficacy .bim-deriv-unit { color: #8a5a12; }
-.bim-deriv-op { font-size: 0.75rem; color: var(--muted); }
-.bim-deriv-res { font-size: 0.82rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 .bim-bridge-wrap { margin-top: 1.4rem; }
 .bim-bridge-val { font-size: 11px; fill: var(--ink); font-variant-numeric: tabular-nums; }
@@ -250,3 +233,56 @@
 @media (max-width: 640px) {
   .bim-deriv { grid-template-columns: 1fr; }
 }
+
+/* ---- derivation tables: one row per factor, provenance in full ---- */
+.bim-deriv { grid-template-columns: 1fr; }
+.bim-deriv-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 0.95rem; }
+.bim-deriv-part { margin-bottom: 0.9rem; }
+.bim-deriv-part:last-child { margin-bottom: 0; }
+.bim-deriv-label { font-size: 0.76rem; font-weight: 600; color: var(--ink); margin-bottom: 0.25rem; }
+.bim-deriv-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.bim-deriv-table td { padding: 0.22rem 0.4rem; border-bottom: 1px solid #eef1f5; vertical-align: baseline; }
+.bim-deriv-table tr:last-child td { border-bottom: 0; }
+.bim-deriv-table td.op   { width: 1.2rem; color: var(--muted); text-align: center; }
+.bim-deriv-table td.fac  { color: var(--ink); }
+.bim-deriv-table td.val  { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; width: 8rem; }
+.bim-deriv-table td.val.strong { font-weight: 700; }
+.bim-deriv-table td.prov { width: 46%; }
+.bim-deriv-table tr.efficacy   { background: #fdfaf2; }
+.bim-deriv-table tr.calibrated { background: #f6f4fc; }
+.bim-deriv-table tr.res td { border-top: 1.5px solid var(--border); padding-top: 0.35rem; }
+.bim-deriv-table tr.res td.fac { color: var(--muted); font-style: italic; }
+.bim-kind {
+  display: inline-block; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 0.05rem 0.35rem; border-radius: 3px; margin-right: 0.4rem; vertical-align: 1px;
+}
+.bim-kind-published { background: #eaf1fa; color: #22548f; }
+.bim-kind-expert    { background: #eaf5f0; color: #14664a; }
+.bim-kind-estimated { background: #f1eefb; color: #4a3aa7; }
+.bim-kind-derived   { background: #f0f0f2; color: #55606e; }
+.bim-prov-text { font-size: 0.7rem; color: var(--muted); }
+@media (max-width: 720px) {
+  .bim-deriv-table td.prov { display: block; width: auto; padding-left: 1.6rem; padding-top: 0; border: 0; }
+  .bim-deriv-table td.val { width: auto; }
+}
+
+/* ---- model schematic ---- */
+.bim-schematic { margin: 1.2rem 0 1.6rem; max-width: 900px; }
+.bim-schematic svg { width: 100%; height: auto; display: block; }
+.sch-f1 { fill: #e8a54a; }
+.sch-f2 { fill: #f2c489; }
+.sch-f3 { fill: #f8e0c2; }
+.sch-box { stroke: #d9e0e8; stroke-width: 1; fill: #fff; }
+.sch-now   { fill: #f6f8fb; }
+.sch-new   { fill: #fdf6ec; stroke: #eccfa6; }
+.sch-share { fill: #eaf5f0; stroke: #c9e6da; }
+.sch-cost  { fill: #eef4fb; stroke: #cfe0f3; }
+.sch-a { stroke: #8a93a0; stroke-width: 1.4; fill: none; }
+.sch-h { font-size: 13px; font-weight: 600; fill: #172033; }
+.sch-t { font-size: 12px; fill: #3d4855; }
+.sch-em { font-weight: 600; fill: #8a5a12; }
+.sch-cap { font-size: 11px; fill: #5f6b7a; font-style: italic; }
+.sch-out { fill: #4a3aa7; }
+.sch-out-t { font-size: 13.5px; font-weight: 600; fill: #ffffff; }
+.sch-note { text-align: center; font-size: 0.78rem; color: #5f6b7a; margin: 0.5rem 0 0; }
+

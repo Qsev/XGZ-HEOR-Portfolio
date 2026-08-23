@@ -274,12 +274,6 @@
     });
     w.appendChild(grid);
 
-    w.appendChild(el("div", { class: "bim-note-box", html:
-      "<strong>A contradiction in the published supplement, and how it was settled.</strong> " +
-      "S1 Table gives venetoclax + decitabine 14.5% and venetoclax + LDAC 9.6%. S7 Table gives those same " +
-      "two regimens 12 and 19 patients — the opposite assignment. Reconciling each against the drug costs " +
-      "in Table 4 settles it: S7's assignment reproduces published drug spend to within 0.35–1.3%, S1's is " +
-      "out by 3.7–5.2%. The two rows of S1 Table appear to be transposed, and this model follows S7." }));
 
     const chart = el("div", { class: "bim-chart" });
     chart.appendChild(el("h4", { class: "bim-chart-title", text: "Patients treated, by regimen" }));
@@ -440,21 +434,12 @@
       "multiplied by the patients in each arm, summed, and differenced between the two worlds are " +
       "the budget impact at the top of this page — there is nothing else in it." }));
     w.appendChild(el("div", { class: "bim-note-box", html:
-      "<strong>Complete remission is the switch on hospitalisation, and finding that took reading " +
-      "the Delphi questionnaire.</strong> The main paper never states how hospital days are " +
-      "derived. The questionnaire in the supplementary material does: it asks the panel for days " +
-      "per 28-day cycle separately for patients who do and do not achieve CR/CRi, on the stated " +
-      "assumption that failing to achieve remission means the disease is progressing and " +
-      "progression means admissions. Suggested values are 20 days per cycle for everyone in cycles " +
-      "1 and 2, then 2 days if in remission against 15 if not, rising to 20 in the post-active " +
-      "period on best supportive care. So the headline clinical result — 66.4% against 27.8% for " +
-      "venetoclax plus azacitidine — reaches the budget through hospital days. " +
-      "Note what this displaced: time to blood count recovery is reported in Table 1 and, on this " +
-      "reading, does no work at all. An earlier version of this rebuild used it to drive hospital " +
-      "days, which was an invention with no documentary basis and left hospitalisation at less than " +
-      "half the published figure. Switching to the documented mechanism, and estimating the day " +
-      "counts the panel returned but the paper never printed, brings hospitalisation to within 0.1% " +
-      "and the year-3 budget impact to within 0.1% under both perspectives." }));
+      "<strong>Complete remission drives hospitalisation.</strong> The main paper never says how " +
+      "hospital days are derived; the Delphi questionnaire does. It asks the panel for days per " +
+      "cycle separately for patients who do and do not reach CR/CRi, on the assumption that no " +
+      "remission means progression, and progression means admissions. That is the channel through " +
+      "which the clinical result reaches the budget. Time to blood count recovery, reported in " +
+      "Table 1, does no work under this reading." }));
 
     /* -- 3b. the summary table --------------------------------------------- */
     w.appendChild(el("h4", { class: "bim-sub-title", text: "Cost per patient, by component" }));
@@ -471,11 +456,13 @@
     /* -- 3c. full derivation for one regimen -------------------------------- */
     w.appendChild(el("h4", { class: "bim-sub-title", text: "The arithmetic, in full" }));
     w.appendChild(el("p", { class: "bim-panel-note", html:
-      "Pick a regimen. Every factor below is the value the model actually multiplied — this is " +
-      "generated from the calculation itself, not transcribed alongside it. Factors carrying " +
-      "clinical evidence are marked <span class='bim-eff-dot'></span>, and factors estimated " +
-      "against the published totals rather than read from the source are marked " +
-      "<span class='bim-cal-dot'></span>." }));
+      "Pick a regimen. Every factor below is the value the model actually multiplied, generated " +
+      "from the calculation itself rather than transcribed alongside it, and every one names where " +
+      "it came from: <span class='bim-kind bim-kind-published'>published</span> in the source, " +
+      "<span class='bim-kind bim-kind-expert'>expert</span> elicited from the Delphi panel, " +
+      "<span class='bim-kind bim-kind-estimated'>estimated</span> because the source uses it but " +
+      "never prints it, or <span class='bim-kind bim-kind-derived'>derived</span> by arithmetic on " +
+      "the others." }));
     const picker = el("div", { class: "bim-picker" });
     const pickBtns = {};
     P.regimens.forEach(r => {
@@ -514,45 +501,51 @@
         head.appendChild(el("span", { class: "bim-deriv-name", text: E.COMPONENT_LABELS[k] }));
         head.appendChild(el("span", { class: "bim-deriv-total", text: money(comp.value) }));
         card.appendChild(head);
+
         if (!comp.parts.length) {
           const why = (k === "administration")
             ? "Best supportive care involves no drug administration."
             : (k === "hospitalisation")
-            ? "Table 1 reports no time to blood count recovery for this regimen, so the model "
-              + "assigns zero neutropenic-room cost. This is one of the two stated assumptions "
-              + "and it understates the comparator arm."
+            ? "Table 1 reports no remission rate for this regimen, so no admitted days are costed — a stated assumption that understates the comparator arm."
             : (k === "adverseEvents")
-            ? "Table 1 has no adverse event column for this regimen, so the model assigns zero — "
-              + "a stated assumption, and one that flatters the comparator."
+            ? "Table 1 has no adverse event column for this regimen, so the model costs none — a stated assumption that flatters the comparator."
             : "No cost arises under this component for this regimen.";
           card.appendChild(el("p", { class: "bim-deriv-none", text: why }));
         }
+
         comp.parts.forEach(part => {
-          const row = el("div", { class: "bim-deriv-part" });
-          row.appendChild(el("div", { class: "bim-deriv-label", text: part.label }));
-          const expr = el("div", { class: "bim-deriv-expr" });
-          part.terms.forEach((t, i) => {
-            if (i) expr.appendChild(el("span", { class: "bim-deriv-op", text: "×" }));
-            const term = el("span", { class: "bim-deriv-term"
-                + (t.efficacy ? " efficacy" : "") + (t.calibrated ? " calibrated" : ""),
-              title: t.label + (t.calibrated ? " — estimated against the published totals, not a published value" : "") });
-            term.appendChild(el("span", { class: "bim-deriv-num",
-              text: t.unit === "$" ? money(t.value)
-                  : t.unit === "share" ? (t.value * 100).toFixed(1) + "%"
-                  : (Math.round(t.value * 100) / 100).toLocaleString("en-GB") }));
-            term.appendChild(el("span", { class: "bim-deriv-unit",
-              text: t.unit === "$" || t.unit === "share" || t.unit === "factor" ? t.label : t.unit }));
-            if (t.src) term.appendChild(el("span", { class: "bim-deriv-src", text: t.src }));
-            expr.appendChild(term);
+          const block = el("div", { class: "bim-deriv-part" });
+          block.appendChild(el("div", { class: "bim-deriv-label", text: part.label }));
+          const t = el("table", { class: "bim-deriv-table" });
+          const tb = el("tbody", {});
+          part.terms.forEach((term, i) => {
+            const tr = el("tr", { class: term.efficacy ? "efficacy" : term.calibrated ? "calibrated" : "" });
+            tr.appendChild(el("td", { class: "op", text: i ? "×" : "" }));
+            tr.appendChild(el("td", { class: "fac", text: term.label }));
+            tr.appendChild(el("td", { class: "val",
+              text: term.unit === "$" ? money(term.value)
+                  : term.unit === "share" ? (term.value * 100).toFixed(1) + "%"
+                  : term.unit === "factor" ? term.value.toFixed(3)
+                  : (Math.round(term.value * 100) / 100).toLocaleString("en-GB")
+                    + (term.unit && term.unit !== "$" ? " " + term.unit : "") }));
+            const prov = el("td", { class: "prov" });
+            prov.appendChild(el("span", { class: "bim-kind bim-kind-" + term.kind, text: term.kind }));
+            prov.appendChild(el("span", { class: "bim-prov-text",
+              text: term.from + (term.at ? " · " + term.at : "") }));
+            tr.appendChild(prov);
+            tb.appendChild(tr);
           });
-          expr.appendChild(el("span", { class: "bim-deriv-op", text: "=" }));
-          expr.appendChild(el("span", { class: "bim-deriv-res", text: money(part.product) }));
-          row.appendChild(expr);
-          card.appendChild(row);
+          const sum = el("tr", { class: "res" });
+          sum.appendChild(el("td", { class: "op", text: "=" }));
+          sum.appendChild(el("td", { class: "fac", colspan: 2, text: part.label }));
+          sum.appendChild(el("td", { class: "val strong", text: money(part.product) }));
+          tb.appendChild(sum);
+          t.appendChild(tb);
+          block.appendChild(t);
+          card.appendChild(block);
         });
         deriv.appendChild(card);
       });
-
     } };
   }
 
