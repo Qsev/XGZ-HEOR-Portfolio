@@ -109,7 +109,8 @@
 .bim-share-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.1rem; }
 .bim-share-col { background: var(--soft); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 0.9rem; }
 .bim-share-head { margin: 0 0 0.1rem; font-size: 0.88rem; }
-.bim-share-sub { margin: 0 0 0.7rem; font-size: 0.73rem; color: var(--muted); }
+.bim-share-sub { margin: 0 0 0.35rem; font-size: 0.73rem; color: var(--muted); }
+.bim-share-col > .bim-src { margin-bottom: 0.7rem; }
 .bim-share-row { margin-bottom: 0.35rem; }
 .bim-share-row label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; }
 .bim-share-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

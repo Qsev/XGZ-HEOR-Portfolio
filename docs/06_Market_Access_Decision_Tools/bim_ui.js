@@ -272,12 +272,17 @@
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "A budget impact model is the world <em>with</em> the new therapy minus the world <em>without</em> it. " +
       "Without this layer there is only one world and no budget impact at all. Drag any share: the rest of " +
-      "that column renormalises so it always sums to 100%." }));
+      "that column renormalises so it always sums to 100%.<br>" +
+      "<strong>These are projections, not observed market data.</strong> They were supplied by the " +
+      "manufacturer and validated by a modified Delphi panel of six onco-haematologists — the single " +
+      "most challengeable input in any budget impact model, and the reason this layer is the one a " +
+      "payer will want to move first." }));
 
     const grid = el("div", { class: "bim-share-grid" });
     const col0 = el("div", { class: "bim-share-col" });
     col0.appendChild(el("h4", { class: "bim-share-head", text: "Without venetoclax" }));
     col0.appendChild(el("p", { class: "bim-share-sub", text: "held constant across the 3-year horizon" }));
+    col0.appendChild(chip(P.marketShare.withoutVEN));
     NON_VEN.forEach(r => col0.appendChild(shareRow("without", r, v => {
       const next = E.renormalise(Object.assign({}, S.sharesWithout, { [r]: v }), r, NON_VEN);
       RID.forEach(x => S.sharesWithout[x] = IS_VEN[x] ? 0 : next[x]);
@@ -290,7 +295,8 @@
     YEARS.forEach((y, i) => {
       const col = el("div", { class: "bim-share-col" });
       col.appendChild(el("h4", { class: "bim-share-head", text: "With venetoclax — year " + (i + 1) }));
-      col.appendChild(el("p", { class: "bim-share-sub", text: "manufacturer projection, Delphi-validated" }));
+      col.appendChild(el("p", { class: "bim-share-sub", text: "projected uptake" }));
+      col.appendChild(chip(P.marketShare.withVEN));
       RID.forEach(r => col.appendChild(shareRow(y, r, v => {
         S.sharesWith[y] = E.renormalise(Object.assign({}, S.sharesWith[y], { [r]: v }), r, RID);
         update();

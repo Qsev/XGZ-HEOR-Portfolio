@@ -124,11 +124,11 @@ is the answer; everything under it is the justification.
 <!-- ?v= is a cache-busting token. Bump it whenever these files change:
      Quarto does not fingerprint page assets, so a returning visitor would
      otherwise keep a stale stylesheet or engine and see a broken page. -->
-<link rel="stylesheet" href="bim.css?v=2026-08-23o">
+<link rel="stylesheet" href="bim.css?v=2026-08-23p">
 <div id="bim-app"></div>
-<script src="bim_params.js?v=2026-08-23o"></script>
-<script src="bim_engine.js?v=2026-08-23o"></script>
-<script src="bim_ui.js?v=2026-08-23o"></script>
+<script src="bim_params.js?v=2026-08-23p"></script>
+<script src="bim_engine.js?v=2026-08-23p"></script>
+<script src="bim_ui.js?v=2026-08-23p"></script>
 ```
 :::
 
