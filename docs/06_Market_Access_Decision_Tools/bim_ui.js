@@ -586,7 +586,7 @@
     const holder = el("div", {});
     chart.appendChild(holder);
     chart.appendChild(legend(E.COMPONENTS.map((k, i) => [CCOLOR[i], E.COMPONENT_LABELS[k]])
-                             .concat([[null, "● net impact"]])));
+                             .concat([[null, "— net impact, marked on each bar"]])));
     w.appendChild(chart);
 
     return { node: w, update(res) {
@@ -632,7 +632,7 @@
   }
 
   function impactChart(res) {
-    const W = 720, H = 300, m = { t: 16, r: 12, b: 46, l: 78 };
+    const W = 720, H = 300, m = { t: 16, r: 34, b: 46, l: 78 };
     const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "bim-svg",
                             preserveAspectRatio: "xMidYMid meet" });
     const pw = W - m.l - m.r, ph = H - m.t - m.b;
@@ -668,11 +668,17 @@
           "text-anchor": "middle", class: "bim-seg-label", fill: inkOn(CCOLOR[ki]) },
           SHORT_C[k]));
       });
-      svg.appendChild(sv("circle", { cx: cx, cy: yOf(y.impact.total), r: 5, class: "bim-net-dot" }));
+      /* The net is not the top of either stack — positives rise from zero and
+         negatives fall from it — so it needs its own mark. A labelled rule
+         reads as a level; an unlabelled dot sat over the segment text and told
+         the reader nothing. */
+      const ny = yOf(y.impact.total), half = bw * 0.62;
+      svg.appendChild(sv("line", { x1: cx - half, x2: cx + half, y1: ny, y2: ny,
+                                   class: "bim-net-line" }));
+      svg.appendChild(sv("text", { x: cx + half + 7, y: ny + 4, class: "bim-net-label" },
+                         "net " + moneyM(y.impact.total)));
       svg.appendChild(sv("text", { x: cx, y: H - m.b + 18, class: "bim-axis-label",
                                    "text-anchor": "middle" }, "Year " + y.year));
-      svg.appendChild(sv("text", { x: cx, y: H - m.b + 34, class: "bim-axis-sub",
-                                   "text-anchor": "middle" }, "net " + moneyM(y.impact.total)));
     });
     return svg;
   }
