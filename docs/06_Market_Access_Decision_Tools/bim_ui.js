@@ -471,7 +471,7 @@
       "never prints it, or <span class='bim-kind bim-kind-derived'>derived</span> by arithmetic on " +
       "the others." }));
     const derivBox = el("details", { class: "bim-details" });
-    derivBox.appendChild(el("summary", { text: "Show the full arithmetic for one regimen" }));
+    derivBox.appendChild(el("summary", { text: "Show the full arithmetic for each regimen" }));
     const picker = el("div", { class: "bim-picker" });
     const pickBtns = {};
     P.regimens.forEach(r => {
@@ -766,6 +766,20 @@
     const body = el("tbody", {});
     tbl.appendChild(body);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [tbl]));
+
+    const fig = el("div", { class: "bim-chart" });
+    fig.appendChild(el("h4", { class: "bim-chart-title",
+      text: "The published headline figure, rebuilt beside it" }));
+    fig.appendChild(el("p", { class: "bim-chart-sub", html:
+      "Per-member-per-month budget impact by year and payer perspective — the only result figure in " +
+      "the source. Published values are read from Table 4 divided by 1,000,000 members over 12 " +
+      "months, which reproduces the figure's own labels exactly. Base-case settings, so this does " +
+      "not move with the controls above." }));
+    const figHolder = el("div", {});
+    fig.appendChild(figHolder);
+    fig.appendChild(legend([["#2a78d6", "This rebuild"], ["#eb6834", "Published"]]));
+    w.appendChild(fig);
+
     w.appendChild(el("div", { class: "bim-note-box", html:
       "<strong>Two kinds of calibration, and why only one of them is legitimate.</strong> " +
       "An earlier version of this rebuild multiplied whole cost components by coefficients fitted on the " +
@@ -796,6 +810,9 @@
         return el("td", { class: "num " + (extraClass || "") + " " + (Math.abs(d) < 10 ? "pos" : "neg"),
                           text: (d >= 0 ? "+" : "") + d.toFixed(0) + "%" });
       };
+      clear(figHolder);
+      figHolder.appendChild(pmpmFigure());
+
       E.COMPONENTS.forEach(k => {
         const tr = el("tr", {});
         tr.appendChild(el("td", { text: E.COMPONENT_LABELS[k] }));
@@ -822,6 +839,60 @@
       tr.appendChild(pctCell(oi, pi, "impact-col"));
       body.appendChild(tr);
     } };
+  }
+
+  /* Replication of the source's only result figure: PMPM by year, both
+     perspectives, our value beside the published one on the same axis. */
+  function pmpmFigure() {
+    const groups = [{ key: "socsec", label: "Social security" },
+                    { key: "private", label: "Private sector" }];
+    const rows = [];
+    groups.forEach(g => {
+      const r = E.budgetImpact(P, { perspective: g.key });
+      r.years.forEach((y, i) => rows.push({
+        group: g.label, year: y.year,
+        ours: y.pmpm,
+        pub: P.published.budgetImpactTotal[g.key][y.key] / P.epidemiology.coveredPopulation.value / 12
+      }));
+    });
+    const W = 720, H = 300, m = { t: 26, r: 14, b: 54, l: 62 };
+    const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "bim-svg",
+                            preserveAspectRatio: "xMidYMid meet" });
+    const pw = W - m.l - m.r, ph = H - m.t - m.b;
+    let lo = 0, hi = 0;
+    rows.forEach(r => { lo = Math.min(lo, r.ours, r.pub); hi = Math.max(hi, r.ours, r.pub); });
+    lo -= 0.02; hi += 0.03;
+    const yOf = v => m.t + ph * (1 - (v - lo) / (hi - lo));
+
+    [lo, (lo + hi) / 2, hi].concat([0]).forEach(v => {
+      const y = yOf(v);
+      svg.appendChild(sv("line", { x1: m.l, x2: W - m.r, y1: y, y2: y,
+                                   class: v === 0 ? "bim-zero" : "bim-grid" }));
+      svg.appendChild(sv("text", { x: m.l - 8, y: y + 4, class: "bim-axis-label",
+                                   "text-anchor": "end" }, pmpmFmt(v)));
+    });
+
+    const slot = pw / rows.length, bw = slot * 0.3;
+    rows.forEach((r, i) => {
+      const cx = m.l + slot * (i + 0.5);
+      [[r.ours, "#2a78d6", -1], [r.pub, "#eb6834", 1]].forEach(([v, col, side]) => {
+        const x = cx + side * 2 - (side < 0 ? bw : 0);
+        const y0 = yOf(0), y1 = yOf(v);
+        const rect = sv("rect", { x: x, y: Math.min(y0, y1), width: bw,
+                                  height: Math.max(1.5, Math.abs(y1 - y0)), fill: col, rx: 1 });
+        rect.appendChild(sv("title", {}, (side < 0 ? "Rebuilt: " : "Published: ") + pmpmFmt(v)));
+        svg.appendChild(rect);
+        svg.appendChild(sv("text", { x: x + bw / 2, y: v >= 0 ? y1 - 5 : y1 + 12,
+          class: "bim-pmpm-val", "text-anchor": "middle" }, pmpmFmt(v)));
+      });
+      svg.appendChild(sv("text", { x: cx, y: H - m.b + 18, class: "bim-axis-label",
+                                   "text-anchor": "middle" }, "Year " + r.year));
+      if (i === 1 || i === 4) svg.appendChild(sv("text", { x: cx, y: H - m.b + 36,
+        class: "bim-pmpm-group", "text-anchor": "middle" }, r.group));
+    });
+    svg.appendChild(sv("line", { x1: m.l + slot * 3, x2: m.l + slot * 3,
+                                 y1: m.t - 8, y2: H - m.b + 40, class: "bim-grid" }));
+    return svg;
   }
 
   /* ---- panel 7: provenance (static) --------------------------------------- */

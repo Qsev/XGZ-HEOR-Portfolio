@@ -291,3 +291,6 @@
 
 .bim-seg-out { fill: #3d4855; }
 .bim-seg-leader { stroke: #8a93a0; stroke-width: 1; }
+
+.bim-pmpm-val { font-size: 10px; fill: #3d4855; font-variant-numeric: tabular-nums; }
+.bim-pmpm-group { font-size: 11.5px; font-weight: 600; fill: #172033; }
