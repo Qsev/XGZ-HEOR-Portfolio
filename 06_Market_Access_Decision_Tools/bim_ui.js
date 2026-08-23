@@ -734,16 +734,23 @@
       });
       clear(holder);
       holder.appendChild(tornado(o));
-      const topClin = o.rows.find(r => !/drug cost/i.test(r.label));
       note.innerHTML =
-        "<strong>Replication check against the published tornado.</strong> The source reports that the " +
-        "duration of active venetoclax treatment dominates: at +25% year-3 PMPM exceeds $0.27 under the " +
-        "social security perspective and $0.21 under the private perspective, and at −25% venetoclax " +
-        "becomes cost-saving under both. This rebuild reproduces all three at base-case settings. " +
-        "Ranking differs in one respect: drug cost edges ahead of duration here, and duration leads among " +
-        "the non-price parameters (currently <em>" + (topClin ? topClin.label : "—") + "</em>). The " +
-        "published figure is an image and does not list which parameters it varied; drug price is commonly " +
-        "held fixed in a deterministic sensitivity analysis because it is a contracted, known quantity.";
+        "<strong>Replication check against the published tornado.</strong> " +
+        "These are the seven parameters the source varies, named as it names them, so the two figures " +
+        "compare line for line. The order matches on the two that carry the result: mean duration of " +
+        "venetoclax treatment first by a wide margin, venetoclax drug cost second. Below them, " +
+        "hospitalisation cost and the post-active cost per cycle swap places, and the remaining three " +
+        "sit near zero in both.<br><br>" +
+        "Duration reproduces the published range too: at +25% year-3 PMPM reaches $0.274 under the " +
+        "social security perspective against the $0.27 reported, and at −25% venetoclax turns " +
+        "cost-saving, as the source finds under both perspectives.<br><br>" +
+        "<strong>One parameter behaves differently here, and the reason is worth knowing.</strong> " +
+        "Mean time to blood count recovery moves nothing, because this rebuild derives hospital days " +
+        "from remission status — the mechanism the Delphi questionnaire documents — rather than from " +
+        "recovery time. Its bar is barely visible in the published figure either.<br><br>" +
+        "The source did not vary market share, incidence, or the share unfit for intensive " +
+        "chemotherapy. Those are the levers a payer actually pushes, and the controls above are " +
+        "where to push them.";
     } };
   }
 

@@ -335,44 +335,39 @@
      Range follows the publication: 95% CI where reported, otherwise +/-25%.
      No CIs are reported, so +/-25% applies throughout.
      Outcome is year-3 PMPM, matching the published tornado.                   */
+  /* The seven parameters the source varies in its own tornado, named as it
+     names them, so the two figures can be compared line for line.
+
+     One of them takes care. "Drug cost of VEN" is venetoclax alone, not the
+     combination: azacitidine costs $14,966 a cycle against roughly $1,861 for
+     the venetoclax in it, so scaling the combination would be a lever eight
+     times the size and would put drug cost above duration for the wrong reason.
+     Venetoclax is therefore isolated by subtracting its partner agent, which
+     reproduces the per-cycle venetoclax costs in S2 Table to within 1%.        */
+  const VEN_PARTNER = { VEN_AZA: "AZA", VEN_DE: "DE", VEN_LDC: "LDC" };
   const DRIVERS = [
-    { id: "duration_ven", label: "Duration of active treatment, VEN combinations",
+    { id: "duration_ven", label: "Mean duration of active treatment, VEN combinations",
       apply: (P, f) => ["VEN_AZA", "VEN_DE", "VEN_LDC"].forEach(r => {
         P.treatmentCycles.active[r] = Math.min(P.meta.cyclesPerYear.value,
                                                P.treatmentCycles.active[r] * f); }) },
-    { id: "duration_comp", label: "Duration of active treatment, comparators",
-      apply: (P, f) => ["AZA", "DE", "LDC"].forEach(r => {
-        P.treatmentCycles.active[r] = Math.min(P.meta.cyclesPerYear.value,
-                                               P.treatmentCycles.active[r] * f); }) },
-    { id: "price_ven", label: "Venetoclax combination drug cost",
-      apply: (P, f) => ["VEN_AZA", "VEN_DE", "VEN_LDC"].forEach(r => {
-        P.drugCostPerCycle[r].value *= f; }) },
-    { id: "price_comp", label: "Comparator drug cost",
-      apply: (P, f) => ["AZA", "DE", "LDC"].forEach(r => {
-        P.drugCostPerCycle[r].value *= f; }) },
-    { id: "uptake", label: "Venetoclax market share, year 3",
-      apply: (P, f) => {
-        const rid = P.regimens.map(r => r.id);
-        const s = P.marketShare.withVEN.y3;
-        ["VEN_AZA", "VEN_DE", "VEN_LDC"].forEach(r => s[r] = s[r] * f);
-        const t = rid.reduce((a, r) => a + (s[r] || 0), 0);
-        rid.forEach(r => s[r] = (s[r] || 0) / t * 100); } },
-    { id: "incidence", label: "AML incidence rate",
-      apply: (P, f) => { P.epidemiology.incidence65plus.value *= f; } },
-    { id: "unfit", label: "Share unfit for intensive chemotherapy",
-      apply: (P, f) => { P.epidemiology.pctUnfitIntensive.value =
-                         Math.min(100, P.epidemiology.pctUnfitIntensive.value * f); } },
-    { id: "hosp", label: "Neutropenic room cost per day",
+    { id: "price_ven", label: "Drug cost of venetoclax",
+      apply: (P, f) => Object.keys(VEN_PARTNER).forEach(r => {
+        const partner = P.drugCostPerCycle[VEN_PARTNER[r]].value;
+        const ven = P.drugCostPerCycle[r].value - partner;
+        P.drugCostPerCycle[r].value = partner + ven * f; }) },
+    { id: "post_active", label: "Cost per cycle of the post-active period",
+      apply: (P, f) => { P.drugCostPerCycle.BSC.value *= f; } },
+    { id: "hosp_cost", label: "Daily cost of hospitalisation",
       apply: (P, f) => { P.unitCosts.neutropenicRoomDay.socsec  *= f;
                          P.unitCosts.neutropenicRoomDay.private *= f; } },
-    { id: "remission", label: "Complete remission rate",
-      apply: (P, f) => Object.keys(P.efficacy.completeRemission).forEach(r => {
-        if (typeof P.efficacy.completeRemission[r] === "number")
-          P.efficacy.completeRemission[r] = Math.min(100, P.efficacy.completeRemission[r] * f); }) },
-    { id: "hospdays", label: "Hospital days when not in remission",
-      apply: (P, f) => { P.hospitalisationDays.activeNoRemission.value *= f;
-                         P.hospitalisationDays.postActive.value *= f; } },
-    { id: "txindep", label: "Transfusion independence",
+    { id: "recovery", label: "Mean time to blood count recovery",
+      apply: (P, f) => Object.keys(P.efficacy.bloodCountRecoveryCycles).forEach(r => {
+        if (typeof P.efficacy.bloodCountRecoveryCycles[r] === "number")
+          P.efficacy.bloodCountRecoveryCycles[r] *= f; }) },
+    { id: "tx_units", label: "Transfusions and platelets per cycle",
+      apply: (P, f) => { P.transfusionRates.rbcPerCycle.value *= f;
+                         P.transfusionRates.plateletPerCycle.value *= f; } },
+    { id: "txindep", label: "Transfusion independence for 56 days",
       apply: (P, f) => Object.keys(P.efficacy.transfusionIndependence).forEach(r => {
         if (typeof P.efficacy.transfusionIndependence[r] === "number")
           P.efficacy.transfusionIndependence[r] = Math.min(100,
@@ -389,11 +384,7 @@
       const run = (f) => {
         const Q = clone(P);
         d.apply(Q, f);
-        const opts = Object.assign({}, o);
-        // OWSA perturbs the parameter set, so drop any UI share overrides that
-        // would otherwise mask the perturbation of market share.
-        if (d.id === "uptake") { delete opts.sharesWith; }
-        return budgetImpact(Q, opts).years[2].pmpm;
+        return budgetImpact(Q, o).years[2].pmpm;
       };
       const low = run(1 - pct), high = run(1 + pct);
       return { id: d.id, label: d.label, low, high, base: basePMPM,
