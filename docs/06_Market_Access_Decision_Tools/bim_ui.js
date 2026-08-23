@@ -216,44 +216,7 @@
     const note = el("p", { class: "bim-callout" });
     w.appendChild(note);
 
-    /* The base case applies a 65+ incidence rate to the whole membership, so it
-       implies a membership entirely aged 65 or over. The source rescales for
-       realistic age structures in its Table 5; this reproduces that table. */
-    w.appendChild(el("h4", { class: "bim-sub-title", text: "If the membership is not all elderly" }));
-    w.appendChild(el("p", { class: "bim-panel-note", html:
-      "Year-3 budget impact per member per month at the age structures the source examines, " +
-      "rebuilt beside its published values. Base-case settings, so this does not move with the " +
-      "controls above. A payer reads their own row here: the disease sits entirely in the 65+ " +
-      "segment, so the answer scales with how much of the membership that segment is." }));
-    const pyrTbl = el("table", { class: "bim-table" });
-    const ph1 = el("tr", {});
-    ph1.appendChild(el("th", { text: "" }));
-    P.epidemiology.pyramidScenarios.value.forEach(v =>
-      ph1.appendChild(el("th", { class: "num", text: v + "% aged 65+" })));
-    const ph2 = el("tr", {});
-    ph2.appendChild(el("th", { text: "" }));
-    ["private sector", "whole health system", "social security", "social security",
-     "retiree fund"].forEach(t => ph2.appendChild(el("th", { class: "num bim-pyr-sub", text: t })));
-    pyrTbl.appendChild(el("thead", {}, [ph1, ph2]));
-    const pyrBody = el("tbody", {});
-    pyrTbl.appendChild(pyrBody);
-    w.appendChild(el("div", { class: "bim-table-wrap" }, [pyrTbl]));
-
     return { node: w, update(res) {
-      clear(pyrBody);
-      [["socsec", "Social security"], ["private", "Private sector"]].forEach(([k, label]) => {
-        [["Rebuilt", true], ["Published", false]].forEach(([tag, isOurs]) => {
-          const tr = el("tr", { class: isOurs ? "" : "bim-row-published" });
-          tr.appendChild(el("td", { text: label + " · " + tag }));
-          P.epidemiology.pyramidScenarios.value.forEach(v => {
-            const val = isOurs
-              ? E.budgetImpact(P, { perspective: k, pct65plus: v }).years[2].pmpm
-              : P.published.pmpmByPyramid[k][v];
-            tr.appendChild(el("td", { class: "num", text: pmpmFmt(val) }));
-          });
-          pyrBody.appendChild(tr);
-        });
-      });
 
       funnelInputs.forEach(f => { f.val.textContent = f.fmt(S[f.key]); f.input.value = S[f.key]; });
       clear(steps);
@@ -294,9 +257,9 @@
         "</strong> patients in year 1; the publication rounds this to 129. Note what the base case " +
         "implies: the 65+ incidence rate is applied to the entire covered population, so default " +
         "membership is 100% aged 65 or over. Table 5's age-structure scenarios scale linearly from " +
-        "here — see the table below. The population is held constant across all three years, " +
-        "exactly as in the source: no growth, no ageing trajectory, and no carry-over of patients " +
-        "between budget years.";
+        "here, which is how that reading was confirmed. The population is held constant across all " +
+        "three years, exactly as in the source: no growth, no ageing trajectory, and no carry-over " +
+        "of patients between budget years.";
     } };
   }
 
@@ -854,12 +817,52 @@
     tbl.appendChild(body);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [tbl]));
 
+    /* The base case applies a 65+ incidence rate to the whole membership, so it
+       implies a membership entirely aged 65 or over. The source rescales for
+       realistic age structures in its Table 5; this reproduces that table. */
+    w.appendChild(el("h4", { class: "bim-sub-title", text: "The age-structure scenario, against Table 5" }));
+    w.appendChild(el("p", { class: "bim-panel-note", html:
+      "Year-3 budget impact per member per month at the age structures the source examines, " +
+      "rebuilt beside its published values. Base-case settings, so this does not move with the " +
+      "controls above. It also settles the base case: the source applies a 65-and-over incidence " +
+      "rate to the whole membership, which implies a membership entirely aged 65 or over, and these " +
+      "five columns are that figure rescaled. A payer reads their own row — the disease sits wholly " +
+      "in the elderly segment, so the answer scales with how much of a membership that segment is." }));
+    const pyrTbl = el("table", { class: "bim-table" });
+    const ph1 = el("tr", {});
+    ph1.appendChild(el("th", { text: "" }));
+    P.epidemiology.pyramidScenarios.value.forEach(v =>
+      ph1.appendChild(el("th", { class: "num", text: v + "% aged 65+" })));
+    const ph2 = el("tr", {});
+    ph2.appendChild(el("th", { text: "" }));
+    ["private sector", "whole health system", "social security", "social security",
+     "retiree fund"].forEach(t => ph2.appendChild(el("th", { class: "num bim-pyr-sub", text: t })));
+    pyrTbl.appendChild(el("thead", {}, [ph1, ph2]));
+    const pyrBody = el("tbody", {});
+    pyrTbl.appendChild(pyrBody);
+    w.appendChild(el("div", { class: "bim-table-wrap" }, [pyrTbl]));
 
 
     return { node: w, update() {
       const base = E.budgetImpact(P, { perspective: S.perspective });
       const pub = P.published;
       clear(body);
+      clear(pyrBody);
+      [["socsec", "Social security"], ["private", "Private sector"]].forEach(([k, label]) => {
+        [["Rebuilt", true], ["Published", false]].forEach(([tag, isOurs]) => {
+          const tr = el("tr", { class: isOurs ? "" : "bim-row-published" });
+          tr.appendChild(el("td", { text: label + " · " + tag }));
+          P.epidemiology.pyramidScenarios.value.forEach(v => {
+            const val = isOurs
+              ? E.budgetImpact(P, { perspective: k, pct65plus: v }).years[2].pmpm
+              : P.published.pmpmByPyramid[k][v];
+            tr.appendChild(el("td", { class: "num", text: pmpmFmt(val) }));
+          });
+          pyrBody.appendChild(tr);
+        });
+      });
+
+
       const pctCell = (ours, published, extraClass) => {
         const d = (ours - published) / Math.abs(published) * 100;
         return el("td", { class: "num " + (extraClass || "") + " " + (Math.abs(d) < 10 ? "pos" : "neg"),
