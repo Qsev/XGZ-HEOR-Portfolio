@@ -426,19 +426,24 @@
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "Four parameters carry the clinical evidence into the cost, and they pull in opposite " +
       "directions. This is the whole mechanism of the budget impact: venetoclax is taken for " +
-      "longer and causes more adverse events, but recovers blood counts sooner and achieves " +
-      "transfusion independence more often." }));
+      "longer and causes more adverse events, but puts more patients into remission and keeps " +
+      "more of them transfusion-independent, which takes days out of hospital and units out of " +
+      "the blood bank." }));
     const effTbl = el("table", { class: "bim-table" });
     const eh = el("tr", {});
     ["Efficacy or safety input", "Drives", "Direction"].forEach(t => eh.appendChild(el("th", { text: t })));
-    P.regimens.forEach(r => eh.appendChild(el("th", { class: "num", text: SHORT[r.id] })));
-    eh.appendChild(el("th", { class: "num impact-col", text: "Worth per patient" }));
+    /* BSC is omitted: Table 1 has no best supportive care column, so every cell
+       in it would be a dash. */
+    const EFF_REGIMENS = P.regimens.filter(r => r.id !== "BSC");
+    EFF_REGIMENS.forEach(r => eh.appendChild(el("th", { class: "num", text: SHORT[r.id] })));
+    eh.appendChild(el("th", { class: "num impact-col", html:
+      "Worth per patient<br><span class='bim-th-sub'>VEN+AZA vs AZA</span>" }));
     effTbl.appendChild(el("thead", {}, [eh]));
     const eb = el("tbody", {});
     const effRows = [
       ["Complete remission (CR/CRi)", "Hospitalisation", "higher → cheaper", "down",
        r => { const v = P.efficacy.completeRemission[r]; return v ? v.toFixed(1) + "%" : "—"; }],
-      ["Mean duration of active treatment", "Drug acquisition · Administration · Hospitalisation", "longer → costlier", "up",
+      ["Mean duration of active treatment", "Drug acquisition · Administration", "longer → costlier", "up",
        r => { const v = P.treatmentCycles.active[r]; return v ? v.toFixed(2) : "—"; }],
       ["Transfusion independence", "Blood transfusions", "higher → cheaper", "down",
        r => { const v = P.efficacy.transfusionIndependence[r]; return v ? v.toFixed(1) + "%" : "—"; }],
@@ -464,17 +469,19 @@
       tr.appendChild(el("td", { text: name }));
       tr.appendChild(el("td", { class: "bim-drives", text: drives }));
       tr.appendChild(el("td", {}, [el("span", { class: "bim-dir bim-dir-" + arrow, text: dir })]));
-      P.regimens.forEach(r => tr.appendChild(el("td", { class: "num", text: get(r.id) })));
+      EFF_REGIMENS.forEach(r => tr.appendChild(el("td", { class: "num", text: get(r.id) })));
       tr.appendChild(el("td", { class: "num impact-col", text: worthOf(WORTH[WORTH_KEY[i]]) }));
       eb.appendChild(tr);
     });
     effTbl.appendChild(eb);
     w.appendChild(el("div", { class: "bim-table-wrap" }, [effTbl]));
     w.appendChild(el("p", { class: "bim-panel-note", html:
-      "The last column prices each channel: the per-patient cost difference on the component that " +
-      "parameter drives, venetoclax plus azacitidine against azacitidine alone. Those six figures " +
-      "multiplied by the patients in each arm, summed, and differenced between the two worlds are " +
-      "the budget impact at the top of this page — there is nothing else in it." }));
+      "The last column prices each channel — the per-patient cost difference on the component that " +
+      "parameter drives, for venetoclax plus azacitidine against azacitidine alone. Multiply those " +
+      "by the patients in each arm and difference the two worlds, and you have the budget impact at " +
+      "the top of this page. There is nothing else in it.<br>" +
+      "Hospitalisation responds to both remission and treatment duration, and is counted once, under " +
+      "remission — so the column shows what each channel contributes, not four figures to add up." }));
     w.appendChild(el("div", { class: "bim-note-box", html:
       "<strong>Complete remission drives hospitalisation.</strong> The main paper never says how " +
       "hospital days are derived; the Delphi questionnaire does. It asks the panel for days per " +
