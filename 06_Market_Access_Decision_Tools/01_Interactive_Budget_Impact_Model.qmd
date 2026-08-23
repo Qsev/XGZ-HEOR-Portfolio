@@ -17,13 +17,11 @@ format:
 ::: {.callout-warning icon=false}
 ## This is a demonstration, not a deliverable
 
-**A real budget impact model is an Excel workbook.** That is what a payer, an HTA agency and a
-client review team expect to receive, and it is what I would build and hand over. This web page is
-not a substitute for one and is not offered as a deliverable format.
+**A real budget impact model is an Excel workbook** — that is what a payer or an HTA agency
+receives, and what I would build. This page is not one.
 
-It exists to make the *structure* of a budget impact model visible in a way a spreadsheet cannot:
-every parameter carries its source, every calculation shows its working, and every assumption is
-labelled. Read it as a demonstration of how the model is put together and where its judgements sit.
+It shows the structure instead: every parameter names its source, every calculation shows its
+working, every assumption is labelled.
 
 It uses no confidential or commercial data. Every parameter comes from one published, openly
 licensed study:
