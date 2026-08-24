@@ -12,6 +12,14 @@ format:
     self-contained: false
     grid:
       margin-width: 260px
+    include-in-header:
+      - text: |
+          <meta property="og:type" content="article">
+          <meta property="og:site_name" content="HEOR Technical Portfolio">
+          <meta property="og:url" content="https://xgzhang.com/06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.html">
+          <meta property="og:title" content="Rebuilding a Published Budget Impact Model: Venetoclax in Acute Myeloid Leukaemia">
+          <meta property="og:description" content="A parameter-level rebuild of a published budget impact model. It surfaced two contradictions inside the paper's own supplement, a mechanism the paper never documents, and two cost components that do not reconcile.">
+          <meta name="twitter:card" content="summary">
 ---
 
 ::: {.callout-warning icon=false}
