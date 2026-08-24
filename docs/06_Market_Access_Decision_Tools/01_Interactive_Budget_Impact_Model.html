@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Xiaoge Zhang, PhD">
-<meta name="dcterms.date" content="2026-08-23">
+<meta name="dcterms.date" content="2026-08-24">
 
 <title>Rebuilding a Published Budget Impact Model: Venetoclax in Acute Myeloid Leukaemia – HEOR Technical Portfolio</title>
 <style>
@@ -239,7 +239,7 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Rebuilding a Published Budget Impact Model: Venetoclax in Acute Myeloid Leukaemia</h1>
-<p class="subtitle lead">A replication of Palacios et al.&nbsp;2024, built to show how a budget impact model is put together, layer by layer</p>
+<p class="subtitle lead">A parameter-level rebuild of Palacios et al.&nbsp;2024 — and what it surfaced about the published analysis</p>
 </div>
 
 
@@ -256,7 +256,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 23, 2026</p>
+      <p class="date">August 24, 2026</p>
     </div>
   </div>
   
@@ -287,6 +287,54 @@ ul.task-list li input[type="checkbox"] {
 <p>It is not a validated reimbursement model and not a pricing recommendation. Market shares in the source are projections supplied by the manufacturer and validated by a Delphi panel; they are not observed market data.</p>
 </div>
 </div>
+<section id="what-this-rebuild-found" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-rebuild-found">What this rebuild found</h2>
+<p>Rebuilding the model from its parameters — rather than restating its results — surfaced three things the paper does not report.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Finding</th>
+<th>Resolved by</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1</strong></td>
+<td>The supplement <strong>contradicts itself twice</strong>: two market-share rows are transposed between tables, and two tables disagree on dosing days</td>
+<td>Reconciling each reading against published drug costs, and against the label and the trial</td>
+</tr>
+<tr class="even">
+<td><strong>2</strong></td>
+<td>The mechanism driving hospitalisation <strong>is not in the paper</strong> — it is in the Delphi questionnaire in the supplementary material</td>
+<td>Reading the questionnaire’s own wording</td>
+</tr>
+<tr class="odd">
+<td><strong>3</strong></td>
+<td>Two cost components <strong>do not reconcile</strong>: administration ≈45% low, monitoring ≈12% low, against unit costs the source never publishes</td>
+<td>Left open in the reconciliation panel, not closed by fitting</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Verdict
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>The published headline holds</strong> — year-3 budget impact rebuilds to within 0.1% under both payer perspectives. But it holds for a reason the paper does not state: the model keeps every patient alive for a full year, and the comparator arm has the worse survival, so it <strong>overstates the comparator’s cost more than venetoclax’s — compressing the difference between the two worlds.</strong> That limitation runs against the sponsor, not for it.</p>
+</div>
+</div>
+</section>
 <section id="the-question" class="level2">
 <h2 class="anchored" data-anchor-id="the-question">The question</h2>
 <p>A cost-effectiveness model asks whether a therapy is worth its price. A budget impact model asks a narrower and more immediate question: <strong>can this payer afford to adopt it, and when does the money move?</strong></p>
@@ -368,29 +416,99 @@ ul.task-list li input[type="checkbox"] {
 <script src="bim_ui.js?v=2026-08-23u"></script>
 </div>
 </section>
-<section id="how-this-was-built" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="how-this-was-built">How this was built</h2>
+<section id="how-this-was-audited" class="level2">
+<h2 class="anchored" data-anchor-id="how-this-was-audited">How this was audited</h2>
+<p>Five steps, in order. The same sequence works on any model you did not build.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Step</th>
+<th>What it catches</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td><strong>Trace every parameter</strong> back to a specific table, and label its source type</td>
+<td>Inputs with no provenance</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><strong>Reconcile against every published total</strong>, not just the headline</td>
+<td>Errors that cancel in the aggregate</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td><strong>Adjudicate contradictions with a third source</strong>, and quantify both readings</td>
+<td>Picking the more plausible reading and being wrong</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td><strong>Trace mechanisms the text omits</strong> into the appendices and questionnaires</td>
+<td>Undocumented links from clinical result to cost</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td><strong>Hold the calibration line</strong>: estimate unpublished <em>parameters</em>; never scale whole <em>components</em> to match a total</td>
+<td>Fitting that hides the very quantity the model reports</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="how-it-is-put-together" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="how-it-is-put-together">How it is put together</h2>
 <p>The model reconstructs a published budget impact analysis from its parameters rather than restating its results, so that every input is visible and every calculation can be checked against the source. Three files, no server, no build step, no dependencies: <code>bim_params.js</code> holds every parameter with its source and no logic, <code>bim_engine.js</code> holds the calculation with no interface code, and <code>bim_ui.js</code> renders. A reviewer auditing the model opens the parameter file and checks it against the paper — the same thing they would ask to do with a spreadsheet, and rarely can.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The three findings in full — how each was resolved
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <p>Three things surfaced during the reconstruction that a spreadsheet would have hidden.</p>
 <p><strong>The published supplement contradicts itself, in two places.</strong> S1 Table and S7 Table assign the venetoclax + decitabine and venetoclax + LDAC market shares in opposite order, and Table 2 and S2 Table disagree on the dosing days for decitabine and low-dose cytarabine. Neither can be resolved by choosing the more plausible reading; both were settled against a third source.</p>
 
-<div class="no-row-height column-margin column-container"><div class="">
+<p><strong>The mechanism behind hospitalisation is in the questionnaire, not the paper.</strong> The main text never says how hospital days are derived. The Delphi questionnaire in the supplementary material asks the panel for days per cycle separately for patients who do and do not achieve complete remission, on the stated assumption that failing to reach remission means progression, and progression means admissions. That is how the headline clinical result reaches the budget.</p>
+<p><strong>Two kinds of calibration, and only one of them is legitimate.</strong> Scaling whole cost components to match published levels distorts the difference between the two worlds, which is the only quantity a budget impact model reports. Estimating individual parameters that the source uses but never publishes — the panel’s returned hospital days, the effective duration of transfusion independence — against all the published totals including the difference is a different thing, and it is what this model does. The estimates land close to the questionnaire’s own suggested values.</p>
+</div>
+</div>
+</div>
+<div class="no-row-height column-margin column-container"><div class="callout-3-contents callout-collapse collapse callout-margin-content">
 <p><strong>Settling the market share rows.</strong> S1 Table gives venetoclax + decitabine 14.5% of the market and venetoclax + LDAC 9.6%; S7 Table gives those same two regimens 12 and 19 patients, the opposite assignment. Reconciled against the drug costs in Table 4, S7’s version reproduces published spend to within 0.35–1.3% and S1’s is out by 3.7–5.2%. The two rows of S1 Table appear to be transposed.</p>
 <p><strong>Settling the dosing days.</strong> The EMA label for decitabine gives five consecutive days per 28-day cycle, and VIALE-C gave low-dose cytarabine on days 1–10 — matching S2 Table, not Table 2.</p>
-</div></div><p><strong>The mechanism behind hospitalisation is in the questionnaire, not the paper.</strong> The main text never says how hospital days are derived. The Delphi questionnaire in the supplementary material asks the panel for days per cycle separately for patients who do and do not achieve complete remission, on the stated assumption that failing to reach remission means progression, and progression means admissions. That is how the headline clinical result reaches the budget.</p>
-<p><strong>Two kinds of calibration, and only one of them is legitimate.</strong> Scaling whole cost components to match published levels distorts the difference between the two worlds, which is the only quantity a budget impact model reports. Estimating individual parameters that the source uses but never publishes — the panel’s returned hospital days, the effective duration of transfusion independence — against all the published totals including the difference is a different thing, and it is what this model does. The estimates land close to the questionnaire’s own suggested values.</p>
-</section>
+</div></div></section>
 <section id="limitations" class="level2">
 <h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
-<section id="the-population-is-a-flow-not-a-stock" class="level3">
-<h3 class="anchored" data-anchor-id="the-population-is-a-flow-not-a-stock">The population is a flow, not a stock</h3>
-<p>This is the limitation that matters most, and it is one the source does not list.</p>
-<p>The model carries no population <em>stock</em>. Each budget year is an independent cohort of newly diagnosed patients — 129 of them, the same number every year — and every patient is costed for exactly one year before leaving the model. The arithmetic is explicit: active treatment plus the post-active period always sum to 13.04 cycles, which is 365 days. Nobody carries over. The entire growth in spending across the horizon comes from the treatment mix shifting toward venetoclax, not from patients accumulating.</p>
-<p>Three consequences follow, and a payer will find all three.</p>
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>The population is a flow, not a stock — the limitation the source does not list
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Each budget year is an independent cohort of 129 newly diagnosed patients, each costed for exactly one year. Nobody carries over. <strong>Three consequences, and a payer will find all three.</strong></p>
 <p><strong>Incidence rather than prevalence is right here, but the source says the wrong word.</strong> This is first-line treatment of newly diagnosed disease, so only incident patients are eligible; counting prevalent patients would double-count people already treated. The source nevertheless writes that it assumes “the prevalence of AML is constant”, while the parameter it uses is an incidence rate. The distinction matters elsewhere: for a chronic therapy the treated pool accumulates year on year, and an incidence-only model would badly understate later years. In unfit AML, with median survival around ten to fifteen months, almost nothing accumulates.</p>
 <p><strong>Survival gain does not feed back into the population.</strong> Venetoclax combinations extend overall survival materially. Both worlds nonetheless contain the same 129 patients, each alive and incurring a full year of costs. Mortality is absent from both arms, so the model cannot express the argument a payer will certainly make — that a therapy which keeps people alive creates patients who go on costing money. Because the comparator arm has the worse survival, holding everyone alive for a full year overstates the comparator’s cost more than venetoclax’s, which compresses the difference between the two worlds.</p>
 <p><strong>Costs are assigned to the year of diagnosis, not the year they fall.</strong> The source acknowledges this one: in practice, patients responding well continue therapy beyond the budget period. Venetoclax regimens run longer than their comparators — 10.98 cycles against 8.8 for azacitidine and 3.76 for low-dose cytarabine — so they spill across year boundaries more. Charging each cohort’s whole cost to its year of diagnosis therefore flattens the ramp: the real budget pressure is more back-loaded than the model shows. This is the difference between costing each incident cohort in full and costing only what falls inside the budget year, and it is the second that answers a payer’s cash-flow question.</p>
-</section>
+</div>
+</div>
+</div>
 <section id="scope-held-to-the-source" class="level3">
 <h3 class="anchored" data-anchor-id="scope-held-to-the-source">Scope held to the source</h3>
 <p>Three years, 28-day cycles, deterministic, no probabilistic sensitivity analysis. No QALYs or ICERs — this is a budget impact model, and mixing the two questions is a common way of answering neither. Costs are US dollars at 2020 prices with no inflation adjustment, following the source’s stated reasoning for excluding it under high inflation.</p>
