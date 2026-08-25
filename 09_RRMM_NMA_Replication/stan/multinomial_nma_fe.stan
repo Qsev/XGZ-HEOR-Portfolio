@@ -25,7 +25,11 @@ data {
   int<lower=1> ns;                              // 试验数 = 17
   int<lower=1> nt;                              // 治疗数 = 16
   int<lower=1> na;                              // 臂数   = 34
-  int<lower=1> ns_ref;                          // 含参照治疗的试验数 = 6
+  // 合并参照基线要在哪些试验上取平均。论文取的是含参照治疗的全部 6 个,
+  // 其中两个的基线在数学上不可识别 —— 所以这里把它做成一个显式的输入,
+  // 而不是写死在模型里。判准是「参照臂三个类别都至少有一个事件」。
+  int<lower=1> n_ref_use;
+  array[n_ref_use] int<lower=1> ref_use;
 
   array[na] int<lower=1> study;
   array[na] int<lower=1> trt;
@@ -77,7 +81,7 @@ model {
 generated quantities {
   // 照抄 WinBUGS 的 a_av / p_av / p_or / rk 段落。
   row_vector[2] a_av;
-  for (k in 1:2) a_av[k] = mean(mu[1:ns_ref, k]);
+  for (k in 1:2) a_av[k] = mean(mu[ref_use, k]);
 
   matrix[nt, 3] p_av;                           // 每个治疗三个类别的绝对概率
   vector[nt] crr;                               // 完全缓解率      = p_av[,1]
