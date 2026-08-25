@@ -1,0 +1,17 @@
+rank,treatment,sucra_pct,crr_pct,crr_lo_pct,crr_hi_pct
+1,PomBorDex,93,42,17,71
+2,CarLenDex,92,40,21,61
+3,DaraLenDex,84,34,17,55
+4,DaraBorDex,76,27,10,53
+5,CarDex,70,24,9,48
+6,IxaLenDex,64,21,8,39
+7,PanoBorDex,60,20,7,40
+8,PLDBor,57,19,5,45
+9,LenDex,42,11,5,21
+10,BorThalDex,39,11,2,33
+11,Bor/BorDex,37,11,4,24
+12,EloLenDex,30,8,3,18
+13,PomDex,22,6,0,29
+14,Thal/ThalDex,14,3,1,11
+15,OblDex,13,4,0,23
+16,Dex,6,1,1,2

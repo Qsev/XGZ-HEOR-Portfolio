@@ -1,0 +1,35 @@
+"trial","arm","tx","tx_index","r","n"
+"GMY302",1,"Dex",1,0,114
+"GMY302",2,"OblDex",15,0,110
+"APEX",1,"Dex",1,5,336
+"APEX",2,"Bor",2,41,333
+"MM-009",1,"Dex",1,3,176
+"MM-009",2,"LenDex",3,43,177
+"MM-010",1,"Dex",1,9,175
+"MM-010",2,"LenDex",3,43,176
+"Orlowski",1,"Bor",2,8,322
+"Orlowski",2,"PLDBor",16,14,324
+"Garderet 2012",1,"ThalDex",11,25,134
+"Garderet 2012",2,"BorThalDex",12,56,135
+"OPTIMUM",1,"Dex",1,2,126
+"OPTIMUM",2,"Thal",11,7,373
+"Hjorth 2012",1,"BorDex",2,0,64
+"Hjorth 2012",2,"ThalDex",11,0,67
+"OPTIMISMM",1,"BorDex",2,11,278
+"OPTIMISMM",2,"PomBorDex",5,44,281
+"PANORAMA1",1,"BorDex",2,60,381
+"PANORAMA1",2,"PanoBorDex",10,107,387
+"ASPIRE",1,"LenDex",3,37,396
+"ASPIRE",2,"CarLenDex",6,126,396
+"MM-003",1,"Dex",1,0,153
+"MM-003",2,"PomDex",4,3,302
+"ELOQUENT-2",1,"LenDex",3,24,325
+"ELOQUENT-2",2,"EloLenDex",7,14,321
+"ENDEAVOR",1,"BorDex",2,29,465
+"ENDEAVOR",2,"CarDex",9,58,464
+"Tourmaline-MM1",1,"LenDex",3,24,362
+"Tourmaline-MM1",2,"IxaLenDex",8,42,360
+"Pollux",1,"LenDex",3,54,283
+"Pollux",2,"DaraLenDex",14,123,286
+"Castor",1,"BorDex",2,21,247
+"Castor",2,"DaraBorDex",13,46,251

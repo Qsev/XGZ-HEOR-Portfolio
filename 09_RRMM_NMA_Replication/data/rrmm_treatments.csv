@@ -1,0 +1,17 @@
+tx_index,table1_labels,n_labels
+1,Dexamethasone,1
+2,Bortezomib | Bortezomib + Dexamethasone,2
+3,Lenalidomide + Dexamethasone,1
+4,Pomalidomide + Dexamethasone,1
+5,Pomalidomide + Bortezomib + Dexamethasone,1
+6,Carfilzomib + Lenalidomide + Dexamethasone,1
+7,Elotuzumab + Lenalidomide + Dexamethasone,1
+8,Ixazomib + Lenalidomide + Dexamethasone,1
+9,Carfilzomib + Dexamethasone,1
+10,Panobinostat + Bortezomib + Dexamethasone,1
+11,Thalidomide + Dexamethasone | Thalidomidet,2
+12,Bortezomib + Thalidomide + Dexamethasone,1
+13,Daratumumab + Bortezomib + Dexamethasone,1
+14,Daratumumab + Lenalidomide + Dexamethasone,1
+15,Oblimersen + Dexamethasone,1
+16,Pegylated Liposomal Doxorubicin + Bortezomib,1

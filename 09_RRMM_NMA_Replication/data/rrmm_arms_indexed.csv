@@ -1,0 +1,35 @@
+trial,nct,arm,treatment,median_age,prior_lines,n_itt,cr_group,pr_group,lt_pr_group,duration,tx_index
+GMY302,NCT00017602,1,Dexamethasone,65 (n/r-n/r),3,114,0,19,95,Dec 2000—Apr 2009,1
+GMY302,NCT00017602,2,Oblimersen + Dexamethasone,59 (n/r-n/r),3,110,0,16,94,Dec 2000—Apr 2009,15
+APEX,NCT00048230,1,Dexamethasone,61 (47–73),2,336,5,51,280,Jun 2002—Dec 2004,1
+APEX,NCT00048230,2,Bortezomib,62 (48–74),2,333,41,80,212,Jun 2002—Dec 2004,2
+MM-009,NCT00056160,1,Dexamethasone,62 (37–85),n/r,176,3,32,141,Jan 2003—Oct 2008,1
+MM-009,NCT00056160,2,Lenalidomide + Dexamethasone,64 (38–86),n/r,177,43,65,69,Jan 2003—Oct 2008,3
+MM-010,NCT00424047,1,Dexamethasone,64 (40–82),2,175,9,33,133,Sep 2003—Nov 2013,1
+MM-010,NCT00424047,2,Lenalidomide + Dexamethasone,63 (33–84),2,176,43,63,70,Sep 2003—Nov 2013,3
+Orlowski,NCT00103506,1,Bortezomib,62 (34–88),n/r,322,8,125,189,Dec 2004—Jun 2014,2
+Orlowski,NCT00103506,2,Pegylated Liposomal Doxorubicin + Bortezomib,61 (28–85),n/r,324,14,130,180,Dec 2004—Jun 2014,16
+Garderet 2012,NCT00256776,1,Thalidomide + Dexamethasone,63 (39–75),n/r,134,25,61,48,Jul 2005—Jun 2013,11
+Garderet 2012,NCT00256776,2,Bortezomib + Thalidomide + Dexamethasone,60 (29–76),n/r,135,56,52,27,Jul 2005—Jun 2013,12
+OPTIMUM,NCT00452569,1,Dexamethasone,63 (40–86),n/r (1–3),126,2,23,101,Feb 2006—Jan 2009,1
+OPTIMUM,NCT00452569,2,Thalidomidet,63 (33–86),n/r (1–3),373,7,53,313,Feb 2006—Jan 2009,11
+Hjorth 2012,NCT00602511,1,Bortezomib + Dexamethasone,71 (50–84),n/r,64,0,40,24,Oct 2007—Dec 2010,2
+Hjorth 2012,NCT00602511,2,Thalidomide + Dexamethasone,71 (38–85),n/r,67,0,37,30,Oct 2007—Dec 2010,11
+OPTIMISMM,NCT0173492,1,Bortezomib + Dexamethasone,68 (59–73),2 (1–2),278,11,128,139,Jan 2013—May 2017,2
+OPTIMISMM,NCT0173492,2,Pomalidomide + Bortezomib + Dexamethasone,67 (60–73),2 (1–2),281,44,187,50,Jan 2013—May 2017,5
+PANORAMA1,NCT01023308,1,Bortezomib + Dexamethasone,63 (56–68),2 (1–3),381,60,148,173,Dec 2009—Jul 2015,2
+PANORAMA1,NCT01023308,2,Panobinostat + Bortezomib + Dexamethasone,63 (56–69),2 (1–3),387,107,128,152,Dec 2009—Jul 2015,10
+ASPIRE,NCT01080391,1,Lenalidomide + Dexamethasone,65 (31–91),2 (1–3),396,37,227,132,Jul 2010—Oct 2017,3
+ASPIRE,NCT01080391,2,Carfilzomib + Lenalidomide + Dexamethasone,64 (38–87),2 (1–3),396,126,219,51,Jul 2010—Oct 2017,6
+MM-003,NCT01311687,1,Dexamethasone,65 (35–87),5 (2–17),153,0,15,138,Mar 2011—Sep 2017,1
+MM-003,NCT01311687,2,Pomalidomide + Dexamethasone,64 (35–84),5 (2–14),302,3,92,207,Mar 2011—Sep 2017,4
+ELOQUENT-2,NCT01239797,1,Lenalidomide + Dexamethasone,66 (38–91),2 (1–4),325,24,189,112,Mar 2011—Mar 2018,3
+ELOQUENT-2,NCT01239797,2,Elotuzumab + Lenalidomide + Dexamethasone,67 (37–88),2 (1–4),321,14,238,69,Mar 2011—Mar 2018,7
+ENDEAVOR,NCT01568866,1,Bortezomib + Dexamethasone,65 (30–88),2 (1–3),465,29,261,175,Jun 2012—Dec 2018,2
+ENDEAVOR,NCT01568866,2,Carfilzomib + Dexamethasone,65 (35–89),2 (1–3),464,58,298,108,Jun 2012—Dec 2018,9
+Tourmaline-MM1,NCT01564537,1,Lenalidomide + Dexamethasone,66 (30–89),n/r (1–3),362,24,235,103,Aug 2012—Dec 2020,3
+Tourmaline-MM1,NCT01564537,2,Ixazomib + Lenalidomide + Dexamethasone,66 (38–91),n/r (1–3),360,42,240,78,Aug 2012—Dec 2020,8
+Pollux,NCT02076009,1,Lenalidomide + Dexamethasone,65 (42–87),1 (1–8),283,54,162,67,May 2014—Sep 2020,3
+Pollux,NCT02076009,2,Daratumumab + Lenalidomide + Dexamethasone,65 (34–89),1 (1–11),286,123,143,20,May 2014—Sep 2020,14
+Castor,NCT02136134,1,Bortezomib + Dexamethasone,64 (33–85),2 (1–10),247,21,127,99,Aug 2014—Mar 2017,2
+Castor,NCT02136134,2,Daratumumab + Bortezomib + Dexamethasone,64 (30–88),2 (1–9),251,46,153,52,Aug 2014—Mar 2017,13
