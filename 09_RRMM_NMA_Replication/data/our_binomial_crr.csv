@@ -1,0 +1,17 @@
+"treatment","crr","lo","hi","best"
+"Dex",0,0,0,0
+"Bor/BorDex",0,0,0.2,0
+"LenDex",0,0,0.1,0
+"PomDex",74.9,0,100,83.5
+"PomBorDex",0.2,0,0.7,1.5
+"CarLenDex",0.1,0,0.6,1
+"EloLenDex",0,0,0.1,0
+"IxaLenDex",0.1,0,0.3,0
+"CarDex",0.1,0,0.3,0
+"PanoBorDex",0.1,0,0.3,0
+"Thal/ThalDex",0,0,0,0
+"BorThalDex",0,0,0.1,0
+"DaraBorDex",0.1,0,0.4,0.1
+"DaraLenDex",0.1,0,0.4,0
+"OblDex",20.3,0,100,15.2
+"PLDBor",0.1,0,0.3,0.1

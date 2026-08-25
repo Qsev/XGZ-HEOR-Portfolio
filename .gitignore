@@ -75,3 +75,7 @@ synthetic_rwd_generator.txt
 
 # Local-only AI prompts / working notes (never publish)
 **/_LOCAL_*
+
+# Fitted Stan objects and compiled models — regenerable, and tens of MB each
+09_RRMM_NMA_Replication/data/*.rds
+09_RRMM_NMA_Replication/stan/*.rds
