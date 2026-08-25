@@ -35,6 +35,7 @@ project:
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/03_TMLE_and_Sensitivity.qmd
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/04_Time_to_Event_and_Immortal_Time.qmd
     - 06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.qmd
+    - 09_RRMM_NMA_Replication/01_Multinomial_NMA_Replication.qmd
 
 
 website:
@@ -57,6 +58,8 @@ website:
             text: "PSM: Survival Extrapolation in RRMM"
           - href: 07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.qmd
             text: "NICE TA1092 (Pembro) Case"
+          - href: 09_RRMM_NMA_Replication/01_Multinomial_NMA_Replication.qmd
+            text: "Multinomial NMA: Response in RRMM"
       - text: "NMA Library"
         menu:
           - href: 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd

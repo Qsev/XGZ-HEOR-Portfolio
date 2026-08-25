@@ -23,6 +23,17 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 ::: {.g-col-12 .g-col-md-6}
 ::: {.card .h-100 .shadow-sm}
 ::: {.card-body}
+<h3 class="card-title">Replicating a Published Multinomial NMA</h3>
+<h6 class="card-subtitle text-muted mb-2">Response rates in relapsed/refractory myeloma — van Beurden-Tan et al. 2022 (<em>BMC Cancer</em>, CC-BY)</h6>
+<p class="card-text">A Bayesian multinomial network meta-analysis over 17 phase III trials and 16 treatments, rebuilt in Stan from the published trial counts and cross-checked by running the original WinBUGS code in JAGS. All sixteen response rates reconcile to within 0.27 percentage points and SUCRA to within 0.2 — but only after correcting the data file the paper supplies for replication, which produces an error of 19.6 points as published. The rebuild then asks what the ranking rests on: the treatment reported as best holds 47% of the posterior probability of being best, and loses that place when an undiscussed continuity constant or the prior width is changed.</p>
+<a href="./09_RRMM_NMA_Replication/01_Multinomial_NMA_Replication.qmd" class="stretched-link">View the replication &rarr;</a>
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
 <h3 class="card-title">NICE TA1092 (Pembro) Case Study</h3>
 <h6 class="card-subtitle text-muted mb-2">Mock Case — Extrapolation Audit & Spline Sensitivity</h6>
 <p class="card-text">An EAG-style forensic audit of survival extrapolations (standard parametric vs. flexible splines), treatment-effect waning (5-7 years), and curve-crossing capping, using Guyot-reconstructed patient-level data.</p>
