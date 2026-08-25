@@ -92,7 +92,7 @@ the way?**
 
 ## The evidence network
 
-::: {.column-page}
+::: {.column-body-outset}
 ![The 17 trials as a network of 16 treatments. Dexamethasone, the reference treatment, is highlighted. Edge width counts trials; the doubled edge is the two lenalidomide trials, MM-009 and MM-010. Dashed edges carry no information about complete response, because both arms report zero complete responders.](visuals/network_crr.png){#fig-network}
 :::
 
@@ -110,7 +110,7 @@ unusual, but a loop that exists and is never examined is worth naming.
 
 ## What the ranking actually looks like
 
-::: {.column-screen-inset}
+::: {.column-page}
 ![Posterior probability that each treatment occupies each rank, under the paper's own priors and its own zero-correction. Treatments are in one order in both panels so movement between outcomes is visible; the boxed column is rank 1. SUCRA scores are printed on the right.](visuals/rank_probability_matrix.png){#fig-rankogram}
 :::
 
