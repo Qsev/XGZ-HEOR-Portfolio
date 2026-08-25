@@ -136,7 +136,7 @@ edge_w <- 1.5 * as.integer(n_trials)
 
 dir.create(file.path(root, "visuals"), showWarnings = FALSE)
 png(file.path(root, "visuals", "network_crr.png"),
-    width = 1600, height = 1200, res = 160)
+    width = 1900, height = 1350, res = 140)
 par(mar = c(0, 0, 2, 0))
 set.seed(1)                      # 布局有随机性,固定种子每次才画得一样
 plot(g,
@@ -146,10 +146,10 @@ plot(g,
      edge.width         = edge_w,
      vertex.color       = vertex_col,
      vertex.frame.color = vertex_fg,
-     vertex.size        = 8,
+     vertex.size        = 9,
      vertex.label.color = "black",
-     vertex.label.cex   = 0.8,
-     vertex.label.dist  = 1.6,
+     vertex.label.cex   = 1.05,
+     vertex.label.dist  = 1.5,
      main = "RRMM evidence network - dashed = no information on CRR")
 dev.off()
 

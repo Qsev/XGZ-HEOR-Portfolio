@@ -4,20 +4,50 @@
     {
       "name": "bia-preview",
       "runtimeExecutable": "quarto",
-      "runtimeArgs": ["preview", "scratch/market_access_decision_tools/01_Interactive_Budget_Impact_Model_DRAFT.qmd", "--port", "4747", "--no-browser"],
+      "runtimeArgs": [
+        "preview",
+        "scratch/market_access_decision_tools/01_Interactive_Budget_Impact_Model_DRAFT.qmd",
+        "--port",
+        "4747",
+        "--no-browser"
+      ],
       "port": 4747
     },
     {
       "name": "homepage-preview",
       "runtimeExecutable": "quarto",
-      "runtimeArgs": ["preview", "index.qmd", "--port", "4748", "--no-browser"],
+      "runtimeArgs": [
+        "preview",
+        "index.qmd",
+        "--port",
+        "4748",
+        "--no-browser"
+      ],
       "port": 4748
     },
     {
       "name": "ta1092-survival-preview",
       "runtimeExecutable": "quarto",
-      "runtimeArgs": ["preview", "07_TA1092_Pembro_ endometrial cancer/survival_models/fit_parametric_survival_1.qmd", "--port", "4749", "--no-browser"],
+      "runtimeArgs": [
+        "preview",
+        "07_TA1092_Pembro_ endometrial cancer/survival_models/fit_parametric_survival_1.qmd",
+        "--port",
+        "4749",
+        "--no-browser"
+      ],
       "port": 4749
+    },
+    {
+      "name": "rrmm-nma-preview",
+      "runtimeExecutable": "quarto",
+      "runtimeArgs": [
+        "preview",
+        "09_RRMM_NMA_Replication/01_Multinomial_NMA_Replication.qmd",
+        "--port",
+        "4750",
+        "--no-browser"
+      ],
+      "port": 4750
     }
   ]
 }

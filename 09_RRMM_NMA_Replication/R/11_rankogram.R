@@ -39,7 +39,7 @@ pal <- colorRampPalette(c("#f8fafc", "#cbd5e1", "#7c93ad", "#2f4a68", "#152a42")
 
 panel <- function(P, s, ord, title, show_ylab) {
   m <- P[ord, ]
-  par(mar = c(4.2, if (show_ylab) 9.5 else 1.2, 3.4, 3.6))
+  par(mar = c(4.6, if (show_ylab) 10.5 else 1.4, 3.8, 4.0))
   plot(NA, xlim = c(0.5, nt + 0.5), ylim = c(nt + 0.5, 0.5), axes = FALSE,
        xlab = "", ylab = "", xaxs = "i", yaxs = "i")
   for (i in 1:nt) for (j in 1:nt) {
@@ -47,26 +47,26 @@ panel <- function(P, s, ord, title, show_ylab) {
     rect(j - .5, i - .5, j + .5, i + .5, col = pal[max(1, ceiling(100 * v / 0.6))],
          border = "white", lwd = 0.6)
     if (v >= 0.05)
-      text(j, i, sprintf("%.0f", 100 * v), cex = 0.62,
+      text(j, i, sprintf("%.0f", 100 * v), cex = 0.85,
            col = if (v > 0.30) "white" else "#1f2937")
   }
-  axis(1, at = 1:nt, labels = 1:nt, tick = FALSE, line = -0.7, cex.axis = 0.72)
-  mtext("rank  (1 = best)", side = 1, line = 1.7, cex = 0.78)
+  axis(1, at = 1:nt, labels = 1:nt, tick = FALSE, line = -0.6, cex.axis = 0.95)
+  mtext("rank  (1 = best)", side = 1, line = 2.1, cex = 1.0)
   if (show_ylab)
     axis(2, at = 1:nt, labels = rownames(m), tick = FALSE, las = 1,
-         line = -0.6, cex.axis = 0.78)
+         line = -0.4, cex.axis = 1.05)
   # 右侧 SUCRA
   axis(4, at = 1:nt, labels = sprintf("%2.0f", 100 * s[ord]), tick = FALSE,
-       las = 1, line = -0.9, cex.axis = 0.72)
-  mtext("SUCRA", side = 4, line = 1.6, cex = 0.72, las = 0)
-  mtext(title, side = 3, line = 1.1, adj = 0, cex = 0.95, font = 2)
+       las = 1, line = -0.8, cex.axis = 0.95)
+  mtext("SUCRA", side = 4, line = 2.1, cex = 0.95, las = 0)
+  mtext(title, side = 3, line = 1.3, adj = 0, cex = 1.25, font = 2)
   # 第 1 名那一列框出来
   rect(0.5, 0.5, 1.5, nt + 0.5, border = "#c2410c", lwd = 1.8)
 }
 
 dir.create(file.path(root, "visuals"), showWarnings = FALSE)
 png(file.path(root, "visuals", "rank_probability_matrix.png"),
-    width = 2200, height = 1150, res = 150)
+    width = 2400, height = 1300, res = 130)
 layout(matrix(1:2, nrow = 1), widths = c(1.30, 1))
 panel(P_crr, s_crr, ord, "Complete response  (CRR)", TRUE)
 panel(P_orr, s_orr, ord, "Objective response  (ORR)", FALSE)
