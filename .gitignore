@@ -77,5 +77,8 @@ synthetic_rwd_generator.txt
 **/_LOCAL_*
 
 # Fitted Stan objects and compiled models — regenerable, and tens of MB each
-09_RRMM_NMA_Replication/data/*.rds
-09_RRMM_NMA_Replication/stan/*.rds
+**/data/*.rds
+**/stan/*.rds
+
+# Abandoned cases — kept locally for their source material, never published
+_ABANDONED_*
