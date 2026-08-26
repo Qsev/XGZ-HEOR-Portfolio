@@ -1,6 +1,6 @@
 ---
 title: "Rebuilding a Published Budget Impact Model: Venetoclax in Acute Myeloid Leukaemia"
-subtitle: "A parameter-level rebuild of Palacios et al. 2024 — and what it surfaced about the published analysis"
+subtitle: "A published budget impact model in AML, rebuilt from its parameters and audited against its own sources"
 author: "Xiaoge Zhang, PhD"
 date: today
 page-layout: article
@@ -54,11 +54,14 @@ observed market data.
 Rebuilding the model from its parameters — rather than restating its results — surfaced three
 things the paper does not report.
 
-| | Finding | Resolved by |
-|---|---|---|
-| **1** | The supplement **contradicts itself twice**: two market-share rows are transposed between tables, and two tables disagree on dosing days | Reconciling each reading against published drug costs, and against the label and the trial |
-| **2** | The mechanism driving hospitalisation **is not in the paper** — it is in the Delphi questionnaire in the supplementary material | Reading the questionnaire's own wording |
-| **3** | Two cost components **do not reconcile**: administration ≈45% low, monitoring ≈12% low, against unit costs the source never publishes | Left open in the reconciliation panel, not closed by fitting |
+1. **The supplement contradicts itself twice** — two market-share rows are transposed between
+   tables, and two tables disagree on dosing days. Resolved by reconciling each reading against
+   published drug costs, and against the label and the trial.
+2. **The mechanism driving hospitalisation is not in the paper** — it is in the Delphi
+   questionnaire in the supplementary material. Resolved by reading the questionnaire's own wording.
+3. **Two cost components do not reconcile** — administration ≈45% low, monitoring ≈12% low,
+   against unit costs the source never publishes. Left open in the reconciliation panel, not
+   closed by fitting.
 
 ::: {.callout-note icon=false}
 ## Verdict
@@ -69,6 +72,26 @@ alive for a full year, and the comparator arm has the worse survival, so it **ov
 comparator's cost more than venetoclax's — compressing the difference between the two worlds.**
 That limitation runs against the sponsor, not for it.
 :::
+
+## How this was audited
+
+Five steps, in order. The same sequence works on any model you did not build.
+
+1. **Trace every parameter** back to a specific table, and label its source type. Inputs with no
+   provenance are invisible until you try to write the citation down.
+2. **Reconcile against every published total**, not just the headline. Errors that cancel in the
+   aggregate survive a headline check.
+3. **Adjudicate contradictions with a third source**, and quantify both readings — otherwise you
+   pick the more plausible one and have no way of knowing you picked wrong.
+4. **Trace mechanisms the text omits** into the appendices and questionnaires. Undocumented links
+   from a clinical result to a cost live there, not in the Methods.
+5. **Hold the calibration line**: estimate unpublished *parameters*; never scale whole *components*
+   to match a total. Fitting hides the very quantity the model exists to report.
+
+The same five steps are applied to a different model type — a four-state Markov
+cost-effectiveness model — in [Rebuilding a Published Hypertension Markov
+Model](../11_Hypertension_Markov_QC_Replication/01_Hypertension_Markov_Replication.html),
+there set against the TECH-VER verification checklist.
 
 ## The question
 
@@ -164,18 +187,6 @@ is the answer; everything under it is the justification.
 <script src="bim_ui.js?v=2026-08-23u"></script>
 ```
 :::
-
-## How this was audited
-
-Five steps, in order. The same sequence works on any model you did not build.
-
-| | Step | What it catches |
-|---|---|---|
-| 1 | **Trace every parameter** back to a specific table, and label its source type | Inputs with no provenance |
-| 2 | **Reconcile against every published total**, not just the headline | Errors that cancel in the aggregate |
-| 3 | **Adjudicate contradictions with a third source**, and quantify both readings | Picking the more plausible reading and being wrong |
-| 4 | **Trace mechanisms the text omits** into the appendices and questionnaires | Undocumented links from clinical result to cost |
-| 5 | **Hold the calibration line**: estimate unpublished *parameters*; never scale whole *components* to match a total | Fitting that hides the very quantity the model reports |
 
 ## How it is put together
 

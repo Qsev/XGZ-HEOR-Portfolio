@@ -75,7 +75,7 @@ ul.task-list li input[type="checkbox"] {
 <meta property="og:site_name" content="HEOR Technical Portfolio">
 <meta property="og:url" content="https://xgzhang.com/06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.html">
 <meta property="og:title" content="Rebuilding a Published Budget Impact Model: Venetoclax in Acute Myeloid Leukaemia – HEOR Technical Portfolio">
-<meta property="og:description" content="A parameter-level rebuild of Palacios et al.&nbsp;2024 — and what it surfaced about the published analysis">
+<meta property="og:description" content="A published budget impact model in AML, rebuilt from its parameters and audited against its own sources">
 <meta property="og:image" content="https://xgzhang.com/06_Market_Access_Decision_Tools/visuals/bim_demo_og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -257,7 +257,7 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Rebuilding a Published Budget Impact Model: Venetoclax in Acute Myeloid Leukaemia</h1>
-<p class="subtitle lead">A parameter-level rebuild of Palacios et al.&nbsp;2024 — and what it surfaced about the published analysis</p>
+<p class="subtitle lead">A published budget impact model in AML, rebuilt from its parameters and audited against its own sources</p>
 </div>
 
 
@@ -308,37 +308,11 @@ ul.task-list li input[type="checkbox"] {
 <section id="what-this-rebuild-found" class="level2">
 <h2 class="anchored" data-anchor-id="what-this-rebuild-found">What this rebuild found</h2>
 <p>Rebuilding the model from its parameters — rather than restating its results — surfaced three things the paper does not report.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th></th>
-<th>Finding</th>
-<th>Resolved by</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>1</strong></td>
-<td>The supplement <strong>contradicts itself twice</strong>: two market-share rows are transposed between tables, and two tables disagree on dosing days</td>
-<td>Reconciling each reading against published drug costs, and against the label and the trial</td>
-</tr>
-<tr class="even">
-<td><strong>2</strong></td>
-<td>The mechanism driving hospitalisation <strong>is not in the paper</strong> — it is in the Delphi questionnaire in the supplementary material</td>
-<td>Reading the questionnaire’s own wording</td>
-</tr>
-<tr class="odd">
-<td><strong>3</strong></td>
-<td>Two cost components <strong>do not reconcile</strong>: administration ≈45% low, monitoring ≈12% low, against unit costs the source never publishes</td>
-<td>Left open in the reconciliation panel, not closed by fitting</td>
-</tr>
-</tbody>
-</table>
+<ol type="1">
+<li><strong>The supplement contradicts itself twice</strong> — two market-share rows are transposed between tables, and two tables disagree on dosing days. Resolved by reconciling each reading against published drug costs, and against the label and the trial.</li>
+<li><strong>The mechanism driving hospitalisation is not in the paper</strong> — it is in the Delphi questionnaire in the supplementary material. Resolved by reading the questionnaire’s own wording.</li>
+<li><strong>Two cost components do not reconcile</strong> — administration ≈45% low, monitoring ≈12% low, against unit costs the source never publishes. Left open in the reconciliation panel, not closed by fitting.</li>
+</ol>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -352,6 +326,18 @@ ul.task-list li input[type="checkbox"] {
 <p><strong>The published headline holds</strong> — year-3 budget impact rebuilds to within 0.1% under both payer perspectives. But it holds for a reason the paper does not state: the model keeps every patient alive for a full year, and the comparator arm has the worse survival, so it <strong>overstates the comparator’s cost more than venetoclax’s — compressing the difference between the two worlds.</strong> That limitation runs against the sponsor, not for it.</p>
 </div>
 </div>
+</section>
+<section id="how-this-was-audited" class="level2">
+<h2 class="anchored" data-anchor-id="how-this-was-audited">How this was audited</h2>
+<p>Five steps, in order. The same sequence works on any model you did not build.</p>
+<ol type="1">
+<li><strong>Trace every parameter</strong> back to a specific table, and label its source type. Inputs with no provenance are invisible until you try to write the citation down.</li>
+<li><strong>Reconcile against every published total</strong>, not just the headline. Errors that cancel in the aggregate survive a headline check.</li>
+<li><strong>Adjudicate contradictions with a third source</strong>, and quantify both readings — otherwise you pick the more plausible one and have no way of knowing you picked wrong.</li>
+<li><strong>Trace mechanisms the text omits</strong> into the appendices and questionnaires. Undocumented links from a clinical result to a cost live there, not in the Methods.</li>
+<li><strong>Hold the calibration line</strong>: estimate unpublished <em>parameters</em>; never scale whole <em>components</em> to match a total. Fitting hides the very quantity the model exists to report.</li>
+</ol>
+<p>The same five steps are applied to a different model type — a four-state Markov cost-effectiveness model — in <a href="../11_Hypertension_Markov_QC_Replication/01_Hypertension_Markov_Replication.html">Rebuilding a Published Hypertension Markov Model</a>, there set against the TECH-VER verification checklist.</p>
 </section>
 <section id="the-question" class="level2">
 <h2 class="anchored" data-anchor-id="the-question">The question</h2>
@@ -433,51 +419,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="bim_engine.js?v=2026-08-23u"></script>
 <script src="bim_ui.js?v=2026-08-23u"></script>
 </div>
-</section>
-<section id="how-this-was-audited" class="level2">
-<h2 class="anchored" data-anchor-id="how-this-was-audited">How this was audited</h2>
-<p>Five steps, in order. The same sequence works on any model you did not build.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th></th>
-<th>Step</th>
-<th>What it catches</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td><strong>Trace every parameter</strong> back to a specific table, and label its source type</td>
-<td>Inputs with no provenance</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td><strong>Reconcile against every published total</strong>, not just the headline</td>
-<td>Errors that cancel in the aggregate</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td><strong>Adjudicate contradictions with a third source</strong>, and quantify both readings</td>
-<td>Picking the more plausible reading and being wrong</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td><strong>Trace mechanisms the text omits</strong> into the appendices and questionnaires</td>
-<td>Undocumented links from clinical result to cost</td>
-</tr>
-<tr class="odd">
-<td>5</td>
-<td><strong>Hold the calibration line</strong>: estimate unpublished <em>parameters</em>; never scale whole <em>components</em> to match a total</td>
-<td>Fitting that hides the very quantity the model reports</td>
-</tr>
-</tbody>
-</table>
 </section>
 <section id="how-it-is-put-together" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="how-it-is-put-together">How it is put together</h2>
