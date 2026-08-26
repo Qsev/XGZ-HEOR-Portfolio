@@ -1,0 +1,54 @@
+Stage,Check,Verdict,Note
+1. Model inputs,Transition probabilities in Table 6 reconcile to the derivation in Tables 4-5,pass,1-exp(-p) reproduces all six probabilities exactly; PH-D reproduces by subtraction to four decimals
+1. Model inputs,"All transition probabilities lie within [0,1]",pass,Checked for both arms
+1. Model inputs,Raising the drug price raises total cost,pass,Monotone across a 4800-6000 CNY sweep
+1. Model inputs,Implementation matches the paper's own account of which costs are included,not pass,"Limitations state only medicine costs were counted, but the published totals reproduce only with the MI and stroke state costs included"
+1. Model inputs,Inputs reconcile to their cited sources,not pass,"Table 3 attributes utilities 0.98 and 0.87 to ACCOMPLISH, which reports no utility outcome; the Methods attribute the utilities to two other references the table never names"
+1. Model inputs,Every input has a retrievable source,not pass,Drug prices cite a tender website with no version or date; three inputs cite a Chinese-language article not obtained
+1. Model inputs,Each row of the transition matrix sums to one,not pass,"The event-free row as printed sums to 1.0001: PH-E is the complement of the unrounded values while the other three are each rounded independently. A display artefact, not a modelling one"
+1. Model inputs,Observation period of the source data matches the conversion applied,not pass,ACCOMPLISH's percentages are cumulative over a mean 36-month follow-up and are converted as though annual; run over the trial's own three years the model returns 11.2% cumulative death where 4.1% went in
+1. Model inputs,Event definitions in the source match the states they populate,not pass,"The 2.2% and 1.9% figures are 'fatal and nonfatal' events, used to populate non-fatal states while death is modelled separately"
+1. Model inputs,Analytic perspective stated,not pass,"Nothing in the paper states whether the evaluation takes a payer, health-system or societal perspective"
+1. Model inputs,The observation period used in the rate conversion is reported,not pass,The Methods print the conversion with t1 as a free argument and never assign it a value; the trial's follow-up duration is not mentioned either
+1. Model inputs,Inputs printed in the tables are the inputs the model ran on,not pass,"Fourteen of the fifteen ranges on Figure 4 back-solve to the value in Tables 2 and 3; the amlodipine drug price implies 5459.50 where Table 2 prints 5494.53, and only the former reproduces the published total"
+1. Model inputs,The two columns of Table 5 are reconcilable to one conversion,not pass,"Back-solving the observation period linking them gives about 3.3 years for three rows, exactly one year for a fourth and four weeks for the fifth; the left-hand column is used by nothing in Table 6 or the model"
+1. Model inputs,"Rates, probabilities and percentages are named and scaled correctly",not pass,Tables 5 and 6 are both headed (%) but hold probabilities - 0.9251 is not 0.9251%; ISPOR-SMDM asks that rates never be shown as percentages and probabilities never be called rates
+1. Model inputs,Post-event fatality inputs locatable in the cited source,cant_verify,"27.2% does not appear in ACCOMPLISH; 6.3% appears once, as a different endpoint in the other arm"
+2. Event and state calculations,State occupancy sums to the cohort in every cycle,pass,"Black-box test from TECH-VER Table 2, run on the rebuild"
+2. Event and state calculations,All occupancies and probabilities are non-negative,pass,"Black-box test from TECH-VER Table 2, run on the rebuild"
+2. Event and state calculations,Cumulative deaths are monotonically non-decreasing,pass,"Black-box test from TECH-VER Table 2, run on the rebuild"
+2. Event and state calculations,Setting all utilities to one makes QALYs equal life-years,pass,"Black-box test from TECH-VER Table 2, run on the rebuild"
+2. Event and state calculations,Setting all utilities to zero accrues no QALYs,pass,"Black-box test from TECH-VER Table 2, run on the rebuild"
+2. Event and state calculations,Scaling all utilities down lowers QALYs,pass,"Black-box test from TECH-VER Table 2, run on the rebuild"
+2. Event and state calculations,Setting all costs to zero accrues no cost,pass,"Black-box test from TECH-VER Table 2, run on the rebuild"
+2. Event and state calculations,Setting mortality to zero produces no deaths,pass,"Black-box test from TECH-VER Table 2, run on the rebuild"
+2. Event and state calculations,Cycle-10 occupancy matches the cohort analysis reported in the text,pass,Six of six cells match to the last printed digit across both arms
+2. Event and state calculations,Half-cycle correction implemented,not pass,Not mentioned anywhere; ISPOR-SMDM best practice III-14 asks for it in the first and final cycle when the horizon is not lifetime
+2. Event and state calculations,Structural restrictions declared,not pass,The three stated assumptions cover neither the absence of recurrent events nor the treatment-independent post-event mortality
+2. Event and state calculations,Whole cohort dead by the end of the horizon,N/A,"Ten-year horizon, not lifetime, so TECH-VER's lifetime test does not apply"
+3. Result calculations,Cost-effectiveness ratio equals total cost divided by total QALYs,pass,Both arms reconcile exactly
+3. Result calculations,Incremental cost equals the difference of the arm totals,pass,8391.53 reproduces exactly
+3. Result calculations,Direction of the incremental effect is correct,pass,"Amlodipine accrues more QALYs, consistent with its lower event probabilities"
+3. Result calculations,Independent rebuild reconciles to Table 7 on QALYs,pass,"6.5884 and 6.4598 against 6.59 and 6.46, exact at the precision published"
+3. Result calculations,"Independent rebuild reconciles to Table 7 on cost, HCTZ arm",pass,"74515.72 against 74588.50, within the range that four-decimal rounding of the transition matrix allows"
+3. Result calculations,Dominance reported correctly,not pass,Amlodipine is both cheaper and more effective; a negative ICER of -64550.23 is reported where 'dominated' is the correct entry
+3. Result calculations,"Discount rate reported, and applied consistently to costs and outcomes",not pass,No base-case rate is stated - 5% appears only as a sensitivity re-run and had to be fitted - and nothing says whether costs and QALYs were discounted alike
+3. Result calculations,Cost accrual rule reported,not pass,Recovered by back-solving; the intuitive alternative undershoots the published costs by 28-31%
+3. Result calculations,"Independent rebuild reconciles to Table 7 on cost, amlodipine arm",not pass,"66452.27 against 66196.97 on Table 2's drug price, further apart than rounding can account for; the gap closes to 0.07% on the price implied by Figure 4's printed range"
+4. Uncertainty analysis,One-way sensitivity ranges reported,pass,Stated in the Methods and printed parameter by parameter on Figure 4
+4. Uncertainty analysis,Tornado diagram reproducible from reported numbers,pass,"Figure 4 prints each parameter's low and high value, so the analysis can be re-run; doing so reproduces its rank order on all sixteen parameters"
+4. Uncertainty analysis,PSA distribution parameters reported,not pass,"Families are given - normal for costs, beta for probabilities and rates - but no standard deviations or shape parameters"
+4. Uncertainty analysis,Distribution families appropriate to the parameters they cover,not pass,Beta is declared over 'all probability and rate values'; rates are not confined to the unit interval
+4. Uncertainty analysis,Sensitivity analysis reaches the assumptions the result is actually sensitive to,not pass,The stated ranges perturb input values; the annualisation and the cost-accrual rule are structural and lie outside them
+4. Uncertainty analysis,Every parameter in the model appears among the reported inputs,not pass,"Figure 4 varies a utility of death and a cost of death; neither appears in Table 2 or Table 3, where both are zero"
+4. Uncertainty analysis,PSA reproducible,cant_verify,Follows from the missing distribution parameters
+5. Overall validation,The same check after correcting the annualisation,pass,4.1% and 4.4% against 4.1% and 4.5% in: the round trip closes
+5. Overall validation,Robustness of the cost result to the drug price,pass,"HCTZ would have to fall 23.6% to 4527.89 CNY - below the amlodipine price - before the arms cost the same, so the ordering is not load-bearing"
+5. Overall validation,Robustness of the conclusion to the annualisation,pass,"Correcting it halves the incremental QALY, from -0.130 to -0.062, and cuts incremental cost from 8392 to 5611 CNY; amlodipine remains both cheaper and more effective"
+5. Overall validation,Round trip: the trial mortality used to build the model comes back out of it,not pass,"At cycle 3, roughly the trial's own length, the model gives 11.2% and 12.1% cumulative death where 4.1% and 4.5% went in"
+5. Overall validation,Face validity: utility of the event-free state,not pass,"0.98 places the cohort close to full health, while the cohort is defined by 60% diabetes, 23% prior MI and a median age of 68"
+5. Overall validation,Any model validation is reported,not pass,"No face validity exercise, no internal verification, no external validation against the trial, and no cross-model comparison is reported anywhere"
+5. Overall validation,Time horizon justified against the decision problem,not pass,"Ten years is justified by the cohort's age alone; ISPOR-SMDM asks for a lifetime horizon where the intervention affects mortality, and no comparison against a lifetime horizon is reported"
+5. Overall validation,Face validity: relative drug prices,cant_verify,The ordering that makes HCTZ the dearer generic cannot be checked against the cited website
+5. Overall validation,Event-state costs are defined on a basis that matches how they are applied,cant_verify,"Half of each total is an annual event charge, applied on average 3.9 times per MI; if the source figures are first-year costs the cost gap falls to a third, but the source could not be obtained"
+5. Overall validation,Cross-model validation against other hypertension Markov models,N/A,Out of scope for this exercise; declared rather than attempted

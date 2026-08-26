@@ -1,0 +1,25 @@
+Parameter,Value,Source as cited by the paper,Where that quantity actually sits,Transformation applied,Verifiable
+"Event-free -> non-fatal MI, amlodipine",0.0218,Reference 13 (ACCOMPLISH),"Jamerson 2008 Table 2, 'Fatal and nonfatal myocardial infarction', 125/5744 = 2.2%",1-exp(-0.022),"Yes - source located; the 2.2% is cumulative over a mean 36-month follow-up, and includes fatal events"
+"Event-free -> non-fatal MI, HCTZ",0.0276,Reference 13 (ACCOMPLISH),"Jamerson 2008 Table 2, 159/5762 = 2.8%",1-exp(-0.028),Yes - same caveat
+"Event-free -> non-fatal stroke, amlodipine",0.0188,Reference 13 (ACCOMPLISH),"Jamerson 2008 Table 2, 'Fatal and nonfatal stroke', 112/5744 = 1.9%",1-exp(-0.019),Yes - same caveat
+"Event-free -> non-fatal stroke, HCTZ",0.0227,Reference 13 (ACCOMPLISH),"Jamerson 2008 Table 2, 133/5762 = 2.3%",1-exp(-0.023),Yes - same caveat
+All-cause annual death (intermediate),0.0402 / 0.0440,Reference 13 (ACCOMPLISH),"Jamerson 2008 Table 2, 'Death from any cause', 4.1% / 4.5%",1-exp(-p),Yes - same caveat
+Event-free -> death (PH-D),0.0344 / 0.0369,Not separately sourced,Derived inside the paper,All-cause annual death minus MI incidence x PM-D minus stroke incidence x PS-D; reproduces to four decimals,Yes - derivation recovered and reproduced
+MI -> death (PM-D),0.0611,"Reference 13, via Table 4 'Myocardial infarction-related death 6.3%'","6.3% occurs once in ACCOMPLISH: the HCTZ arm's secondary composite endpoint, 364/5762 - not post-MI mortality",1-exp(-0.063),No - the quantity used is not locatable in the cited source
+Stroke -> death (PS-D),0.2381,"Reference 13, via Table 4 'Stroke-related death 27.2%'",27.2% does not appear anywhere in ACCOMPLISH,1-exp(-0.272),No - value absent from the cited source
+"Annual cost, event-free state, amlodipine",5494.53 CNY,china-yao.com,"Provincial drug tender website; no version, date or accession given",Daily median price scaled to a year,No - source not retrievable as cited
+"Annual cost, event-free state, HCTZ",5926.76 CNY,china-yao.com,As above,As above,No - source not retrievable as cited
+"Annual cost, non-fatal MI state",48874.2 CNY,"Reference 14 (Zhu Y et al., Chin J Health Econ 2019;36:50-53)",Chinese-language journal; original not obtained,Adjusted to 2021 prices using the Chinese CPI; applied every year the state is occupied,"No - source not obtained, so whether the figure is an annual or a first-year cost could not be checked"
+"Annual cost, non-fatal stroke state",28023.8 CNY,Reference 14,As above,Adjusted to 2021 prices using the Chinese CPI; applied every year the state is occupied,"No - source not obtained, so whether the figure is an annual or a first-year cost could not be checked"
+"Utility, event-free",0.98,Table 3 marks reference 13 (ACCOMPLISH); the Methods cite references 14 and 19 instead,"ACCOMPLISH reports no utility, EQ-5D, SF-36 or quality-of-life outcome anywhere; references 14 and 19 not obtained",None stated,"No - the table and the Methods name different sources, and the one the table names does not hold the value"
+"Utility, non-fatal MI",0.87,Table 3 marks reference 13 (ACCOMPLISH); the Methods cite references 14 and 19 instead,As above,None stated,No - same citation inconsistency
+"Utility, non-fatal stroke",0.77,Table 3 marks reference 14; the Methods cite references 14 and 19,Chinese-language journal; original not obtained,None stated,No - source not obtained
+"Utility, death",0,Convention,-,None,Yes
+Cycle length,1 year,Stated in Methods,'the Markov model cycle in this study was set to 1 year',-,Yes
+Time horizon,10 cycles,Stated in Methods,'the Markov model was set to 10 cycles',-,Yes
+"Discount rate, base case",Not reported,-,"Appears only in the sensitivity analysis; 5% recovered by fitting the published totals (0-7% sweep, 5% is the only fit)",-,"Recovered, not reported"
+Half-cycle correction,Not reported,-,Not mentioned anywhere in the paper,-,No
+Cost accrual by state,Not fully reported,-,"Methods state the event-free cost is the drug cost; nothing states whether drug cost continues after an event, or whether the MI and stroke figures are annual or one-off","Recovered by back-solving the published totals: drug cost accrues only while event-free, event figures are annual state costs","Recovered, not reported"
+PSA distributions,"Normal (costs), beta (probabilities and rates)",Stated in Methods,No standard deviations or shape parameters given,-,No - PSA not reproducible
+Willingness-to-pay threshold,80976 CNY,"2021 China Statistical Yearbook, GDP per capita",Stated in Methods,-,Yes
+Software,TreeAge Pro 2021,Stated in Methods,'The Markov model was created using TreeAge Pro 2021',-,Yes
