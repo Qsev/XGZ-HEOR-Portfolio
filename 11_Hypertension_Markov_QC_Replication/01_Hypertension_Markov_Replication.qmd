@@ -93,8 +93,10 @@ from a search.]{.est}
 ::: {.finding}
 **3 · The model runs at about three times the event rate its own trial observed.**
 ACCOMPLISH's percentages are cumulative over a mean 36-month follow-up and are
-used as one-year probabilities. Run the model over the trial's own three years
-and it returns 11.2% cumulative death where 4.1% went in.
+used as one-year probabilities. The trial reports only cumulative proportions for
+the individual endpoints, but gives its primary composite as a rate per 1000
+patient-years as well — the distinction is one it draws itself. Run the model over
+the trial's own three years and it returns 11.2% cumulative death where 4.1% went in.
 [**How it was established** — a round-trip test on the transition matrix, using
 no cost or utility value: the trial figure that went into the model does not come
 back out of it.]{.est}
@@ -121,8 +123,9 @@ event-state components, then re-running with the event figures charged once.]{.e
 ::: {.finding}
 **6 · The paper's own table and Methods disagree about where the utilities came
 from.** Table 3 attributes two of them to ACCOMPLISH, which reports no utility
-outcome of any kind; the Methods attribute the utilities to two other papers the
-table never names.
+outcome of any kind. The Methods name two economic evaluations instead; the two
+attributions overlap in only one reference, and the trial the table cites is
+absent from the Methods sentence entirely.
 [**How it was established** — a full-text check of the trial, read against
 Table 3's reference marks and the Methods sentence.]{.est}
 :::

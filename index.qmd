@@ -23,6 +23,17 @@ A professional showcase of high-fidelity health economic modeling, Bayesian evid
 ::: {.g-col-12 .g-col-md-6}
 ::: {.card .h-100 .shadow-sm}
 ::: {.card-body}
+<h3 class="card-title">Verifying a Published Hypertension Markov Model</h3>
+<h6 class="card-subtitle text-muted mb-2">Cost-effectiveness of two antihypertensive regimens in China — Feng et al. 2023 (<em>J Int Med Res</em>, CC BY-NC)</h6>
+<p class="card-text">A four-state Markov cost-effectiveness model rebuilt in R from the published inputs and checked stage by stage against the TECH-VER verification checklist. The published QALYs reproduce exactly and both arms' costs reconcile — the amlodipine arm only once its drug price is taken from the paper's own Figure 4 rather than its Table 2, which differ by 35 CNY a year. The trial percentages behind the transition matrix are cumulative over a 36-month follow-up and are used as one-year probabilities: run the model over the trial's own three years and it returns 11.2% cumulative death where 4.1% went in. Correcting that halves the health gain, and the direction of the published conclusion survives while its magnitudes do not.</p>
+<a href="./11_Hypertension_Markov_QC_Replication/01_Hypertension_Markov_Replication.qmd" class="stretched-link">View the verification &rarr;</a>
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-md-6}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
 <h3 class="card-title">Replicating a Published Multinomial NMA</h3>
 <h6 class="card-subtitle text-muted mb-2">Response rates in relapsed/refractory myeloma — van Beurden-Tan et al. 2022 (<em>BMC Cancer</em>, CC-BY)</h6>
 <p class="card-text">A Bayesian multinomial network meta-analysis over 17 phase III trials and 16 treatments, rebuilt in Stan from the published trial counts and cross-checked by running the original WinBUGS code in JAGS. All sixteen response rates reconcile to within 0.27 percentage points and SUCRA to within 0.2 — but only after correcting the data file the paper supplies for replication, which produces an error of 19.6 points as published. The rebuild then asks what the ranking rests on: the treatment reported as best holds 47% of the posterior probability of being best, and loses that place when an undiscussed continuity constant or the prior width is changed.</p>

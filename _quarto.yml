@@ -36,6 +36,7 @@ project:
     - 02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/04_Time_to_Event_and_Immortal_Time.qmd
     - 06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.qmd
     - 09_RRMM_NMA_Replication/01_Multinomial_NMA_Replication.qmd
+    - 11_Hypertension_Markov_QC_Replication/01_Hypertension_Markov_Replication.qmd
 
 
 website:
@@ -60,6 +61,8 @@ website:
             text: "NICE TA1092 (Pembro) Case"
           - href: 09_RRMM_NMA_Replication/01_Multinomial_NMA_Replication.qmd
             text: "Multinomial NMA: Response in RRMM"
+          - href: 11_Hypertension_Markov_QC_Replication/01_Hypertension_Markov_Replication.qmd
+            text: "Markov CEA: Hypertension verification"
       - text: "NMA Library"
         menu:
           - href: 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd

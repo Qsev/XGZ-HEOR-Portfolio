@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Xiaoge Zhang, PhD">
+<meta name="dcterms.date" content="2026-08-26">
+
+<title>Rebuilding a Published Hypertension Markov Model — and Verifying It – HEOR Technical Portfolio</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-546e63a57e6708acd7172ee02f9c6244.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../custom.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">HEOR Technical Portfolio</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-flagship-audits" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Flagship Audits</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-flagship-audits">    
+        <li>
+    <a class="dropdown-item" href="../05_TA975_CAR-T_Case/TA975_Mock_Case.html">
+ <span class="dropdown-text">NICE TA975 (CAR-T) Case</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../03_Bayesian_NMA_Reconstruction/MLNMR_Flagship_Case.html">
+ <span class="dropdown-text">ML-NMR: AML Population Alignment</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_RWE_Causal_Inference_Pipeline/RWE_Mock_Case_DLBCL.html">
+ <span class="dropdown-text">RWE ECA: R/R DLBCL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../01_Oncology_PartSM_Audit/PartSM_Forensic_Audit_RRMM.html">
+ <span class="dropdown-text">PSM: Survival Extrapolation in RRMM</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.html">
+ <span class="dropdown-text">NICE TA1092 (Pembro) Case</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../09_RRMM_NMA_Replication/01_Multinomial_NMA_Replication.html">
+ <span class="dropdown-text">Multinomial NMA: Response in RRMM</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../11_Hypertension_Markov_QC_Replication/01_Hypertension_Markov_Replication.html">
+ <span class="dropdown-text">Markov CEA: Hypertension verification</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-nma-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">NMA Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-nma-library">    
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.html">
+ <span class="dropdown-text">Bayesian Estimation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">
+ <span class="dropdown-text">Standard Bayesian NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.html">
+ <span class="dropdown-text">Network Meta-Regression</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.html">
+ <span class="dropdown-text">Survival NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/04_Component_NMA.html">
+ <span class="dropdown-text">Component NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/05_IPD_NMA.html">
+ <span class="dropdown-text">IPD NMA</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/06_MAIC.html">
+ <span class="dropdown-text">MAIC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/07_STC.html">
+ <span class="dropdown-text">STC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/08_ML_NMR.html">
+ <span class="dropdown-text">ML-NMR</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/09_Flexible_Survival.html">
+ <span class="dropdown-text">Flexible Survival</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../04_NMA/05_NMA_Technical_Prep/11_HR_OR_Intuition.html">
+ <span class="dropdown-text">HR vs OR Intuition</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-rwe-library" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">RWE Library</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-rwe-library">    
+        <li>
+    <a class="dropdown-item" href="../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/01_Confounding_and_Frameworks.html">
+ <span class="dropdown-text">NICE Framework &amp; Confounding</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/02_PSM_IPTW_AIPW.html">
+ <span class="dropdown-text">PSM, IPTW &amp; AIPW</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/03_TMLE_and_Sensitivity.html">
+ <span class="dropdown-text">TMLE &amp; Sensitivity Analysis</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_RWE_Causal_Inference_Pipeline/01_RWE_Technical_Prep/04_Time_to_Event_and_Immortal_Time.html">
+ <span class="dropdown-text">Survival &amp; Immortal Time</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-market-access-tools" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Market Access Tools</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-market-access-tools">    
+        <li>
+    <a class="dropdown-item" href="../06_Market_Access_Decision_Tools/01_Interactive_Budget_Impact_Model.html">
+ <span class="dropdown-text">BIM rebuild: Venetoclax in AML</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../00_HTA_LLM_Wiki/README.html"> 
+<span class="menu-text">Methodology Wiki</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Qsev/XGZ-HEOR-Portfolio" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#what-this-replication-found" id="toc-what-this-replication-found" class="nav-link active" data-scroll-target="#what-this-replication-found">What this replication found</a></li>
+  <li><a href="#the-model" id="toc-the-model" class="nav-link" data-scroll-target="#the-model">1 · The model</a>
+  <ul class="collapse">
+  <li><a href="#the-transition-matrices" id="toc-the-transition-matrices" class="nav-link" data-scroll-target="#the-transition-matrices">The transition matrices</a></li>
+  <li><a href="#costs-and-utilities" id="toc-costs-and-utilities" class="nav-link" data-scroll-target="#costs-and-utilities">Costs and utilities</a></li>
+  <li><a href="#time-discounting-and-software" id="toc-time-discounting-and-software" class="nav-link" data-scroll-target="#time-discounting-and-software">Time, discounting and software</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">2 · Results</a>
+  <ul class="collapse">
+  <li><a href="#the-cohort-over-time" id="toc-the-cohort-over-time" class="nav-link" data-scroll-target="#the-cohort-over-time">The cohort over time</a></li>
+  <li><a href="#uncertainty" id="toc-uncertainty" class="nav-link" data-scroll-target="#uncertainty">Uncertainty</a></li>
+  </ul></li>
+  <li><a href="#verification-and-appraisal" id="toc-verification-and-appraisal" class="nav-link" data-scroll-target="#verification-and-appraisal">3 · Verification and appraisal</a>
+  <ul class="collapse">
+  <li><a href="#stage-1-the-inputs" id="toc-stage-1-the-inputs" class="nav-link" data-scroll-target="#stage-1-the-inputs">Stage 1 — the inputs</a></li>
+  <li><a href="#stage-2-the-engine" id="toc-stage-2-the-engine" class="nav-link" data-scroll-target="#stage-2-the-engine">Stage 2 — the engine</a></li>
+  <li><a href="#stage-3-the-results" id="toc-stage-3-the-results" class="nav-link" data-scroll-target="#stage-3-the-results">Stage 3 — the results</a></li>
+  <li><a href="#stage-4-uncertainty" id="toc-stage-4-uncertainty" class="nav-link" data-scroll-target="#stage-4-uncertainty">Stage 4 — uncertainty</a></li>
+  <li><a href="#stage-5-validation" id="toc-stage-5-validation" class="nav-link" data-scroll-target="#stage-5-validation">Stage 5 — validation</a></li>
+  <li><a href="#the-checklist" id="toc-the-checklist" class="nav-link" data-scroll-target="#the-checklist">The checklist</a></li>
+  <li><a href="#scope-and-how-this-was-built" id="toc-scope-and-how-this-was-built" class="nav-link" data-scroll-target="#scope-and-how-this-was-built">Scope, and how this was built</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Rebuilding a Published Hypertension Markov Model — and Verifying It</h1>
+<p class="subtitle lead">A four-state cost-effectiveness model from the ACCOMPLISH trial, reconstructed in R and checked against TECH-VER</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xiaoge Zhang, PhD </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 26, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>What this is
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>replication and verification of a published model</strong>, not a new clinical finding. Nothing here is evidence about how these two antihypertensive regimens compare; everything here is evidence about how one published comparison behaves when it is rebuilt from the numbers the paper prints.</p>
+<blockquote class="blockquote">
+<p>Feng A, Lin W, Li L, Zeng M, Lyu J. <strong>Pharmacoeconomic evaluation of stroke and myocardial infarction prevention in hypertensive patients: Markov model based on the ACCOMPLISH trial.</strong> <em>Journal of International Medical Research</em>. 2023;51(12):1–15. <a href="https://doi.org/10.1177/03000605231214921">doi:10.1177/03000605231214921</a> — CC BY-NC.</p>
+</blockquote>
+<p>The rebuild is an independent R implementation of the paper’s four-state annual Markov cohort. The verification follows the five-stage structure of <strong>TECH-VER</strong> (Büyükkaramikli et al., <em>PharmacoEconomics</em> 2019;37:1391–1408), with the closing questions posed in the language of <strong>AdViSHE</strong> (Vemer et al., <em>PharmacoEconomics</em> 2016;34:349–361).</p>
+<p>This is a methodological appraisal of an academic model. It was supported by a Chinese provincial research laboratory grant, and its authors declare no conflict of interest — there is no commercial sponsor and no product position at stake here. Nothing below should be read as questioning anyone’s good faith.</p>
+</div>
+</div>
+<section id="what-this-replication-found" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-replication-found">What this replication found</h2>
+<style>
+.finding { margin: 0 0 1.35rem 0; }
+.finding > p { margin: 0 0 .3rem 0; }
+.est { display:block; font-size:.86em; line-height:1.5; color:#5b6068;
+       border-left:2px solid #d8dade; padding-left:.7rem; margin-top:.35rem; }
+.est b { color:#3d424a; font-weight:600; }
+.tablescroll { overflow-x: auto; margin: .4rem 0 .2rem 0; }
+.tablescroll table { font-size: .82em; min-width: 52rem; }
+.tablescroll td, .tablescroll th { vertical-align: top; }
+/* a wide table may scroll; the page body never does */
+.column-page > .tablescroll table { min-width: 0; }
+</style>
+<div class="finding">
+<p><strong>1 · The published results reproduce.</strong> QALYs are exact at the precision printed. On cost, hydrochlorothiazide reconciles immediately; amlodipine only once the drug price is taken from the paper’s own Figure 4, which prints a value 35 CNY a year below the one its Table 2 gives. <span class="est"><strong>How it was established</strong> — an independent R rebuild; cycle-10 cohort occupancy matching the paper’s text in six of six cells; the ranges printed on Figure 4 back-solved to their base values.</span></p>
+</div>
+<div class="finding">
+<p><strong>2 · Much of the model cannot be checked from the paper at all.</strong> No analytic perspective, no base-case discount rate, no observation period for the rate conversion, no distribution parameters behind the probabilistic analysis, no account of what the event costs contain — and no validation of any kind reported. <span class="est"><strong>How it was established</strong> — a reporting audit against TECH-VER’s completeness tests, with each absence confirmed across the full text rather than inferred from a search.</span></p>
+</div>
+<div class="finding">
+<p><strong>3 · The model runs at about three times the event rate its own trial observed.</strong> ACCOMPLISH’s percentages are cumulative over a mean 36-month follow-up and are used as one-year probabilities. The trial reports only cumulative proportions for the individual endpoints, but gives its primary composite as a rate per 1000 patient-years as well — the distinction is one it draws itself. Run the model over the trial’s own three years and it returns 11.2% cumulative death where 4.1% went in. <span class="est"><strong>How it was established</strong> — a round-trip test on the transition matrix, using no cost or utility value: the trial figure that went into the model does not come back out of it.</span></p>
+</div>
+<div class="finding">
+<p><strong>4 · The conclusion survives it.</strong> Correcting the conversion halves the health gain and narrows the cost gap by a third, and amlodipine still costs less and delivers more. Everything found here is about the size of the answer, not its sign. <span class="est"><strong>How it was established</strong> — the rebuild re-run on corrected transition probabilities, engine otherwise untouched.</span></p>
+</div>
+<div class="finding">
+<p><strong>5 · Half the modelled cost is an event charge levied every year</strong>, from a source that could not be obtained. The MI charge is applied on average 3.9 times per patient who has one; if it is a first-year cost, the cost gap falls to a third of the published one. <span class="est"><strong>How it was established</strong> — decomposing the rebuilt totals into drug and event-state components, then re-running with the event figures charged once.</span></p>
+</div>
+<div class="finding">
+<p><strong>6 · The paper’s own table and Methods disagree about where the utilities came from.</strong> Table 3 attributes two of them to ACCOMPLISH, which reports no utility outcome of any kind. The Methods name two economic evaluations instead; the two attributions overlap in only one reference, and the trial the table cites is absent from the Methods sentence entirely. <span class="est"><strong>How it was established</strong> — a full-text check of the trial, read against Table 3’s reference marks and the Methods sentence.</span></p>
+</div>
+<p><strong>The bottom line.</strong> The analysis is competently built and it replicates. Its <em>direction</em> — that amlodipine plus benazepril is the more economical of the two regimens in China — survives every correction made here, including the largest. Its <em>magnitudes</em> do not, and much of the model cannot be checked from the paper at all. <strong>The conclusion is usable; the numbers should not be quoted.</strong></p>
+</section>
+<section id="the-model" class="level1 page-columns page-full">
+<h1>1 · The model</h1>
+<p>A cohort of high-risk hypertensive patients — the ACCOMPLISH population, median age 68, 60% diabetic, 23% with prior myocardial infarction — moves through four health states in annual cycles for ten years. Two of those states are the events the treatments exist to prevent: <strong>myocardial infarction (MI, heart attack)</strong> and <strong>stroke</strong>.</p>
+<div class="page-columns page-full">
+<div id="fig-states" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full">
+<div aria-describedby="fig-states-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
+<img src="visuals/state_diagram.png" class="img-fluid figure-img column-page">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-states-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The four states and every transition the model allows, with the annual probabilities as published. <strong>Colour is the arm throughout this page</strong> — blue for amlodipine, orange for hydrochlorothiazide. Where a transition carries two figures the arms differ there, which happens only on the three edges leaving the event-free state; everywhere else the two arms are identical. The self-loops are where most of the cohort actually sits.
+</figcaption>
+</figure>
+</div>
+</div>
+<p>Three structural choices deserve naming, because each is a modelling decision rather than a piece of trial evidence.</p>
+<ul>
+<li><strong>No recurrent events, and no transition between MI and stroke.</strong> A patient who has an infarction can only stay in that state or die — never have a second infarction, and never go on to have a stroke.</li>
+<li><strong>Post-event mortality is identical in both arms</strong> (0.0611 from MI, 0.2381 from stroke). Treatment is modelled as acting only on <em>whether</em> an event happens, never on what happens afterwards.</li>
+<li><strong>The horizon is ten years, not lifetime.</strong> Whatever befalls the patients still alive at cycle 10 is outside the model.</li>
+</ul>
+<p>All three are ordinary simplifications. Whether the paper declares them, and whether they hold up, is §3.</p>
+<section id="the-transition-matrices" class="level2">
+<h2 class="anchored" data-anchor-id="the-transition-matrices">The transition matrices</h2>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="cf">function</span>(arm) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> TPM_PUBLISHED[[arm]]; d <span class="ot">&lt;-</span> <span class="st">"&amp;mdash;"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">sprintf</span>(<span class="st">"%.4f"</span>, x)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">From =</span> <span class="fu">c</span>(<span class="st">"Event-free"</span>, <span class="st">"Non-fatal MI"</span>, <span class="st">"Non-fatal stroke"</span>, <span class="st">"Death"</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Event-free</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">f</span>(p[[<span class="st">"EE"</span>]]), d, d, d),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Non-fatal MI</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">f</span>(p[[<span class="st">"EM"</span>]]), <span class="fu">f</span>(p[[<span class="st">"MM"</span>]]), d, d),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Non-fatal stroke</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">f</span>(p[[<span class="st">"ES"</span>]]), d, <span class="fu">f</span>(p[[<span class="st">"SS"</span>]]), d),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Death =</span> <span class="fu">c</span>(<span class="fu">f</span>(p[[<span class="st">"ED"</span>]]), <span class="fu">f</span>(p[[<span class="st">"MD"</span>]]), <span class="fu">f</span>(p[[<span class="st">"SD"</span>]]), <span class="st">"1.0000"</span>),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">check.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  rs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">sum</span>(p[<span class="fu">c</span>(<span class="st">"EE"</span>, <span class="st">"EM"</span>, <span class="st">"ES"</span>, <span class="st">"ED"</span>)]), <span class="fu">sum</span>(p[<span class="fu">c</span>(<span class="st">"MM"</span>, <span class="st">"MD"</span>)]),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>          <span class="fu">sum</span>(p[<span class="fu">c</span>(<span class="st">"SS"</span>, <span class="st">"SD"</span>)]), <span class="dv">1</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  m<span class="sc">$</span><span class="st">`</span><span class="at">Row sum</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(rs <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">&lt;</span> <span class="fl">1e-9</span>, <span class="fu">sprintf</span>(<span class="st">"%.4f"</span>, rs),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">sprintf</span>(<span class="st">"**%.4f**"</span>, rs))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  m</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>nm <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">amlodipine =</span> <span class="st">"Amlodipine"</span>, <span class="at">hctz =</span> <span class="st">"Hydrochlorothiazide"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (a <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"amlodipine"</span>, <span class="st">"hctz"</span>)) {</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">mat</span>(a), <span class="at">escape =</span> <span class="cn">FALSE</span>, <span class="at">align =</span> <span class="st">"lrrrrr"</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="fu">sprintf</span>(<span class="st">"**%s + benazepril.** Columns are the state moved *to*; a dash is a transition the model does not allow."</span>, nm[[a]])))</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<table class="caption-top table">
+<caption><strong>Amlodipine + benazepril.</strong> Columns are the state moved <em>to</em>; a dash is a transition the model does not allow.</caption>
+<colgroup>
+<col style="width: 22%">
+<col style="width: 14%">
+<col style="width: 17%">
+<col style="width: 22%">
+<col style="width: 9%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">From</th>
+<th style="text-align: right;">Event-free</th>
+<th style="text-align: right;">Non-fatal MI</th>
+<th style="text-align: right;">Non-fatal stroke</th>
+<th style="text-align: right;">Death</th>
+<th style="text-align: right;">Row sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Event-free</td>
+<td style="text-align: right;">0.9251</td>
+<td style="text-align: right;">0.0218</td>
+<td style="text-align: right;">0.0188</td>
+<td style="text-align: right;">0.0344</td>
+<td style="text-align: right;"><strong>1.0001</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Non-fatal MI</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">0.9389</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">0.0611</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Non-fatal stroke</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">0.7619</td>
+<td style="text-align: right;">0.2381</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Death</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<caption><strong>Hydrochlorothiazide + benazepril.</strong> Columns are the state moved <em>to</em>; a dash is a transition the model does not allow.</caption>
+<colgroup>
+<col style="width: 22%">
+<col style="width: 14%">
+<col style="width: 17%">
+<col style="width: 22%">
+<col style="width: 9%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">From</th>
+<th style="text-align: right;">Event-free</th>
+<th style="text-align: right;">Non-fatal MI</th>
+<th style="text-align: right;">Non-fatal stroke</th>
+<th style="text-align: right;">Death</th>
+<th style="text-align: right;">Row sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Event-free</td>
+<td style="text-align: right;">0.9127</td>
+<td style="text-align: right;">0.0276</td>
+<td style="text-align: right;">0.0227</td>
+<td style="text-align: right;">0.0369</td>
+<td style="text-align: right;"><strong>0.9999</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Non-fatal MI</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">0.9389</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">0.0611</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Non-fatal stroke</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">0.7619</td>
+<td style="text-align: right;">0.2381</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Death</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+</tbody>
+</table>
+<p>Laid out as matrices, those structural choices <em>are</em> the dashes: the MI and stroke rows lead nowhere except back to themselves or on to death, and the death row leads only to itself. The event-free row sums to <strong>1.0001</strong> in the amlodipine arm and <strong>0.9999</strong> in the hydrochlorothiazide arm, so the printed matrix is not quite the matrix that was run.</p>
+</section>
+<section id="costs-and-utilities" class="level2">
+<h2 class="anchored" data-anchor-id="costs-and-utilities">Costs and utilities</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">State =</span> STATES,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Annual cost, amlodipine arm (CNY)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(COST_DRUG[[<span class="st">"amlodipine"</span>]],</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    COST_EVENT[[<span class="st">"MI"</span>]], COST_EVENT[[<span class="st">"Stroke"</span>]], <span class="dv">0</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Annual cost, HCTZ arm (CNY)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(COST_DRUG[[<span class="st">"hctz"</span>]],</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    COST_EVENT[[<span class="st">"MI"</span>]], COST_EVENT[[<span class="st">"Stroke"</span>]], <span class="dv">0</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Utility =</span> <span class="fu">unname</span>(UTIL[STATES]), <span class="at">check.names =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Tables 2 and 3 of the paper. Every figure in Table 2 sits under the header Assignment/RMB/year."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Tables 2 and 3 of the paper. Every figure in Table 2 sits under the header Assignment/RMB/year.</caption>
+<colgroup>
+<col style="width: 12%">
+<col style="width: 42%">
+<col style="width: 35%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">State</th>
+<th style="text-align: right;">Annual cost, amlodipine arm (CNY)</th>
+<th style="text-align: right;">Annual cost, HCTZ arm (CNY)</th>
+<th style="text-align: right;">Utility</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">EventFree</td>
+<td style="text-align: right;">5494.53</td>
+<td style="text-align: right;">5926.76</td>
+<td style="text-align: right;">0.98</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MI</td>
+<td style="text-align: right;">48874.20</td>
+<td style="text-align: right;">48874.20</td>
+<td style="text-align: right;">0.87</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Stroke</td>
+<td style="text-align: right;">28023.80</td>
+<td style="text-align: right;">28023.80</td>
+<td style="text-align: right;">0.77</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dead</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>There is no micro-costing anywhere in this model. Cost enters as <strong>state occupancy × an annual state cost</strong> — four numbers for the whole analysis. The drug figures are a daily median tender price scaled to a year, with no dosing, adherence, monitoring or follow-up resource use behind them; the two event figures are taken whole from another study and adjusted to 2021 prices.</p>
+</section>
+<section id="time-discounting-and-software" class="level2">
+<h2 class="anchored" data-anchor-id="time-discounting-and-software">Time, discounting and software</h2>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td>Cycle</td>
+<td>1 year</td>
+</tr>
+<tr class="even">
+<td>Horizon</td>
+<td>10 cycles, not lifetime</td>
+</tr>
+<tr class="odd">
+<td>Discount rate</td>
+<td>5% — recovered rather than reported; see §3</td>
+</tr>
+<tr class="even">
+<td>Half-cycle correction</td>
+<td>not applied, and not mentioned in the paper</td>
+</tr>
+<tr class="odd">
+<td>Software</td>
+<td>TreeAge Pro 2021</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Where every input comes from — and whether it checks out
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Every transition probability traces to one table in the ACCOMPLISH trial through a conversion the paper sets out in its Methods.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">names</span>(TRIAL), <span class="cf">function</span>(a) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> TRIAL[[a]]; p <span class="ot">&lt;-</span> TPM_PUBLISHED[[a]]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">Arm =</span> a,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ACCOMPLISH MI</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.1f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> t[[<span class="st">"mi"</span>]]),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">1-exp(-p)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.4f"</span>, <span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(<span class="sc">-</span>t[[<span class="st">"mi"</span>]])),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Published PH-M</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.4f"</span>, p[[<span class="st">"EM"</span>]]),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ACCOMPLISH stroke</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.1f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> t[[<span class="st">"stroke"</span>]]),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">1-exp(-p) </span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.4f"</span>, <span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(<span class="sc">-</span>t[[<span class="st">"stroke"</span>]])),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Published PH-S</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.4f"</span>, p[[<span class="st">"ES"</span>]]), <span class="at">check.names =</span> <span class="cn">FALSE</span>) })),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">caption =</span> <span class="st">"The conversion, reproduced."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>The conversion, reproduced.</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 19%">
+<col style="width: 11%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: left;">ACCOMPLISH MI</th>
+<th style="text-align: left;">1-exp(-p)</th>
+<th style="text-align: left;">Published PH-M</th>
+<th style="text-align: left;">ACCOMPLISH stroke</th>
+<th style="text-align: left;">1-exp(-p)</th>
+<th style="text-align: left;">Published PH-S</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">amlodipine</td>
+<td style="text-align: left;">2.2%</td>
+<td style="text-align: left;">0.0218</td>
+<td style="text-align: left;">0.0218</td>
+<td style="text-align: left;">1.9%</td>
+<td style="text-align: left;">0.0188</td>
+<td style="text-align: left;">0.0188</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hctz</td>
+<td style="text-align: left;">2.8%</td>
+<td style="text-align: left;">0.0276</td>
+<td style="text-align: left;">0.0276</td>
+<td style="text-align: left;">2.3%</td>
+<td style="text-align: left;">0.0227</td>
+<td style="text-align: left;">0.0227</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The event-free death probability then follows by subtraction — all-cause annual death less the deaths already routed through the two event states — reproducing 0.0344 and 0.0369 to four decimals. <strong>The parameter chain is fully recovered.</strong> Whether the conversion itself is sound is a separate question, taken up in §3.</p>
+<p><strong>The utility rows need reading together.</strong> Table 3 marks the event-free and MI utilities to reference 13 — the ACCOMPLISH trial, which reports no utility, EQ-5D, SF-36 or quality-of-life outcome anywhere — and the stroke utility to reference 14. The paper’s Methods say something different: that the utilities “were derived from published studies of the same or similar populations”, citing references <strong>14 and 19</strong>. Reference 13 does not appear in that sentence.</p>
+<p>So the table and the text disagree, and the source the table names does not hold the values. Both papers those Methods point to are Chinese-language and were not obtainable here, which is exactly what a reviewer would need to settle it. Recorded as a citation-consistency problem, not a data-integrity one.</p>
+<div class="tablescroll">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">read.csv</span>(<span class="st">"data/provenance.csv"</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 15%">
+<col style="width: 29%">
+<col style="width: 21%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Value</th>
+<th style="text-align: left;">Source as cited by the paper</th>
+<th style="text-align: left;">Where that quantity actually sits</th>
+<th style="text-align: left;">Transformation applied</th>
+<th style="text-align: left;">Verifiable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Event-free -&gt; non-fatal MI, amlodipine</td>
+<td style="text-align: left;">0.0218</td>
+<td style="text-align: left;">Reference 13 (ACCOMPLISH)</td>
+<td style="text-align: left;">Jamerson 2008 Table 2, ‘Fatal and nonfatal myocardial infarction’, 125/5744 = 2.2%</td>
+<td style="text-align: left;">1-exp(-0.022)</td>
+<td style="text-align: left;">Yes - source located; the 2.2% is cumulative over a mean 36-month follow-up, and includes fatal events</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Event-free -&gt; non-fatal MI, HCTZ</td>
+<td style="text-align: left;">0.0276</td>
+<td style="text-align: left;">Reference 13 (ACCOMPLISH)</td>
+<td style="text-align: left;">Jamerson 2008 Table 2, 159/5762 = 2.8%</td>
+<td style="text-align: left;">1-exp(-0.028)</td>
+<td style="text-align: left;">Yes - same caveat</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Event-free -&gt; non-fatal stroke, amlodipine</td>
+<td style="text-align: left;">0.0188</td>
+<td style="text-align: left;">Reference 13 (ACCOMPLISH)</td>
+<td style="text-align: left;">Jamerson 2008 Table 2, ‘Fatal and nonfatal stroke’, 112/5744 = 1.9%</td>
+<td style="text-align: left;">1-exp(-0.019)</td>
+<td style="text-align: left;">Yes - same caveat</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Event-free -&gt; non-fatal stroke, HCTZ</td>
+<td style="text-align: left;">0.0227</td>
+<td style="text-align: left;">Reference 13 (ACCOMPLISH)</td>
+<td style="text-align: left;">Jamerson 2008 Table 2, 133/5762 = 2.3%</td>
+<td style="text-align: left;">1-exp(-0.023)</td>
+<td style="text-align: left;">Yes - same caveat</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">All-cause annual death (intermediate)</td>
+<td style="text-align: left;">0.0402 / 0.0440</td>
+<td style="text-align: left;">Reference 13 (ACCOMPLISH)</td>
+<td style="text-align: left;">Jamerson 2008 Table 2, ‘Death from any cause’, 4.1% / 4.5%</td>
+<td style="text-align: left;">1-exp(-p)</td>
+<td style="text-align: left;">Yes - same caveat</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Event-free -&gt; death (PH-D)</td>
+<td style="text-align: left;">0.0344 / 0.0369</td>
+<td style="text-align: left;">Not separately sourced</td>
+<td style="text-align: left;">Derived inside the paper</td>
+<td style="text-align: left;">All-cause annual death minus MI incidence x PM-D minus stroke incidence x PS-D; reproduces to four decimals</td>
+<td style="text-align: left;">Yes - derivation recovered and reproduced</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MI -&gt; death (PM-D)</td>
+<td style="text-align: left;">0.0611</td>
+<td style="text-align: left;">Reference 13, via Table 4 ‘Myocardial infarction-related death 6.3%’</td>
+<td style="text-align: left;">6.3% occurs once in ACCOMPLISH: the HCTZ arm’s secondary composite endpoint, 364/5762 - not post-MI mortality</td>
+<td style="text-align: left;">1-exp(-0.063)</td>
+<td style="text-align: left;">No - the quantity used is not locatable in the cited source</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stroke -&gt; death (PS-D)</td>
+<td style="text-align: left;">0.2381</td>
+<td style="text-align: left;">Reference 13, via Table 4 ‘Stroke-related death 27.2%’</td>
+<td style="text-align: left;">27.2% does not appear anywhere in ACCOMPLISH</td>
+<td style="text-align: left;">1-exp(-0.272)</td>
+<td style="text-align: left;">No - value absent from the cited source</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Annual cost, event-free state, amlodipine</td>
+<td style="text-align: left;">5494.53 CNY</td>
+<td style="text-align: left;">china-yao.com</td>
+<td style="text-align: left;">Provincial drug tender website; no version, date or accession given</td>
+<td style="text-align: left;">Daily median price scaled to a year</td>
+<td style="text-align: left;">No - source not retrievable as cited</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Annual cost, event-free state, HCTZ</td>
+<td style="text-align: left;">5926.76 CNY</td>
+<td style="text-align: left;">china-yao.com</td>
+<td style="text-align: left;">As above</td>
+<td style="text-align: left;">As above</td>
+<td style="text-align: left;">No - source not retrievable as cited</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Annual cost, non-fatal MI state</td>
+<td style="text-align: left;">48874.2 CNY</td>
+<td style="text-align: left;">Reference 14 (Zhu Y et al., Chin J Health Econ 2019;36:50-53)</td>
+<td style="text-align: left;">Chinese-language journal; original not obtained</td>
+<td style="text-align: left;">Adjusted to 2021 prices using the Chinese CPI; applied every year the state is occupied</td>
+<td style="text-align: left;">No - source not obtained, so whether the figure is an annual or a first-year cost could not be checked</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Annual cost, non-fatal stroke state</td>
+<td style="text-align: left;">28023.8 CNY</td>
+<td style="text-align: left;">Reference 14</td>
+<td style="text-align: left;">As above</td>
+<td style="text-align: left;">Adjusted to 2021 prices using the Chinese CPI; applied every year the state is occupied</td>
+<td style="text-align: left;">No - source not obtained, so whether the figure is an annual or a first-year cost could not be checked</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Utility, event-free</td>
+<td style="text-align: left;">0.98</td>
+<td style="text-align: left;">Table 3 marks reference 13 (ACCOMPLISH); the Methods cite references 14 and 19 instead</td>
+<td style="text-align: left;">ACCOMPLISH reports no utility, EQ-5D, SF-36 or quality-of-life outcome anywhere; references 14 and 19 not obtained</td>
+<td style="text-align: left;">None stated</td>
+<td style="text-align: left;">No - the table and the Methods name different sources, and the one the table names does not hold the value</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Utility, non-fatal MI</td>
+<td style="text-align: left;">0.87</td>
+<td style="text-align: left;">Table 3 marks reference 13 (ACCOMPLISH); the Methods cite references 14 and 19 instead</td>
+<td style="text-align: left;">As above</td>
+<td style="text-align: left;">None stated</td>
+<td style="text-align: left;">No - same citation inconsistency</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Utility, non-fatal stroke</td>
+<td style="text-align: left;">0.77</td>
+<td style="text-align: left;">Table 3 marks reference 14; the Methods cite references 14 and 19</td>
+<td style="text-align: left;">Chinese-language journal; original not obtained</td>
+<td style="text-align: left;">None stated</td>
+<td style="text-align: left;">No - source not obtained</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Utility, death</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">Convention</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">None</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cycle length</td>
+<td style="text-align: left;">1 year</td>
+<td style="text-align: left;">Stated in Methods</td>
+<td style="text-align: left;">‘the Markov model cycle in this study was set to 1 year’</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Time horizon</td>
+<td style="text-align: left;">10 cycles</td>
+<td style="text-align: left;">Stated in Methods</td>
+<td style="text-align: left;">‘the Markov model was set to 10 cycles’</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Discount rate, base case</td>
+<td style="text-align: left;">Not reported</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Appears only in the sensitivity analysis; 5% recovered by fitting the published totals (0-7% sweep, 5% is the only fit)</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Recovered, not reported</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Half-cycle correction</td>
+<td style="text-align: left;">Not reported</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Not mentioned anywhere in the paper</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cost accrual by state</td>
+<td style="text-align: left;">Not fully reported</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Methods state the event-free cost is the drug cost; nothing states whether drug cost continues after an event, or whether the MI and stroke figures are annual or one-off</td>
+<td style="text-align: left;">Recovered by back-solving the published totals: drug cost accrues only while event-free, event figures are annual state costs</td>
+<td style="text-align: left;">Recovered, not reported</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PSA distributions</td>
+<td style="text-align: left;">Normal (costs), beta (probabilities and rates)</td>
+<td style="text-align: left;">Stated in Methods</td>
+<td style="text-align: left;">No standard deviations or shape parameters given</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">No - PSA not reproducible</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Willingness-to-pay threshold</td>
+<td style="text-align: left;">80976 CNY</td>
+<td style="text-align: left;">2021 China Statistical Yearbook, GDP per capita</td>
+<td style="text-align: left;">Stated in Methods</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Software</td>
+<td style="text-align: left;">TreeAge Pro 2021</td>
+<td style="text-align: left;">Stated in Methods</td>
+<td style="text-align: left;">‘The Markov model was created using TreeAge Pro 2021’</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="results" class="level1 page-columns page-full">
+<h1>2 · Results</h1>
+<p><strong>Amlodipine plus benazepril costs less and delivers more.</strong> Over ten years it accrues about 8,400 CNY less and a tenth of a QALY more per patient, so it <strong>dominates</strong> — there is no incremental cost-effectiveness ratio to compute, and none that could be interpreted. That is the paper’s conclusion, and the rebuild reproduces it.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>reb <span class="ot">&lt;-</span> <span class="fu">run_both</span>(<span class="at">drug_in =</span> <span class="st">"event_free"</span>, <span class="at">event_cost =</span> <span class="st">"prevalent"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>reb <span class="ot">&lt;-</span> reb[<span class="fu">match</span>(TARGET<span class="sc">$</span>arm, reb<span class="sc">$</span>arm), ]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Arm =</span> TARGET<span class="sc">$</span>arm,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Cost, published</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, TARGET<span class="sc">$</span>cost),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Cost, rebuilt</span><span class="st">`</span>   <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, reb<span class="sc">$</span>cost),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Difference</span><span class="st">`</span>      <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%+.2f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> (reb<span class="sc">$</span>cost <span class="sc">-</span> TARGET<span class="sc">$</span>cost) <span class="sc">/</span> TARGET<span class="sc">$</span>cost),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">QALY, published</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, TARGET<span class="sc">$</span>qaly),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">QALY, rebuilt</span><span class="st">`</span>   <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.4f"</span>, reb<span class="sc">$</span>qaly),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Difference </span><span class="st">`</span>     <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%+.3f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> (reb<span class="sc">$</span>qaly <span class="sc">-</span> TARGET<span class="sc">$</span>qaly) <span class="sc">/</span> TARGET<span class="sc">$</span>qaly),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Cell-by-cell reconciliation against Table 7."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Cell-by-cell reconciliation against Table 7.</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 17%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 17%">
+<col style="width: 14%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: left;">Cost, published</th>
+<th style="text-align: left;">Cost, rebuilt</th>
+<th style="text-align: left;">Difference</th>
+<th style="text-align: left;">QALY, published</th>
+<th style="text-align: left;">QALY, rebuilt</th>
+<th style="text-align: left;">Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">amlodipine</td>
+<td style="text-align: left;">66196.97</td>
+<td style="text-align: left;">66452.27</td>
+<td style="text-align: left;">+0.39%</td>
+<td style="text-align: left;">6.59</td>
+<td style="text-align: left;">6.5884</td>
+<td style="text-align: left;">-0.024%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hctz</td>
+<td style="text-align: left;">74588.50</td>
+<td style="text-align: left;">74515.72</td>
+<td style="text-align: left;">-0.10%</td>
+<td style="text-align: left;">6.46</td>
+<td style="text-align: left;">6.4598</td>
+<td style="text-align: left;">-0.003%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>QALYs match to the precision the paper prints, and the incremental cost of 8,391.53 reproduces exactly. The 0.39% on the amlodipine total is not rounding; it is traced to a specific input in §3, and closing it makes amlodipine slightly cheaper still.</p>
+<p>The paper nonetheless reports an ICER of −64,550.23 alongside a decision entry of “Advantage plan”. A negative ratio under dominance has no reading; §3 takes that up, along with a second value the paper gives for the same quantity.</p>
+<p>Everything below comes from the independent R rebuild. Two accounting rules and the discount rate are not fully specified in the paper and had to be fitted to the published totals; that is set out at the end of the page.</p>
+<p>The paper carries five result figures, and it is worth being precise about what each figure below is:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><a href="#fig-trace" class="quarto-xref">Figure&nbsp;2</a></td>
+<td><strong>reproduces</strong> the paper’s Figures 2 and 3</td>
+</tr>
+<tr class="even">
+<td><a href="#fig-tornado" class="quarto-xref">Figure&nbsp;4</a></td>
+<td>answers the question of its Figure 4, on a <strong>different outcome</strong> — the one it uses has no interpretation under dominance</td>
+</tr>
+<tr class="odd">
+<td><a href="#fig-psa" class="quarto-xref">Figure&nbsp;3</a></td>
+<td><strong>cannot</strong> reproduce its Figures 5 and 6, because the parameters those need are not published; built here on stated assumptions instead</td>
+</tr>
+</tbody>
+</table>
+<p>Nothing on this page is copied from the paper. Every number and every mark is computed from the published inputs by the code behind it, which is folded into the page and can be opened chunk by chunk.</p>
+<section id="the-cohort-over-time" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-cohort-over-time">The cohort over time</h2>
+<div class="page-columns page-full">
+<div id="fig-trace" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full">
+<div aria-describedby="fig-trace-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
+<img src="visuals/cohort_trace.png" class="img-fluid figure-img column-page">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-trace-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Where the cohort sits in each cycle, under the model as published. This reproduces the content of the paper’s Figures 2 and 3, drawn as stacked areas rather than its four separate lines so that the four states are visibly one cohort. States take a sequential ramp because they are ordered by severity; the categorical blue and orange stay reserved for the arms.
+</figcaption>
+</figure>
+</div>
+</div>
+<p>By cycle 10 the amlodipine cohort is 45.9% event-free, 11.6% post-MI, 4.5% post-stroke and 38.1% dead. The paper’s own Results text reports 11.6%, 4.5% and 38.0% for the same three states — a match to the last digit it prints.</p>
+</section>
+<section id="uncertainty" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="uncertainty">Uncertainty</h2>
+<div class="page-columns page-full">
+<div id="fig-psa" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full">
+<div aria-describedby="fig-psa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
+<img src="visuals/psa.png" class="img-fluid figure-img column-page">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-psa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Probabilistic sensitivity analysis: 1000 simulations run on the rebuilt model. <strong>Built here, not reproduced from the paper</strong> — its Figures 5 and 6 depend on distribution parameters it does not report, so the spreads are mine, each set so the parameter’s 95% interval matches the range the paper itself used in its one-way analysis. That choice sets the width of the cloud; it does not move the point estimate.
+</figcaption>
+</figure>
+</div>
+</div>
+<p>Under those assumptions amlodipine is cheaper <em>and</em> more effective in 87% of draws, and cost-effective at the paper’s own threshold in 98%. The 13% that fall outside the dominant quadrant are worth naming: dominance is the base-case result, not a certainty.</p>
+<p>The reconstruction can be partly checked against the paper’s own figures even though it cannot reproduce them. At zero willingness to pay — where the question reduces to “is amlodipine cheaper?” — the paper’s Figure 5 reads <strong>88%</strong> and this one gives <strong>89%</strong>, so the assumed spread on the cost side is close to whatever the paper used. The effect side is not: the paper’s Figure 6 runs its horizontal axis from −0.30 to 0.50 incremental QALYs, while this cloud spans −0.06 to 0.31. <strong>The paper’s effect uncertainty is materially wider than what these assumptions generate</strong>, which is the honest limit of a reconstruction: it can be anchored, but not matched.</p>
+<div class="page-columns page-full">
+<div id="fig-tornado" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full">
+<div aria-describedby="fig-tornado-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
+<img src="visuals/tornado.png" class="img-fluid figure-img column-page">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-tornado-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: One-way sensitivity analysis, plotted twice from the same runs. The left panel uses the ICER, as the paper’s Figure 4 does, and <strong>reproduces its rank order on all sixteen parameters</strong>. The right panel uses incremental net monetary benefit at the paper’s own threshold, which is what a dominant comparison can actually be read on. Each arm’s transition probabilities are moved separately, as the parameter names on the paper’s figure show it does; ranges are the ones that figure prints.
+</figcaption>
+</figure>
+</div>
+</div>
+<p><strong>No parameter, moved to either end of its stated range, takes the net benefit below zero.</strong> The base-case conclusion is stable inside the ranges the paper itself tested.</p>
+<p><strong>The left panel is the strongest single verification test in this case.</strong> Run the same analysis on the paper’s own axis and the rank order comes back identical on all sixteen parameters, from the two event-free-to-death transitions at the top to MI-to-death at the bottom. The bar extents line up too: the widest run spans −220,000 to −34,000 against roughly −240,000 to −35,000 as printed. A ratio with an effect difference of 0.125 in its denominator amplifies any disagreement in the engine that produced it; there is none to amplify.</p>
+<p><strong>Which is why the two panels look nothing alike, and why that is not a disagreement.</strong> A tornado ranks parameters by the outcome it plots. An ICER explodes as its denominator approaches zero, so anything that moves survival dominates it — hence the long left tails, which are the ratio misbehaving rather than the model being uncertain. Net benefit is linear in cost and in effect, so the cost inputs lead instead, and the discount rate moves from near-invisible to mid-table. Same model, same ranges, two defensible pictures.</p>
+<p>⚠ The left panel also shows why the paper’s own axis is the wrong one to decide on: under dominance the ICER has no interpretation, and a bar that runs from −220,000 to −34,000 tells a reader nothing about whether the conclusion holds. The right panel does, and it never reaches zero.</p>
+</section>
+</section>
+<section id="verification-and-appraisal" class="level1 page-columns page-full">
+<h1>3 · Verification and appraisal</h1>
+<p>Verification asks a narrow question: <strong>does the model do what its description says it does?</strong> <strong>TECH-VER</strong> sets out a checklist for answering it, in five stages worked in order — each one worth starting only once the stage before it holds.</p>
+<ol type="1">
+<li><strong>Model inputs</strong> — do the numbers going in match their sources, and each other?</li>
+<li><strong>Event and state calculations</strong> — does the cohort move between states correctly?</li>
+<li><strong>Result calculations</strong> — are the totals, the incremental figures and the decision rule right?</li>
+<li><strong>Uncertainty analysis</strong> — are the sensitivity analyses correctly built, and reported well enough to check?</li>
+<li><strong>Overall validation</strong> — does the model reproduce anything that can be verified from outside it?</li>
+</ol>
+<p>Within each stage the checks escalate by how much work they cost. <strong>Black-box tests come first</strong>: push an input to an extreme and see whether the output does what it must — set every utility to zero and no QALYs should accrue; set mortality to zero and nobody should die. They need no sight of the code, they take minutes, and they catch a surprising share of what goes wrong. Only what survives them is worth the expensive work: <strong>white-box</strong> inspection, reading the calculation line by line, and then <strong>replication</strong>, rebuilding the model independently to see whether the same numbers come back.</p>
+<p>This page is a replication, so all three are open to it. Most of what follows is black-box work even so, because that is where the cheap tests happened to bite.</p>
+<section id="stage-1-the-inputs" class="level2">
+<h2 class="anchored" data-anchor-id="stage-1-the-inputs">Stage 1 — the inputs</h2>
+<p>The model runs on twenty-four numbers. They fall into four groups, and the verification result is different for each.</p>
+<ul>
+<li><p><strong>Sixteen transition probabilities.</strong> Every one is derived inside the paper from the ACCOMPLISH trial, and the derivation reconciles exactly — all six annual probabilities and both event-free death probabilities come back to four decimals. <strong>The arithmetic is right; the input to it looks wrong.</strong> The trial percentages it starts from are cumulative over a mean follow-up of 36 months, and they are converted as though they were annual — the paper prints a conversion formula carrying an observation period and never gives that period a value. On the face of it that inflates every event rate in the matrix about threefold. <strong>Stage 5 tests it rather than argues it.</strong></p></li>
+<li><p><strong>Four costs.</strong> Two drug prices and two event-state costs. <strong>None can be checked against its source</strong>: the drug prices cite a tender website with no version or date, and the event costs cite a Chinese-language article that could not be obtained. One of the two drug prices also disagrees with the paper’s own Figure 4, which Stage 3 takes up.</p></li>
+<li><p><strong>Four utilities.</strong> <strong>The paper’s Table 3 and its Methods cite different sources for them</strong>, and the source the table names contains no utility data at all. Set out in §1.</p></li>
+<li><p><strong>The settings around them</strong> — cycle length, horizon, discount rate, perspective, half-cycle correction. Two are stated; the rest are not reported at all, which is collected below.</p></li>
+</ul>
+<section id="what-the-paper-does-not-report" class="level3">
+<h3 class="anchored" data-anchor-id="what-the-paper-does-not-report">What the paper does not report</h3>
+<p>Verification keeps running into the same obstacle, so it is worth setting out in one place. None of the following appears anywhere in the paper — not in the its Methods, its tables, its figures, its Discussion or its limitations.</p>
+<ul>
+<li>the <strong>analytic perspective</strong> — payer, health system or societal is never said, and which costs belong in scope follows from it</li>
+<li>the <strong>base-case discount rate</strong>, and whether costs and outcomes are discounted alike</li>
+<li>the <strong>observation period <span class="math inline">\(t_1\)</span></strong> in the rate conversion, and <strong>ACCOMPLISH’s follow-up duration</strong> — the two things a reader would need to check it</li>
+<li>whether <strong>drug cost continues after an event</strong>, whether the <strong>event figures are annual or one-off</strong>, and <strong>what resource use they contain</strong></li>
+<li>the <strong>PSA distribution parameters</strong> — the families are given, the numbers are not</li>
+<li><strong>half-cycle correction</strong></li>
+<li>that the model <strong>forbids recurrent events</strong> and holds <strong>post-event mortality equal across arms</strong> — two structural restrictions with real consequences over ten years</li>
+<li><strong>why ten years rather than a lifetime horizon</strong>, which ISPOR-SMDM asks for where an intervention affects mortality</li>
+<li>any <strong>model validation</strong> — no face validity exercise, no internal verification, no external check against the trial, no cross-model comparison</li>
+</ul>
+<p>On the two structural restrictions, it is worth being exact about what “not declared” means here, because the paper does declare three assumptions of its own. They are, in full:</p>
+<blockquote class="blockquote">
+<p><em>“(1) the probability of occurrence of various events in the two patient groups at the end of the trial is the same; (2) the health status transition probability in each cycle is the same as the probability of clinical trial events; (3) because the cost of adverse drug reactions is low, the analysis does not include the occurrence of adverse reactions.”</em></p>
+</blockquote>
+<p>The first is about event probabilities persisting past the trial, the second is the conversion discussed above, the third is about adverse events. <strong>Neither the ban on recurrent events nor the equal post-event mortality appears in that list, or anywhere else in the paper.</strong> They are visible only in the transition matrix, where the MI and stroke rows each sum to one across just two destinations.</p>
+</section>
+</section>
+<section id="stage-2-the-engine" class="level2">
+<h2 class="anchored" data-anchor-id="stage-2-the-engine">Stage 2 — the engine</h2>
+<p>The Results text reports the state distribution at cycle 10 for both arms — an independent check that constrains the trace without passing through a single cost or utility value.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pub <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">arm =</span> <span class="fu">c</span>(<span class="st">"amlodipine"</span>, <span class="st">"hctz"</span>),</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">Dead =</span> <span class="fu">c</span>(<span class="fl">38.0</span>, <span class="fl">41.0</span>), <span class="at">Stroke =</span> <span class="fu">c</span>(<span class="fl">4.5</span>, <span class="fl">5.1</span>), <span class="at">MI =</span> <span class="fu">c</span>(<span class="fl">11.6</span>, <span class="fl">13.8</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>reb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">c</span>(<span class="st">"amlodipine"</span>, <span class="st">"hctz"</span>), <span class="cf">function</span>(a) {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  tr <span class="ot">&lt;-</span> <span class="fu">run_markov</span>(a)<span class="sc">$</span>trace</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">arm =</span> a, <span class="at">Dead =</span> <span class="dv">100</span> <span class="sc">*</span> tr[<span class="st">"10"</span>, <span class="st">"Dead"</span>],</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">Stroke =</span> <span class="dv">100</span> <span class="sc">*</span> tr[<span class="st">"10"</span>, <span class="st">"Stroke"</span>], <span class="at">MI =</span> <span class="dv">100</span> <span class="sc">*</span> tr[<span class="st">"10"</span>, <span class="st">"MI"</span>])</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">sprintf</span>(<span class="st">"%.1f%%"</span>, x)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">data.frame</span>(<span class="at">Arm =</span> pub<span class="sc">$</span>arm,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">Dead, published</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">p1</span>(pub<span class="sc">$</span>Dead),  <span class="st">`</span><span class="at">Dead, rebuilt</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">p1</span>(reb<span class="sc">$</span>Dead),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">Stroke, published</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">p1</span>(pub<span class="sc">$</span>Stroke), <span class="st">`</span><span class="at">Stroke, rebuilt</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">p1</span>(reb<span class="sc">$</span>Stroke),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">MI, published</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">p1</span>(pub<span class="sc">$</span>MI), <span class="st">`</span><span class="at">MI, rebuilt</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">p1</span>(reb<span class="sc">$</span>MI),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">check.names =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>   <span class="at">caption =</span> <span class="st">"Where the cohort sits at cycle 10, as reported in the paper's Results text and as rebuilt."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Where the cohort sits at cycle 10, as reported in the paper’s Results text and as rebuilt.</caption>
+<colgroup>
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 13%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: left;">Dead, published</th>
+<th style="text-align: left;">Dead, rebuilt</th>
+<th style="text-align: left;">Stroke, published</th>
+<th style="text-align: left;">Stroke, rebuilt</th>
+<th style="text-align: left;">MI, published</th>
+<th style="text-align: left;">MI, rebuilt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">amlodipine</td>
+<td style="text-align: left;">38.0%</td>
+<td style="text-align: left;">38.1%</td>
+<td style="text-align: left;">4.5%</td>
+<td style="text-align: left;">4.5%</td>
+<td style="text-align: left;">11.6%</td>
+<td style="text-align: left;">11.6%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hctz</td>
+<td style="text-align: left;">41.0%</td>
+<td style="text-align: left;">40.9%</td>
+<td style="text-align: left;">5.1%</td>
+<td style="text-align: left;">5.0%</td>
+<td style="text-align: left;">13.8%</td>
+<td style="text-align: left;">13.8%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Six cells, six matches to the last digit printed. The nine black-box tests TECH-VER specifies for this stage also pass: cohort conservation, non-negativity, monotone deaths, utilities set to one and to zero, costs set to zero, mortality set to zero. <strong>The transition engine is correct.</strong></p>
+</section>
+<section id="stage-3-the-results" class="level2">
+<h2 class="anchored" data-anchor-id="stage-3-the-results">Stage 3 — the results</h2>
+<p>The reconciliation is in §2. QALYs are exact at the precision printed and the incremental cost of 8,391.53 reproduces exactly; the amlodipine total comes out 0.39% high.</p>
+<p>That residual is a reporting inconsistency rather than arithmetic. Fourteen of the fifteen parameter ranges printed on the paper’s Figure 4 back-solve to the value in Tables 2 and 3. The fifteenth does not: the amlodipine drug price implies <strong>5,459.50</strong> where Table 2 prints <strong>5,494.53</strong>. Run on the figure’s value, the arm total falls to 0.07% of the published one — within what the transition matrix’s four printed decimals allow.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20260826</span>); HALF <span class="ot">&lt;-</span> <span class="fl">0.00005</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>srow <span class="ot">&lt;-</span> <span class="cf">function</span>(q) <span class="cf">repeat</span> { v <span class="ot">&lt;-</span> q <span class="sc">+</span> <span class="fu">runif</span>(<span class="fu">length</span>(q), <span class="sc">-</span>HALF, HALF)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  v[<span class="fu">length</span>(v)] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>(v[<span class="sc">-</span><span class="fu">length</span>(v)])</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">abs</span>(v[<span class="fu">length</span>(v)] <span class="sc">-</span> q[<span class="fu">length</span>(q)]) <span class="sc">&lt;=</span> HALF) <span class="fu">return</span>(v) }</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>band <span class="ot">&lt;-</span> <span class="cf">function</span>(drug) <span class="fu">replicate</span>(<span class="dv">3000</span>, {</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  q <span class="ot">&lt;-</span> TPM_PUBLISHED<span class="sc">$</span>amlodipine</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  e <span class="ot">&lt;-</span> <span class="fu">srow</span>(<span class="fu">c</span>(q[[<span class="st">"EE"</span>]], q[[<span class="st">"EM"</span>]], q[[<span class="st">"ES"</span>]], q[[<span class="st">"ED"</span>]]))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">srow</span>(<span class="fu">c</span>(q[[<span class="st">"MM"</span>]], q[[<span class="st">"MD"</span>]])); k <span class="ot">&lt;-</span> <span class="fu">srow</span>(<span class="fu">c</span>(q[[<span class="st">"SS"</span>]], q[[<span class="st">"SD"</span>]]))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> TPM_PUBLISHED</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  t<span class="sc">$</span>amlodipine <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">EE=</span>e[<span class="dv">1</span>], <span class="at">EM=</span>e[<span class="dv">2</span>], <span class="at">ES=</span>e[<span class="dv">3</span>], <span class="at">ED=</span>e[<span class="dv">4</span>], <span class="at">MM=</span>m[<span class="dv">1</span>], <span class="at">MD=</span>m[<span class="dv">2</span>], <span class="at">SS=</span>k[<span class="dv">1</span>], <span class="at">SD=</span>k[<span class="dv">2</span>])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_model</span>(<span class="at">tpm =</span> t, <span class="at">drug =</span> <span class="fu">replace</span>(COST_DRUG, <span class="st">"amlodipine"</span>, drug))<span class="sc">$</span>cost[[<span class="st">"amlodipine"</span>]] })</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>fig <span class="ot">&lt;-</span> (<span class="fl">4094.6</span> <span class="sc">+</span> <span class="fl">6824.4</span>) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">c</span>(COST_DRUG[[<span class="st">"amlodipine"</span>]], fig), <span class="cf">function</span>(v) {</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  tot <span class="ot">&lt;-</span> <span class="fu">run_model</span>(<span class="at">drug =</span> <span class="fu">replace</span>(COST_DRUG, <span class="st">"amlodipine"</span>, v))<span class="sc">$</span>cost[[<span class="st">"amlodipine"</span>]]</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  bd <span class="ot">&lt;-</span> <span class="fu">band</span>(v)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="st">`</span><span class="at">Amlodipine drug cost</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, v),</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Source =</span> <span class="cf">if</span> (v <span class="sc">&gt;</span> <span class="dv">5470</span>) <span class="st">"Table 2"</span> <span class="cf">else</span> <span class="st">"implied by Figure 4"</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rebuilt arm total</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, tot),</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">vs published 66,196.97</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%+.2f  (%+.2f%%)"</span>, tot <span class="sc">-</span> <span class="fl">66196.97</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>                                       <span class="dv">100</span> <span class="sc">*</span> (tot <span class="sc">-</span> <span class="fl">66196.97</span>) <span class="sc">/</span> <span class="fl">66196.97</span>),</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Within four-decimal rounding</span><span class="st">`</span> <span class="ot">=</span> <span class="cf">if</span> (<span class="fl">66196.97</span> <span class="sc">&gt;=</span> <span class="fu">min</span>(bd) <span class="sc">&amp;&amp;</span> <span class="fl">66196.97</span> <span class="sc">&lt;=</span> <span class="fu">max</span>(bd))</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>      <span class="st">"yes"</span> <span class="cf">else</span> <span class="st">"no"</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>) })), <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"The amlodipine total on each of the two drug prices the paper gives."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>The amlodipine total on each of the two drug prices the paper gives.</caption>
+<colgroup>
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 16%">
+<col style="width: 20%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Amlodipine drug cost</th>
+<th style="text-align: left;">Source</th>
+<th style="text-align: left;">Rebuilt arm total</th>
+<th style="text-align: left;">vs published 66,196.97</th>
+<th style="text-align: left;">Within four-decimal rounding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">5494.53</td>
+<td style="text-align: left;">Table 2</td>
+<td style="text-align: left;">66452.27</td>
+<td style="text-align: left;">+255.30 (+0.39%)</td>
+<td style="text-align: left;">no</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5459.50</td>
+<td style="text-align: left;">implied by Figure 4</td>
+<td style="text-align: left;">66240.78</td>
+<td style="text-align: left;">+43.81 (+0.07%)</td>
+<td style="text-align: left;">yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>A documented value and an implemented value differing by 35 CNY a year, findable only by reading a figure’s small print against a table. Nothing material turns on it; every number elsewhere on this page uses Table 2’s.</p>
+<p>Dominance is reported as a ratio. Amlodipine is cheaper and more effective, so the correct entry is <em>dominated</em>; Table 7 prints an ICER of −64,550.23 next to a decision of “Advantage plan”. The paper also gives a second value for the same quantity — Figure 4 is centred on −67,133.56 — because Table 7 divides by the effect difference <strong>as printed</strong>, 0.13, while the figure uses the unrounded 0.125.</p>
+</section>
+<section id="stage-4-uncertainty" class="level2">
+<h2 class="anchored" data-anchor-id="stage-4-uncertainty">Stage 4 — uncertainty</h2>
+<p>The paper gives distribution families — normal for costs, beta for probabilities and rates — but no standard deviations and no shape parameters, so its probabilistic analysis cannot be reproduced; <a href="#fig-psa" class="quarto-xref">Figure&nbsp;3</a> is a reconstruction on stated assumptions, not a replication. The one-way analysis is a different matter: its Figure 4 prints every parameter’s name and its low and high value on the face of the figure, which is better reporting than most published tornados manage and is what made <a href="#fig-tornado" class="quarto-xref">Figure&nbsp;4</a> checkable at all.</p>
+<p>Worth noting for its own sake: those ranges perturb input <em>values</em>. The two findings in Stages 1 and 5 are structural, and nothing inside the stated ranges reaches them.</p>
+</section>
+<section id="stage-5-validation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="stage-5-validation">Stage 5 — validation</h2>
+<p>The model’s death transitions were derived <em>from</em> ACCOMPLISH’s three-year mortality, so running the model over ACCOMPLISH’s own three years should give that mortality back. It does not.</p>
+<div class="page-columns page-full">
+<div id="fig-validity" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full">
+<div aria-describedby="fig-validity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
+<img src="visuals/mortality_validity.png" class="img-fluid figure-img column-page">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-validity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Cumulative all-cause death in the modelled cohort. Colour is the arm as before; <strong>line style is the version</strong> — solid as published, dashed with the trial percentages annualised over the 36 months actually observed. The shaded band is the trial’s own follow-up, the only stretch where the model can be checked against evidence rather than extrapolated. The black marker is what ACCOMPLISH observed.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">names</span>(TRIAL), <span class="cf">function</span>(a) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  run3 <span class="ot">&lt;-</span> <span class="cf">function</span>(p) { m <span class="ot">&lt;-</span> <span class="fu">make_tpm</span>(p)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="dv">11</span>, <span class="dv">4</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">10</span>, STATES)); x[<span class="dv">1</span>, <span class="st">"EventFree"</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) x[t <span class="sc">+</span> <span class="dv">1</span>, ] <span class="ot">&lt;-</span> x[t, ] <span class="sc">%*%</span> m; x }</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  pu <span class="ot">&lt;-</span> <span class="fu">run3</span>(TPM_PUBLISHED[[a]]); co <span class="ot">&lt;-</span> <span class="fu">run3</span>(<span class="fu">corr_tpm</span>(a))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">Arm =</span> a,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Trial observed</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.1f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> TRIAL[[a]][[<span class="st">"death"</span>]]),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Model at cycle 3, as published</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.1f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> pu[<span class="st">"3"</span>, <span class="st">"Dead"</span>]),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Model at cycle 3, annualised</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%.1f%%"</span>, <span class="dv">100</span> <span class="sc">*</span> co[<span class="st">"3"</span>, <span class="st">"Dead"</span>]),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">check.names =</span> <span class="cn">FALSE</span>) })), <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"The round trip. Column two is what went into the model; column three is what comes back out of it over the same three years; column four is what comes back once the conversion uses the period the trial actually ran."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>The round trip. Column two is what went into the model; column three is what comes back out of it over the same three years; column four is what comes back once the conversion uses the period the trial actually ran.</caption>
+<colgroup>
+<col style="width: 12%">
+<col style="width: 17%">
+<col style="width: 36%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: left;">Trial observed</th>
+<th style="text-align: left;">Model at cycle 3, as published</th>
+<th style="text-align: left;">Model at cycle 3, annualised</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">amlodipine</td>
+<td style="text-align: left;">4.1%</td>
+<td style="text-align: left;">11.2%</td>
+<td style="text-align: left;">4.1%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hctz</td>
+<td style="text-align: left;">4.5%</td>
+<td style="text-align: left;">12.1%</td>
+<td style="text-align: left;">4.4%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The round trip does not close. What went in as 4.1% comes back out as 11.2%. Correcting the conversion closes it — 4.1% in, 4.1% out — which is what a sound conversion has to do. Seven of the model’s ten years sit outside anything the trial observed — ordinary for a Markov model, and not a criticism. What matters is the other three.</p>
+<section id="does-any-of-it-change-the-answer" class="level3">
+<h3 class="anchored" data-anchor-id="does-any-of-it-change-the-answer">Does any of it change the answer?</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>TPM_SAVE <span class="ot">&lt;-</span> TPM_PUBLISHED</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>TPM_PUBLISHED <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">names</span>(TRIAL), corr_tpm); <span class="fu">names</span>(TPM_PUBLISHED) <span class="ot">&lt;-</span> <span class="fu">names</span>(TRIAL)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>cc <span class="ot">&lt;-</span> <span class="fu">run_both</span>(<span class="at">drug_in =</span> <span class="st">"event_free"</span>, <span class="at">event_cost =</span> <span class="st">"prevalent"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>cc <span class="ot">&lt;-</span> cc[<span class="fu">match</span>(TARGET<span class="sc">$</span>arm, cc<span class="sc">$</span>arm), ]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>TPM_PUBLISHED <span class="ot">&lt;-</span> TPM_SAVE</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Version =</span> <span class="fu">c</span>(<span class="st">"As published"</span>, <span class="st">"Conversion corrected"</span>),</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Incremental cost (CNY)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%+.0f"</span>, <span class="fu">c</span>(<span class="fu">diff</span>(TARGET<span class="sc">$</span>cost), <span class="fu">diff</span>(cc<span class="sc">$</span>cost))),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Incremental QALY</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"%+.4f"</span>, <span class="fu">c</span>(<span class="fu">diff</span>(TARGET<span class="sc">$</span>qaly), <span class="fu">diff</span>(cc<span class="sc">$</span>qaly))),</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Amlodipine dominant</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"yes"</span>, <span class="st">"yes"</span>), <span class="at">check.names =</span> <span class="cn">FALSE</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Hydrochlorothiazide relative to amlodipine."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Hydrochlorothiazide relative to amlodipine.</caption>
+<colgroup>
+<col style="width: 25%">
+<col style="width: 28%">
+<col style="width: 20%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Version</th>
+<th style="text-align: left;">Incremental cost (CNY)</th>
+<th style="text-align: left;">Incremental QALY</th>
+<th style="text-align: left;">Amlodipine dominant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">As published</td>
+<td style="text-align: left;">+8392</td>
+<td style="text-align: left;">-0.1300</td>
+<td style="text-align: left;">yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Conversion corrected</td>
+<td style="text-align: left;">+5611</td>
+<td style="text-align: left;">-0.0618</td>
+<td style="text-align: left;">yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Not the direction. Correcting the conversion halves the health gain and narrows the cost gap by a third, and amlodipine still costs less and delivers more. Two other things were tested for the same reason and behave the same way: charging the event costs once rather than annually cuts the cost gap to a third of the published one, and hydrochlorothiazide’s price would have to fall 23.6% — below amlodipine’s — before the two arms cost the same.</p>
+<p><strong>Everything found here is about the size of the answer, not its sign.</strong> That is worth being plain about, because it is the difference between a model that is wrong and a model whose numbers should not be quoted.</p>
+</section>
+</section>
+<section id="the-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="the-checklist">The checklist</h2>
+<p>This is the full record of what was checked on <strong>the paper’s model</strong> — whether it does what the paper says it does, and whether its inputs and its reporting hold up. It is not a judgement on the clinical question.</p>
+<p>The rows come from two places. Most are TECH-VER’s own items, adapted to a four-state cohort model: the black-box tests each stage prescribes, the completeness and consistency tests that precede them, and the result and uncertainty checks. The rest are checks the rebuild itself generated — questions that could only be asked once there was a working model to ask them of, such as whether the trial figures come back out of it, or whether the inputs printed in the tables are the inputs it ran on. TECH-VER items that assume a spreadsheet implementation — hidden sheets, external links, password protection — are left out, because the model is a TreeAge file that was not available.</p>
+<p>Each row carries one of four verdicts and a single line of reason. <code>cant_verify</code> marks a check that could not be completed, which is not the same as one that failed; four rows carry it, and each names what was missing.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ck <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/techver_checklist.csv"</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kb</span>(<span class="fu">as.data.frame</span>(<span class="fu">t</span>(<span class="fu">table</span>(<span class="fu">factor</span>(ck<span class="sc">$</span>Verdict,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"pass"</span>, <span class="st">"not pass"</span>, <span class="st">"cant_verify"</span>, <span class="st">"N/A"</span>)))))[, <span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Verdict"</span>, <span class="st">"Items"</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Verdict</th>
+<th style="text-align: right;">Items</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">pass</td>
+<td style="text-align: right;">22</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">not pass</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cant_verify</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">N/A</td>
+<td style="text-align: right;">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>All 53 checks
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="tablescroll">
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 24%">
+<col style="width: 3%">
+<col style="width: 62%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stage</th>
+<th style="text-align: left;">Check</th>
+<th style="text-align: left;">Verdict</th>
+<th style="text-align: left;">Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Transition probabilities in Table 6 reconcile to the derivation in Tables 4-5</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">1-exp(-p) reproduces all six probabilities exactly; PH-D reproduces by subtraction to four decimals</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">All transition probabilities lie within [0,1]</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Checked for both arms</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Raising the drug price raises total cost</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Monotone across a 4800-6000 CNY sweep</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Implementation matches the paper’s own account of which costs are included</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Limitations state only medicine costs were counted, but the published totals reproduce only with the MI and stroke state costs included</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Inputs reconcile to their cited sources</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Table 3 attributes utilities 0.98 and 0.87 to ACCOMPLISH, which reports no utility outcome; the Methods attribute the utilities to two other references the table never names</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Every input has a retrievable source</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Drug prices cite a tender website with no version or date; three inputs cite a Chinese-language article not obtained</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Each row of the transition matrix sums to one</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">The event-free row as printed sums to 1.0001: PH-E is the complement of the unrounded values while the other three are each rounded independently. A display artefact, not a modelling one</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Observation period of the source data matches the conversion applied</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">ACCOMPLISH’s percentages are cumulative over a mean 36-month follow-up and are converted as though annual; run over the trial’s own three years the model returns 11.2% cumulative death where 4.1% went in</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Event definitions in the source match the states they populate</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">The 2.2% and 1.9% figures are ‘fatal and nonfatal’ events, used to populate non-fatal states while death is modelled separately</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Analytic perspective stated</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Nothing in the paper states whether the evaluation takes a payer, health-system or societal perspective</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">The observation period used in the rate conversion is reported</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">The Methods print the conversion with t1 as a free argument and never assign it a value; the trial’s follow-up duration is not mentioned either</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Inputs printed in the tables are the inputs the model ran on</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Fourteen of the fifteen ranges on Figure 4 back-solve to the value in Tables 2 and 3; the amlodipine drug price implies 5459.50 where Table 2 prints 5494.53, and only the former reproduces the published total</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">The two columns of Table 5 are reconcilable to one conversion</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Back-solving the observation period linking them gives about 3.3 years for three rows, exactly one year for a fourth and four weeks for the fifth; the left-hand column is used by nothing in Table 6 or the model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Rates, probabilities and percentages are named and scaled correctly</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Tables 5 and 6 are both headed (%) but hold probabilities - 0.9251 is not 0.9251%; ISPOR-SMDM asks that rates never be shown as percentages and probabilities never be called rates</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1. Model inputs</td>
+<td style="text-align: left;">Post-event fatality inputs locatable in the cited source</td>
+<td style="text-align: left;">cant_verify</td>
+<td style="text-align: left;">27.2% does not appear in ACCOMPLISH; 6.3% appears once, as a different endpoint in the other arm</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">State occupancy sums to the cohort in every cycle</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Black-box test from TECH-VER Table 2, run on the rebuild</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">All occupancies and probabilities are non-negative</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Black-box test from TECH-VER Table 2, run on the rebuild</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Cumulative deaths are monotonically non-decreasing</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Black-box test from TECH-VER Table 2, run on the rebuild</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Setting all utilities to one makes QALYs equal life-years</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Black-box test from TECH-VER Table 2, run on the rebuild</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Setting all utilities to zero accrues no QALYs</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Black-box test from TECH-VER Table 2, run on the rebuild</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Scaling all utilities down lowers QALYs</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Black-box test from TECH-VER Table 2, run on the rebuild</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Setting all costs to zero accrues no cost</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Black-box test from TECH-VER Table 2, run on the rebuild</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Setting mortality to zero produces no deaths</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Black-box test from TECH-VER Table 2, run on the rebuild</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Cycle-10 occupancy matches the cohort analysis reported in the text</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Six of six cells match to the last printed digit across both arms</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Half-cycle correction implemented</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Not mentioned anywhere; ISPOR-SMDM best practice III-14 asks for it in the first and final cycle when the horizon is not lifetime</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Structural restrictions declared</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">The three stated assumptions cover neither the absence of recurrent events nor the treatment-independent post-event mortality</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2. Event and state calculations</td>
+<td style="text-align: left;">Whole cohort dead by the end of the horizon</td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;">Ten-year horizon, not lifetime, so TECH-VER’s lifetime test does not apply</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Cost-effectiveness ratio equals total cost divided by total QALYs</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Both arms reconcile exactly</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Incremental cost equals the difference of the arm totals</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">8391.53 reproduces exactly</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Direction of the incremental effect is correct</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Amlodipine accrues more QALYs, consistent with its lower event probabilities</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Independent rebuild reconciles to Table 7 on QALYs</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">6.5884 and 6.4598 against 6.59 and 6.46, exact at the precision published</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Independent rebuild reconciles to Table 7 on cost, HCTZ arm</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">74515.72 against 74588.50, within the range that four-decimal rounding of the transition matrix allows</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Dominance reported correctly</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Amlodipine is both cheaper and more effective; a negative ICER of -64550.23 is reported where ‘dominated’ is the correct entry</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Discount rate reported, and applied consistently to costs and outcomes</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">No base-case rate is stated - 5% appears only as a sensitivity re-run and had to be fitted - and nothing says whether costs and QALYs were discounted alike</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Cost accrual rule reported</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Recovered by back-solving; the intuitive alternative undershoots the published costs by 28-31%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3. Result calculations</td>
+<td style="text-align: left;">Independent rebuild reconciles to Table 7 on cost, amlodipine arm</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">66452.27 against 66196.97 on Table 2’s drug price, further apart than rounding can account for; the gap closes to 0.07% on the price implied by Figure 4’s printed range</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4. Uncertainty analysis</td>
+<td style="text-align: left;">One-way sensitivity ranges reported</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Stated in the Methods and printed parameter by parameter on Figure 4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4. Uncertainty analysis</td>
+<td style="text-align: left;">Tornado diagram reproducible from reported numbers</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Figure 4 prints each parameter’s low and high value, so the analysis can be re-run; doing so reproduces its rank order on all sixteen parameters</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4. Uncertainty analysis</td>
+<td style="text-align: left;">PSA distribution parameters reported</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Families are given - normal for costs, beta for probabilities and rates - but no standard deviations or shape parameters</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4. Uncertainty analysis</td>
+<td style="text-align: left;">Distribution families appropriate to the parameters they cover</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Beta is declared over ‘all probability and rate values’; rates are not confined to the unit interval</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4. Uncertainty analysis</td>
+<td style="text-align: left;">Sensitivity analysis reaches the assumptions the result is actually sensitive to</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">The stated ranges perturb input values; the annualisation and the cost-accrual rule are structural and lie outside them</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4. Uncertainty analysis</td>
+<td style="text-align: left;">Every parameter in the model appears among the reported inputs</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Figure 4 varies a utility of death and a cost of death; neither appears in Table 2 or Table 3, where both are zero</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4. Uncertainty analysis</td>
+<td style="text-align: left;">PSA reproducible</td>
+<td style="text-align: left;">cant_verify</td>
+<td style="text-align: left;">Follows from the missing distribution parameters</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">The same check after correcting the annualisation</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">4.1% and 4.4% against 4.1% and 4.5% in: the round trip closes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Robustness of the cost result to the drug price</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">HCTZ would have to fall 23.6% to 4527.89 CNY - below the amlodipine price - before the arms cost the same, so the ordering is not load-bearing</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Robustness of the conclusion to the annualisation</td>
+<td style="text-align: left;">pass</td>
+<td style="text-align: left;">Correcting it halves the incremental QALY, from -0.130 to -0.062, and cuts incremental cost from 8392 to 5611 CNY; amlodipine remains both cheaper and more effective</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Round trip: the trial mortality used to build the model comes back out of it</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">At cycle 3, roughly the trial’s own length, the model gives 11.2% and 12.1% cumulative death where 4.1% and 4.5% went in</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Face validity: utility of the event-free state</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">0.98 places the cohort close to full health, while the cohort is defined by 60% diabetes, 23% prior MI and a median age of 68</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Any model validation is reported</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">No face validity exercise, no internal verification, no external validation against the trial, and no cross-model comparison is reported anywhere</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Time horizon justified against the decision problem</td>
+<td style="text-align: left;">not pass</td>
+<td style="text-align: left;">Ten years is justified by the cohort’s age alone; ISPOR-SMDM asks for a lifetime horizon where the intervention affects mortality, and no comparison against a lifetime horizon is reported</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Face validity: relative drug prices</td>
+<td style="text-align: left;">cant_verify</td>
+<td style="text-align: left;">The ordering that makes HCTZ the dearer generic cannot be checked against the cited website</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Event-state costs are defined on a basis that matches how they are applied</td>
+<td style="text-align: left;">cant_verify</td>
+<td style="text-align: left;">Half of each total is an annual event charge, applied on average 3.9 times per MI; if the source figures are first-year costs the cost gap falls to a third, but the source could not be obtained</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5. Overall validation</td>
+<td style="text-align: left;">Cross-model validation against other hypertension Markov models</td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;">Out of scope for this exercise; declared rather than attempted</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="scope-and-how-this-was-built" class="level2">
+<h2 class="anchored" data-anchor-id="scope-and-how-this-was-built">Scope, and how this was built</h2>
+<p>An independent implementation in R of the model the paper describes, built from the inputs the paper prints and from the trial it cites. Every implementation choice — cycle timing, discount indexing, which states carry which cost — is a switch rather than a hard-wired constant, so each could be tested against the published totals rather than assumed.</p>
+<p><strong>Covered.</strong> The deterministic base case in full, the derivation of every transition probability from the trial, the provenance of every input, and the one-way analysis on the paper’s own ranges. Three sensitivities were run far enough to test the conclusion rather than describe it: the annualisation, the basis of the event costs, and the drug price.</p>
+<p><strong>Not covered.</strong> The probabilistic analysis cannot be reproduced, because the paper publishes distribution families and no parameters; <a href="#fig-psa" class="quarto-xref">Figure&nbsp;3</a> is built on stated assumptions instead. Cross-model comparison against other hypertension models is validation rather than verification, and was declared out of scope rather than attempted.</p>
+<p><strong>Not obtainable.</strong> Two Chinese-language articles — reference 14, cited for the stroke utility and both event-state costs, and reference 19, named in the Methods as a source of utilities but absent from Table 3. Neither could be retrieved, so the rows depending on them are recorded as <code>cant_verify</code> rather than assessed. The paper’s own TreeAge file was likewise unavailable.</p>
+<p><strong>Three inputs had to be fitted.</strong> Whether drug cost continues after an event, whether the MI and stroke figures are annual or one-off, and the base-case discount rate are not reported. To make the rebuild runnable each was fitted to the published totals, and one setting fits in each case: drug cost accrues only while event-free, the event figures are annual state costs, the discount rate is 5%. The transition-probability findings do not use these settings.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
