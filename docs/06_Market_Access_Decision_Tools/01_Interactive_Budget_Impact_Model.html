@@ -420,6 +420,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="bim_ui.js?v=2026-08-23u"></script>
 </div>
 </section>
+<section id="how-to-use-it" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-use-it">How to use it</h2>
+<p>A model handed to someone else needs a note saying how to drive it, so here is one.</p>
+<p><strong>The payer-perspective switch is the only control.</strong> It moves the model between the social security and private-sector settings the source reports. Everything else on the page is output: the panels recompute together, so a switch flipped at the top changes every figure below it.</p>
+<p><strong>Seven panels, in the order the calculation runs.</strong> <em>Funnel</em> narrows a million covered lives to the treated population. <em>Market share</em> splits that population between the two worlds being compared. <em>Per-patient cost</em> builds one patient’s annual cost from its components. <em>Budget impact</em> is the difference between the two worlds — the number the model exists to report. <em>OWSA</em> varies the seven parameters the source varies, one at a time.</p>
+<p><strong>Two panels are the audit rather than the analysis.</strong> <em>Reconciliation</em> sets every rebuilt component against the published figure and states the gap where there is one — it is the record of what agrees with the source and what does not, including the two components that do not. <em>Provenance</em> is the data extraction document: every parameter, the upstream source it comes from, and whether that source is published, derived, calibrated or assumed. Hovering any parameter elsewhere on the page shows the same provenance without leaving the panel you are in.</p>
+<p><strong>What not to read into it.</strong> The figures are a rebuild of one published analysis under that paper’s assumptions, at 2020 US dollars, over three years. They are not a forecast for any real plan, and the market shares are manufacturer projections rather than observed data.</p>
+</section>
 <section id="how-it-is-put-together" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="how-it-is-put-together">How it is put together</h2>
 <p>The model reconstructs a published budget impact analysis from its parameters rather than restating its results, so that every input is visible and every calculation can be checked against the source. Three files, no server, no build step, no dependencies: <code>bim_params.js</code> holds every parameter with its source and no logic, <code>bim_engine.js</code> holds the calculation with no interface code, and <code>bim_ui.js</code> renders. A reviewer auditing the model opens the parameter file and checks it against the paper — the same thing they would ask to do with a spreadsheet, and rarely can.</p>

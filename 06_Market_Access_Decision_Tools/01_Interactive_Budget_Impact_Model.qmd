@@ -188,6 +188,31 @@ is the answer; everything under it is the justification.
 ```
 :::
 
+## How to use it
+
+A model handed to someone else needs a note saying how to drive it, so here is one.
+
+**The payer-perspective switch is the only control.** It moves the model between the social
+security and private-sector settings the source reports. Everything else on the page is output:
+the panels recompute together, so a switch flipped at the top changes every figure below it.
+
+**Seven panels, in the order the calculation runs.** *Funnel* narrows a million covered lives to
+the treated population. *Market share* splits that population between the two worlds being
+compared. *Per-patient cost* builds one patient's annual cost from its components. *Budget impact*
+is the difference between the two worlds — the number the model exists to report. *OWSA* varies
+the seven parameters the source varies, one at a time.
+
+**Two panels are the audit rather than the analysis.** *Reconciliation* sets every rebuilt
+component against the published figure and states the gap where there is one — it is the record of
+what agrees with the source and what does not, including the two components that do not.
+*Provenance* is the data extraction document: every parameter, the upstream source it comes from,
+and whether that source is published, derived, calibrated or assumed. Hovering any parameter
+elsewhere on the page shows the same provenance without leaving the panel you are in.
+
+**What not to read into it.** The figures are a rebuild of one published analysis under that
+paper's assumptions, at 2020 US dollars, over three years. They are not a forecast for any real
+plan, and the market shares are manufacturer projections rather than observed data.
+
 ## How it is put together
 
 The model reconstructs a published budget impact analysis from its parameters rather than restating

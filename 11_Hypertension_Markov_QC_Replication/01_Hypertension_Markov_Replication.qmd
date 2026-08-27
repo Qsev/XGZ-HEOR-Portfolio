@@ -263,6 +263,12 @@ the values. Both papers those Methods point to are Chinese-language and were not
 obtainable here, which is exactly what a reviewer would need to settle it.
 Recorded as a citation-consistency problem, not a data-integrity one.
 
+The table below is the **data extraction document** for this rebuild: one row per
+input, the source the paper cites for it, where that quantity actually sits in
+the cited work, any transformation applied, and whether the source could be
+located and checked. It is written for a reviewer who should not have to repeat
+the search to judge whether an input is appropriate.
+
 ::: {.tablescroll}
 ```{r provenance}
 kb(read.csv("data/provenance.csv", check.names = FALSE))
@@ -639,9 +645,11 @@ the tables are the inputs it ran on. TECH-VER items that assume a spreadsheet
 implementation — hidden sheets, external links, password protection — are left
 out, because the model is a TreeAge file that was not available.
 
-Each row carries one of four verdicts and a single line of reason.
-`cant_verify` marks a check that could not be completed, which is not the same
-as one that failed; four rows carry it, and each names what was missing.
+This is the **model checklist** for the rebuild. Each row carries one of four
+verdicts — `pass`, `not pass`, `N/A`, `cant_verify` — and a single line of
+reason. `cant_verify` marks a check that could not be completed, which is not
+the same as one that failed; four rows carry it, and each names what was
+missing.
 
 ```{r checklist-summary}
 #| code-fold: true
