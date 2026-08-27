@@ -4,7 +4,8 @@ subtitle: "A published budget impact model in AML, rebuilt from its parameters a
 author: "Xiaoge Zhang, PhD"
 date: today
 page-layout: article
-toc: false
+toc: true
+toc-depth: 2
 number-sections: false
 format:
   html:
@@ -172,6 +173,8 @@ layer there is only one world and no budget impact at all.
 ```
 
 
+## The working model
+
 Each block below is one layer of that diagram, in order. The budget impact comes first because that
 is the answer; everything under it is the justification.
 
@@ -180,11 +183,11 @@ is the answer; everything under it is the justification.
 <!-- ?v= is a cache-busting token. Bump it whenever these files change:
      Quarto does not fingerprint page assets, so a returning visitor would
      otherwise keep a stale stylesheet or engine and see a broken page. -->
-<link rel="stylesheet" href="bim.css?v=2026-08-23u">
+<link rel="stylesheet" href="bim.css?v=2026-08-27a">
 <div id="bim-app"></div>
-<script src="bim_params.js?v=2026-08-23u"></script>
-<script src="bim_engine.js?v=2026-08-23u"></script>
-<script src="bim_ui.js?v=2026-08-23u"></script>
+<script src="bim_params.js?v=2026-08-27a"></script>
+<script src="bim_engine.js?v=2026-08-27a"></script>
+<script src="bim_ui.js?v=2026-08-27a"></script>
 ```
 :::
 

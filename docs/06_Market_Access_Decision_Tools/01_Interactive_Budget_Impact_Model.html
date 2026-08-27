@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Xiaoge Zhang, PhD">
-<meta name="dcterms.date" content="2026-08-26">
+<meta name="dcterms.date" content="2026-08-27">
 
 <title>Rebuilding a Published Budget Impact Model: Venetoclax in Acute Myeloid Leukaemia – HEOR Technical Portfolio</title>
 <style>
@@ -249,7 +249,21 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#what-this-rebuild-found" id="toc-what-this-rebuild-found" class="nav-link active" data-scroll-target="#what-this-rebuild-found">What this rebuild found</a></li>
+  <li><a href="#how-this-was-audited" id="toc-how-this-was-audited" class="nav-link" data-scroll-target="#how-this-was-audited">How this was audited</a></li>
+  <li><a href="#the-question" id="toc-the-question" class="nav-link" data-scroll-target="#the-question">The question</a></li>
+  <li><a href="#the-structure" id="toc-the-structure" class="nav-link" data-scroll-target="#the-structure">The structure</a></li>
+  <li><a href="#the-working-model" id="toc-the-working-model" class="nav-link" data-scroll-target="#the-working-model">The working model</a></li>
+  <li><a href="#how-to-use-it" id="toc-how-to-use-it" class="nav-link" data-scroll-target="#how-to-use-it">How to use it</a></li>
+  <li><a href="#how-it-is-put-together" id="toc-how-it-is-put-together" class="nav-link" data-scroll-target="#how-it-is-put-together">How it is put together</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content">
@@ -274,7 +288,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 26, 2026</p>
+      <p class="date">August 27, 2026</p>
     </div>
   </div>
   
@@ -344,7 +358,7 @@ ul.task-list li input[type="checkbox"] {
 <p>A cost-effectiveness model asks whether a therapy is worth its price. A budget impact model asks a narrower and more immediate question: <strong>can this payer afford to adopt it, and when does the money move?</strong></p>
 <p>The answer is a subtraction — the world <strong>with</strong> the new therapy, minus the world <strong>without</strong> it — and that subtraction is the whole model. Both worlds must be built on the same population, the same horizon and the same cost categories, and only then differenced. Without an explicit market share layer there is only one world and no budget impact at all.</p>
 </section>
-<section id="the-structure" class="level2 page-columns page-full">
+<section id="the-structure" class="level2">
 <h2 class="anchored" data-anchor-id="the-structure">The structure</h2>
 <div class="bim-schematic">
 <svg viewbox="0 0 900 606" role="img" aria-label="Budget impact model structure: population funnel, two treatment-mix scenarios, market share, total costs, difference, budget impact" xmlns="http://www.w3.org/2000/svg">
@@ -408,16 +422,19 @@ ul.task-list li input[type="checkbox"] {
 </svg>
 <p class="sch-note">The layers below follow this diagram, with the budget impact first.</p>
 </div>
+</section>
+<section id="the-working-model" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-working-model">The working model</h2>
 <p>Each block below is one layer of that diagram, in order. The budget impact comes first because that is the answer; everything under it is the justification.</p>
 <div class="column-screen-inset">
 <!-- ?v= is a cache-busting token. Bump it whenever these files change:
      Quarto does not fingerprint page assets, so a returning visitor would
      otherwise keep a stale stylesheet or engine and see a broken page. -->
-<link rel="stylesheet" href="bim.css?v=2026-08-23u">
+<link rel="stylesheet" href="bim.css?v=2026-08-27a">
 <div id="bim-app"></div>
-<script src="bim_params.js?v=2026-08-23u"></script>
-<script src="bim_engine.js?v=2026-08-23u"></script>
-<script src="bim_ui.js?v=2026-08-23u"></script>
+<script src="bim_params.js?v=2026-08-27a"></script>
+<script src="bim_engine.js?v=2026-08-27a"></script>
+<script src="bim_ui.js?v=2026-08-27a"></script>
 </div>
 </section>
 <section id="how-to-use-it" class="level2">

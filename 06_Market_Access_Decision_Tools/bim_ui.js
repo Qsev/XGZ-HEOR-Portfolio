@@ -954,7 +954,7 @@
   /* ---- panel 7: provenance (static) --------------------------------------- */
   function buildProvenance() {
     const w = el("section", { class: "bim-panel" });
-    w.appendChild(el("h3", { class: "bim-panel-title", text: "6 · Where every input comes from" }));
+    w.appendChild(el("h3", { class: "bim-panel-title", text: "6 · Data extraction — where every input comes from" }));
     w.appendChild(el("p", { class: "bim-panel-note", html:
       "The question a reviewer actually asks is not which table a number sits in — it is <em>which trial, " +
       "which expert process, which price list</em>. Each input below names its upstream source first; the " +

@@ -228,7 +228,7 @@ figures are taken whole from another study and adjusted to 2021 prices.
 | Software | TreeAge Pro 2021 |
 
 ::: {.callout-note collapse="true" appearance="simple"}
-## Where every input comes from — and whether it checks out
+## The data extraction document — every input, its source, and whether it checks out
 
 Every transition probability traces to one table in the ACCOMPLISH trial through
 a conversion the paper sets out in its Methods.
@@ -660,7 +660,7 @@ kb(as.data.frame(t(table(factor(ck$Verdict,
 ```
 
 ::: {.callout-note collapse="true" appearance="simple"}
-## All `r nrow(ck)` checks
+## The model checklist — all `r nrow(ck)` checks, with verdicts
 
 ::: {.tablescroll}
 ```{r checklist}
