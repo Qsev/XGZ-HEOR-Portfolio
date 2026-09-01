@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Xiaoge Zhang, PhD">
-<meta name="dcterms.date" content="2026-08-26">
+<meta name="dcterms.date" content="2026-09-01">
 
 <title>Mock Case — Multilevel Network Meta-Regression (ML-NMR) – HEOR Technical Portfolio</title>
 <style>
@@ -318,19 +318,16 @@ window.Quarto = {
   <li><a href="#agd-likelihood-numerical-integration" id="toc-agd-likelihood-numerical-integration" class="nav-link" data-scroll-target="#agd-likelihood-numerical-integration"><span class="header-section-number">4.3</span> AgD Likelihood &amp; Numerical Integration</a></li>
   <li><a href="#joint-likelihood" id="toc-joint-likelihood" class="nav-link" data-scroll-target="#joint-likelihood"><span class="header-section-number">4.4</span> Joint Likelihood</a></li>
   </ul></li>
-  <li><a href="#mcmc-convergence-audit-three-phases" id="toc-mcmc-convergence-audit-three-phases" class="nav-link" data-scroll-target="#mcmc-convergence-audit-three-phases"><span class="header-section-number">5</span> MCMC Convergence Audit: Three Phases</a>
+  <li><a href="#multi-dimensional-synthesis-cholesky-decomposition" id="toc-multi-dimensional-synthesis-cholesky-decomposition" class="nav-link" data-scroll-target="#multi-dimensional-synthesis-cholesky-decomposition"><span class="header-section-number">5</span> Multi-Dimensional Synthesis: Cholesky Decomposition</a></li>
+  <li><a href="#r-implementation-network-construction-model-fitting" id="toc-r-implementation-network-construction-model-fitting" class="nav-link" data-scroll-target="#r-implementation-network-construction-model-fitting"><span class="header-section-number">6</span> R Implementation: Network Construction &amp; Model Fitting</a></li>
+  <li><a href="#counterfactual-projection" id="toc-counterfactual-projection" class="nav-link" data-scroll-target="#counterfactual-projection"><span class="header-section-number">7</span> Counterfactual Projection</a></li>
+  <li><a href="#parameter-recovery" id="toc-parameter-recovery" class="nav-link" data-scroll-target="#parameter-recovery"><span class="header-section-number">8</span> Parameter Recovery</a></li>
+  <li><a href="#methodological-boundaries-ml-nmr-vs-maic" id="toc-methodological-boundaries-ml-nmr-vs-maic" class="nav-link" data-scroll-target="#methodological-boundaries-ml-nmr-vs-maic"><span class="header-section-number">9</span> Methodological Boundaries: ML-NMR vs MAIC</a></li>
+  <li><a href="#auditors-stress-test-strategic-qa" id="toc-auditors-stress-test-strategic-qa" class="nav-link" data-scroll-target="#auditors-stress-test-strategic-qa"><span class="header-section-number">10</span> Auditor’s Stress Test: Strategic Q&amp;A</a></li>
+  <li><a href="#case-study-vs-nice-ta1013-quizartinib" id="toc-case-study-vs-nice-ta1013-quizartinib" class="nav-link" data-scroll-target="#case-study-vs-nice-ta1013-quizartinib"><span class="header-section-number">11</span> Case Study vs NICE TA1013 (Quizartinib)</a>
   <ul class="collapse">
-  <li><a href="#phase-1-information-deficit-the-crash" id="toc-phase-1-information-deficit-the-crash" class="nav-link" data-scroll-target="#phase-1-information-deficit-the-crash"><span class="header-section-number">5.1</span> Phase 1 — Information Deficit (The Crash)</a></li>
-  <li><a href="#phase-2-extrapolation-trap-the-no-overlap-crisis" id="toc-phase-2-extrapolation-trap-the-no-overlap-crisis" class="nav-link" data-scroll-target="#phase-2-extrapolation-trap-the-no-overlap-crisis"><span class="header-section-number">5.2</span> Phase 2 — Extrapolation Trap (The No-Overlap Crisis)</a></li>
-  <li><a href="#phase-3-population-alignment-recovery" id="toc-phase-3-population-alignment-recovery" class="nav-link" data-scroll-target="#phase-3-population-alignment-recovery"><span class="header-section-number">5.3</span> Phase 3 — Population Alignment &amp; Recovery</a></li>
+  <li><a href="#what-actually-happened-and-what-this-case-study-does-not-show" id="toc-what-actually-happened-and-what-this-case-study-does-not-show" class="nav-link" data-scroll-target="#what-actually-happened-and-what-this-case-study-does-not-show"><span class="header-section-number">11.1</span> What actually happened — and what this case study does not show</a></li>
   </ul></li>
-  <li><a href="#multi-dimensional-synthesis-cholesky-decomposition" id="toc-multi-dimensional-synthesis-cholesky-decomposition" class="nav-link" data-scroll-target="#multi-dimensional-synthesis-cholesky-decomposition"><span class="header-section-number">6</span> Multi-Dimensional Synthesis: Cholesky Decomposition</a></li>
-  <li><a href="#r-implementation-network-construction-model-fitting" id="toc-r-implementation-network-construction-model-fitting" class="nav-link" data-scroll-target="#r-implementation-network-construction-model-fitting"><span class="header-section-number">7</span> R Implementation: Network Construction &amp; Model Fitting</a></li>
-  <li><a href="#counterfactual-projection" id="toc-counterfactual-projection" class="nav-link" data-scroll-target="#counterfactual-projection"><span class="header-section-number">8</span> Counterfactual Projection</a></li>
-  <li><a href="#parameter-recovery" id="toc-parameter-recovery" class="nav-link" data-scroll-target="#parameter-recovery"><span class="header-section-number">9</span> Parameter Recovery</a></li>
-  <li><a href="#methodological-boundaries-ml-nmr-vs-maic" id="toc-methodological-boundaries-ml-nmr-vs-maic" class="nav-link" data-scroll-target="#methodological-boundaries-ml-nmr-vs-maic"><span class="header-section-number">10</span> Methodological Boundaries: ML-NMR vs MAIC</a></li>
-  <li><a href="#auditors-stress-test-strategic-qa" id="toc-auditors-stress-test-strategic-qa" class="nav-link" data-scroll-target="#auditors-stress-test-strategic-qa"><span class="header-section-number">11</span> Auditor’s Stress Test: Strategic Q&amp;A</a></li>
-  <li><a href="#case-study-vs-nice-ta1013-quizartinib" id="toc-case-study-vs-nice-ta1013-quizartinib" class="nav-link" data-scroll-target="#case-study-vs-nice-ta1013-quizartinib"><span class="header-section-number">12</span> Case Study vs NICE TA1013 (Quizartinib)</a></li>
   </ul>
 </nav>
     </div>
@@ -357,7 +354,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 26, 2026</p>
+      <p class="date">September 1, 2026</p>
     </div>
   </div>
   
@@ -390,7 +387,7 @@ window.Quarto = {
 <ol type="1">
 <li>Simulate a realistic IPD + AgD network with a known effect-modifier (age)</li>
 <li>Formulate the Joint Likelihood linking both data levels</li>
-<li>Diagnose and resolve MCMC convergence failures</li>
+<li>Extend the integration to two correlated covariates via a Gaussian copula</li>
 <li>Perform counterfactual projection into the target population</li>
 <li>Validate parameter recovery against ground truth</li>
 <li>Compare structural decisions against the real TA1013 submission</li>
@@ -579,41 +576,8 @@ window.Quarto = {
 <p>Because both likelihoods share the same <span class="math inline">\(\beta\)</span>, the model finds the equilibrium that simultaneously explains individual-level CR patterns (IPD) and aggregate CR counts (AgD).</p>
 </section>
 </section>
-<section id="mcmc-convergence-audit-three-phases" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="mcmc-convergence-audit-three-phases"><span class="header-section-number">5</span> MCMC Convergence Audit: Three Phases</h2>
-<p>Running Bayesian evidence synthesis on sparse networks often produces algorithmic failures before convergence is achieved. The following three-phase narrative documents the diagnostic process — a critical skill in real HTA submissions.</p>
-<section id="phase-1-information-deficit-the-crash" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="phase-1-information-deficit-the-crash"><span class="header-section-number">5.1</span> Phase 1 — Information Deficit (The Crash)</h3>
-<p><strong>Symptom:</strong> &gt;3,900 divergent transitions; R-hat &gt; 10.0.</p>
-<p><strong>Diagnosis:</strong> Attempting to fit a complex interaction surface on a minimal IPD sample creates a near-flat likelihood. The MCMC sampler wanders without finding a unimodal posterior — a signal that the data cannot support the complexity of this model.</p>
-<p><strong>Resolution:</strong> Increase IPD sample size and simplify the interaction structure until the likelihood surface becomes identifiable.</p>
-</section>
-<section id="phase-2-extrapolation-trap-the-no-overlap-crisis" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="phase-2-extrapolation-trap-the-no-overlap-crisis"><span class="header-section-number">5.2</span> Phase 2 — Extrapolation Trap (The No-Overlap Crisis)</h3>
-<p><strong>Symptom:</strong> R-hat ~ 11.0; complete chain bifurcation across all parameters.</p>
-<p><strong>Diagnosis:</strong> An <strong>Extrapolation Gap</strong>. If the IPD population (e.g., mean age 25) and the AgD population (mean age 70) have zero covariate overlap, the Sobol avatars must extrapolate across a 45-year data vacuum. The non-linear logit mapping amplifies minor slope uncertainties into catastrophic integration errors. The chains bifurcate because the model has two equally plausible but mutually incompatible explanations for the data.</p>
-<p><strong>Resolution:</strong> Realign the IPD population to establish statistical overlap with the AgD population (e.g., shift mean age from 25 to 45–55). This converts the task from high-risk extrapolation to robust interpolation.</p>
-</section>
-<section id="phase-3-population-alignment-recovery" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="phase-3-population-alignment-recovery"><span class="header-section-number">5.3</span> Phase 3 — Population Alignment &amp; Recovery</h3>
-<p><strong>Outcome:</strong> After establishing common support (Trial 1 mean age 45, Trial 2 mean age 65 — overlapping tails), chains mix perfectly and R-hat converges to <strong>1.00</strong>.</p>
-<div class="callout callout-style-default callout-important no-icon callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Key Diagnostic Principle
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>MCMC divergences in NMA are almost always a symptom of <strong>geometric incompatibility in the data</strong> — not a model specification error. Restoring covariate overlap resolves R-hat failures more reliably than tuning MCMC hyperparameters. Technical stability is ultimately a function of clinical plausibility.</p>
-</div>
-</div>
-</section>
-</section>
-<section id="multi-dimensional-synthesis-cholesky-decomposition" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="multi-dimensional-synthesis-cholesky-decomposition"><span class="header-section-number">6</span> Multi-Dimensional Synthesis: Cholesky Decomposition</h2>
+<section id="multi-dimensional-synthesis-cholesky-decomposition" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="multi-dimensional-synthesis-cholesky-decomposition"><span class="header-section-number">5</span> Multi-Dimensional Synthesis: Cholesky Decomposition</h2>
 <p>When adjusting for two covariates simultaneously (e.g., Age and WBC count), the Sobol integration space expands to a 2D plane. A critical challenge arises: published AgD trials rarely report the <strong>correlation</strong> (<span class="math inline">\(\rho\)</span>) between covariates.</p>
 <p><strong>Correlation Borrowing</strong> solves this by computing <span class="math inline">\(\rho\)</span> from the IPD cohort and injecting it into the AgD integration nodes via <strong>Cholesky Decomposition</strong>:</p>
 <ol type="1">
@@ -621,67 +585,127 @@ window.Quarto = {
 <li>Decompose: <span class="math inline">\(\Sigma = LL^\top\)</span> (Cholesky factor <span class="math inline">\(L\)</span>)</li>
 <li>Apply <span class="math inline">\(L\)</span> to the standard Sobol grid to stretch the independent 2D grid into an elliptical “probability cloud” that respects biological covariance</li>
 </ol>
-<p>This ensures the virtual avatars represent clinically plausible patient profiles — not mathematically impossible combinations (e.g., age 20 with WBC typical of a 70-year-old).</p>
+<p>The point is not that ignoring <span class="math inline">\(\rho\)</span> would generate implausible individuals — it is that it would generate the <strong>wrong population mixture</strong>, and the integral <span class="math inline">\(E[f(X)]\)</span> is taken over that mixture.</p>
+<p>⚠ <strong>Correlation borrowing is an assumption, not a measurement.</strong> It presumes the dependence structure between covariates transports from the IPD population to the AgD population, even though their marginals differ. Trial eligibility criteria are the main mechanism that breaks this: restricting on one covariate distorts its correlation with the others. This assumption sits alongside — not inside — the shared effect-modification assumption.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate IPD with two covariates</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n_ipd2 <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>ipd_2d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">study =</span> <span class="st">"Trial_1"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">trt   =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">"Placebo"</span>, <span class="st">"Quizartinib"</span>), n_ipd2, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">age   =</span> <span class="fu">rnorm</span>(n_ipd2, <span class="at">mean =</span> <span class="dv">55</span>, <span class="at">sd =</span> <span class="dv">10</span>),</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">wbc   =</span> <span class="fu">rlnorm</span>(n_ipd2, <span class="at">meanlog =</span> <span class="fl">3.5</span>, <span class="at">sdlog =</span> <span class="fl">0.5</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">class  =</span> <span class="fu">if_else</span>(trt <span class="sc">==</span> <span class="st">"Placebo"</span>, <span class="st">"Placebo"</span>, <span class="st">"Active"</span>),</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">logit_p =</span> <span class="fl">1.0</span> <span class="sc">+</span> <span class="fl">2.5</span> <span class="sc">*</span> (trt <span class="sc">==</span> <span class="st">"Quizartinib"</span>) <span class="sc">-</span> <span class="fl">0.05</span> <span class="sc">*</span> age <span class="sc">-</span> <span class="fl">0.1</span> <span class="sc">*</span> wbc,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="fu">rbinom</span>(n_ipd2, <span class="dv">1</span>, <span class="fu">plogis</span>(logit_p))</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Borrow correlation from IPD</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fu">cor</span>(ipd_2d<span class="sc">$</span>age, ipd_2d<span class="sc">$</span>wbc)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Empirical Age-WBC correlation (borrowed from IPD): rho = %.3f</span><span class="sc">\n</span><span class="st">"</span>, rho))</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># AgD with 2D covariate summaries</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>agd_2d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">study    =</span> <span class="st">"Trial_2"</span>,</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">trt      =</span> <span class="fu">c</span>(<span class="st">"Placebo"</span>, <span class="st">"Midostaurin"</span>),</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">class    =</span> <span class="fu">c</span>(<span class="st">"Placebo"</span>, <span class="st">"Active"</span>),</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">r        =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">25</span>), <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>),</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_mean =</span> <span class="dv">70</span>, <span class="at">age_sd =</span> <span class="dv">5</span>,</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">wbc_mean =</span> <span class="dv">50</span>, <span class="at">wbc_sd  =</span> <span class="dv">15</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wbc_shape =</span> wbc_mean<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> wbc_sd<span class="sc">^</span><span class="dv">2</span>,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">wbc_rate  =</span> wbc_mean <span class="sc">/</span> wbc_sd<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>net_2d <span class="ot">&lt;-</span> <span class="fu">combine_network</span>(</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_ipd</span>(ipd_2d, <span class="at">study =</span> study, <span class="at">trt =</span> trt, <span class="at">r =</span> outcome, <span class="at">trt_class =</span> class),</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_agd_arm</span>(agd_2d, <span class="at">study =</span> study, <span class="at">trt =</span> trt, <span class="at">r =</span> r, <span class="at">n =</span> n, <span class="at">trt_class =</span> class),</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">trt_ref =</span> <span class="st">"Placebo"</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Add 2D Sobol integration with Cholesky-based correlation</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>net_2d <span class="ot">&lt;-</span> <span class="fu">add_integration</span>(net_2d,</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">distr</span>(qnorm,  <span class="at">mean =</span> age_mean, <span class="at">sd =</span> age_sd),</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">wbc =</span> <span class="fu">distr</span>(qgamma, <span class="at">shape =</span> wbc_shape, <span class="at">rate =</span> wbc_rate),</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">cor =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, rho, rho, <span class="dv">1</span>), <span class="dv">2</span>, <span class="dv">2</span>),   <span class="co"># Cholesky applied internally</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_int =</span> <span class="dv">64</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"2D Sobol integration configured with Cholesky correlation borrowing.</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Integration nodes: 64 per AgD arm | Covariates: age + wbc</span><span class="sc">\n</span><span class="st">"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-2"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-3"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>n_ipd2   <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>n_agd2   <span class="ot">&lt;-</span> <span class="dv">150</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-5" class="code-annotation-target"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>rho_true <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.30</span></span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Gaussian copula: correlate on the normal scale, then swap in the marginals</span></span>
+<span id="annotated-cell-2-8"><a href="#annotated-cell-2-8" aria-hidden="true" tabindex="-1"></a>gen_pair <span class="ot">&lt;-</span> <span class="cf">function</span>(n, rho, age_m, age_s, wbc_m, wbc_s) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-9" class="code-annotation-target"><a href="#annotated-cell-2-9" aria-hidden="true" tabindex="-1"></a>  L <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">chol</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, rho, rho, <span class="dv">1</span>), <span class="dv">2</span>, <span class="dv">2</span>)))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-10" class="code-annotation-target"><a href="#annotated-cell-2-10" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> L <span class="sc">%*%</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">2</span> <span class="sc">*</span> n), <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-2-11" class="code-annotation-target"><a href="#annotated-cell-2-11" aria-hidden="true" tabindex="-1"></a>  u <span class="ot">&lt;-</span> <span class="fu">pnorm</span>(z)</span>
+<span id="annotated-cell-2-12"><a href="#annotated-cell-2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="annotated-cell-2-13"><a href="#annotated-cell-2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">qnorm</span>(u[<span class="dv">1</span>, ], <span class="at">mean =</span> age_m, <span class="at">sd =</span> age_s),</span>
+<span id="annotated-cell-2-14"><a href="#annotated-cell-2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">wbc =</span> <span class="fu">qgamma</span>(u[<span class="dv">2</span>, ], <span class="at">shape =</span> wbc_m<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> wbc_s<span class="sc">^</span><span class="dv">2</span>, <span class="at">rate =</span> wbc_m <span class="sc">/</span> wbc_s<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="annotated-cell-2-15"><a href="#annotated-cell-2-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="annotated-cell-2-16"><a href="#annotated-cell-2-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-2-17"><a href="#annotated-cell-2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-18"><a href="#annotated-cell-2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Shared individual-level model for both trials</span></span>
+<span id="annotated-cell-2-19"><a href="#annotated-cell-2-19" aria-hidden="true" tabindex="-1"></a>lp <span class="ot">&lt;-</span> <span class="cf">function</span>(age, wbc, active, eff) {</span>
+<span id="annotated-cell-2-20"><a href="#annotated-cell-2-20" aria-hidden="true" tabindex="-1"></a>  <span class="sc">-</span><span class="fl">0.8</span> <span class="sc">+</span> eff <span class="sc">*</span> active <span class="sc">-</span> <span class="fl">0.04</span> <span class="sc">*</span> (age <span class="sc">-</span> <span class="dv">55</span>) <span class="sc">-</span> <span class="fl">0.02</span> <span class="sc">*</span> (wbc <span class="sc">-</span> <span class="dv">40</span>)</span>
+<span id="annotated-cell-2-21"><a href="#annotated-cell-2-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-2-22"><a href="#annotated-cell-2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-23"><a href="#annotated-cell-2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Trial 1: IPD, two correlated covariates ---</span></span>
+<span id="annotated-cell-2-24"><a href="#annotated-cell-2-24" aria-hidden="true" tabindex="-1"></a>ipd_2d <span class="ot">&lt;-</span> <span class="fu">gen_pair</span>(n_ipd2, rho_true, <span class="at">age_m =</span> <span class="dv">55</span>, <span class="at">age_s =</span> <span class="dv">10</span>,</span>
+<span id="annotated-cell-2-25"><a href="#annotated-cell-2-25" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">wbc_m =</span> <span class="dv">40</span>, <span class="at">wbc_s =</span> <span class="dv">20</span>) <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-2-26"><a href="#annotated-cell-2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="annotated-cell-2-27"><a href="#annotated-cell-2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">study   =</span> <span class="st">"Trial_1"</span>,</span>
+<span id="annotated-cell-2-28"><a href="#annotated-cell-2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">trt     =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">"Placebo"</span>, <span class="st">"Quizartinib"</span>), n_ipd2, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="annotated-cell-2-29"><a href="#annotated-cell-2-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">class   =</span> <span class="fu">if_else</span>(trt <span class="sc">==</span> <span class="st">"Placebo"</span>, <span class="st">"Placebo"</span>, <span class="st">"Active"</span>),</span>
+<span id="annotated-cell-2-30"><a href="#annotated-cell-2-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="fu">rbinom</span>(n_ipd2, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="fu">lp</span>(age, wbc, trt <span class="sc">==</span> <span class="st">"Quizartinib"</span>, <span class="fl">1.3</span>)))</span>
+<span id="annotated-cell-2-31"><a href="#annotated-cell-2-31" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="annotated-cell-2-32"><a href="#annotated-cell-2-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-33"><a href="#annotated-cell-2-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Borrow correlation from IPD — the only joint-distribution information available</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-2-34" class="code-annotation-target"><a href="#annotated-cell-2-34" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fu">cor</span>(ipd_2d<span class="sc">$</span>age, ipd_2d<span class="sc">$</span>wbc)</span>
+<span id="annotated-cell-2-35"><a href="#annotated-cell-2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-36"><a href="#annotated-cell-2-36" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Trial 2: AgD, simulated from the SAME model, then collapsed to summaries ---</span></span>
+<span id="annotated-cell-2-37"><a href="#annotated-cell-2-37" aria-hidden="true" tabindex="-1"></a>agd_pbo  <span class="ot">&lt;-</span> <span class="fu">gen_pair</span>(n_agd2, rho_true, <span class="dv">70</span>, <span class="dv">5</span>, <span class="dv">50</span>, <span class="dv">15</span>)</span>
+<span id="annotated-cell-2-38"><a href="#annotated-cell-2-38" aria-hidden="true" tabindex="-1"></a>agd_mido <span class="ot">&lt;-</span> <span class="fu">gen_pair</span>(n_agd2, rho_true, <span class="dv">70</span>, <span class="dv">5</span>, <span class="dv">50</span>, <span class="dv">15</span>)</span>
+<span id="annotated-cell-2-39"><a href="#annotated-cell-2-39" aria-hidden="true" tabindex="-1"></a>r_pbo    <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">rbinom</span>(n_agd2, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="fu">lp</span>(agd_pbo<span class="sc">$</span>age,  agd_pbo<span class="sc">$</span>wbc,  <span class="dv">0</span>, <span class="fl">1.1</span>))))</span>
+<span id="annotated-cell-2-40"><a href="#annotated-cell-2-40" aria-hidden="true" tabindex="-1"></a>r_mido   <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">rbinom</span>(n_agd2, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="fu">lp</span>(agd_mido<span class="sc">$</span>age, agd_mido<span class="sc">$</span>wbc, <span class="dv">1</span>, <span class="fl">1.1</span>))))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-2-41" class="code-annotation-target"><a href="#annotated-cell-2-41" aria-hidden="true" tabindex="-1"></a>agd_pool <span class="ot">&lt;-</span> <span class="fu">rbind</span>(agd_pbo, agd_mido)</span>
+<span id="annotated-cell-2-42"><a href="#annotated-cell-2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-43"><a href="#annotated-cell-2-43" aria-hidden="true" tabindex="-1"></a>agd_2d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="annotated-cell-2-44"><a href="#annotated-cell-2-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">study    =</span> <span class="st">"Trial_2"</span>,</span>
+<span id="annotated-cell-2-45"><a href="#annotated-cell-2-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">trt      =</span> <span class="fu">c</span>(<span class="st">"Placebo"</span>, <span class="st">"Midostaurin"</span>),</span>
+<span id="annotated-cell-2-46"><a href="#annotated-cell-2-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">class    =</span> <span class="fu">c</span>(<span class="st">"Placebo"</span>, <span class="st">"Active"</span>),</span>
+<span id="annotated-cell-2-47"><a href="#annotated-cell-2-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">r        =</span> <span class="fu">c</span>(r_pbo, r_mido),</span>
+<span id="annotated-cell-2-48"><a href="#annotated-cell-2-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">n        =</span> <span class="fu">c</span>(n_agd2, n_agd2),</span>
+<span id="annotated-cell-2-49"><a href="#annotated-cell-2-49" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_mean =</span> <span class="fu">mean</span>(agd_pool<span class="sc">$</span>age), <span class="at">age_sd =</span> <span class="fu">sd</span>(agd_pool<span class="sc">$</span>age),</span>
+<span id="annotated-cell-2-50"><a href="#annotated-cell-2-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">wbc_mean =</span> <span class="fu">mean</span>(agd_pool<span class="sc">$</span>wbc), <span class="at">wbc_sd =</span> <span class="fu">sd</span>(agd_pool<span class="sc">$</span>wbc)</span>
+<span id="annotated-cell-2-51"><a href="#annotated-cell-2-51" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-2-52"><a href="#annotated-cell-2-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wbc_shape =</span> wbc_mean<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> wbc_sd<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="annotated-cell-2-53"><a href="#annotated-cell-2-53" aria-hidden="true" tabindex="-1"></a>         <span class="at">wbc_rate  =</span> wbc_mean <span class="sc">/</span> wbc_sd<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="annotated-cell-2-54"><a href="#annotated-cell-2-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-55"><a href="#annotated-cell-2-55" aria-hidden="true" tabindex="-1"></a>net_2d <span class="ot">&lt;-</span> <span class="fu">combine_network</span>(</span>
+<span id="annotated-cell-2-56"><a href="#annotated-cell-2-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_ipd</span>(ipd_2d, <span class="at">study =</span> study, <span class="at">trt =</span> trt, <span class="at">r =</span> outcome, <span class="at">trt_class =</span> class),</span>
+<span id="annotated-cell-2-57"><a href="#annotated-cell-2-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_agd_arm</span>(agd_2d, <span class="at">study =</span> study, <span class="at">trt =</span> trt, <span class="at">r =</span> r, <span class="at">n =</span> n, <span class="at">trt_class =</span> class),</span>
+<span id="annotated-cell-2-58"><a href="#annotated-cell-2-58" aria-hidden="true" tabindex="-1"></a>  <span class="at">trt_ref =</span> <span class="st">"Placebo"</span></span>
+<span id="annotated-cell-2-59"><a href="#annotated-cell-2-59" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-2-60"><a href="#annotated-cell-2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-61"><a href="#annotated-cell-2-61" aria-hidden="true" tabindex="-1"></a><span class="co"># Add 2D Sobol integration with Cholesky-based correlation</span></span>
+<span id="annotated-cell-2-62"><a href="#annotated-cell-2-62" aria-hidden="true" tabindex="-1"></a>net_2d <span class="ot">&lt;-</span> <span class="fu">add_integration</span>(net_2d,</span>
+<span id="annotated-cell-2-63"><a href="#annotated-cell-2-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">distr</span>(qnorm,  <span class="at">mean =</span> age_mean, <span class="at">sd =</span> age_sd),</span>
+<span id="annotated-cell-2-64"><a href="#annotated-cell-2-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">wbc =</span> <span class="fu">distr</span>(qgamma, <span class="at">shape =</span> wbc_shape, <span class="at">rate =</span> wbc_rate),</span>
+<span id="annotated-cell-2-65"><a href="#annotated-cell-2-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">cor =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, rho, rho, <span class="dv">1</span>), <span class="dv">2</span>, <span class="dv">2</span>),   <span class="co"># Cholesky applied internally</span></span>
+<span id="annotated-cell-2-66"><a href="#annotated-cell-2-66" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_int =</span> <span class="dv">64</span></span>
+<span id="annotated-cell-2-67"><a href="#annotated-cell-2-67" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-2-68"><a href="#annotated-cell-2-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-69"><a href="#annotated-cell-2-69" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Age-WBC correlation borrowed from IPD: rho = %+.3f (data-generating %+.2f)</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="annotated-cell-2-70"><a href="#annotated-cell-2-70" aria-hidden="true" tabindex="-1"></a>            rho, rho_true))</span>
+<span id="annotated-cell-2-71"><a href="#annotated-cell-2-71" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"IPD CR rates:  Placebo %.1f%%  |  Quizartinib %.1f%%</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="annotated-cell-2-72"><a href="#annotated-cell-2-72" aria-hidden="true" tabindex="-1"></a>            <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(ipd_2d<span class="sc">$</span>outcome[ipd_2d<span class="sc">$</span>trt <span class="sc">==</span> <span class="st">"Placebo"</span>]),</span>
+<span id="annotated-cell-2-73"><a href="#annotated-cell-2-73" aria-hidden="true" tabindex="-1"></a>            <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(ipd_2d<span class="sc">$</span>outcome[ipd_2d<span class="sc">$</span>trt <span class="sc">==</span> <span class="st">"Quizartinib"</span>])))</span>
+<span id="annotated-cell-2-74"><a href="#annotated-cell-2-74" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"AgD CR rates:  Placebo %.1f%% (%d/%d)  |  Midostaurin %.1f%% (%d/%d)</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="annotated-cell-2-75"><a href="#annotated-cell-2-75" aria-hidden="true" tabindex="-1"></a>            <span class="dv">100</span> <span class="sc">*</span> r_pbo <span class="sc">/</span> n_agd2, r_pbo, n_agd2,</span>
+<span id="annotated-cell-2-76"><a href="#annotated-cell-2-76" aria-hidden="true" tabindex="-1"></a>            <span class="dv">100</span> <span class="sc">*</span> r_mido <span class="sc">/</span> n_agd2, r_mido, n_agd2))</span>
+<span id="annotated-cell-2-77"><a href="#annotated-cell-2-77" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"2D Sobol integration configured: 64 nodes per AgD arm | covariates age + WBC</span><span class="sc">\n</span><span class="st">"</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="5" data-code-annotation="1">Assumed moderate negative Age-WBC dependence in this illustration. <strong>This is a modelling assumption, not an estimate</strong> — see the caveat below.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="9" data-code-annotation="2"><code>chol()</code> returns the <em>upper</em> triangular factor (<span class="math inline">\(\Sigma = R^\top R\)</span>); transposing gives the lower triangular <span class="math inline">\(L\)</span> with <span class="math inline">\(\Sigma = LL^\top\)</span>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="10" data-code-annotation="3"><span class="math inline">\(Lz\)</span> turns the independent (circular) standard-normal cloud into a correlated (elliptical) one.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="11" data-code-annotation="4"><code>pnorm</code> then the marginal quantile functions swap in the target marginals. Both are monotone, so the rank dependence survives while the marginals change — a <strong>Gaussian copula</strong>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="34" data-code-annotation="5">This is the only piece of joint-distribution information the AgD publication does not report, and the only thing being borrowed: a single scalar.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="41" data-code-annotation="6">AgD counts are now <em>simulated from the same individual-level model</em> and the reported marginals are the <strong>realised</strong> sample values — not hard-coded numbers.</span>
+</dd>
+</dl>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Empirical Age-WBC correlation (borrowed from IPD): rho = 0.029
-2D Sobol integration configured with Cholesky correlation borrowing.
-Integration nodes: 64 per AgD arm | Covariates: age + wbc</code></pre>
+<pre><code>Age-WBC correlation borrowed from IPD: rho = -0.320 (data-generating -0.30)
+IPD CR rates:  Placebo 33.7%  |  Quizartinib 59.0%
+AgD CR rates:  Placebo 17.3% (26/150)  |  Midostaurin 37.3% (56/150)
+2D Sobol integration configured: 64 nodes per AgD arm | covariates age + WBC</code></pre>
 </div>
 </div>
 </section>
-<section id="r-implementation-network-construction-model-fitting" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="r-implementation-network-construction-model-fitting"><span class="header-section-number">7</span> R Implementation: Network Construction &amp; Model Fitting</h2>
+<section id="r-implementation-network-construction-model-fitting" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="r-implementation-network-construction-model-fitting"><span class="header-section-number">6</span> R Implementation: Network Construction &amp; Model Fitting</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -826,45 +850,45 @@ Integration nodes: 64 per AgD arm | Covariates: age + wbc</code></pre>
 </div>
 </div>
 </section>
-<section id="counterfactual-projection" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="counterfactual-projection"><span class="header-section-number">8</span> Counterfactual Projection</h2>
+<section id="counterfactual-projection" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="counterfactual-projection"><span class="header-section-number">7</span> Counterfactual Projection</h2>
 <p>The shared parameters <span class="math inline">\(\beta\)</span> allow projection of competitor drug efficacy into any target population baseline.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fit_mlnmr)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>beta_age_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples<span class="sc">$</span><span class="st">`</span><span class="at">beta[age]</span><span class="st">`</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>d_quiz_val   <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples<span class="sc">$</span><span class="st">`</span><span class="at">d[Quizartinib]</span><span class="st">`</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>d_mido_val   <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples<span class="sc">$</span><span class="st">`</span><span class="at">d[Midostaurin]</span><span class="st">`</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Shared interaction (class-level)</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">"beta[age:.trtclassActive]"</span> <span class="sc">%in%</span> <span class="fu">names</span>(samples)) {</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  beta_int_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples<span class="sc">$</span><span class="st">`</span><span class="at">beta[age:.trtclassActive]</span><span class="st">`</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  beta_int_val <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>mu_cols  <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">grep</span>(<span class="st">"^mu</span><span class="sc">\\</span><span class="st">["</span>, <span class="fu">names</span>(samples), <span class="at">value =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>mu_1_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples[[mu_cols[<span class="dv">1</span>]]])</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>mu_2_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples[[mu_cols[<span class="dv">2</span>]]])</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># multinma centers at overall network mean age</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>c_point  <span class="ot">&lt;-</span> (<span class="fu">mean</span>(ipd_data<span class="sc">$</span>age) <span class="sc">*</span> <span class="fu">nrow</span>(ipd_data) <span class="sc">+</span> <span class="dv">65</span> <span class="sc">*</span> <span class="fu">nrow</span>(agd_data) <span class="sc">*</span> <span class="dv">150</span>) <span class="sc">/</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>            (<span class="fu">nrow</span>(ipd_data) <span class="sc">+</span> <span class="fu">nrow</span>(agd_data) <span class="sc">*</span> <span class="dv">150</span>)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust estimates back to Age = 45 reference</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>adj_mu1    <span class="ot">&lt;-</span> mu_1_val <span class="sc">+</span> beta_age_val <span class="sc">*</span> (<span class="dv">45</span> <span class="sc">-</span> c_point)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>adj_d_mido <span class="ot">&lt;-</span> d_mido_val <span class="sc">+</span> beta_int_val <span class="sc">*</span> (<span class="dv">45</span> <span class="sc">-</span> c_point)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>adj_d_quiz <span class="ot">&lt;-</span> d_quiz_val <span class="sc">+</span> beta_int_val <span class="sc">*</span> (<span class="dv">45</span> <span class="sc">-</span> c_point)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Counterfactual: Midostaurin in a 35-year-old Trial 1 patient</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>eta_35 <span class="ot">&lt;-</span> adj_mu1 <span class="sc">+</span> beta_age_val <span class="sc">*</span> (<span class="dv">35</span> <span class="sc">-</span> <span class="dv">45</span>) <span class="sc">+</span> adj_d_mido <span class="sc">+</span> beta_int_val <span class="sc">*</span> (<span class="dv">35</span> <span class="sc">-</span> <span class="dv">45</span>)</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>p_35   <span class="ot">&lt;-</span> <span class="fu">plogis</span>(eta_35)</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Predicted CR probability for Midostaurin in a 35-year-old (Trial 1 baseline): %.1f%%</span><span class="sc">\n</span><span class="st">"</span>,</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>            p_35 <span class="sc">*</span> <span class="dv">100</span>))</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"This is the counterfactual answer ML-NMR was designed to produce.</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fit_mlnmr)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>beta_age_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples<span class="sc">$</span><span class="st">`</span><span class="at">beta[age]</span><span class="st">`</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>d_quiz_val   <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples<span class="sc">$</span><span class="st">`</span><span class="at">d[Quizartinib]</span><span class="st">`</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>d_mido_val   <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples<span class="sc">$</span><span class="st">`</span><span class="at">d[Midostaurin]</span><span class="st">`</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Shared interaction (class-level)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">"beta[age:.trtclassActive]"</span> <span class="sc">%in%</span> <span class="fu">names</span>(samples)) {</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  beta_int_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples<span class="sc">$</span><span class="st">`</span><span class="at">beta[age:.trtclassActive]</span><span class="st">`</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  beta_int_val <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>mu_cols  <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">grep</span>(<span class="st">"^mu</span><span class="sc">\\</span><span class="st">["</span>, <span class="fu">names</span>(samples), <span class="at">value =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>mu_1_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples[[mu_cols[<span class="dv">1</span>]]])</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>mu_2_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(samples[[mu_cols[<span class="dv">2</span>]]])</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># multinma centers at overall network mean age</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>c_point  <span class="ot">&lt;-</span> (<span class="fu">mean</span>(ipd_data<span class="sc">$</span>age) <span class="sc">*</span> <span class="fu">nrow</span>(ipd_data) <span class="sc">+</span> <span class="dv">65</span> <span class="sc">*</span> <span class="fu">nrow</span>(agd_data) <span class="sc">*</span> <span class="dv">150</span>) <span class="sc">/</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>            (<span class="fu">nrow</span>(ipd_data) <span class="sc">+</span> <span class="fu">nrow</span>(agd_data) <span class="sc">*</span> <span class="dv">150</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust estimates back to Age = 45 reference</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>adj_mu1    <span class="ot">&lt;-</span> mu_1_val <span class="sc">+</span> beta_age_val <span class="sc">*</span> (<span class="dv">45</span> <span class="sc">-</span> c_point)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>adj_d_mido <span class="ot">&lt;-</span> d_mido_val <span class="sc">+</span> beta_int_val <span class="sc">*</span> (<span class="dv">45</span> <span class="sc">-</span> c_point)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>adj_d_quiz <span class="ot">&lt;-</span> d_quiz_val <span class="sc">+</span> beta_int_val <span class="sc">*</span> (<span class="dv">45</span> <span class="sc">-</span> c_point)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Counterfactual: Midostaurin in a 35-year-old Trial 1 patient</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>eta_35 <span class="ot">&lt;-</span> adj_mu1 <span class="sc">+</span> beta_age_val <span class="sc">*</span> (<span class="dv">35</span> <span class="sc">-</span> <span class="dv">45</span>) <span class="sc">+</span> adj_d_mido <span class="sc">+</span> beta_int_val <span class="sc">*</span> (<span class="dv">35</span> <span class="sc">-</span> <span class="dv">45</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>p_35   <span class="ot">&lt;-</span> <span class="fu">plogis</span>(eta_35)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Predicted CR probability for Midostaurin in a 35-year-old (Trial 1 baseline): %.1f%%</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>            p_35 <span class="sc">*</span> <span class="dv">100</span>))</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"This is the counterfactual answer ML-NMR was designed to produce.</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Predicted CR probability for Midostaurin in a 35-year-old (Trial 1 baseline): 94.7%
@@ -874,20 +898,20 @@ This is the counterfactual answer ML-NMR was designed to produce.</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>releff <span class="ot">&lt;-</span> <span class="fu">relative_effects</span>(fit_mlnmr,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata       =</span> <span class="fu">data.frame</span>(<span class="at">age =</span> <span class="dv">45</span>),</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">all_contrasts =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>releff_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(releff)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">paste</span>(releff_df<span class="sc">$</span>.trtb, <span class="st">"vs"</span>, releff_df<span class="sc">$</span>.trta)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Quizartinib"</span>, <span class="st">"Quiz"</span>, releff_df<span class="sc">$</span>Comparison)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Midostaurin"</span>, <span class="st">"Mido"</span>, releff_df<span class="sc">$</span>Comparison)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Placebo"</span>, <span class="st">"Pbo"</span>, releff_df<span class="sc">$</span>Comparison)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>releff_df <span class="ot">&lt;-</span> releff_df[, <span class="fu">c</span>(<span class="st">"Comparison"</span>, <span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"2.5%"</span>, <span class="st">"97.5%"</span>, <span class="st">"Rhat"</span>, <span class="st">"Bulk_ESS"</span>)]</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(releff_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Comparison"</span>, <span class="st">"Mean (log-OR)"</span>, <span class="st">"SD"</span>, <span class="st">"2.5%"</span>, <span class="st">"97.5%"</span>, <span class="st">"Rhat"</span>, <span class="st">"ESS"</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(releff_df, <span class="at">digits =</span> <span class="dv">3</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Population-aligned relative effects at Age = 45 (Trial 1 target population)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>releff <span class="ot">&lt;-</span> <span class="fu">relative_effects</span>(fit_mlnmr,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata       =</span> <span class="fu">data.frame</span>(<span class="at">age =</span> <span class="dv">45</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">all_contrasts =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>releff_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(releff)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">paste</span>(releff_df<span class="sc">$</span>.trtb, <span class="st">"vs"</span>, releff_df<span class="sc">$</span>.trta)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Quizartinib"</span>, <span class="st">"Quiz"</span>, releff_df<span class="sc">$</span>Comparison)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Midostaurin"</span>, <span class="st">"Mido"</span>, releff_df<span class="sc">$</span>Comparison)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>releff_df<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Placebo"</span>, <span class="st">"Pbo"</span>, releff_df<span class="sc">$</span>Comparison)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>releff_df <span class="ot">&lt;-</span> releff_df[, <span class="fu">c</span>(<span class="st">"Comparison"</span>, <span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"2.5%"</span>, <span class="st">"97.5%"</span>, <span class="st">"Rhat"</span>, <span class="st">"Bulk_ESS"</span>)]</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(releff_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Comparison"</span>, <span class="st">"Mean (log-OR)"</span>, <span class="st">"SD"</span>, <span class="st">"2.5%"</span>, <span class="st">"97.5%"</span>, <span class="st">"Rhat"</span>, <span class="st">"ESS"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(releff_df, <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Population-aligned relative effects at Age = 45 (Trial 1 target population)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -936,13 +960,13 @@ This is the counterfactual answer ML-NMR was designed to produce.</code></pre>
 </div>
 </div>
 </section>
-<section id="parameter-recovery" class="level2" data-number="9">
-<h2 data-number="9" class="anchored" data-anchor-id="parameter-recovery"><span class="header-section-number">9</span> Parameter Recovery</h2>
+<section id="parameter-recovery" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="parameter-recovery"><span class="header-section-number">8</span> Parameter Recovery</h2>
 <p>A key advantage of synthetic DGP is that we can verify the model against known ground truth:</p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Parameter recovery: estimated vs ground truth (DGP). Note: mu_2 and d_Midostaurin show collinearity-driven bias — see callout below.</caption>
+<caption>Parameter recovery: estimated vs ground truth (DGP). Note: mu_2 and d_Midostaurin show collinearity-driven bias &lt;U+2014&gt; see callout below.</caption>
 <colgroup>
 <col style="width: 32%">
 <col style="width: 28%">
@@ -1012,8 +1036,8 @@ This is the counterfactual answer ML-NMR was designed to produce.</code></pre>
 </div>
 </div>
 </section>
-<section id="methodological-boundaries-ml-nmr-vs-maic" class="level2" data-number="10">
-<h2 data-number="10" class="anchored" data-anchor-id="methodological-boundaries-ml-nmr-vs-maic"><span class="header-section-number">10</span> Methodological Boundaries: ML-NMR vs MAIC</h2>
+<section id="methodological-boundaries-ml-nmr-vs-maic" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="methodological-boundaries-ml-nmr-vs-maic"><span class="header-section-number">9</span> Methodological Boundaries: ML-NMR vs MAIC</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -1041,7 +1065,7 @@ This is the counterfactual answer ML-NMR was designed to produce.</code></pre>
 <tr class="odd">
 <td style="text-align: left;"><strong>Population overlap</strong></td>
 <td style="text-align: left;">Requires good overlap; ESS collapses otherwise</td>
-<td style="text-align: left;">Handles poor overlap via regression extrapolation</td>
+<td style="text-align: left;">Still returns an estimate — but by extrapolating the outcome model, not by observing the gap</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><strong>Model assumptions</strong></td>
@@ -1055,15 +1079,18 @@ This is the counterfactual answer ML-NMR was designed to produce.</code></pre>
 </tr>
 </tbody>
 </table>
-<p><strong>Decision rule:</strong> Use MAIC for a single pairwise comparison with good overlap and minimal parametric assumptions. Use ML-NMR for multi-trial networks, poor overlap, or non-linear outcomes where STC would produce biased estimates.</p>
+<p><strong>Decision rule:</strong> Use MAIC for a single pairwise comparison with good overlap and minimal parametric assumptions. Use ML-NMR for multi-trial networks, non-linear outcomes where STC would produce biased estimates, and for standardising to an external target population.</p>
+<p>⚠ <strong>On poor overlap — the row above is a difference, not an advantage.</strong> Where MAIC fails loudly (effective sample size collapses to near zero, and you can see it), ML-NMR fails quietly: the chains converge, R-hat reaches 1.00, no divergent transitions appear, and an estimate is returned that rests entirely on extrapolating the assumed linear-in-covariate form beyond the observed data. The cost surfaces as an inflated credible interval, not as a diagnostic warning. <strong>Convergence diagnostics do not detect extrapolation</strong> — the analyst has to know the overlap and say so.</p>
 </section>
-<section id="auditors-stress-test-strategic-qa" class="level2" data-number="11">
-<h2 data-number="11" class="anchored" data-anchor-id="auditors-stress-test-strategic-qa"><span class="header-section-number">11</span> Auditor’s Stress Test: Strategic Q&amp;A</h2>
+<section id="auditors-stress-test-strategic-qa" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="auditors-stress-test-strategic-qa"><span class="header-section-number">10</span> Auditor’s Stress Test: Strategic Q&amp;A</h2>
 <p><strong>Q1: Why 64 Sobol points specifically?</strong></p>
 <blockquote class="blockquote">
-<p>64 quasi-random Sobol points provide an optimal balance between computational cost and numerical precision — equivalent in accuracy to approximately 2,000 random Monte Carlo points. The Sobol sequence achieves this efficiency through low-discrepancy sampling: points are space-filling rather than randomly clustered, ensuring every region of the age distribution (including the tails) is adequately represented. Increasing to 128 points yields marginal gains in a 1D integration; the payoff grows more in 2D+ settings.</p>
+<p>64 quasi-random Sobol points balance computational cost against numerical precision. The efficiency comes from <strong>low-discrepancy sampling</strong> — the points are space-filling rather than randomly clustered, so the integration error falls roughly as <span class="math inline">\(O(\log^d n / n)\)</span> rather than the <span class="math inline">\(O(1/\sqrt{n})\)</span> of plain Monte Carlo. On this integrand 64 Sobol points carry roughly the accuracy of ~2,000 random draws.</p>
+<p>⚠ <strong>What 64 points do <em>not</em> buy is exact coverage of the tails.</strong> A finite Sobol set does not reproduce the target distribution’s moments: at <span class="math inline">\(n=64\)</span> the realised node SD is about 2.4% below the target SD, so the tails are under-represented and the ecological correction is slightly understated. This moment error, not the discrepancy, dominates the residual bias at this <span class="math inline">\(n\)</span>. The remedy is not faith in a magic number — it is to <strong>double <code>n_int</code> and confirm the estimate is stable</strong>, which is the check that should be reported alongside any ML-NMR result.</p>
+<p>A second, more important reason for Sobol over random sampling: the points are <strong>generated once and held fixed</strong> across MCMC iterations. Re-drawing them at every iteration would make the likelihood stochastic, and HMC’s gradients cannot survive a noisy target.</p>
 </blockquote>
-<p><strong>Q2: Why assume common interactions (<span class="math inline">\(\beta_{\text{age:trt}}\)</span>) across different drugs?</strong></p>
+<p><strong>Q2: Why assume common interactions (</strong><span class="math inline">\(\beta_{\text{age:trt}}\)</span>) across different drugs?</p>
 <blockquote class="blockquote">
 <p>This is a <strong>Mechanism of Action (MoA)</strong> argument grounded in the Exchangeability assumption of NICE DSU TSD 18. Both Quizartinib and Midostaurin are FLT3 TKIs acting on the same molecular pathway. We assume the biological decay of TKI efficacy with age follows a similar pharmacodynamic trajectory across the class — not because we can prove it, but because the data from a 2-trial sparse network cannot identify separate interaction terms without severe collinearity. This assumption must be declared transparently in the submission and challenged in sensitivity analysis.</p>
 </blockquote>
@@ -1072,9 +1099,9 @@ This is the counterfactual answer ML-NMR was designed to produce.</code></pre>
 <p>In a sparse 2-trial network, Random Effects introduces a between-study heterogeneity parameter (<span class="math inline">\(\tau^2\)</span>) that cannot be estimated reliably — the model is statistically over-parameterised. MCMC chains typically fail to converge for <span class="math inline">\(\tau\)</span>. The Fixed Effects choice is therefore not a simplifying preference but the only computationally stable option, and should be pre-registered in the statistical analysis plan.</p>
 </blockquote>
 </section>
-<section id="case-study-vs-nice-ta1013-quizartinib" class="level2" data-number="12">
-<h2 data-number="12" class="anchored" data-anchor-id="case-study-vs-nice-ta1013-quizartinib"><span class="header-section-number">12</span> Case Study vs NICE TA1013 (Quizartinib)</h2>
-<p>This mock case deliberately mirrors the structural decisions made in the real Daiichi Sankyo submission for TA1013. The parallel demonstrates that the methodological constraints here are not pedagogical simplifications — they are the actual constraints of state-of-the-art ML-NMR in live HTA submissions.</p>
+<section id="case-study-vs-nice-ta1013-quizartinib" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="case-study-vs-nice-ta1013-quizartinib"><span class="header-section-number">11</span> Case Study vs NICE TA1013 (Quizartinib)</h2>
+<p>This mock case deliberately mirrors the <strong>structural constraints</strong> of the real Daiichi Sankyo submission for TA1013 — the constraints that force particular modelling choices when a network contains one IPD trial and one published comparator.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -1092,44 +1119,51 @@ This is the counterfactual answer ML-NMR was designed to produce.</code></pre>
 <tr class="odd">
 <td style="text-align: left;"><strong>Network</strong></td>
 <td style="text-align: left;">1 IPD trial + 1 AgD trial</td>
-<td style="text-align: left;">QuANTUM-First (IPD, N=539) + RATIFY (AgD, N=452 FLT3 subgroup)</td>
+<td style="text-align: left;">QuANTUM-First (IPD, N=539) + RATIFY FLT3-ITD+ subgroup (AgD, N=452 of 717 randomised)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><strong>IPD age</strong></td>
-<td style="text-align: left;">Mean 45 (younger)</td>
-<td style="text-align: left;">Median ~56</td>
+<td style="text-align: left;">Mean 45</td>
+<td style="text-align: left;">Median 56 (eligibility 18–75)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><strong>AgD age</strong></td>
-<td style="text-align: left;">Mean 65 (older)</td>
-<td style="text-align: left;">Median ~47 (reversed direction, same mismatch)</td>
+<td style="text-align: left;">Mean 65</td>
+<td style="text-align: left;">Median 47, range 18–60 (RATIFY capped at &lt;60) — mismatch in the opposite direction</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><strong>Link function</strong></td>
-<td style="text-align: left;">Logit (<code>bernoulli2</code>)</td>
-<td style="text-align: left;">Logit (<code>bernoulli2</code>) — identical specification</td>
+<td style="text-align: left;">Logit, Bernoulli</td>
+<td style="text-align: left;">Logit, Bernoulli for the binary CR outcome — identical specification</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><strong>Interaction</strong></td>
 <td style="text-align: left;"><code>class_interactions = "common"</code></td>
-<td style="text-align: left;"><code>class_interactions = "common"</code> — forced by sparse data</td>
+<td style="text-align: left;">Shared effect modification, <em>forced</em>: with only two trials the data cannot identify separate interaction terms per treatment. The EAG accepted the assumption as clinically reasonable</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><strong>Collinearity bias</strong></td>
-<td style="text-align: left;">Midostaurin effect overestimated</td>
-<td style="text-align: left;">Quizartinib effect overestimated — EAG flag</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong>Committee outcome</strong></td>
-<td style="text-align: left;">—</td>
-<td style="text-align: left;">Results “lacked face validity” (EAG conclusion)</td>
+<td style="text-align: left;"><strong>Adjusted covariates</strong></td>
+<td style="text-align: left;">Age (1D); age + WBC (2D extension)</td>
+<td style="text-align: left;">Platelet count, age, sex, NPM1 status. Clinical experts named <strong>WBC count</strong> and cytogenetic risk as the most impactful covariates that had to be <em>omitted</em> for lack of data</td>
 </tr>
 </tbody>
 </table>
-<p>The TA1013 EAG concluded that population adjustments within the ML-NMR were biased toward overestimating the benefit of Quizartinib — an outcome our synthetic collinearity analysis predicts and explains mechanistically.</p>
+<section id="what-actually-happened-and-what-this-case-study-does-not-show" class="level3" data-number="11.1">
+<h3 data-number="11.1" class="anchored" data-anchor-id="what-actually-happened-and-what-this-case-study-does-not-show"><span class="header-section-number">11.1</span> What actually happened — and what this case study does not show</h3>
+<p>The EAG’s verdict on the ML-NMR itself was that the company <strong>seem to have correctly implemented</strong> it (EAG report §3.5.1.6). Faced with a choice, the EAG <strong>preferred the ML-NMR and rejected the MAIC</strong>: the MAIC could only estimate effects in a “RATIFY-like” population under 60, which meant discarding 38.6% of the QuANTUM-First population and produced estimates the EAG judged inapplicable to the NHS. ML-NMR’s ability to standardise to a chosen target population is precisely why it survived that comparison.</p>
+<p>The submission failed <strong>downstream of the ITC</strong>, on a point of estimand:</p>
+<ul>
+<li>MAIC estimates a population-average <strong>marginal</strong> effect; the company’s ML-NMR estimated a population-average <strong>conditional</strong> effect. These are different quantities, and hazard ratios and odds ratios are non-collapsible, so the two do not coincide even under balance.</li>
+<li>The company applied a <strong>conditional, constant</strong> hazard ratio to an <strong>unadjusted</strong> baseline survival curve — which reintroduces a bias of the same family as the aggregation bias that motivates ML-NMR in the first place.</li>
+<li>It assumed proportional hazards while the data showed PH was violated. The EAG concluded the constant HRs from <strong>both</strong> the MAIC and the ML-NMR were unsuitable for decision making, and that the correct approach would have been to carry the ML-NMR’s predicted survival curves into the economic model directly.</li>
+</ul>
+<p>The committee’s conclusion — that the base-case results were highly unreliable and <strong>lacked face validity</strong> — was reached in the Final Appraisal Determination, and was driven by the MAIC for cumulative incidence of relapse (HR 0.42) and by the proportional-hazards problem. It was <strong>not</strong> a verdict on multilevel network meta-regression.</p>
+<p>⚠ <strong>This mock case reproduces the constraints, not the failure.</strong> It has no time-to-event outcome, no hazard ratio and no economic model, so it cannot demonstrate the estimand error that actually sank TA1013. What it does show is the layer beneath: why a two-trial network forces shared effect modification, and why the aggregate likelihood has to be integrated rather than evaluated at the mean. The TA1013 lesson sits one level above — <strong>a correctly fitted ML-NMR can still produce a rejected submission if its estimand is carried into the cost-effectiveness model as though it were something else.</strong></p>
+<p><em>Sources: TA1013 EAG report §3.5.1.4–3.5.1.6 and §3.5.1.6 Issues 1–4; TA1013 Final Appraisal Determination. Note that Dr David Phillippo, an author of the ML-NMR method, advised the EAG on this appraisal.</em></p>
 <p><em>Analysis code available at <a href="https://github.com/Qsev/XGZ-HEOR-Portfolio">github.com/Qsev/XGZ-HEOR-Portfolio</a>. Methodological standard: NICE DSU TSD 18.</em></p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
