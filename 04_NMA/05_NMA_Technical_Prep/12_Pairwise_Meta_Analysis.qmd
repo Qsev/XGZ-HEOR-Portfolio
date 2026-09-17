@@ -1,0 +1,351 @@
+---
+title: "Pairwise Meta-Analysis: The Foundation of NMA"
+author: "Xiaoge Zhang, PhD"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "View the code"
+    number-sections: true
+---
+
+*Pooling direct evidence for one comparison, from the likelihood up*
+
+## Executive Summary: One Comparison, Many Trials
+
+A pairwise meta-analysis pools the results of several trials that all compare the **same two treatments**, say a new drug B against standard of care A. Each trial on its own is a noisy estimate of the treatment effect; pooled, they give one estimate with a narrower interval.
+
+It is also the building block of every method in this library. A [Standard Bayesian NMA](01_Standard_Bayesian_NMA_Guide.qmd) is several pairwise meta-analyses estimated together, tied by the consistency assumption so that evidence on A vs B and A vs C also informs B vs C. Everything an NMA adds sits on top of the two questions answered here:
+
+1.  How should trials of different sizes be **weighted**?
+2.  What if the trials do not all estimate the **same** effect?
+
+## Theoretical Framework: From a 2×2 Table to a Pooled Estimate
+
+### The Effect Size in a Single Trial
+
+For a binary outcome such as response, each trial reduces to a 2×2 table:
+
+|             | Responders | Non-responders |
+|:------------|:----------:|:--------------:|
+| Treatment B |    $a$     |      $b$       |
+| Treatment A |    $c$     |      $d$       |
+
+The odds ratio and its logarithm are
+
+$$OR_i = \frac{a / b}{c / d} = \frac{ad}{bc}, \qquad y_i = \ln OR_i$$
+
+Meta-analysis works on the log scale because the OR is bounded below by 0 and asymmetric around 1, whereas $\ln OR$ is symmetric around 0 and close to Normal in reasonably sized trials.
+
+The variance of $y_i$ is
+
+$$v_i = \frac{1}{a} + \frac{1}{b} + \frac{1}{c} + \frac{1}{d}$$
+
+It comes from the two arms separately. In one arm with $n$ patients and response rate $p$, the log odds $\ln(a/b)$ has approximate variance $\frac{1}{np(1-p)}$, which equals $\frac{1}{a} + \frac{1}{b}$ because $a = np$ and $b = n(1-p)$. The two arms are independent, so their variances add. Larger trials have larger counts, hence smaller $v_i$.
+
+### Fixed Effect: Inverse-Variance Weighting
+
+The **fixed-effect** model assumes every trial estimates one common effect $\theta$, and differs from it only through sampling error:
+
+$$y_i \sim N(\theta, v_i), \qquad i = 1, \dots, k$$
+
+treating each $v_i$ as known. The log-likelihood is
+
+$$\ell(\theta) = -\frac{1}{2} \sum_{i=1}^{k} \frac{(y_i - \theta)^2}{v_i} + \text{const}$$
+
+Setting its derivative to zero gives the maximum likelihood estimate:
+
+$$\sum_{i=1}^{k} \frac{y_i - \theta}{v_i} = 0 \quad \Rightarrow \quad \hat\theta_{FE} = \frac{\sum w_i y_i}{\sum w_i}, \qquad w_i = \frac{1}{v_i}$$
+
+So the pooled estimate is a weighted average, and each trial's weight is the inverse of its variance: precise trials count for more. The second derivative of $\ell(\theta)$ is $-\sum w_i$, which gives
+
+$$\text{Var}(\hat\theta_{FE}) = \frac{1}{\sum w_i}$$
+
+This is the same curvature argument as in [The Core of Bayesian Estimation](10_Bayesian_Estimation.qmd): every trial adds its weight to the curvature of the log-likelihood, so the interval narrows as trials accumulate.
+
+### Random Effects: When Trials Estimate Different Effects
+
+Trials differ in populations, doses and settings, so the true effect may differ between them. The **random-effects** model lets each trial have its own true effect $\theta_i$, drawn from a common distribution:
+
+$$y_i \sim N(\theta_i, v_i), \qquad \theta_i \sim N(\mu, \tau^2)$$
+
+Here $\mu$ is the average effect across settings and $\tau^2$ the between-study variance. Integrating out $\theta_i$ gives
+
+$$y_i \sim N(\mu, \; v_i + \tau^2)$$
+
+which is the fixed-effect model with every variance increased by $\tau^2$. The same algebra therefore applies, with weights $w_i^* = 1 / (v_i + \tau^2)$:
+
+$$\hat\mu_{RE} = \frac{\sum w_i^* y_i}{\sum w_i^*}, \qquad \text{Var}(\hat\mu_{RE}) = \frac{1}{\sum w_i^*}$$
+
+Adding the same $\tau^2$ to every trial matters most for the trials whose own $v_i$ is small. Large trials lose weight, small trials gain it, and the weights become more equal.
+
+### Measuring Heterogeneity: Q, τ² and I²
+
+**Cochran's Q** measures how far the trials scatter around the fixed-effect estimate, in units of their own precision:
+
+$$Q = \sum_{i=1}^{k} w_i (y_i - \hat\theta_{FE})^2$$
+
+If all trials share one effect, $Q$ follows a $\chi^2_{k-1}$ distribution with expected value $k - 1$. Scatter beyond that is attributed to heterogeneity. The **DerSimonian–Laird** estimator turns the excess into an estimate of $\tau^2$:
+
+$$\hat\tau^2_{DL} = \max\left(0, \; \frac{Q - (k - 1)}{\sum w_i - \sum w_i^2 / \sum w_i}\right)$$
+
+and **I²** expresses the excess as a share of $Q$:
+
+$$I^2 = \max\left(0, \; \frac{Q - (k - 1)}{Q}\right)$$
+
+I² is the proportion of the observed variability that reflects real differences between trials rather than chance. It is a proportion, not a size: it says nothing directly about how far apart the true effects are. That is what $\tau$ measures.
+
+### The Prediction Interval
+
+The confidence interval for $\mu$ describes uncertainty about the **average** effect. A decision about a new population needs the range of effects to expect in **one new setting**, which also includes the spread $\tau^2$:
+
+$$\hat\mu_{RE} \pm 1.96 \sqrt{\hat\tau^2 + \text{Var}(\hat\mu_{RE})}$$
+
+With substantial heterogeneity, the prediction interval can include no effect even when the confidence interval does not.
+
+### The Bayesian Version: An NMA With One Comparison
+
+The models above take each $y_i$ and $v_i$ as given, which relies on a Normal approximation. The Bayesian model used for NMA goes back to the counts, with a Binomial likelihood for each arm:
+
+$$r_{iA} \sim \text{Binomial}(n_{iA}, p_{iA}), \qquad r_{iB} \sim \text{Binomial}(n_{iB}, p_{iB})$$
+
+$$\text{logit}(p_{iA}) = \mu_i, \qquad \text{logit}(p_{iB}) = \mu_i + \delta_i, \qquad \delta_i \sim N(d, \tau^2)$$
+
+This is the model of the [Standard Bayesian NMA](01_Standard_Bayesian_NMA_Guide.qmd) guide with a single comparison: $\mu_i$ is the study's baseline log odds, $\delta_i$ its log OR and $d$ the pooled log OR. Two differences from the DerSimonian–Laird approach matter in practice: no Normal approximation is needed for each trial, and $\tau$ is estimated with its own uncertainty instead of being plugged in as a single number.
+
+## The Minimal Mock Case: Five Trials of B vs A
+
+- **Treatment A**: Standard of Care
+- **Treatment B**: New Drug
+- **Outcome**: response (higher is better), so an OR above 1 favours B
+
+Five trials of different sizes compared B with A:
+
+```{r data}
+library(knitr)
+
+trials <- data.frame(
+    study = paste("Study", 1:5),
+    n_A = c(120, 60, 300, 80, 150),
+    r_A = c(24, 15, 75, 16, 30),
+    n_B = c(120, 60, 300, 80, 150),
+    r_B = c(45, 28, 88, 34, 60)
+)
+
+kable(trials, col.names = c("Study", "Patients (A)", "Responders (A)", "Patients (B)", "Responders (B)"))
+```
+
+Study 3 is by far the largest trial, and, as the next section shows, the one closest to no effect. That combination is what makes the choice between fixed and random effects visible.
+
+## Implementation: From Scratch, `metafor` and Stan
+
+### From Scratch in Base R
+
+Every quantity from the theoretical framework, computed directly:
+
+```{r from-scratch}
+fmt <- function(x) sprintf("%.2f", x)
+ci_text <- function(est, se) sprintf("%.2f (%.2f, %.2f)", exp(est), exp(est - 1.96 * se), exp(est + 1.96 * se))
+
+# Cells of each 2x2 table
+resp_B <- trials$r_B
+non_B <- trials$n_B - trials$r_B
+resp_A <- trials$r_A
+non_A <- trials$n_A - trials$r_A
+
+# Effect size and variance per trial
+y <- log((resp_B / non_B) / (resp_A / non_A)) # log OR
+v <- 1 / resp_B + 1 / non_B + 1 / resp_A + 1 / non_A
+k <- length(y)
+
+# Fixed effect
+w <- 1 / v
+lor_fe <- sum(w * y) / sum(w)
+se_fe <- sqrt(1 / sum(w))
+
+# Heterogeneity
+Q <- sum(w * (y - lor_fe)^2)
+Q_p <- pchisq(Q, df = k - 1, lower.tail = FALSE)
+tau2 <- max(0, (Q - (k - 1)) / (sum(w) - sum(w^2) / sum(w))) # DerSimonian-Laird
+I2 <- max(0, (Q - (k - 1)) / Q)
+
+# Random effects
+w_re <- 1 / (v + tau2)
+lor_re <- sum(w_re * y) / sum(w_re)
+se_re <- sqrt(1 / sum(w_re))
+
+# 95% prediction interval, on the OR scale
+pi_half <- 1.96 * sqrt(tau2 + se_re^2)
+pi_lo <- exp(lor_re - pi_half)
+pi_hi <- exp(lor_re + pi_half)
+
+w_fe_pct <- 100 * w / sum(w)
+w_re_pct <- 100 * w_re / sum(w_re)
+
+kable(
+    data.frame(trials$study, exp(y), y, v, w_fe_pct, w_re_pct),
+    digits = c(0, 2, 3, 3, 1, 1),
+    col.names = c("Study", "OR", "log OR", "Variance", "Weight, FE (%)", "Weight, RE (%)")
+)
+
+kable(
+    data.frame(Q, k - 1, Q_p, tau2, 100 * I2),
+    digits = c(2, 0, 3, 3, 1),
+    col.names = c("Cochran's Q", "df", "p-value", "$\\tau^2$", "$I^2$ (%)")
+)
+
+kable(
+    data.frame(
+        c("Fixed effect", "Random effects (DerSimonian-Laird)"),
+        c(ci_text(lor_fe, se_fe), ci_text(lor_re, se_re)),
+        c("&ndash;", sprintf("%.2f to %.2f", pi_lo, pi_hi))
+    ),
+    col.names = c("Model", "Pooled OR (95% CI)", "95% prediction interval")
+)
+```
+
+Study 3 has the smallest variance, so under the fixed-effect model it carries `r sprintf("%.0f%%", w_fe_pct[3])` of the weight. With $\hat\tau^2 =$ `r sprintf("%.3f", tau2)` added to every variance, its share falls to `r sprintf("%.0f%%", w_re_pct[3])`, while the smallest trial, Study 2, rises from `r sprintf("%.0f%%", w_fe_pct[2])` to `r sprintf("%.0f%%", w_re_pct[2])`.
+
+### Cross-Check With `metafor`
+
+The standard R package gives the same numbers:
+
+```{r metafor-check, message=FALSE}
+library(metafor)
+
+es <- escalc(measure = "OR", ai = r_B, n1i = n_B, ci = r_A, n2i = n_A, data = trials)
+fit_fe <- rma(yi, vi, data = es, method = "FE")
+fit_re <- rma(yi, vi, data = es, method = "DL")
+
+kable(
+    data.frame(
+        c("log OR, fixed effect", "SE, fixed effect", "log OR, random effects", "SE, random effects", "$\\tau^2$", "$I^2$ (%)"),
+        c(lor_fe, se_fe, lor_re, se_re, tau2, 100 * I2),
+        c(coef(fit_fe), fit_fe$se, coef(fit_re), fit_re$se, fit_re$tau2, fit_re$I2)
+    ),
+    digits = 4,
+    col.names = c("Quantity", "From scratch", "metafor")
+)
+```
+
+The forest plot shows each trial with its 95% CI, the random-effects pooled estimate as a diamond, and the prediction interval as the dotted line through it:
+
+```{r forest, fig.height=4}
+forest(
+    fit_re,
+    slab = trials$study,
+    atransf = exp,
+    at = log(c(0.5, 1, 2, 4, 8)),
+    addpred = TRUE,
+    header = c("Study", "OR [95% CI]")
+)
+```
+
+### Bayesian Random Effects in Stan
+
+::: {.callout-note collapse="true" appearance="minimal"}
+# Stan model: pairwise_re.stan
+
+```{r show-stan, echo=FALSE, class.output="stan"}
+cat(readLines("pairwise_re.stan"), sep = "\n")
+```
+:::
+
+Three choices in the model are worth stating:
+
+- **Priors**: $N(0, 10^2)$ for the baselines $\mu_i$ and the pooled log OR $d$, which is vague on the log-odds scale; half-Normal$(0, 1)$ for $\tau$, which keeps implausibly large heterogeneity unlikely without ruling it out.
+- **Non-centred parameterisation**: $\delta_i = d + \tau z_i$ with $z_i \sim N(0, 1)$. It describes the same model as $\delta_i \sim N(d, \tau^2)$, but samples far more reliably when $\tau$ is poorly identified, as it is with five trials.
+- **Prediction**: `OR_new` draws a log OR for a new study from $N(d, \tau^2)$ at every iteration, giving the Bayesian counterpart of the prediction interval.
+
+```{r stan-fit, message=FALSE, warning=FALSE}
+library(rstan)
+
+stan_data <- list(
+    S = nrow(trials),
+    n_A = trials$n_A, r_A = trials$r_A,
+    n_B = trials$n_B, r_B = trials$r_B
+)
+
+fit_bayes <- stan(
+    file = "pairwise_re.stan",
+    data = stan_data,
+    chains = 4,
+    iter = 4000,
+    warmup = 2000,
+    seed = 42,
+    control = list(adapt_delta = 0.99),
+    refresh = 0
+)
+
+bayes_sum <- summary(fit_bayes, pars = c("d", "OR", "tau", "OR_new"))$summary
+kable(
+    bayes_sum[, c("mean", "sd", "2.5%", "50%", "97.5%", "n_eff", "Rhat")],
+    digits = c(3, 3, 3, 3, 3, 0, 3),
+    col.names = c("Mean", "SD", "2.5%", "Median", "97.5%", "ESS", "R-hat")
+)
+
+n_div <- sum(sapply(get_sampler_params(fit_bayes, inc_warmup = FALSE), function(x) sum(x[, "divergent__"])))
+```
+
+All R-hat values are at or below `r sprintf("%.3f", max(bayes_sum[, "Rhat"]))`, the smallest ESS is `r round(min(bayes_sum[, "n_eff"]))`, and the sampler reported `r n_div` divergent transitions.
+
+## Results & Interpretation {#results}
+
+```{r compare}
+post <- rstan::extract(fit_bayes, pars = c("OR", "OR_new", "tau"))
+b_or <- quantile(post$OR, c(0.5, 0.025, 0.975))
+b_new <- quantile(post$OR_new, c(0.025, 0.975))
+b_tau <- quantile(post$tau, c(0.5, 0.025, 0.975))
+
+kable(
+    data.frame(
+        c("Fixed effect", "Random effects (DerSimonian-Laird)", "Random effects (Bayesian)"),
+        c(ci_text(lor_fe, se_fe), ci_text(lor_re, se_re), sprintf("%.2f (%.2f, %.2f)", b_or[1], b_or[2], b_or[3])),
+        c("&ndash;", sprintf("%.2f to %.2f", pi_lo, pi_hi), sprintf("%.2f to %.2f", b_new[1], b_new[2])),
+        c("0 (assumed)", sprintf("%.2f", sqrt(tau2)), sprintf("%.2f (%.2f, %.2f)", b_tau[1], b_tau[2], b_tau[3]))
+    ),
+    col.names = c("Model", "Pooled OR (95% interval)", "95% prediction interval", "$\\tau$ (between-study SD)")
+)
+```
+
+Three readings of this table matter for an HTA submission.
+
+**Fixed vs random effects.** The fixed-effect OR (`r fmt(exp(lor_fe))`) sits closer to Study 3 than the random-effects OR (`r fmt(exp(lor_re))`), because the fixed-effect model gives the largest, least favourable trial `r sprintf("%.0f%%", w_fe_pct[3])` of the weight. Which is right is not a statistical question alone: if the trials plausibly differ in population or setting, the fixed-effect assumption of one common effect is hard to defend, and its narrower interval is not a real gain in precision.
+
+**Confidence vs prediction interval.** The random-effects 95% CI (`r sprintf("%.2f to %.2f", exp(lor_re - 1.96 * se_re), exp(lor_re + 1.96 * se_re))`) describes the average effect across settings like these trials. The prediction interval (`r sprintf("%.2f to %.2f", pi_lo, pi_hi)`) describes the effect to expect in one new setting, and its lower end sits at `r fmt(pi_lo)`. B helps on average; whether it helps in a particular new population is far less certain. A cost-effectiveness model that uses only the pooled estimate carries the first statement, not the second.
+
+**Frequentist vs Bayesian random effects.** The Bayesian 95% interval for the pooled OR (`r sprintf("%.2f to %.2f", b_or[2], b_or[3])`) is wider than the DerSimonian–Laird CI. DerSimonian–Laird plugs in one value of $\tau$ (`r fmt(sqrt(tau2))`) as if it were known; the Bayesian model carries the uncertainty about $\tau$ itself, whose 95% interval runs from `r fmt(b_tau[2])` to `r fmt(b_tau[3])`. With five trials, that uncertainty is large, and ignoring it overstates precision.
+
+## HTA Audit Points & Interview Q&A {#audit}
+
+::: {.callout-important collapse="true"}
+# Should I choose fixed or random effects based on I²?
+
+No. The choice should rest first on whether the trials plausibly estimate one common effect: similar populations, doses, comparators and outcome definitions. I² is a supporting signal, not a switch. A low I² with few trials is weak evidence of homogeneity, because Q has little power to detect heterogeneity when $k$ is small. NICE DSU TSD 2 compares fixed- and random-effects models on fit (residual deviance and DIC) alongside this clinical reasoning.
+:::
+
+::: {.callout-important collapse="true"}
+# What does an I² of around 60% actually tell you?
+
+That around 60% of the scatter between trial results reflects real differences rather than chance. It does not say whether those differences are clinically large; $\tau$ on the log OR scale, or the prediction interval, answers that. I² also depends on trial size: the same true spread gives a higher I² when the trials are large and precise, because less of the scatter can be put down to chance.
+:::
+
+::: {.callout-important collapse="true"}
+# Why is DerSimonian–Laird criticised when there are few trials?
+
+It estimates $\tau^2$ from one moment equation and then treats the estimate as fixed, so the confidence interval ignores the uncertainty in $\tau^2$. With few trials that uncertainty is large, and the interval is too narrow. Common remedies are the Hartung–Knapp–Sidik–Jonkman adjustment, which rescales the variance and uses a $t$ distribution, usually widening the interval, restricted maximum likelihood for $\tau^2$, or a Bayesian model that carries the uncertainty in $\tau$ through, as above.
+:::
+
+::: {.callout-important collapse="true"}
+# When is a pairwise meta-analysis enough, and when do you need an NMA?
+
+A pairwise meta-analysis is enough when the decision problem is one comparison and there are head-to-head trials of it. Once the decision involves several treatments, or the comparator of interest has never been tested directly against the new treatment, the evidence has to be connected through common comparators, which is what an [NMA](01_Standard_Bayesian_NMA_Guide.qmd) does.
+:::
+
+## Conclusion {#conclusion}
+
+Pairwise meta-analysis comes down to a weighted average with two decisions attached: how to weight the trials, and whether they share one effect. The fixed-effect model weights by precision alone; the random-effects model adds between-study variance, which evens out the weights, widens the interval and makes the prediction interval available. The Bayesian version works from the counts and carries the uncertainty in $\tau$, and it is the same model that a [Standard Bayesian NMA](01_Standard_Bayesian_NMA_Guide.qmd) extends to a network of comparisons.
+
+**Methodological References**: NICE DSU TSD 2 (Dias et al., 2011, updated 2016); *Cochrane Handbook for Systematic Reviews of Interventions*, Chapter 10; DerSimonian & Laird (1986); Higgins, Thompson & Spiegelhalter (2009) on prediction intervals.

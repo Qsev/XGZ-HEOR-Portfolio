@@ -20,6 +20,7 @@ project:
     - 07_TA1092_Pembro_ endometrial cancer/TA1092_Pembro_Endometrial_EAG_Case.qmd
     - 00_HTA_LLM_Wiki/README.md
     - 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
+    - 04_NMA/05_NMA_Technical_Prep/12_Pairwise_Meta_Analysis.qmd
     - 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
     - 04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd
     - 04_NMA/05_NMA_Technical_Prep/03_Survival_NMA.qmd
@@ -65,6 +66,8 @@ website:
         menu:
           - href: 04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.qmd
             text: "Bayesian Estimation"
+          - href: 04_NMA/05_NMA_Technical_Prep/12_Pairwise_Meta_Analysis.qmd
+            text: "Pairwise Meta-Analysis"
           - href: 04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.qmd
             text: "Standard Bayesian NMA"
           - href: 04_NMA/05_NMA_Technical_Prep/02_Network_Meta_Regression_NMR.qmd
