@@ -32,11 +32,11 @@ A curated knowledge base of HTA principles, NICE/SMC/AWMSG guidelines, and techn
 
 | Domain | Tools |
 |---|---|
-| Economic Modelling | R (HEEMOD), Excel (VBA / PowerQuery) |
-| Evidence Synthesis | R (multinma, gemtc), Stan, JAGS |
-| Causal Inference | R (SuperLearner, MatchIt, tmle) |
-| Survival Analysis | R (flexsurv, survminer) |
-| HTA Standards | NICE DSU TSDs, SMC Submission Guidelines |
+| Economic Modelling | Excel; R (cohort Markov and partitioned survival models written directly) |
+| Evidence Synthesis | R (multinma), Stan, JAGS |
+| Causal Inference | R (WeightIt, cobalt, SuperLearner, tmle, EValue) |
+| Survival Analysis | R (survival, flexsurv, flexsurvcure) |
+| HTA Standards | NICE DSU TSDs, NICE RWE Framework, TECH-VER |
 
 ---
 
