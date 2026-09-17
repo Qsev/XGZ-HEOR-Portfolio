@@ -30,9 +30,36 @@ In this chapter, we will:
 
 ## The Fundamental Equation
 
-At the heart of Bayesian estimation is Bayes' Theorem:
+### Starting From Conditional Probability
+
+For any two events $A$ and $B$ with $P(B) > 0$, conditional probability is *defined* as
+
+$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+
+Once we know $B$ has happened, we restrict attention to the outcomes in which $B$ is true, and ask what share of them also have $A$.
+
+The same definition works in the other direction, $P(B \mid A) = P(A \cap B) / P(A)$. Both describe the same joint event $A \cap B$, so
+
+$$P(A \cap B) = P(A \mid B)\,P(B) = P(B \mid A)\,P(A)$$
+
+Dividing through by $P(B)$ gives Bayes' Theorem in its general form:
+
+$$P(A \mid B) = \frac{P(B \mid A)\,P(A)}{P(B)}$$
+
+### From Events to Parameters and Data
+
+Bayesian estimation applies the same identity with two substitutions:
+
+- $A$ becomes the unknown **parameter** $\theta$ (the hypothesis).
+- $B$ becomes the observed **data** $y$ (the evidence).
+
+The direction we can compute is $P(y \mid \theta)$: given a value of the parameter, how probable are the data? The direction we want is $P(\theta \mid y)$: given the data, what should we believe about the parameter? Bayes' Theorem connects the two:
 
 $$P(\theta | y) = \frac{P(y | \theta) P(\theta)}{P(y)}$$
+
+When $\theta$ is continuous, probabilities become densities and the denominator becomes an integral over every possible value of $\theta$:
+
+$$P(y) = \int P(y \mid \theta)\,P(\theta)\,d\theta$$
 
 Where:
 
@@ -93,30 +120,33 @@ By multiplying the Prior and the Likelihood, we get this final distribution. We 
 
 ## Visualizing the Update in R: A Simple MCMC Simulation
 
-Instead of using math formulas to draw the Posterior, let's write a simple **Markov Chain Monte Carlo (MCMC)** algorithm (the Metropolis algorithm) to "find" the posterior distribution, just like we described above.
+Let's write a simple **Markov Chain Monte Carlo (MCMC)** algorithm (the Metropolis algorithm) to "find" the posterior distribution, just like we described above. Its target is the product of the Likelihood and the Prior, and the algorithm takes random walks to map it out.
 
-We will define our target as the product of the Likelihood and the Prior. Then we let the algorithm take random walks to map it out.
+With a single parameter, that same product is simply a function of $\theta$, and we can plot it like any curve: compute its value at many closely spaced values of $\theta$, join the points, and rescale so the area under it is 1. Putting the curve and the MCMC samples on one set of axes shows what the sampler has been mapping.
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(dplyr)
+library(knitr)
 
 # 1. Generate the 30 observed numbers from a "true" distribution
-set.seed(42) # <1>
-true_theta <- 1.5 # <2>
+set.seed(42) # for reproducibility
+true_theta <- 1.5 # the "hidden" true parameter
 y <- rnorm(30, mean = true_theta, sd = 1)
 
 # 2. Define the Target (Log-Posterior)
 log_target <- function(theta) {
-    log_like <- sum(dnorm(y, mean = theta, sd = 1, log = TRUE)) # <3>
-    log_prior <- dnorm(theta, mean = 0, sd = 1, log = TRUE) # <4>
-    return(log_like + log_prior) # <5>
+    # sum of log-densities over the 30 points
+    log_like <- sum(dnorm(y, mean = theta, sd = 1, log = TRUE))
+    # log-prior: guess = 0, SD = 1
+    log_prior <- dnorm(theta, mean = 0, sd = 1, log = TRUE)
+    return(log_like + log_prior) # log of Likelihood x Prior
 }
 
 # 3. Metropolis Algorithm
 n_iter <- 10000
 samples <- numeric(n_iter)
-current_theta <- 0 # <6>
+current_theta <- 0 # starting point of the random walk
 
 set.seed(42)
 for (i in 1:n_iter) {
@@ -127,62 +157,135 @@ for (i in 1:n_iter) {
     log_acc_ratio <- log_target(proposed_theta) - log_target(current_theta)
 
     # Accept or reject
-    if (log(runif(1)) < log_acc_ratio) { # <7>
+    if (log(runif(1)) < log_acc_ratio) { # <1>
         current_theta <- proposed_theta
     }
     samples[i] <- current_theta
 }
 
-# 4. Plot the Results
-df_samples <- data.frame(theta = samples)
-theta_seq <- seq(-3, 4, length.out = 200) # <8>
-prior_dens <- dnorm(theta_seq, 0, 1)
+# 4. Plot the same target directly as a curve
+theta_grid <- seq(0.5, 2.5, length.out = 2000)
+d_theta <- diff(theta_grid)[1]
+log_post_grid <- sapply(theta_grid, log_target)
+h <- exp(log_post_grid - max(log_post_grid)) # <2>
+post_dens <- h / sum(h * d_theta) # <3>
 
-df_curves <- data.frame(
-    theta = theta_seq,
-    density = prior_dens,
-    type = "Prior (Theta ~ N(0,1))"
-)
-
+# 5. Plot the MCMC samples against the directly drawn curve
 ggplot() +
-    # MCMC Samples (Posterior)
     geom_histogram(
-        data = df_samples, aes(x = theta, y = ..density..),
-        bins = 50, fill = "lightblue", color = "white", alpha = 0.7
+        data = data.frame(theta = samples), aes(x = theta, y = after_stat(density)),
+        binwidth = 0.05, boundary = 0, fill = "lightblue", color = "white"
     ) +
-    geom_density(data = df_samples, aes(x = theta, color = "Posterior (MCMC Samples)"), size = 1.2) +
-    # Prior Curve
-    geom_line(data = df_curves, aes(x = theta, y = density, color = type), linetype = "dashed", size = 1) +
+    geom_line(data = data.frame(theta = theta_grid, density = post_dens), aes(x = theta, y = density), color = "blue", linewidth = 1) +
+    coord_cartesian(xlim = c(0.8, 2.3)) +
     theme_minimal() +
     labs(
-        title = "The Bayesian Update Process via MCMC",
-        subtitle = "Histogram shows MCMC samples mapping the Posterior",
+        title = "The same posterior, sampled and drawn",
+        subtitle = "Bars: where the 10,000 MCMC draws fell. Line: Likelihood x Prior plotted directly",
         x = "True Mean (Theta)",
-        y = "Density",
-        color = "Component"
-    ) +
-    scale_color_manual(values = c("Posterior (MCMC Samples)" = "blue", "Prior (Theta ~ N(0,1))" = "orange"))
+        y = "Density"
+    )
 
-# 5. Summary of the Posterior
-cat("\n--- Posterior Summary ---\n")
-cat("Mean:", round(mean(samples), 3), "\n")
-cat("SD:", round(sd(samples), 3), "\n")
-cat("Quantiles:\n")
-print(round(quantile(samples, probs = c(0.025, 0.5, 0.975)), 3))
+# 6. Summarise both
+probs <- c(0.025, 0.5, 0.975)
+grid_mean <- sum(theta_grid * post_dens) * d_theta
+grid_sd <- sqrt(sum((theta_grid - grid_mean)^2 * post_dens) * d_theta)
+grid_q <- sapply(probs, function(p) theta_grid[which(cumsum(post_dens * d_theta) >= p)[1]])
+
+summary_tbl <- rbind(
+    "MCMC samples" = c(mean(samples), sd(samples), quantile(samples, probs)),
+    "Plotted directly" = c(grid_mean, grid_sd, grid_q)
+)
+kable(summary_tbl, digits = 3, col.names = c("Mean", "SD", "2.5%", "Median", "97.5%"))
 ```
 
-1.  For reproducibility
-2.  The "hidden" true parameter
-3.  sum of log-densities for each of the 30 points
-4.  Log-prior: Guess = 0, SD = 1
-5.  Log of the Product of Likelihoods for each data point \* Prior
-6.  Starting Point of random walk of $\theta$
-7.  Random threshold to allow "downhill" moves proportional to probability
-8.  Generate Prior curve for comparison
+1.  Random threshold to allow "downhill" moves proportional to probability
+2.  Subtract the maximum before exponentiating, so the values do not underflow to zero
+3.  Rescale to area 1: the numerical counterpart of $P(y)$
 
-Notice how the blue histogram and density curve (the MCMC samples) map out the Posterior distribution. It forms a compromise: it is pulled away from our Prior guess (0) towards the region supported by the data. The algorithm spent more time in the high-probability region, successfully "mapping" the Posterior without using any integration or analytical formulas.
+Each bar covers an interval of $\theta$ 0.05 wide. Its height is the share of the 10,000 MCMC draws that fell in that interval, divided by 0.05 so that the bars have a total area of 1, like the area under the line. A tall bar marks a range of $\theta$ where the random walk spent much of its time.
+
+The bars and the line are one distribution reached two ways: the MCMC by a random walk, the line by computing the formula along the whole axis. Plotting works here only because there is one parameter: at 100 values per parameter, ten parameters would need $100^{10}$ calculations. The MCMC computes $\text{Likelihood} \times \text{Prior}$ only at the points it visits, so its cost does not explode as parameters are added. That is why it can handle Network Meta-Analysis models, which carry dozens of parameters (see the next section).
 
 *Note: With 30 samples, the data provides stronger evidence. If you reduce the sample size to 10, you will see the posterior peak drift more due to random sampling error, as the likelihood becomes less sharp and the prior at 0 exerts a relatively stronger pull.*
+
+### With Half the Data
+
+What happens with only 15 observations? To separate the effect of sample size from the luck of one particular sample, the comparison is run on two independent draws from the same true distribution ($\theta = 1.5$). Draw 1 is the 30 numbers used above; Draw 2 is a fresh set of 30. In each draw, the 15-observation case uses the first 15 of its 30 numbers. The prior and the algorithm are unchanged.
+
+```{r half-sample, message=FALSE, warning=FALSE, fig.height=9}
+# The same Metropolis algorithm as above, written as a function of the data
+run_metropolis <- function(y_obs) {
+    log_target_obs <- function(theta) {
+        sum(dnorm(y_obs, mean = theta, sd = 1, log = TRUE)) + dnorm(theta, mean = 0, sd = 1, log = TRUE)
+    }
+    draws <- numeric(n_iter)
+    current_theta <- 0
+    set.seed(42)
+    for (i in 1:n_iter) {
+        proposed_theta <- current_theta + rnorm(1, 0, 0.5)
+        if (log(runif(1)) < log_target_obs(proposed_theta) - log_target_obs(current_theta)) {
+            current_theta <- proposed_theta
+        }
+        draws[i] <- current_theta
+    }
+    draws
+}
+
+set.seed(43)
+y2 <- rnorm(30, mean = true_theta, sd = 1) # a second, independent sample of 30
+
+runs <- list(
+    list(draw = "Draw 1", n = 30, y_obs = y),
+    list(draw = "Draw 1", n = 15, y_obs = y[1:15]),
+    list(draw = "Draw 2", n = 30, y_obs = y2),
+    list(draw = "Draw 2", n = 15, y_obs = y2[1:15])
+)
+
+df_runs <- bind_rows(lapply(runs, function(r) {
+    data.frame(draw = r$draw, n = paste(r$n, "observations"), theta = run_metropolis(r$y_obs))
+}))
+df_runs$n <- factor(df_runs$n, levels = c("30 observations", "15 observations"))
+
+cri <- df_runs %>%
+    group_by(n, draw) %>%
+    summarise(
+        Mean = mean(theta),
+        SD = sd(theta),
+        Lower = quantile(theta, 0.025),
+        Upper = quantile(theta, 0.975),
+        .groups = "drop"
+    ) %>%
+    mutate(Width = Upper - Lower)
+
+ggplot(df_runs, aes(x = theta)) +
+    geom_histogram(aes(y = after_stat(density)), binwidth = 0.05, boundary = 0, fill = "lightblue", color = "white") +
+    geom_vline(xintercept = true_theta, color = "grey40") +
+    geom_vline(data = cri, aes(xintercept = Lower), color = "blue", linetype = "dashed") +
+    geom_vline(data = cri, aes(xintercept = Upper), color = "blue", linetype = "dashed") +
+    geom_text(data = cri, aes(x = Lower, y = Inf, label = sprintf("%.2f", Lower)), color = "blue", size = 4, hjust = 1.1, vjust = 1.5) +
+    geom_text(data = cri, aes(x = Upper, y = Inf, label = sprintf("%.2f", Upper)), color = "blue", size = 4, hjust = -0.1, vjust = 1.5) +
+    facet_wrap(~ n + draw, ncol = 1, labeller = label_wrap_gen(multi_line = FALSE)) +
+    scale_x_continuous(breaks = seq(0.5, 2.5, by = 0.5)) +
+    coord_cartesian(xlim = c(0.5, 2.7)) +
+    theme_minimal() +
+    labs(
+        title = "Half the data: a wider interval and a less reliable centre",
+        subtitle = "Dashed lines: 95% credible interval. Grey line: true value (1.5)",
+        x = "True Mean (Theta)",
+        y = "Density"
+    )
+
+kable(cri, digits = 3, col.names = c("Sample", "Draw", "Mean", "SD", "95% CrI lower", "95% CrI upper", "Width"))
+```
+
+Two things change when the sample is halved.
+
+**The interval widens**, by about 40%, and by the same amount in both draws. The reason is how evidence accumulates. The log-likelihood is a sum with one term per observation, so every observation adds the same amount of curvature around the peak. With 15 terms instead of 30 the peak is flatter: a wider range of $\theta$ values explains the data almost equally well, and the posterior spreads out accordingly.
+
+In this Normal example the arithmetic is exact. The posterior SD is $1/\sqrt{n + 1}$, where the $+1$ is the prior's contribution, so halving the data widens the interval by $\sqrt{31/16} \approx 1.39$. It depends only on how many observations there are, not on their values, which is why both draws widen alike. More generally, an interval narrows only with $\sqrt{n}$: halving the width takes four times the data.
+
+**The centre becomes less reliable.** With 30 observations the two draws are centred at about 1.5 and 1.3, 0.2 apart. With 15 they are centred at about 1.9 and 1.2, more than 0.6 apart. A smaller sample's mean wanders further from the truth, and that is exactly the uncertainty the wider interval describes. Two draws are an illustration rather than a proof: the standard error of a sample mean is $1/\sqrt{n}$, which is 0.18 for 30 observations and 0.26 for 15.
 
 ------------------------------------------------------------------------
 
