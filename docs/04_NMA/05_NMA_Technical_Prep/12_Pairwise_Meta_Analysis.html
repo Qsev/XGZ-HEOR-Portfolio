@@ -1230,123 +1230,99 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <details class="code-fold">
 <summary>View the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Published values, exactly as printed in TSD 2 Table 2</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>tsd2 <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-0.26"</span>, <span class="st">"0.050"</span>, <span class="st">"-0.36"</span>, <span class="st">"-0.16"</span>, <span class="st">"46.8"</span>, <span class="st">"23.0"</span>, <span class="st">"69.8"</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-0.25"</span>, <span class="st">"0.066"</span>, <span class="st">"-0.38"</span>, <span class="st">"-0.12"</span>, <span class="st">"0.13"</span>, <span class="st">"41.9"</span>, <span class="st">"28.1"</span>, <span class="st">"70.0"</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>ours <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"DIC"</span>]),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"sigma"</span>, <span class="st">"50%"</span>]),</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"DIC"</span>])</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fixed effect: $d$ (log OR), median"</span>, <span class="st">"Fixed effect: SD"</span>, <span class="st">"Fixed effect: 2.5%"</span>, <span class="st">"Fixed effect: 97.5%"</span>,</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fixed effect: $</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"Fixed effect: $p_D$"</span>, <span class="st">"Fixed effect: DIC"</span>,</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random effects: $d$ (log OR), median"</span>, <span class="st">"Random effects: SD"</span>, <span class="st">"Random effects: 2.5%"</span>, <span class="st">"Random effects: 97.5%"</span>,</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random effects: $</span><span class="sc">\\</span><span class="st">sigma$, median"</span>, <span class="st">"Random effects: $</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"Random effects: $p_D$"</span>, <span class="st">"Random effects: DIC"</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        tsd2, ours</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"lcc"</span>,</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Quantity"</span>, <span class="st">"TSD 2, Table 2"</span>, <span class="st">"This page, Stan"</span>)</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>tsd2_fe <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"-0.26"</span>, <span class="st">"0.050"</span>, <span class="st">"-0.36"</span>, <span class="st">"-0.16"</span>, <span class="st">"&amp;ndash;"</span>, <span class="st">"46.8"</span>, <span class="st">"23.0"</span>, <span class="st">"69.8"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>tsd2_re <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"-0.25"</span>, <span class="st">"0.066"</span>, <span class="st">"-0.38"</span>, <span class="st">"-0.12"</span>, <span class="st">"0.13"</span>, <span class="st">"41.9"</span>, <span class="st">"28.1"</span>, <span class="st">"70.0"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>ours_row <span class="ot">&lt;-</span> <span class="cf">function</span>(pars, stats, <span class="at">sigma =</span> <span class="cn">NA</span>) {</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">is.na</span>(sigma)) <span class="st">"&amp;ndash;"</span> <span class="cf">else</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, sigma),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats[<span class="st">"DIC"</span>])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rbind</span>(</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Fixed effect, TSD 2 Table 2"</span>, tsd2_fe),</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Fixed effect, this page"</span>, <span class="fu">ours_row</span>(pars_fe, stats_fe)),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Random effects, TSD 2 Table 2"</span>, tsd2_re),</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Random effects, this page"</span>, <span class="fu">ours_row</span>(pars_re, stats_re, pars_re[<span class="st">"sigma"</span>, <span class="st">"50%"</span>]))</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"lcccccccc"</span>,</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">escape =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"$d$ (log OR)"</span>, <span class="st">"SD"</span>, <span class="st">"2.5%"</span>, <span class="st">"97.5%"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">sigma$"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"$p_D$"</span>, <span class="st">"DIC"</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 52%">
-<col style="width: 22%">
-<col style="width: 24%">
+<col style="width: 28%">
+<col style="width: 13%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 16%">
+<col style="width: 6%">
+<col style="width: 5%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Quantity</th>
-<th style="text-align: center;">TSD 2, Table 2</th>
-<th style="text-align: center;">This page, Stan</th>
+<th style="text-align: left;"></th>
+<th style="text-align: center;"><span class="math inline">\(d\)</span> (log OR)</th>
+<th style="text-align: center;">SD</th>
+<th style="text-align: center;">2.5%</th>
+<th style="text-align: center;">97.5%</th>
+<th style="text-align: center;"><span class="math inline">\(\sigma\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\bar{D}_{res}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(p_D\)</span></th>
+<th style="text-align: center;">DIC</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Fixed effect: <span class="math inline">\(d\)</span> (log OR), median</td>
+<td style="text-align: left;">Fixed effect, TSD 2 Table 2</td>
 <td style="text-align: center;">-0.26</td>
-<td style="text-align: center;">-0.26</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Fixed effect: SD</td>
 <td style="text-align: center;">0.050</td>
-<td style="text-align: center;">0.050</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Fixed effect: 2.5%</td>
 <td style="text-align: center;">-0.36</td>
-<td style="text-align: center;">-0.36</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Fixed effect: 97.5%</td>
 <td style="text-align: center;">-0.16</td>
-<td style="text-align: center;">-0.16</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Fixed effect: <span class="math inline">\(\bar{D}_{res}\)</span></td>
+<td style="text-align: center;">–</td>
 <td style="text-align: center;">46.8</td>
-<td style="text-align: center;">46.8</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Fixed effect: <span class="math inline">\(p_D\)</span></td>
 <td style="text-align: center;">23.0</td>
-<td style="text-align: center;">23.2</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Fixed effect: DIC</td>
 <td style="text-align: center;">69.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fixed effect, this page</td>
+<td style="text-align: center;">-0.26</td>
+<td style="text-align: center;">0.050</td>
+<td style="text-align: center;">-0.36</td>
+<td style="text-align: center;">-0.16</td>
+<td style="text-align: center;">–</td>
+<td style="text-align: center;">46.8</td>
+<td style="text-align: center;">23.2</td>
 <td style="text-align: center;">70.0</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">Random effects: <span class="math inline">\(d\)</span> (log OR), median</td>
+<tr class="odd">
+<td style="text-align: left;">Random effects, TSD 2 Table 2</td>
 <td style="text-align: center;">-0.25</td>
-<td style="text-align: center;">-0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Random effects: SD</td>
 <td style="text-align: center;">0.066</td>
-<td style="text-align: center;">0.066</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Random effects: 2.5%</td>
 <td style="text-align: center;">-0.38</td>
-<td style="text-align: center;">-0.38</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Random effects: 97.5%</td>
 <td style="text-align: center;">-0.12</td>
-<td style="text-align: center;">-0.12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Random effects: <span class="math inline">\(\sigma\)</span>, median</td>
 <td style="text-align: center;">0.13</td>
-<td style="text-align: center;">0.13</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Random effects: <span class="math inline">\(\bar{D}_{res}\)</span></td>
 <td style="text-align: center;">41.9</td>
-<td style="text-align: center;">41.9</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Random effects: <span class="math inline">\(p_D\)</span></td>
 <td style="text-align: center;">28.1</td>
-<td style="text-align: center;">28.3</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Random effects: DIC</td>
 <td style="text-align: center;">70.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Random effects, this page</td>
+<td style="text-align: center;">-0.25</td>
+<td style="text-align: center;">0.066</td>
+<td style="text-align: center;">-0.38</td>
+<td style="text-align: center;">-0.12</td>
+<td style="text-align: center;">0.13</td>
+<td style="text-align: center;">41.9</td>
+<td style="text-align: center;">28.3</td>
 <td style="text-align: center;">70.2</td>
 </tr>
 </tbody>

@@ -554,33 +554,28 @@ TSD 2 reports its own posterior summaries and fit statistics for this example in
 
 ```{r replication}
 # Published values, exactly as printed in TSD 2 Table 2
-tsd2 <- c(
-    "-0.26", "0.050", "-0.36", "-0.16", "46.8", "23.0", "69.8",
-    "-0.25", "0.066", "-0.38", "-0.12", "0.13", "41.9", "28.1", "70.0"
-)
+tsd2_fe <- c("-0.26", "0.050", "-0.36", "-0.16", "&ndash;", "46.8", "23.0", "69.8")
+tsd2_re <- c("-0.25", "0.066", "-0.38", "-0.12", "0.13", "41.9", "28.1", "70.0")
 
-ours <- c(
-    sprintf("%.2f", pars_fe["d", "50%"]), sprintf("%.3f", pars_fe["d", "sd"]),
-    sprintf("%.2f", pars_fe["d", "2.5%"]), sprintf("%.2f", pars_fe["d", "97.5%"]),
-    sprintf("%.1f", stats_fe["D_res"]), sprintf("%.1f", stats_fe["pD"]), sprintf("%.1f", stats_fe["DIC"]),
-    sprintf("%.2f", pars_re["d", "50%"]), sprintf("%.3f", pars_re["d", "sd"]),
-    sprintf("%.2f", pars_re["d", "2.5%"]), sprintf("%.2f", pars_re["d", "97.5%"]),
-    sprintf("%.2f", pars_re["sigma", "50%"]),
-    sprintf("%.1f", stats_re["D_res"]), sprintf("%.1f", stats_re["pD"]), sprintf("%.1f", stats_re["DIC"])
-)
+ours_row <- function(pars, stats, sigma = NA) {
+    c(
+        sprintf("%.2f", pars["d", "50%"]), sprintf("%.3f", pars["d", "sd"]),
+        sprintf("%.2f", pars["d", "2.5%"]), sprintf("%.2f", pars["d", "97.5%"]),
+        if (is.na(sigma)) "&ndash;" else sprintf("%.2f", sigma),
+        sprintf("%.1f", stats["D_res"]), sprintf("%.1f", stats["pD"]), sprintf("%.1f", stats["DIC"])
+    )
+}
 
 kable(
-    data.frame(
-        c(
-            "Fixed effect: $d$ (log OR), median", "Fixed effect: SD", "Fixed effect: 2.5%", "Fixed effect: 97.5%",
-            "Fixed effect: $\\bar{D}_{res}$", "Fixed effect: $p_D$", "Fixed effect: DIC",
-            "Random effects: $d$ (log OR), median", "Random effects: SD", "Random effects: 2.5%", "Random effects: 97.5%",
-            "Random effects: $\\sigma$, median", "Random effects: $\\bar{D}_{res}$", "Random effects: $p_D$", "Random effects: DIC"
-        ),
-        tsd2, ours
+    rbind(
+        c("Fixed effect, TSD 2 Table 2", tsd2_fe),
+        c("Fixed effect, this page", ours_row(pars_fe, stats_fe)),
+        c("Random effects, TSD 2 Table 2", tsd2_re),
+        c("Random effects, this page", ours_row(pars_re, stats_re, pars_re["sigma", "50%"]))
     ),
-    align = "lcc",
-    col.names = c("Quantity", "TSD 2, Table 2", "This page, Stan")
+    align = "lcccccccc",
+    escape = FALSE,
+    col.names = c("", "$d$ (log OR)", "SD", "2.5%", "97.5%", "$\\sigma$", "$\\bar{D}_{res}$", "$p_D$", "DIC")
 )
 ```
 
