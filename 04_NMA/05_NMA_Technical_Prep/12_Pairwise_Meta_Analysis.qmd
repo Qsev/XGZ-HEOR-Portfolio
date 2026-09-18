@@ -411,7 +411,7 @@ kable(
 
 Heterogeneity is modest: $Q$ = `r fmt(Q)` on `r k - 1` degrees of freedom (p = `r sprintf("%.2f", Q_p)`), $\hat\tau$ = `r sprintf("%.3f", sqrt(tau2))` on the log OR scale, and $I^2$ = `r sprintf("%.0f%%", 100 * I2)`. The two models therefore give nearly the same answer, and the weights move only a little: the largest trial (trial `r which.max(blocker$n_C + blocker$n_T)`, with `r format(max(blocker$n_C + blocker$n_T), big.mark = ",")` patients) carries `r sprintf("%.0f%%", max(w_fe_pct))` of the weight under fixed effects and `r sprintf("%.0f%%", w_re_pct[which.max(w_fe_pct)])` under random effects. `metafor` reproduces all six quantities above, the largest discrepancy being `r sprintf("%.0e", max_diff)`.
 
-The forest plot shows each trial with its 95% CI, the random-effects pooled estimate as a diamond, and the prediction interval as the dotted line through it:
+The forest plot shows each trial with its 95% CI, the random-effects pooled estimate as a diamond, and the prediction interval as the dotted line through it. Each square is sized by the trial's weight, and an arrow means the interval runs past the edge of the axis:
 
 ```{r forest, fig.height=8}
 forest(
