@@ -22,18 +22,20 @@ It is also the building block of every method in this library. A [Standard Bayes
 1.  How should trials of different sizes be **weighted**?
 2.  What if the trials do not all estimate the **same** effect?
 
+The worked example is the one NICE DSU TSD 2 uses for the same purpose, 22 trials of beta-blockers after myocardial infarction, rebuilt here from the published counts. Its posterior estimates and fit statistics are reproduced independently in Stan and set side by side with the published ones.
+
 ## Theoretical Framework: From a 2×2 Table to a Pooled Estimate
 
 ### The Effect Size in a Single Trial
 
-For a binary outcome such as response, each trial reduces to a 2×2 table:
+For a binary outcome, where each patient either has the event of interest or does not, each trial reduces to a 2×2 table:
 
-|             | Responders | Non-responders |
-|:------------|:----------:|:--------------:|
+|             |  Events  | Non-events |
+|:------------|:--------:|:----------:|
 | Treatment B |    $a$     |      $b$       |
 | Treatment A |    $c$     |      $d$       |
 
-Index the trials by $i = 1, \dots, k$ (in the mock case below, $k = 5$). In trial $i$, arm B enrols $n_B$ patients and arm A enrols $n_A$. The responder counts are random variables, $a \sim \text{Binomial}(n_B, p_B)$ and $c \sim \text{Binomial}(n_A, p_A)$, where $p_B$ and $p_A$ are the true response rates; the non-responders are $b = n_B - a$ and $d = n_A - c$. The subscript $i$ is dropped from these quantities to keep the formulas readable.
+Index the trials by $i = 1, \dots, k$ ($k = 22$ in the worked example below). In trial $i$, arm B enrols $n_B$ patients and arm A enrols $n_A$. The event counts are random variables, $a \sim \text{Binomial}(n_B, p_B)$ and $c \sim \text{Binomial}(n_A, p_A)$, where $p_B$ and $p_A$ are the true event rates; the non-events are $b = n_B - a$ and $d = n_A - c$. The subscript $i$ is dropped from these quantities to keep the formulas readable.
 
 The odds ratio and its logarithm are
 
@@ -50,7 +52,7 @@ Each arm contributes the reciprocals of its own two counts. Larger trials have l
 ::: {.callout-note collapse="true"}
 # Where the variance formula comes from
 
-**Step 1: the response rate in one arm.** Take arm B, and write $n = n_B$ and $p = p_B$ for short. Since $a \sim \text{Binomial}(n, p)$, the observed rate $\hat p = a / n$ has variance
+**Step 1: the event rate in one arm.** Take arm B, and write $n = n_B$ and $p = p_B$ for short. Since $a \sim \text{Binomial}(n, p)$, the observed rate $\hat p = a / n$ has variance
 
 $$\text{Var}(\hat p) = \frac{p(1-p)}{n}$$ {#eq-var-p}
 
@@ -74,7 +76,7 @@ $$\text{Var}\left(\ln\frac{a}{b}\right) \approx \frac{1}{p^2(1-p)^2} \cdot \frac
 
 $$\frac{1}{np(1-p)} = \frac{(1 - p) + p}{np(1-p)} = \frac{1}{np} + \frac{1}{n(1-p)}$$ {#eq-split}
 
-In ([-@eq-split]), $np$ and $n(1-p)$ are the expected numbers of responders and non-responders. Replacing them with the observed counts $a$ and $b$ gives the variance for arm B:
+In ([-@eq-split]), $np$ and $n(1-p)$ are the expected numbers of events and non-events. Replacing them with the observed counts $a$ and $b$ gives the variance for arm B:
 
 $$\text{Var}\left(\ln\frac{a}{b}\right) \approx \frac{1}{a} + \frac{1}{b}$$ {#eq-arm-B}
 
@@ -88,7 +90,7 @@ $$v_i = \text{Var}(y_i) \approx \frac{1}{a} + \frac{1}{b} + \frac{1}{c} + \frac{
 
 which is the formula above.
 
-**What it implies.** The smallest cell dominates ([-@eq-vi]). A trial of 1,000 patients per arm with only 5 responders on A still has $v_i > 1/5$, so a large trial with a rare event can be less precise than a small trial with a common one. When a cell is zero, $v_i$ is infinite, which is why a continuity correction, typically adding 0.5 to every cell, is applied. That correction is itself an assumption, and one that can move results when events are sparse.
+**What it implies.** The smallest cell dominates ([-@eq-vi]). A trial of 1,000 patients per arm with only 5 events on A still has $v_i > 1/5$, so a large trial with a rare event can be less precise than a small trial with a common one. When a cell is zero, $v_i$ is infinite, which is why a continuity correction, typically adding 0.5 to every cell, is applied. That correction is itself an assumption, and one that can move results when events are sparse.
 :::
 
 ### Fixed Effect: Inverse-Variance Weighting
@@ -97,7 +99,7 @@ The **fixed-effect** model assumes every trial estimates one common effect $\the
 
 $$y_i \sim N(\theta, v_i), \qquad i = 1, \dots, k$$
 
-treating each $v_i$ as known. Strictly, the variance of $y_i$ depends on the true response rates $p_B$ and $p_A$, which are unknown; $v_i$ replaces them with the observed rates, so it is an estimate. Treating it as a known constant is an approximation that works well with large counts, but with few events it makes both the weights and the pooled estimate unreliable, because $y_i$ and $v_i$ are computed from the same counts.
+treating each $v_i$ as known. Strictly, the variance of $y_i$ depends on the true event rates $p_B$ and $p_A$, which are unknown; $v_i$ replaces them with the observed rates, so it is an estimate. Treating it as a known constant is an approximation that works well with large counts, but with few events it makes both the weights and the pooled estimate unreliable, because $y_i$ and $v_i$ are computed from the same counts.
 
 The log-likelihood is
 
@@ -320,29 +322,39 @@ Each trial's estimate is pulled from its own result towards the average of the t
 In an NMA this is the mechanism behind a question EAGs often ask: how much of the estimate for a treatment supported by one small trial comes from that trial, and how much is borrowed from the rest of the network.
 :::
 
-## The Minimal Mock Case: Five Trials of B vs A
+## The Worked Example: Beta-Blockers After Myocardial Infarction
 
-- **Treatment A**: Standard of Care
-- **Treatment B**: New Drug
-- **Outcome**: response (higher is better), so an OR above 1 favours B
+The example is the one NICE DSU TSD 2 uses throughout: 22 randomised trials of beta-blockers for preventing death after myocardial infarction, originally collated by Carlin (1992) and reproduced in TSD 2 Table 1. It is a pairwise comparison of two treatments with a binary outcome, which is exactly the setting of the models above.
 
-Five trials of different sizes compared B with A:
+- **Treatment A**: control or placebo
+- **Treatment B**: beta-blocker
+- **Outcome**: death. The event is a harm, so an OR **below** 1 favours the beta-blocker.
+
+Using a published example means the results can be checked: TSD 2 reports its own posterior estimates and fit statistics, and this page reproduces them independently in Stan.
 
 ```{r data}
 library(knitr)
 
-trials <- data.frame(
-    study = paste("Study", 1:5),
-    n_A = c(120, 60, 300, 80, 150),
-    r_A = c(24, 15, 75, 16, 30),
-    n_B = c(120, 60, 300, 80, 150),
-    r_B = c(45, 28, 88, 34, 60)
+blocker <- data.frame(
+    trial = 1:22,
+    r_C = c(3, 14, 11, 127, 27, 6, 152, 48, 37, 188, 52, 47, 16, 45, 31, 38, 12, 6, 3, 40, 43, 39),
+    n_C = c(39, 116, 93, 1520, 365, 52, 939, 471, 282, 1921, 583, 266, 293, 883, 147, 213, 122, 154, 134, 218, 364, 674),
+    r_T = c(3, 7, 5, 102, 28, 4, 98, 60, 25, 138, 64, 45, 9, 57, 25, 33, 28, 8, 6, 32, 27, 22),
+    n_T = c(38, 114, 69, 1533, 355, 59, 945, 632, 278, 1916, 873, 263, 291, 858, 154, 207, 251, 151, 174, 209, 391, 680)
 )
 
-kable(trials, col.names = c("Study", "Patients (A)", "Responders (A)", "Patients (B)", "Responders (B)"))
+kable(
+    data.frame(
+        blocker$trial,
+        sprintf("%d / %d", blocker$r_C, blocker$n_C),
+        sprintf("%d / %d", blocker$r_T, blocker$n_T)
+    ),
+    align = "lcc",
+    col.names = c("Trial", "Deaths / patients, control", "Deaths / patients, beta-blocker")
+)
 ```
 
-Study 3 is by far the largest trial, and, as the next section shows, the one closest to no effect. That combination is what makes the choice between fixed and random effects visible.
+The 22 trials cover `r format(sum(blocker$n_C) + sum(blocker$n_T), big.mark = ",")` patients and `r format(sum(blocker$r_C) + sum(blocker$r_T), big.mark = ",")` deaths, and they differ in size by almost two orders of magnitude, from `r min(blocker$n_C + blocker$n_T)` patients to `r format(max(blocker$n_C + blocker$n_T), big.mark = ",")`. That spread is what makes the weighting question concrete.
 
 ## Implementation: From Scratch, `metafor` and Stan
 
@@ -355,10 +367,10 @@ fmt <- function(x) sprintf("%.2f", x)
 ci_text <- function(est, se) sprintf("%.2f (%.2f, %.2f)", exp(est), exp(est - 1.96 * se), exp(est + 1.96 * se))
 
 # Cells of each 2x2 table
-resp_B <- trials$r_B
-non_B <- trials$n_B - trials$r_B
-resp_A <- trials$r_A
-non_A <- trials$n_A - trials$r_A
+resp_B <- blocker$r_T
+non_B <- blocker$n_T - blocker$r_T
+resp_A <- blocker$r_C
+non_A <- blocker$n_C - blocker$r_C
 
 # Effect size and variance per trial
 y <- log((resp_B / non_B) / (resp_A / non_A)) # log OR
@@ -390,12 +402,6 @@ w_fe_pct <- 100 * w / sum(w)
 w_re_pct <- 100 * w_re / sum(w_re)
 
 kable(
-    data.frame(trials$study, exp(y), y, v, w_fe_pct, w_re_pct),
-    digits = c(0, 2, 3, 3, 1, 1),
-    col.names = c("Study", "OR", "log OR", "Variance", "Weight, FE (%)", "Weight, RE (%)")
-)
-
-kable(
     data.frame(Q, k - 1, Q_p, tau2, 100 * I2),
     digits = c(2, 0, 3, 3, 1),
     col.names = c("Cochran's Q", "df", "p-value", "$\\tau^2$", "$I^2$ (%)")
@@ -411,7 +417,7 @@ kable(
 )
 ```
 
-Study 3 has the smallest variance, so under the fixed-effect model it carries `r sprintf("%.0f%%", w_fe_pct[3])` of the weight. With $\hat\tau^2 =$ `r sprintf("%.3f", tau2)` added to every variance, its share falls to `r sprintf("%.0f%%", w_re_pct[3])`, while the smallest trial, Study 2, rises from `r sprintf("%.0f%%", w_fe_pct[2])` to `r sprintf("%.0f%%", w_re_pct[2])`.
+Heterogeneity here is modest: $Q$ = `r fmt(Q)` on `r k - 1` degrees of freedom (p = `r sprintf("%.2f", Q_p)`), $\hat\tau$ = `r sprintf("%.3f", sqrt(tau2))` on the log OR scale, and $I^2$ = `r sprintf("%.0f%%", 100 * I2)`. The two models therefore give nearly the same answer, and the weights move only a little: the largest trial (trial `r which.max(blocker$n_C + blocker$n_T)`, with `r format(max(blocker$n_C + blocker$n_T), big.mark = ",")` patients) carries `r sprintf("%.0f%%", max(w_fe_pct))` of the weight under fixed effects and `r sprintf("%.0f%%", w_re_pct[which.max(w_fe_pct)])` under random effects.
 
 ### Cross-Check With `metafor`
 
@@ -420,7 +426,7 @@ The standard R package gives the same numbers:
 ```{r metafor-check, message=FALSE}
 library(metafor)
 
-es <- escalc(measure = "OR", ai = r_B, n1i = n_B, ci = r_A, n2i = n_A, data = trials)
+es <- escalc(measure = "OR", ai = r_T, n1i = n_T, ci = r_C, n2i = n_C, data = blocker)
 fit_fe <- rma(yi, vi, data = es, method = "FE")
 fit_re <- rma(yi, vi, data = es, method = "DL")
 
@@ -437,91 +443,139 @@ kable(
 
 The forest plot shows each trial with its 95% CI, the random-effects pooled estimate as a diamond, and the prediction interval as the dotted line through it:
 
-```{r forest, fig.height=4}
+```{r forest, fig.height=8}
 forest(
     fit_re,
-    slab = trials$study,
+    slab = paste("Trial", blocker$trial),
     atransf = exp,
-    at = log(c(0.5, 1, 2, 4, 8)),
+    at = log(c(0.25, 0.5, 1, 2, 4)),
     addpred = TRUE,
-    header = c("Study", "OR [95% CI]")
+    header = c("Trial", "OR [95% CI]")
 )
 ```
 
-### Bayesian Random Effects in Stan
+### The Bayesian Models in Stan
+
+TSD 2 fits this example in WinBUGS with a fixed-effect and a random-effects program. The two Stan models below are the same specifications: Binomial likelihood, logit link, one baseline per trial, and TSD 2's own vague priors, $N(0, 100^2)$ for the baselines and the pooled effect and $\text{Uniform}(0, 5)$ for the between-trial SD.
 
 ::: {.callout-note collapse="true" appearance="minimal"}
-# Stan model: pairwise_re.stan
+# Stan model: blocker_fe.stan (fixed effect)
 
-```{r show-stan, echo=FALSE, class.output="stan"}
-cat(readLines("pairwise_re.stan"), sep = "\n")
+```{r show-stan-fe, echo=FALSE, class.output="stan"}
+cat(readLines("blocker_fe.stan"), sep = "\n")
 ```
 :::
 
-Three choices in the model are worth stating:
+::: {.callout-note collapse="true" appearance="minimal"}
+# Stan model: blocker_re.stan (random effects)
 
-- **Priors**: $N(0, 10^2)$ for the baselines $\mu_i$ and the pooled log OR $d$, which is vague on the log-odds scale; half-Normal$(0, 1)$ for $\tau$, which keeps implausibly large heterogeneity unlikely without ruling it out. NICE DSU TSD 2 uses wider conventions, $N(0, 100^2)$ for $\mu_i$ and $d$ and $\sigma \sim \text{Uniform}(0, 2)$ for the between-trial standard deviation; the tighter priors here are chosen to sample stably with only five trials, and a submission would report a sensitivity analysis over both.
-- **Non-centred parameterisation**: $\delta_i = d + \tau z_i$ with $z_i \sim N(0, 1)$. It describes the same model as $\delta_i \sim N(d, \tau^2)$, but samples far more reliably when $\tau$ is poorly identified, as it is with five trials.
-- **Prediction**: `OR_new` draws a log OR for a new study from $N(d, \tau^2)$ at every iteration, giving the Bayesian counterpart of the prediction interval.
+```{r show-stan-re, echo=FALSE, class.output="stan"}
+cat(readLines("blocker_re.stan"), sep = "\n")
+```
+:::
+
+Both models also return the residual deviance at every iteration, which is what TSD 2's fit statistics are built from:
+
+- **Residual deviance** $\bar{D}_{res}$: the posterior mean of the deviance relative to a saturated model. Each independent data point should contribute about 1, so with 22 two-arm trials a well-fitting model gives roughly 44.
+- **Effective number of parameters** $p_D$: the posterior mean deviance minus the deviance evaluated at the posterior mean of the fitted values.
+- **DIC** $= \bar{D}_{res} + p_D$: fit plus a penalty for complexity, lower being better.
 
 ```{r stan-fit, message=FALSE, warning=FALSE}
 library(rstan)
 
 stan_data <- list(
-    S = nrow(trials),
-    n_A = trials$n_A, r_A = trials$r_A,
-    n_B = trials$n_B, r_B = trials$r_B
+    S = nrow(blocker),
+    n_C = blocker$n_C, r_C = blocker$r_C,
+    n_T = blocker$n_T, r_T = blocker$r_T
 )
 
-fit_bayes <- stan(
-    file = "pairwise_re.stan",
-    data = stan_data,
-    chains = 4,
-    iter = 4000,
-    warmup = 2000,
-    seed = 42,
-    control = list(adapt_delta = 0.99),
-    refresh = 0
-)
+fit_stan <- function(file) {
+    stan(
+        file = file, data = stan_data,
+        chains = 4, iter = 6000, warmup = 2000,
+        seed = 42, control = list(adapt_delta = 0.99), refresh = 0
+    )
+}
 
-bayes_sum <- summary(fit_bayes, pars = c("d", "OR", "tau", "OR_new"))$summary
+bayes_fe <- fit_stan("blocker_fe.stan")
+bayes_re <- fit_stan("blocker_re.stan")
+
+# TSD 2 fit statistics, from the deviance contributions the models return
+fit_stats <- function(fit) {
+    D_bar <- mean(as.matrix(fit, pars = "dev")) # <1>
+    fit_C <- colMeans(as.matrix(fit, pars = "fit_C"))
+    fit_T <- colMeans(as.matrix(fit, pars = "fit_T"))
+    dev_at <- function(r, n, f) 2 * (r * log(r / f) + (n - r) * log((n - r) / (n - f)))
+    D_hat <- sum(dev_at(blocker$r_C, blocker$n_C, fit_C)) + sum(dev_at(blocker$r_T, blocker$n_T, fit_T)) # <2>
+    c(D_res = D_bar, pD = D_bar - D_hat, DIC = D_bar + (D_bar - D_hat))
+}
+
+stats_fe <- fit_stats(bayes_fe)
+stats_re <- fit_stats(bayes_re)
+
+pars_fe <- summary(bayes_fe, pars = c("d", "OR"))$summary
+pars_re <- summary(bayes_re, pars = c("d", "OR", "sigma", "OR_new"))$summary
 kable(
-    bayes_sum[, c("mean", "sd", "2.5%", "50%", "97.5%", "n_eff", "Rhat")],
+    rbind(pars_fe, pars_re)[, c("mean", "sd", "2.5%", "50%", "97.5%", "n_eff", "Rhat")],
     digits = c(3, 3, 3, 3, 3, 0, 3),
     col.names = c("Mean", "SD", "2.5%", "Median", "97.5%", "ESS", "R-hat")
 )
 
-n_div <- sum(sapply(get_sampler_params(fit_bayes, inc_warmup = FALSE), function(x) sum(x[, "divergent__"])))
+n_div <- function(fit) sum(sapply(get_sampler_params(fit, inc_warmup = FALSE), function(x) sum(x[, "divergent__"])))
 ```
 
-All R-hat values are at or below `r sprintf("%.3f", max(bayes_sum[, "Rhat"]))`, the smallest ESS is `r round(min(bayes_sum[, "n_eff"]))`, and the sampler reported `r n_div` divergent transitions.
+1.  Posterior mean of the residual deviance, summed over all 44 trial arms
+2.  The same deviance evaluated once, at the posterior mean of the fitted values
 
-## Results & Interpretation {#results}
+The first two rows are the fixed-effect model, the rest the random-effects model. Neither sampler reported any divergent transitions (`r n_div(bayes_fe)` and `r n_div(bayes_re)`), the largest R-hat is `r sprintf("%.3f", max(c(pars_fe[, "Rhat"], pars_re[, "Rhat"])))`, and the smallest effective sample size is `r format(round(min(c(pars_fe[, "n_eff"], pars_re[, "n_eff"]))), big.mark = ",")`.
 
-```{r compare}
-post <- rstan::extract(fit_bayes, pars = c("OR", "OR_new", "tau"))
-b_or <- quantile(post$OR, c(0.5, 0.025, 0.975))
-b_new <- quantile(post$OR_new, c(0.025, 0.975))
-b_tau <- quantile(post$tau, c(0.5, 0.025, 0.975))
+## Results: Reproducing TSD 2 {#results}
+
+TSD 2 reports its own posterior summaries and fit statistics for this example in its Table 2. Placing them next to the Stan output shows whether the reconstruction holds:
+
+```{r replication}
+# Published values, exactly as printed in TSD 2 Table 2
+tsd2 <- c(
+    "-0.26", "0.050", "-0.36", "-0.16", "46.8", "23.0", "69.8",
+    "-0.25", "0.066", "-0.38", "-0.12", "0.13", "41.9", "28.1", "70.0"
+)
+
+ours <- c(
+    sprintf("%.2f", pars_fe["d", "50%"]), sprintf("%.3f", pars_fe["d", "sd"]),
+    sprintf("%.2f", pars_fe["d", "2.5%"]), sprintf("%.2f", pars_fe["d", "97.5%"]),
+    sprintf("%.1f", stats_fe["D_res"]), sprintf("%.1f", stats_fe["pD"]), sprintf("%.1f", stats_fe["DIC"]),
+    sprintf("%.2f", pars_re["d", "50%"]), sprintf("%.3f", pars_re["d", "sd"]),
+    sprintf("%.2f", pars_re["d", "2.5%"]), sprintf("%.2f", pars_re["d", "97.5%"]),
+    sprintf("%.2f", pars_re["sigma", "50%"]),
+    sprintf("%.1f", stats_re["D_res"]), sprintf("%.1f", stats_re["pD"]), sprintf("%.1f", stats_re["DIC"])
+)
 
 kable(
     data.frame(
-        c("Fixed effect", "Random effects (DerSimonian-Laird)", "Random effects (Bayesian)"),
-        c(ci_text(lor_fe, se_fe), ci_text(lor_re, se_re), sprintf("%.2f (%.2f, %.2f)", b_or[1], b_or[2], b_or[3])),
-        c("&ndash;", sprintf("%.2f to %.2f", pi_lo, pi_hi), sprintf("%.2f to %.2f", b_new[1], b_new[2])),
-        c("0 (assumed)", sprintf("%.2f", sqrt(tau2)), sprintf("%.2f (%.2f, %.2f)", b_tau[1], b_tau[2], b_tau[3]))
+        c(
+            "Fixed effect: $d$ (log OR), median", "Fixed effect: SD", "Fixed effect: 2.5%", "Fixed effect: 97.5%",
+            "Fixed effect: $\\bar{D}_{res}$", "Fixed effect: $p_D$", "Fixed effect: DIC",
+            "Random effects: $d$ (log OR), median", "Random effects: SD", "Random effects: 2.5%", "Random effects: 97.5%",
+            "Random effects: $\\sigma$, median", "Random effects: $\\bar{D}_{res}$", "Random effects: $p_D$", "Random effects: DIC"
+        ),
+        tsd2, ours
     ),
-    col.names = c("Model", "Pooled OR (95% interval)", "95% prediction interval", "$\\tau$ (between-study SD)")
+    align = "lcc",
+    col.names = c("Quantity", "TSD 2, Table 2", "This page, Stan")
 )
 ```
 
+Every quantity reproduces to within Monte Carlo error. The pooled log OR agrees to two decimal places in both models, the residual deviances match at `r fmt(stats_fe["D_res"])` and `r fmt(stats_re["D_res"])`, and $p_D$ and DIC differ by about 0.2, which is the order of the simulation noise in these statistics. The reconstruction uses a different sampler (Stan rather than WinBUGS) and a different parameterisation of the random effects, so agreement at this level is a check on the model specification, not a repetition of the same arithmetic.
+
 Three readings of this table matter for an HTA submission.
 
-**Fixed vs random effects.** The fixed-effect OR (`r fmt(exp(lor_fe))`) sits closer to Study 3 than the random-effects OR (`r fmt(exp(lor_re))`), because the fixed-effect model gives the largest, least favourable trial `r sprintf("%.0f%%", w_fe_pct[3])` of the weight. Which is right is not a statistical question alone: if the trials plausibly differ in population or setting, the fixed-effect assumption of one common effect is hard to defend, and its narrower interval is not a real gain in precision.
+**Fixed versus random effects, when the two agree.** The random-effects model fits better ($\bar{D}_{res}$ `r fmt(stats_re["D_res"])` against `r fmt(stats_fe["D_res"])`, for 44 data points) but uses more effective parameters (`r fmt(stats_re["pD"])` against `r fmt(stats_fe["pD"])`), and the DIC ends up essentially tied: `r fmt(stats_re["DIC"])` against `r fmt(stats_fe["DIC"])`. TSD 2 draws the conclusion that "there is little to choose between the two models and the fixed effect model may be preferred since it is easier to interpret". This is the situation described in @nte-choose: no threshold decides it, and the argument moves to interpretability.
 
-**Confidence vs prediction interval.** The random-effects 95% CI (`r sprintf("%.2f to %.2f", exp(lor_re - 1.96 * se_re), exp(lor_re + 1.96 * se_re))`) describes the average effect across settings like these trials. The prediction interval (`r sprintf("%.2f to %.2f", pi_lo, pi_hi)`) describes the effect to expect in one new setting, and its lower end sits at `r fmt(pi_lo)`. B helps on average; whether it helps in a particular new population is far less certain. A cost-effectiveness model that uses only the pooled estimate carries the first statement, not the second.
+**What $p_D$ shows about the parameter count.** The fixed-effect model has 23 parameters, 22 baselines and one pooled effect, and $p_D$ comes out at `r fmt(stats_fe["pD"])`: with a vague prior, every parameter counts as one. The random-effects model nominally adds 22 trial-specific effects and $\sigma$, which would be 46, but $p_D$ is only `r fmt(stats_re["pD"])`. The 22 trial effects are held together by the between-trial distribution, so they are worth about `r fmt(stats_re["pD"] - stats_fe["pD"])` free parameters between them rather than 22. This is the shrinkage of @sec-bayes measured on real data.
 
-**Frequentist vs Bayesian random effects.** The Bayesian 95% interval for the pooled OR (`r sprintf("%.2f to %.2f", b_or[2], b_or[3])`) is wider than the DerSimonian–Laird CI. The two are not different models: as @sec-bayes shows, holding $\tau$ fixed and using a flat prior reproduces the DerSimonian–Laird estimate and interval exactly. The difference is that DerSimonian–Laird plugs in one value of $\tau$ (`r fmt(sqrt(tau2))`) as if it were known, while the Bayesian model carries the uncertainty about $\tau$ itself, whose 95% interval runs from `r fmt(b_tau[2])` to `r fmt(b_tau[3])`. With five trials, that uncertainty is large, and ignoring it overstates precision.
+**What the pooled estimate means, and what it does not.** The random-effects OR is `r fmt(exp(pars_re["d", "50%"]))` with a 95% credible interval of `r sprintf("%.2f to %.2f", exp(pars_re["d", "2.5%"]), exp(pars_re["d", "97.5%"]))`: on average across settings like these trials, beta-blockers reduce mortality. The prediction interval for a new setting is wider, `r sprintf("%.2f to %.2f", quantile(rstan::extract(bayes_re, "OR_new")$OR_new, 0.025), quantile(rstan::extract(bayes_re, "OR_new")$OR_new, 0.975))`, and its upper end sits above 1. TSD 2 does not report a prediction interval for this example, and neither do most submissions; with $\sigma$ estimated at `r fmt(pars_re["sigma", "50%"])` the gap between the two intervals is real but moderate here. In an appraisal, the confidence interval answers "what is the average effect", while the prediction interval answers "what might this treatment do in the population we are appraising".
+
+The two random-effects analyses also disagree about how much heterogeneity there is: DerSimonian-Laird returns $\hat\tau$ = `r sprintf("%.2f", sqrt(tau2))`, the Bayesian model a posterior median of `r fmt(pars_re["sigma", "50%"])`. With 22 trials that scatter little more than chance alone would explain, the data say little about $\sigma$, so the vague $\text{Uniform}(0, 5)$ prior keeps the posterior away from zero while the moment estimator is free to fall almost to it. That difference is why the frequentist prediction interval (`r sprintf("%.2f to %.2f", pi_lo, pi_hi)`) is narrower than the Bayesian one, and it is the reason TSD 2 insists on inspecting the posterior for $\sigma$ against its prior.
 
 ## HTA Audit Points & Interview Q&A {#audit}
 
@@ -532,9 +586,9 @@ No. I² is a supporting signal, not a switch, and a low I² with few trials is w
 :::
 
 ::: {.callout-important collapse="true"}
-# What does an I² of around 60% actually tell you?
+# The beta-blocker trials give an I² of about 10%. Does that settle it?
 
-That around 60% of the scatter between trials is real rather than chance, not how far apart the true effects are: that depends on trial size as well, and $\tau$ or the prediction interval is the measure to use. See @sec-i2.
+It says that only about a tenth of the scatter between these trials looks like real difference rather than chance, which is consistent with the small $\hat\tau$ and with the two models agreeing. It does not by itself justify a fixed-effect analysis: $I^2$ is a share, not a size, and with 22 trials of very unequal precision the same true spread would read differently (@sec-i2). The prediction interval, which still reaches above 1, is the more decision-relevant summary.
 :::
 
 ::: {.callout-important collapse="true"}
@@ -552,5 +606,7 @@ A pairwise meta-analysis is enough when the decision problem is one comparison a
 ## Conclusion {#conclusion}
 
 Pairwise meta-analysis comes down to a weighted average with two decisions attached: how to weight the trials, and whether they share one effect. The fixed-effect model weights by precision alone; the random-effects model adds between-study variance, which evens out the weights, widens the interval and makes the prediction interval available. The Bayesian version works from the counts and carries the uncertainty in $\tau$, and it is the same model that a [Standard Bayesian NMA](01_Standard_Bayesian_NMA_Guide.qmd) extends to a network of comparisons.
+
+On the beta-blocker data all of this reproduces what TSD 2 reports, down to the residual deviance and the effective number of parameters. The two models are hard to separate on fit, which is the ordinary case rather than the exception, and the decision then rests on interpretability and on what the prediction interval says about a new population.
 
 **Methodological References**: NICE DSU TSD 2 (Dias et al., 2011, updated 2016); *Cochrane Handbook for Systematic Reviews of Interventions*, Chapter 10; DerSimonian & Laird (1986); Higgins, Thompson & Spiegelhalter (2009) on prediction intervals.

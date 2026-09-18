@@ -325,14 +325,14 @@ window.Quarto = {
   <li><a href="#sec-pi" id="toc-sec-pi" class="nav-link" data-scroll-target="#sec-pi"><span class="header-section-number">2.5</span> The Prediction Interval</a></li>
   <li><a href="#sec-bayes" id="toc-sec-bayes" class="nav-link" data-scroll-target="#sec-bayes"><span class="header-section-number">2.6</span> The Bayesian Version: The Same Model, Estimated Differently</a></li>
   </ul></li>
-  <li><a href="#the-minimal-mock-case-five-trials-of-b-vs-a" id="toc-the-minimal-mock-case-five-trials-of-b-vs-a" class="nav-link" data-scroll-target="#the-minimal-mock-case-five-trials-of-b-vs-a"><span class="header-section-number">3</span> The Minimal Mock Case: Five Trials of B vs A</a></li>
+  <li><a href="#the-worked-example-beta-blockers-after-myocardial-infarction" id="toc-the-worked-example-beta-blockers-after-myocardial-infarction" class="nav-link" data-scroll-target="#the-worked-example-beta-blockers-after-myocardial-infarction"><span class="header-section-number">3</span> The Worked Example: Beta-Blockers After Myocardial Infarction</a></li>
   <li><a href="#implementation-from-scratch-metafor-and-stan" id="toc-implementation-from-scratch-metafor-and-stan" class="nav-link" data-scroll-target="#implementation-from-scratch-metafor-and-stan"><span class="header-section-number">4</span> Implementation: From Scratch, <code>metafor</code> and Stan</a>
   <ul class="collapse">
   <li><a href="#from-scratch-in-base-r" id="toc-from-scratch-in-base-r" class="nav-link" data-scroll-target="#from-scratch-in-base-r"><span class="header-section-number">4.1</span> From Scratch in Base R</a></li>
   <li><a href="#cross-check-with-metafor" id="toc-cross-check-with-metafor" class="nav-link" data-scroll-target="#cross-check-with-metafor"><span class="header-section-number">4.2</span> Cross-Check With <code>metafor</code></a></li>
-  <li><a href="#bayesian-random-effects-in-stan" id="toc-bayesian-random-effects-in-stan" class="nav-link" data-scroll-target="#bayesian-random-effects-in-stan"><span class="header-section-number">4.3</span> Bayesian Random Effects in Stan</a></li>
+  <li><a href="#the-bayesian-models-in-stan" id="toc-the-bayesian-models-in-stan" class="nav-link" data-scroll-target="#the-bayesian-models-in-stan"><span class="header-section-number">4.3</span> The Bayesian Models in Stan</a></li>
   </ul></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">5</span> Results &amp; Interpretation</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">5</span> Results: Reproducing TSD 2</a></li>
   <li><a href="#audit" id="toc-audit" class="nav-link" data-scroll-target="#audit"><span class="header-section-number">6</span> HTA Audit Points &amp; Interview Q&amp;A</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">7</span> Conclusion</a></li>
   </ul>
@@ -381,18 +381,19 @@ window.Quarto = {
 <li>How should trials of different sizes be <strong>weighted</strong>?</li>
 <li>What if the trials do not all estimate the <strong>same</strong> effect?</li>
 </ol>
+<p>The worked example is the one NICE DSU TSD 2 uses for the same purpose, 22 trials of beta-blockers after myocardial infarction, rebuilt here from the published counts. Its posterior estimates and fit statistics are reproduced independently in Stan and set side by side with the published ones.</p>
 </section>
 <section id="theoretical-framework-from-a-22-table-to-a-pooled-estimate" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="theoretical-framework-from-a-22-table-to-a-pooled-estimate"><span class="header-section-number">2</span> Theoretical Framework: From a 2×2 Table to a Pooled Estimate</h2>
 <section id="the-effect-size-in-a-single-trial" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="the-effect-size-in-a-single-trial"><span class="header-section-number">2.1</span> The Effect Size in a Single Trial</h3>
-<p>For a binary outcome such as response, each trial reduces to a 2×2 table:</p>
+<p>For a binary outcome, where each patient either has the event of interest or does not, each trial reduces to a 2×2 table:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
 <th style="text-align: left;"></th>
-<th style="text-align: center;">Responders</th>
-<th style="text-align: center;">Non-responders</th>
+<th style="text-align: center;">Events</th>
+<th style="text-align: center;">Non-events</th>
 </tr>
 </thead>
 <tbody>
@@ -408,7 +409,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>Index the trials by <span class="math inline">\(i = 1, \dots, k\)</span> (in the mock case below, <span class="math inline">\(k = 5\)</span>). In trial <span class="math inline">\(i\)</span>, arm B enrols <span class="math inline">\(n_B\)</span> patients and arm A enrols <span class="math inline">\(n_A\)</span>. The responder counts are random variables, <span class="math inline">\(a \sim \text{Binomial}(n_B, p_B)\)</span> and <span class="math inline">\(c \sim \text{Binomial}(n_A, p_A)\)</span>, where <span class="math inline">\(p_B\)</span> and <span class="math inline">\(p_A\)</span> are the true response rates; the non-responders are <span class="math inline">\(b = n_B - a\)</span> and <span class="math inline">\(d = n_A - c\)</span>. The subscript <span class="math inline">\(i\)</span> is dropped from these quantities to keep the formulas readable.</p>
+<p>Index the trials by <span class="math inline">\(i = 1, \dots, k\)</span> (<span class="math inline">\(k = 22\)</span> in the worked example below). In trial <span class="math inline">\(i\)</span>, arm B enrols <span class="math inline">\(n_B\)</span> patients and arm A enrols <span class="math inline">\(n_A\)</span>. The event counts are random variables, <span class="math inline">\(a \sim \text{Binomial}(n_B, p_B)\)</span> and <span class="math inline">\(c \sim \text{Binomial}(n_A, p_A)\)</span>, where <span class="math inline">\(p_B\)</span> and <span class="math inline">\(p_A\)</span> are the true event rates; the non-events are <span class="math inline">\(b = n_B - a\)</span> and <span class="math inline">\(d = n_A - c\)</span>. The subscript <span class="math inline">\(i\)</span> is dropped from these quantities to keep the formulas readable.</p>
 <p>The odds ratio and its logarithm are</p>
 <p><span class="math display">\[OR_i = \frac{a / b}{c / d} = \frac{ad}{bc}, \qquad y_i = \ln OR_i\]</span></p>
 <p>Meta-analysis works on the log scale because the OR is bounded below by 0 and asymmetric around 1, whereas <span class="math inline">\(\ln OR\)</span> is symmetric around 0 and close to Normal in reasonably sized trials.</p>
@@ -427,7 +428,7 @@ window.Quarto = {
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p><strong>Step 1: the response rate in one arm.</strong> Take arm B, and write <span class="math inline">\(n = n_B\)</span> and <span class="math inline">\(p = p_B\)</span> for short. Since <span class="math inline">\(a \sim \text{Binomial}(n, p)\)</span>, the observed rate <span class="math inline">\(\hat p = a / n\)</span> has variance</p>
+<p><strong>Step 1: the event rate in one arm.</strong> Take arm B, and write <span class="math inline">\(n = n_B\)</span> and <span class="math inline">\(p = p_B\)</span> for short. Since <span class="math inline">\(a \sim \text{Binomial}(n, p)\)</span>, the observed rate <span class="math inline">\(\hat p = a / n\)</span> has variance</p>
 <p><span id="eq-var-p"><span class="math display">\[\text{Var}(\hat p) = \frac{p(1-p)}{n} \tag{1}\]</span></span></p>
 <p><strong>Step 2: from the rate to the log odds.</strong> The log OR is built not from <span class="math inline">\(\hat p\)</span> but from its log odds, <span class="math inline">\(g(\hat p) = \ln\frac{\hat p}{1 - \hat p} = \ln\frac{a}{b}\)</span>. The <strong>delta method</strong> handles this change of scale. Near <span class="math inline">\(p\)</span>, the curve <span class="math inline">\(g\)</span> is close to its tangent line:</p>
 <p><span id="eq-taylor"><span class="math display">\[g(\hat p) \approx g(p) + g'(p)\,(\hat p - p) \tag{2}\]</span></span></p>
@@ -439,14 +440,14 @@ window.Quarto = {
 <p><span id="eq-var-logodds"><span class="math display">\[\text{Var}\left(\ln\frac{a}{b}\right) \approx \frac{1}{p^2(1-p)^2} \cdot \frac{p(1-p)}{n} = \frac{1}{np(1-p)} \tag{5}\]</span></span></p>
 <p><strong>Step 5: back to the counts.</strong> Because <span class="math inline">\((1 - p) + p = 1\)</span>, the right-hand side of (<a href="#eq-var-logodds" class="quarto-xref">5</a>) splits into two fractions:</p>
 <p><span id="eq-split"><span class="math display">\[\frac{1}{np(1-p)} = \frac{(1 - p) + p}{np(1-p)} = \frac{1}{np} + \frac{1}{n(1-p)} \tag{6}\]</span></span></p>
-<p>In (<a href="#eq-split" class="quarto-xref">6</a>), <span class="math inline">\(np\)</span> and <span class="math inline">\(n(1-p)\)</span> are the expected numbers of responders and non-responders. Replacing them with the observed counts <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> gives the variance for arm B:</p>
+<p>In (<a href="#eq-split" class="quarto-xref">6</a>), <span class="math inline">\(np\)</span> and <span class="math inline">\(n(1-p)\)</span> are the expected numbers of events and non-events. Replacing them with the observed counts <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> gives the variance for arm B:</p>
 <p><span id="eq-arm-B"><span class="math display">\[\text{Var}\left(\ln\frac{a}{b}\right) \approx \frac{1}{a} + \frac{1}{b} \tag{7}\]</span></span></p>
 <p>Steps 1 to 5 apply unchanged to arm A, with its counts <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span>:</p>
 <p><span id="eq-arm-A"><span class="math display">\[\text{Var}\left(\ln\frac{c}{d}\right) \approx \frac{1}{c} + \frac{1}{d} \tag{8}\]</span></span></p>
 <p><strong>Step 6: two arms.</strong> The log OR is a difference of the two log odds, <span class="math inline">\(y_i = \ln\frac{a}{b} - \ln\frac{c}{d}\)</span>. For independent quantities, <span class="math inline">\(\text{Var}(X - Y) = \text{Var}(X) + \text{Var}(Y)\)</span>, and the two arms enrol different patients, so adding (<a href="#eq-arm-B" class="quarto-xref">7</a>) and (<a href="#eq-arm-A" class="quarto-xref">8</a>):</p>
 <p><span id="eq-vi"><span class="math display">\[v_i = \text{Var}(y_i) \approx \frac{1}{a} + \frac{1}{b} + \frac{1}{c} + \frac{1}{d} \tag{9}\]</span></span></p>
 <p>which is the formula above.</p>
-<p><strong>What it implies.</strong> The smallest cell dominates (<a href="#eq-vi" class="quarto-xref">9</a>). A trial of 1,000 patients per arm with only 5 responders on A still has <span class="math inline">\(v_i &gt; 1/5\)</span>, so a large trial with a rare event can be less precise than a small trial with a common one. When a cell is zero, <span class="math inline">\(v_i\)</span> is infinite, which is why a continuity correction, typically adding 0.5 to every cell, is applied. That correction is itself an assumption, and one that can move results when events are sparse.</p>
+<p><strong>What it implies.</strong> The smallest cell dominates (<a href="#eq-vi" class="quarto-xref">9</a>). A trial of 1,000 patients per arm with only 5 events on A still has <span class="math inline">\(v_i &gt; 1/5\)</span>, so a large trial with a rare event can be less precise than a small trial with a common one. When a cell is zero, <span class="math inline">\(v_i\)</span> is infinite, which is why a continuity correction, typically adding 0.5 to every cell, is applied. That correction is itself an assumption, and one that can move results when events are sparse.</p>
 </div>
 </div>
 </div>
@@ -455,7 +456,7 @@ window.Quarto = {
 <h3 data-number="2.2" class="anchored" data-anchor-id="fixed-effect-inverse-variance-weighting"><span class="header-section-number">2.2</span> Fixed Effect: Inverse-Variance Weighting</h3>
 <p>The <strong>fixed-effect</strong> model assumes every trial estimates one common effect <span class="math inline">\(\theta\)</span>, and differs from it only through sampling error:</p>
 <p><span class="math display">\[y_i \sim N(\theta, v_i), \qquad i = 1, \dots, k\]</span></p>
-<p>treating each <span class="math inline">\(v_i\)</span> as known. Strictly, the variance of <span class="math inline">\(y_i\)</span> depends on the true response rates <span class="math inline">\(p_B\)</span> and <span class="math inline">\(p_A\)</span>, which are unknown; <span class="math inline">\(v_i\)</span> replaces them with the observed rates, so it is an estimate. Treating it as a known constant is an approximation that works well with large counts, but with few events it makes both the weights and the pooled estimate unreliable, because <span class="math inline">\(y_i\)</span> and <span class="math inline">\(v_i\)</span> are computed from the same counts.</p>
+<p>treating each <span class="math inline">\(v_i\)</span> as known. Strictly, the variance of <span class="math inline">\(y_i\)</span> depends on the true event rates <span class="math inline">\(p_B\)</span> and <span class="math inline">\(p_A\)</span>, which are unknown; <span class="math inline">\(v_i\)</span> replaces them with the observed rates, so it is an estimate. Treating it as a known constant is an approximation that works well with large counts, but with few events it makes both the weights and the pooled estimate unreliable, because <span class="math inline">\(y_i\)</span> and <span class="math inline">\(v_i\)</span> are computed from the same counts.</p>
 <p>The log-likelihood is</p>
 <p><span class="math display">\[\ell(\theta) = -\frac{1}{2} \sum_{i=1}^{k} \frac{(y_i - \theta)^2}{v_i} + \text{const}\]</span></p>
 <p>Setting its derivative to zero gives the maximum likelihood estimate:</p>
@@ -712,81 +713,163 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 </div>
 </section>
 </section>
-<section id="the-minimal-mock-case-five-trials-of-b-vs-a" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="the-minimal-mock-case-five-trials-of-b-vs-a"><span class="header-section-number">3</span> The Minimal Mock Case: Five Trials of B vs A</h2>
+<section id="the-worked-example-beta-blockers-after-myocardial-infarction" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-worked-example-beta-blockers-after-myocardial-infarction"><span class="header-section-number">3</span> The Worked Example: Beta-Blockers After Myocardial Infarction</h2>
+<p>The example is the one NICE DSU TSD 2 uses throughout: 22 randomised trials of beta-blockers for preventing death after myocardial infarction, originally collated by Carlin (1992) and reproduced in TSD 2 Table 1. It is a pairwise comparison of two treatments with a binary outcome, which is exactly the setting of the models above.</p>
 <ul>
-<li><strong>Treatment A</strong>: Standard of Care</li>
-<li><strong>Treatment B</strong>: New Drug</li>
-<li><strong>Outcome</strong>: response (higher is better), so an OR above 1 favours B</li>
+<li><strong>Treatment A</strong>: control or placebo</li>
+<li><strong>Treatment B</strong>: beta-blocker</li>
+<li><strong>Outcome</strong>: death. The event is a harm, so an OR <strong>below</strong> 1 favours the beta-blocker.</li>
 </ul>
-<p>Five trials of different sizes compared B with A:</p>
+<p>Using a published example means the results can be checked: TSD 2 reports its own posterior estimates and fit statistics, and this page reproduces them independently in Stan.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>trials <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">study =</span> <span class="fu">paste</span>(<span class="st">"Study"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>),</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_A =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">60</span>, <span class="dv">300</span>, <span class="dv">80</span>, <span class="dv">150</span>),</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">r_A =</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">15</span>, <span class="dv">75</span>, <span class="dv">16</span>, <span class="dv">30</span>),</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_B =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">60</span>, <span class="dv">300</span>, <span class="dv">80</span>, <span class="dv">150</span>),</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">r_B =</span> <span class="fu">c</span>(<span class="dv">45</span>, <span class="dv">28</span>, <span class="dv">88</span>, <span class="dv">34</span>, <span class="dv">60</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>blocker <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">trial =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">22</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">r_C =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">14</span>, <span class="dv">11</span>, <span class="dv">127</span>, <span class="dv">27</span>, <span class="dv">6</span>, <span class="dv">152</span>, <span class="dv">48</span>, <span class="dv">37</span>, <span class="dv">188</span>, <span class="dv">52</span>, <span class="dv">47</span>, <span class="dv">16</span>, <span class="dv">45</span>, <span class="dv">31</span>, <span class="dv">38</span>, <span class="dv">12</span>, <span class="dv">6</span>, <span class="dv">3</span>, <span class="dv">40</span>, <span class="dv">43</span>, <span class="dv">39</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_C =</span> <span class="fu">c</span>(<span class="dv">39</span>, <span class="dv">116</span>, <span class="dv">93</span>, <span class="dv">1520</span>, <span class="dv">365</span>, <span class="dv">52</span>, <span class="dv">939</span>, <span class="dv">471</span>, <span class="dv">282</span>, <span class="dv">1921</span>, <span class="dv">583</span>, <span class="dv">266</span>, <span class="dv">293</span>, <span class="dv">883</span>, <span class="dv">147</span>, <span class="dv">213</span>, <span class="dv">122</span>, <span class="dv">154</span>, <span class="dv">134</span>, <span class="dv">218</span>, <span class="dv">364</span>, <span class="dv">674</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">r_T =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">5</span>, <span class="dv">102</span>, <span class="dv">28</span>, <span class="dv">4</span>, <span class="dv">98</span>, <span class="dv">60</span>, <span class="dv">25</span>, <span class="dv">138</span>, <span class="dv">64</span>, <span class="dv">45</span>, <span class="dv">9</span>, <span class="dv">57</span>, <span class="dv">25</span>, <span class="dv">33</span>, <span class="dv">28</span>, <span class="dv">8</span>, <span class="dv">6</span>, <span class="dv">32</span>, <span class="dv">27</span>, <span class="dv">22</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_T =</span> <span class="fu">c</span>(<span class="dv">38</span>, <span class="dv">114</span>, <span class="dv">69</span>, <span class="dv">1533</span>, <span class="dv">355</span>, <span class="dv">59</span>, <span class="dv">945</span>, <span class="dv">632</span>, <span class="dv">278</span>, <span class="dv">1916</span>, <span class="dv">873</span>, <span class="dv">263</span>, <span class="dv">291</span>, <span class="dv">858</span>, <span class="dv">154</span>, <span class="dv">207</span>, <span class="dv">251</span>, <span class="dv">151</span>, <span class="dv">174</span>, <span class="dv">209</span>, <span class="dv">391</span>, <span class="dv">680</span>)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(trials, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Study"</span>, <span class="st">"Patients (A)"</span>, <span class="st">"Responders (A)"</span>, <span class="st">"Patients (B)"</span>, <span class="st">"Responders (B)"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        blocker<span class="sc">$</span>trial,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%d / %d"</span>, blocker<span class="sc">$</span>r_C, blocker<span class="sc">$</span>n_C),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%d / %d"</span>, blocker<span class="sc">$</span>r_T, blocker<span class="sc">$</span>n_T)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"lcc"</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Trial"</span>, <span class="st">"Deaths / patients, control"</span>, <span class="st">"Deaths / patients, beta-blocker"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: left;">Study</th>
-<th style="text-align: right;">Patients (A)</th>
-<th style="text-align: right;">Responders (A)</th>
-<th style="text-align: right;">Patients (B)</th>
-<th style="text-align: right;">Responders (B)</th>
+<th style="text-align: left;">Trial</th>
+<th style="text-align: center;">Deaths / patients, control</th>
+<th style="text-align: center;">Deaths / patients, beta-blocker</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Study 1</td>
-<td style="text-align: right;">120</td>
-<td style="text-align: right;">24</td>
-<td style="text-align: right;">120</td>
-<td style="text-align: right;">45</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: center;">3 / 39</td>
+<td style="text-align: center;">3 / 38</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Study 2</td>
-<td style="text-align: right;">60</td>
-<td style="text-align: right;">15</td>
-<td style="text-align: right;">60</td>
-<td style="text-align: right;">28</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: center;">14 / 116</td>
+<td style="text-align: center;">7 / 114</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Study 3</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">75</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">88</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: center;">11 / 93</td>
+<td style="text-align: center;">5 / 69</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Study 4</td>
-<td style="text-align: right;">80</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">80</td>
-<td style="text-align: right;">34</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: center;">127 / 1520</td>
+<td style="text-align: center;">102 / 1533</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Study 5</td>
-<td style="text-align: right;">150</td>
-<td style="text-align: right;">30</td>
-<td style="text-align: right;">150</td>
-<td style="text-align: right;">60</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: center;">27 / 365</td>
+<td style="text-align: center;">28 / 355</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: center;">6 / 52</td>
+<td style="text-align: center;">4 / 59</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: center;">152 / 939</td>
+<td style="text-align: center;">98 / 945</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: center;">48 / 471</td>
+<td style="text-align: center;">60 / 632</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: center;">37 / 282</td>
+<td style="text-align: center;">25 / 278</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: center;">188 / 1921</td>
+<td style="text-align: center;">138 / 1916</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">11</td>
+<td style="text-align: center;">52 / 583</td>
+<td style="text-align: center;">64 / 873</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">12</td>
+<td style="text-align: center;">47 / 266</td>
+<td style="text-align: center;">45 / 263</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">13</td>
+<td style="text-align: center;">16 / 293</td>
+<td style="text-align: center;">9 / 291</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">14</td>
+<td style="text-align: center;">45 / 883</td>
+<td style="text-align: center;">57 / 858</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">15</td>
+<td style="text-align: center;">31 / 147</td>
+<td style="text-align: center;">25 / 154</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">16</td>
+<td style="text-align: center;">38 / 213</td>
+<td style="text-align: center;">33 / 207</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">17</td>
+<td style="text-align: center;">12 / 122</td>
+<td style="text-align: center;">28 / 251</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">18</td>
+<td style="text-align: center;">6 / 154</td>
+<td style="text-align: center;">8 / 151</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">19</td>
+<td style="text-align: center;">3 / 134</td>
+<td style="text-align: center;">6 / 174</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">20</td>
+<td style="text-align: center;">40 / 218</td>
+<td style="text-align: center;">32 / 209</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21</td>
+<td style="text-align: center;">43 / 364</td>
+<td style="text-align: center;">27 / 391</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">22</td>
+<td style="text-align: center;">39 / 674</td>
+<td style="text-align: center;">22 / 680</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>Study 3 is by far the largest trial, and, as the next section shows, the one closest to no effect. That combination is what makes the choice between fixed and random effects visible.</p>
+<p>The 22 trials cover 20,290 patients and 1,811 deaths, and they differ in size by almost two orders of magnitude, from 77 patients to 3,837. That spread is what makes the weighting question concrete.</p>
 </section>
 <section id="implementation-from-scratch-metafor-and-stan" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="implementation-from-scratch-metafor-and-stan"><span class="header-section-number">4</span> Implementation: From Scratch, <code>metafor</code> and Stan</h2>
@@ -800,10 +883,10 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ci_text <span class="ot">&lt;-</span> <span class="cf">function</span>(est, se) <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f, %.2f)"</span>, <span class="fu">exp</span>(est), <span class="fu">exp</span>(est <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se), <span class="fu">exp</span>(est <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Cells of each 2x2 table</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>resp_B <span class="ot">&lt;-</span> trials<span class="sc">$</span>r_B</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>non_B <span class="ot">&lt;-</span> trials<span class="sc">$</span>n_B <span class="sc">-</span> trials<span class="sc">$</span>r_B</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>resp_A <span class="ot">&lt;-</span> trials<span class="sc">$</span>r_A</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>non_A <span class="ot">&lt;-</span> trials<span class="sc">$</span>n_A <span class="sc">-</span> trials<span class="sc">$</span>r_A</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>resp_B <span class="ot">&lt;-</span> blocker<span class="sc">$</span>r_T</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>non_B <span class="ot">&lt;-</span> blocker<span class="sc">$</span>n_T <span class="sc">-</span> blocker<span class="sc">$</span>r_T</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>resp_A <span class="ot">&lt;-</span> blocker<span class="sc">$</span>r_C</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>non_A <span class="ot">&lt;-</span> blocker<span class="sc">$</span>n_C <span class="sc">-</span> blocker<span class="sc">$</span>r_C</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Effect size and variance per trial</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">log</span>((resp_B <span class="sc">/</span> non_B) <span class="sc">/</span> (resp_A <span class="sc">/</span> non_A)) <span class="co"># log OR</span></span>
@@ -835,74 +918,10 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>w_re_pct <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> w_re <span class="sc">/</span> <span class="fu">sum</span>(w_re)</span>
 <span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(trials<span class="sc">$</span>study, <span class="fu">exp</span>(y), y, v, w_fe_pct, w_re_pct),</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Study"</span>, <span class="st">"OR"</span>, <span class="st">"log OR"</span>, <span class="st">"Variance"</span>, <span class="st">"Weight, FE (%)"</span>, <span class="st">"Weight, RE (%)"</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(Q, k <span class="sc">-</span> <span class="dv">1</span>, Q_p, tau2, <span class="dv">100</span> <span class="sc">*</span> I2),</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">1</span>),</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Cochran's Q"</span>, <span class="st">"df"</span>, <span class="st">"p-value"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">tau^2$"</span>, <span class="st">"$I^2$ (%)"</span>)</span>
 <span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Study</th>
-<th style="text-align: right;">OR</th>
-<th style="text-align: right;">log OR</th>
-<th style="text-align: right;">Variance</th>
-<th style="text-align: right;">Weight, FE (%)</th>
-<th style="text-align: right;">Weight, RE (%)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Study 1</td>
-<td style="text-align: right;">2.40</td>
-<td style="text-align: right;">0.875</td>
-<td style="text-align: right;">0.088</td>
-<td style="text-align: right;">16.4</td>
-<td style="text-align: right;">19.8</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Study 2</td>
-<td style="text-align: right;">2.62</td>
-<td style="text-align: right;">0.965</td>
-<td style="text-align: right;">0.156</td>
-<td style="text-align: right;">9.2</td>
-<td style="text-align: right;">14.8</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Study 3</td>
-<td style="text-align: right;">1.25</td>
-<td style="text-align: right;">0.219</td>
-<td style="text-align: right;">0.034</td>
-<td style="text-align: right;">42.5</td>
-<td style="text-align: right;">27.1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Study 4</td>
-<td style="text-align: right;">2.96</td>
-<td style="text-align: right;">1.084</td>
-<td style="text-align: right;">0.129</td>
-<td style="text-align: right;">11.1</td>
-<td style="text-align: right;">16.4</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Study 5</td>
-<td style="text-align: right;">2.67</td>
-<td style="text-align: right;">0.981</td>
-<td style="text-align: right;">0.069</td>
-<td style="text-align: right;">20.7</td>
-<td style="text-align: right;">21.8</td>
-</tr>
-</tbody>
-</table>
-</div>
-<details class="code-fold">
-<summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(Q, k <span class="sc">-</span> <span class="dv">1</span>, Q_p, tau2, <span class="dv">100</span> <span class="sc">*</span> I2),</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">1</span>),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Cochran's Q"</span>, <span class="st">"df"</span>, <span class="st">"p-value"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">tau^2$"</span>, <span class="st">"$I^2$ (%)"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -917,25 +936,25 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">9.73</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0.045</td>
-<td style="text-align: right;">0.113</td>
-<td style="text-align: right;">58.9</td>
+<td style="text-align: right;">23.26</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;">9.7</td>
 </tr>
 </tbody>
 </table>
 </div>
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Fixed effect"</span>, <span class="st">"Random effects (DerSimonian-Laird)"</span>),</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">ci_text</span>(lor_fe, se_fe), <span class="fu">ci_text</span>(lor_re, se_re)),</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"&amp;ndash;"</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f to %.2f"</span>, pi_lo, pi_hi))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Model"</span>, <span class="st">"Pooled OR (95% CI)"</span>, <span class="st">"95% prediction interval"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Fixed effect"</span>, <span class="st">"Random effects (DerSimonian-Laird)"</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">ci_text</span>(lor_fe, se_fe), <span class="fu">ci_text</span>(lor_re, se_re)),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"&amp;ndash;"</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f to %.2f"</span>, pi_lo, pi_hi))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Model"</span>, <span class="st">"Pooled OR (95% CI)"</span>, <span class="st">"95% prediction interval"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -954,19 +973,19 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Fixed effect</td>
-<td style="text-align: left;">1.92 (1.51, 2.42)</td>
+<td style="text-align: left;">0.77 (0.70, 0.85)</td>
 <td style="text-align: left;">–</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Random effects (DerSimonian-Laird)</td>
-<td style="text-align: left;">2.16 (1.46, 3.19)</td>
-<td style="text-align: left;">1.00 to 4.64</td>
+<td style="text-align: left;">0.78 (0.70, 0.87)</td>
+<td style="text-align: left;">0.64 to 0.94</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>Study 3 has the smallest variance, so under the fixed-effect model it carries 42% of the weight. With <span class="math inline">\(\hat\tau^2 =\)</span> 0.113 added to every variance, its share falls to 27%, while the smallest trial, Study 2, rises from 9% to 15%.</p>
+<p>Heterogeneity here is modest: <span class="math inline">\(Q\)</span> = 23.26 on 21 degrees of freedom (p = 0.33), <span class="math inline">\(\hat\tau\)</span> = 0.079 on the log OR scale, and <span class="math inline">\(I^2\)</span> = 10%. The two models therefore give nearly the same answer, and the weights move only a little: the largest trial (trial 10, with 3,837 patients) carries 18% of the weight under fixed effects and 15% under random effects.</p>
 </section>
 <section id="cross-check-with-metafor" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="cross-check-with-metafor"><span class="header-section-number">4.2</span> Cross-Check With <code>metafor</code></h3>
@@ -974,21 +993,21 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(metafor)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>es <span class="ot">&lt;-</span> <span class="fu">escalc</span>(<span class="at">measure =</span> <span class="st">"OR"</span>, <span class="at">ai =</span> r_B, <span class="at">n1i =</span> n_B, <span class="at">ci =</span> r_A, <span class="at">n2i =</span> n_A, <span class="at">data =</span> trials)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>fit_fe <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> es, <span class="at">method =</span> <span class="st">"FE"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>fit_re <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> es, <span class="at">method =</span> <span class="st">"DL"</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"log OR, fixed effect"</span>, <span class="st">"SE, fixed effect"</span>, <span class="st">"log OR, random effects"</span>, <span class="st">"SE, random effects"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">tau^2$"</span>, <span class="st">"$I^2$ (%)"</span>),</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(lor_fe, se_fe, lor_re, se_re, tau2, <span class="dv">100</span> <span class="sc">*</span> I2),</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">coef</span>(fit_fe), fit_fe<span class="sc">$</span>se, <span class="fu">coef</span>(fit_re), fit_re<span class="sc">$</span>se, fit_re<span class="sc">$</span>tau2, fit_re<span class="sc">$</span>I2)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">4</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Quantity"</span>, <span class="st">"From scratch"</span>, <span class="st">"metafor"</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(metafor)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>es <span class="ot">&lt;-</span> <span class="fu">escalc</span>(<span class="at">measure =</span> <span class="st">"OR"</span>, <span class="at">ai =</span> r_T, <span class="at">n1i =</span> n_T, <span class="at">ci =</span> r_C, <span class="at">n2i =</span> n_C, <span class="at">data =</span> blocker)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>fit_fe <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> es, <span class="at">method =</span> <span class="st">"FE"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>fit_re <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> es, <span class="at">method =</span> <span class="st">"DL"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"log OR, fixed effect"</span>, <span class="st">"SE, fixed effect"</span>, <span class="st">"log OR, random effects"</span>, <span class="st">"SE, random effects"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">tau^2$"</span>, <span class="st">"$I^2$ (%)"</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(lor_fe, se_fe, lor_re, se_re, tau2, <span class="dv">100</span> <span class="sc">*</span> I2),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">coef</span>(fit_fe), fit_fe<span class="sc">$</span>se, <span class="fu">coef</span>(fit_re), fit_re<span class="sc">$</span>se, fit_re<span class="sc">$</span>tau2, fit_re<span class="sc">$</span>I2)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Quantity"</span>, <span class="st">"From scratch"</span>, <span class="st">"metafor"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1002,33 +1021,33 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">log OR, fixed effect</td>
-<td style="text-align: right;">0.6500</td>
-<td style="text-align: right;">0.6500</td>
+<td style="text-align: right;">-0.2599</td>
+<td style="text-align: right;">-0.2599</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">SE, fixed effect</td>
-<td style="text-align: right;">0.1200</td>
-<td style="text-align: right;">0.1200</td>
+<td style="text-align: right;">0.0503</td>
+<td style="text-align: right;">0.0503</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">log OR, random effects</td>
-<td style="text-align: right;">0.7682</td>
-<td style="text-align: right;">0.7682</td>
+<td style="text-align: right;">-0.2527</td>
+<td style="text-align: right;">-0.2527</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">SE, random effects</td>
-<td style="text-align: right;">0.1996</td>
-<td style="text-align: right;">0.1996</td>
+<td style="text-align: right;">0.0554</td>
+<td style="text-align: right;">0.0554</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><span class="math inline">\(\tau^2\)</span></td>
-<td style="text-align: right;">0.1131</td>
-<td style="text-align: right;">0.1131</td>
+<td style="text-align: right;">0.0063</td>
+<td style="text-align: right;">0.0063</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><span class="math inline">\(I^2\)</span> (%)</td>
-<td style="text-align: right;">58.8789</td>
-<td style="text-align: right;">58.8789</td>
+<td style="text-align: right;">9.7251</td>
+<td style="text-align: right;">9.7251</td>
 </tr>
 </tbody>
 </table>
@@ -1038,14 +1057,14 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">forest</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    fit_re,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">slab =</span> trials<span class="sc">$</span>study,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">atransf =</span> exp,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">at =</span> <span class="fu">log</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>)),</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">addpred =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">header =</span> <span class="fu">c</span>(<span class="st">"Study"</span>, <span class="st">"OR [95% CI]"</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">forest</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    fit_re,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">slab =</span> <span class="fu">paste</span>(<span class="st">"Trial"</span>, blocker<span class="sc">$</span>trial),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">atransf =</span> exp,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">at =</span> <span class="fu">log</span>(<span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>)),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">addpred =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">header =</span> <span class="fu">c</span>(<span class="st">"Trial"</span>, <span class="st">"OR [95% CI]"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1056,15 +1075,16 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 </div>
 </div>
 </section>
-<section id="bayesian-random-effects-in-stan" class="level3" data-number="4.3">
-<h3 data-number="4.3" class="anchored" data-anchor-id="bayesian-random-effects-in-stan"><span class="header-section-number">4.3</span> Bayesian Random Effects in Stan</h3>
+<section id="the-bayesian-models-in-stan" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="the-bayesian-models-in-stan"><span class="header-section-number">4.3</span> The Bayesian Models in Stan</h3>
+<p>TSD 2 fits this example in WinBUGS with a fixed-effect and a random-effects program. The two Stan models below are the same specifications: Binomial likelihood, logit link, one baseline per trial, and TSD 2’s own vague priors, <span class="math inline">\(N(0, 100^2)\)</span> for the baselines and the pooled effect and <span class="math inline">\(\text{Uniform}(0, 5)\)</span> for the between-trial SD.</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Stan model: pairwise_re.stan
+<span class="screen-reader-only">Note</span>Stan model: blocker_fe.stan (fixed effect)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -1072,79 +1092,175 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; S;                        <span class="co">// number of studies</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_A;             <span class="co">// patients on A</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_A;             <span class="co">// responders on A</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_B;             <span class="co">// patients on B</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_B;             <span class="co">// responders on B</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] mu;                          <span class="co">// baseline log odds on A, one per study</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d;                                <span class="co">// pooled log OR, B vs A</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; tau;                     <span class="co">// between-study SD of the log OR</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] z;                           <span class="co">// standardised study-level deviations</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="kw">transformed parameters</span> {</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] delta = d + tau * z;         <span class="co">// study-specific log OR (non-centred)</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">10</span>);</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  d ~ normal(<span class="dv">0</span>, <span class="dv">10</span>);</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  tau ~ normal(<span class="dv">0</span>, <span class="dv">1</span>);                    <span class="co">// half-normal, since tau &gt;= 0</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  z ~ std_normal();</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Fixed effect model for the Blocker example, following NICE DSU TSD 2 Program 1(d)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; S;                        <span class="co">// number of trials</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_C;             <span class="co">// patients, control arm</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_C;             <span class="co">// deaths, control arm</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_T;             <span class="co">// patients, beta-blocker arm</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_T;             <span class="co">// deaths, beta-blocker arm</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] mu;                          <span class="co">// trial baselines, log odds of death on control</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d;                                <span class="co">// pooled log OR, beta-blocker vs control</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);                   <span class="co">// TSD 2: vague N(0, 100^2)</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  d ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  r_C ~ binomial_logit(n_C, mu);</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  r_T ~ binomial_logit(n_T, mu + d);</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="kw">generated quantities</span> {</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR = exp(d);</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_C;                       <span class="co">// expected deaths, control arm</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_T;                       <span class="co">// expected deaths, treatment arm</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> dev = <span class="dv">0</span>;                          <span class="co">// residual deviance, this draw</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:S) {</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    fit_C[i] = n_C[i] * inv_logit(mu[i]);</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    fit_T[i] = n_T[i] * inv_logit(mu[i] + d);</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_C[i] * log(r_C[i] / fit_C[i])</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>                + (n_C[i] - r_C[i]) * log((n_C[i] - r_C[i]) / (n_C[i] - fit_C[i])));</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_T[i] * log(r_T[i] / fit_T[i])</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>                + (n_T[i] - r_T[i]) * log((n_T[i] - r_T[i]) / (n_T[i] - fit_T[i])));</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Stan model: blocker_re.stan (random effects)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Random effects model for the Blocker example, following NICE DSU TSD 2 Program 1(c)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; S;                        <span class="co">// number of trials</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_C;             <span class="co">// patients, control arm</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_C;             <span class="co">// deaths, control arm</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_T;             <span class="co">// patients, beta-blocker arm</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_T;             <span class="co">// deaths, beta-blocker arm</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] mu;                          <span class="co">// trial baselines, log odds of death on control</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d;                                <span class="co">// mean log OR, beta-blocker vs control</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">5</span>&gt; sigma;          <span class="co">// between-trial SD; TSD 2: Uniform(0, 5)</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] z;                           <span class="co">// standardised trial deviations</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="kw">transformed parameters</span> {</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] delta = d + sigma * z;       <span class="co">// trial-specific log OR (non-centred)</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);                   <span class="co">// TSD 2: vague N(0, 100^2)</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  d ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  z ~ std_normal();                      <span class="co">// implies delta ~ normal(d, sigma)</span></span>
 <span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  r_A ~ binomial_logit(n_A, mu);</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  r_B ~ binomial_logit(n_B, mu + delta);</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  r_C ~ binomial_logit(n_C, mu);</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  r_T ~ binomial_logit(n_T, mu + delta);</span>
 <span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="kw">generated quantities</span> {</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR = exp(d);                      <span class="co">// pooled OR</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR_new = exp(normal_rng(d, tau)); <span class="co">// OR in a new study setting</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR = exp(d);</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR_new = exp(normal_rng(d, sigma)); <span class="co">// OR in a new trial setting</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_C;                       <span class="co">// expected deaths, control arm</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_T;                       <span class="co">// expected deaths, treatment arm</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> dev = <span class="dv">0</span>;                          <span class="co">// residual deviance, this draw</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:S) {</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    fit_C[i] = n_C[i] * inv_logit(mu[i]);</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    fit_T[i] = n_T[i] * inv_logit(mu[i] + delta[i]);</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_C[i] * log(r_C[i] / fit_C[i])</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>                + (n_C[i] - r_C[i]) * log((n_C[i] - r_C[i]) / (n_C[i] - fit_C[i])));</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_T[i] * log(r_T[i] / fit_T[i])</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>                + (n_T[i] - r_T[i]) * log((n_T[i] - r_T[i]) / (n_T[i] - fit_T[i])));</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<p>Three choices in the model are worth stating:</p>
+<p>Both models also return the residual deviance at every iteration, which is what TSD 2’s fit statistics are built from:</p>
 <ul>
-<li><strong>Priors</strong>: <span class="math inline">\(N(0, 10^2)\)</span> for the baselines <span class="math inline">\(\mu_i\)</span> and the pooled log OR <span class="math inline">\(d\)</span>, which is vague on the log-odds scale; half-Normal<span class="math inline">\((0, 1)\)</span> for <span class="math inline">\(\tau\)</span>, which keeps implausibly large heterogeneity unlikely without ruling it out. NICE DSU TSD 2 uses wider conventions, <span class="math inline">\(N(0, 100^2)\)</span> for <span class="math inline">\(\mu_i\)</span> and <span class="math inline">\(d\)</span> and <span class="math inline">\(\sigma \sim \text{Uniform}(0, 2)\)</span> for the between-trial standard deviation; the tighter priors here are chosen to sample stably with only five trials, and a submission would report a sensitivity analysis over both.</li>
-<li><strong>Non-centred parameterisation</strong>: <span class="math inline">\(\delta_i = d + \tau z_i\)</span> with <span class="math inline">\(z_i \sim N(0, 1)\)</span>. It describes the same model as <span class="math inline">\(\delta_i \sim N(d, \tau^2)\)</span>, but samples far more reliably when <span class="math inline">\(\tau\)</span> is poorly identified, as it is with five trials.</li>
-<li><strong>Prediction</strong>: <code>OR_new</code> draws a log OR for a new study from <span class="math inline">\(N(d, \tau^2)\)</span> at every iteration, giving the Bayesian counterpart of the prediction interval.</li>
+<li><strong>Residual deviance</strong> <span class="math inline">\(\bar{D}_{res}\)</span>: the posterior mean of the deviance relative to a saturated model. Each independent data point should contribute about 1, so with 22 two-arm trials a well-fitting model gives roughly 44.</li>
+<li><strong>Effective number of parameters</strong> <span class="math inline">\(p_D\)</span>: the posterior mean deviance minus the deviance evaluated at the posterior mean of the fitted values.</li>
+<li><strong>DIC</strong> <span class="math inline">\(= \bar{D}_{res} + p_D\)</span>: fit plus a penalty for complexity, lower being better.</li>
 </ul>
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstan)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>stan_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">S =</span> <span class="fu">nrow</span>(trials),</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_A =</span> trials<span class="sc">$</span>n_A, <span class="at">r_A =</span> trials<span class="sc">$</span>r_A,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_B =</span> trials<span class="sc">$</span>n_B, <span class="at">r_B =</span> trials<span class="sc">$</span>r_B</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>fit_bayes <span class="ot">&lt;-</span> <span class="fu">stan</span>(</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"pairwise_re.stan"</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> stan_data,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">chains =</span> <span class="dv">4</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">iter =</span> <span class="dv">4000</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">warmup =</span> <span class="dv">2000</span>,</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">42</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.99</span>),</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">refresh =</span> <span class="dv">0</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>bayes_sum <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_bayes, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"OR"</span>, <span class="st">"tau"</span>, <span class="st">"OR_new"</span>))<span class="sc">$</span>summary</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    bayes_sum[, <span class="fu">c</span>(<span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"2.5%"</span>, <span class="st">"50%"</span>, <span class="st">"97.5%"</span>, <span class="st">"n_eff"</span>, <span class="st">"Rhat"</span>)],</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">3</span>),</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"SD"</span>, <span class="st">"2.5%"</span>, <span class="st">"Median"</span>, <span class="st">"97.5%"</span>, <span class="st">"ESS"</span>, <span class="st">"R-hat"</span>)</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-6"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-6-1"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstan)</span>
+<span id="annotated-cell-6-2"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-6-3"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a>stan_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="annotated-cell-6-4"><a href="#annotated-cell-6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">S =</span> <span class="fu">nrow</span>(blocker),</span>
+<span id="annotated-cell-6-5"><a href="#annotated-cell-6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_C =</span> blocker<span class="sc">$</span>n_C, <span class="at">r_C =</span> blocker<span class="sc">$</span>r_C,</span>
+<span id="annotated-cell-6-6"><a href="#annotated-cell-6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_T =</span> blocker<span class="sc">$</span>n_T, <span class="at">r_T =</span> blocker<span class="sc">$</span>r_T</span>
+<span id="annotated-cell-6-7"><a href="#annotated-cell-6-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-6-8"><a href="#annotated-cell-6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-6-9"><a href="#annotated-cell-6-9" aria-hidden="true" tabindex="-1"></a>fit_stan <span class="ot">&lt;-</span> <span class="cf">function</span>(file) {</span>
+<span id="annotated-cell-6-10"><a href="#annotated-cell-6-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stan</span>(</span>
+<span id="annotated-cell-6-11"><a href="#annotated-cell-6-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">file =</span> file, <span class="at">data =</span> stan_data,</span>
+<span id="annotated-cell-6-12"><a href="#annotated-cell-6-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">6000</span>, <span class="at">warmup =</span> <span class="dv">2000</span>,</span>
+<span id="annotated-cell-6-13"><a href="#annotated-cell-6-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">seed =</span> <span class="dv">42</span>, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.99</span>), <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="annotated-cell-6-14"><a href="#annotated-cell-6-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="annotated-cell-6-15"><a href="#annotated-cell-6-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-6-16"><a href="#annotated-cell-6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-6-17"><a href="#annotated-cell-6-17" aria-hidden="true" tabindex="-1"></a>bayes_fe <span class="ot">&lt;-</span> <span class="fu">fit_stan</span>(<span class="st">"blocker_fe.stan"</span>)</span>
+<span id="annotated-cell-6-18"><a href="#annotated-cell-6-18" aria-hidden="true" tabindex="-1"></a>bayes_re <span class="ot">&lt;-</span> <span class="fu">fit_stan</span>(<span class="st">"blocker_re.stan"</span>)</span>
+<span id="annotated-cell-6-19"><a href="#annotated-cell-6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-6-20"><a href="#annotated-cell-6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># TSD 2 fit statistics, from the deviance contributions the models return</span></span>
+<span id="annotated-cell-6-21"><a href="#annotated-cell-6-21" aria-hidden="true" tabindex="-1"></a>fit_stats <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-22" class="code-annotation-target"><a href="#annotated-cell-6-22" aria-hidden="true" tabindex="-1"></a>    D_bar <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"dev"</span>))</span>
+<span id="annotated-cell-6-23"><a href="#annotated-cell-6-23" aria-hidden="true" tabindex="-1"></a>    fit_C <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"fit_C"</span>))</span>
+<span id="annotated-cell-6-24"><a href="#annotated-cell-6-24" aria-hidden="true" tabindex="-1"></a>    fit_T <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"fit_T"</span>))</span>
+<span id="annotated-cell-6-25"><a href="#annotated-cell-6-25" aria-hidden="true" tabindex="-1"></a>    dev_at <span class="ot">&lt;-</span> <span class="cf">function</span>(r, n, f) <span class="dv">2</span> <span class="sc">*</span> (r <span class="sc">*</span> <span class="fu">log</span>(r <span class="sc">/</span> f) <span class="sc">+</span> (n <span class="sc">-</span> r) <span class="sc">*</span> <span class="fu">log</span>((n <span class="sc">-</span> r) <span class="sc">/</span> (n <span class="sc">-</span> f)))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-6-26" class="code-annotation-target"><a href="#annotated-cell-6-26" aria-hidden="true" tabindex="-1"></a>    D_hat <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dev_at</span>(blocker<span class="sc">$</span>r_C, blocker<span class="sc">$</span>n_C, fit_C)) <span class="sc">+</span> <span class="fu">sum</span>(<span class="fu">dev_at</span>(blocker<span class="sc">$</span>r_T, blocker<span class="sc">$</span>n_T, fit_T))</span>
+<span id="annotated-cell-6-27"><a href="#annotated-cell-6-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="at">D_res =</span> D_bar, <span class="at">pD =</span> D_bar <span class="sc">-</span> D_hat, <span class="at">DIC =</span> D_bar <span class="sc">+</span> (D_bar <span class="sc">-</span> D_hat))</span>
+<span id="annotated-cell-6-28"><a href="#annotated-cell-6-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-6-29"><a href="#annotated-cell-6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-6-30"><a href="#annotated-cell-6-30" aria-hidden="true" tabindex="-1"></a>stats_fe <span class="ot">&lt;-</span> <span class="fu">fit_stats</span>(bayes_fe)</span>
+<span id="annotated-cell-6-31"><a href="#annotated-cell-6-31" aria-hidden="true" tabindex="-1"></a>stats_re <span class="ot">&lt;-</span> <span class="fu">fit_stats</span>(bayes_re)</span>
+<span id="annotated-cell-6-32"><a href="#annotated-cell-6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-6-33"><a href="#annotated-cell-6-33" aria-hidden="true" tabindex="-1"></a>pars_fe <span class="ot">&lt;-</span> <span class="fu">summary</span>(bayes_fe, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"OR"</span>))<span class="sc">$</span>summary</span>
+<span id="annotated-cell-6-34"><a href="#annotated-cell-6-34" aria-hidden="true" tabindex="-1"></a>pars_re <span class="ot">&lt;-</span> <span class="fu">summary</span>(bayes_re, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"OR"</span>, <span class="st">"sigma"</span>, <span class="st">"OR_new"</span>))<span class="sc">$</span>summary</span>
+<span id="annotated-cell-6-35"><a href="#annotated-cell-6-35" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="annotated-cell-6-36"><a href="#annotated-cell-6-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rbind</span>(pars_fe, pars_re)[, <span class="fu">c</span>(<span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"2.5%"</span>, <span class="st">"50%"</span>, <span class="st">"97.5%"</span>, <span class="st">"n_eff"</span>, <span class="st">"Rhat"</span>)],</span>
+<span id="annotated-cell-6-37"><a href="#annotated-cell-6-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">3</span>),</span>
+<span id="annotated-cell-6-38"><a href="#annotated-cell-6-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"SD"</span>, <span class="st">"2.5%"</span>, <span class="st">"Median"</span>, <span class="st">"97.5%"</span>, <span class="st">"ESS"</span>, <span class="st">"R-hat"</span>)</span>
+<span id="annotated-cell-6-39"><a href="#annotated-cell-6-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-6-40"><a href="#annotated-cell-6-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-6-41"><a href="#annotated-cell-6-41" aria-hidden="true" tabindex="-1"></a>n_div <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) <span class="fu">sum</span>(<span class="fu">sapply</span>(<span class="fu">get_sampler_params</span>(fit, <span class="at">inc_warmup =</span> <span class="cn">FALSE</span>), <span class="cf">function</span>(x) <span class="fu">sum</span>(x[, <span class="st">"divergent__"</span>])))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="22" data-code-annotation="1">Posterior mean of the residual deviance, summed over all 44 trial arms</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="26" data-code-annotation="2">The same deviance evaluated once, at the posterior mean of the fitted values</span>
+</dd>
+</dl>
+</div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -1162,123 +1278,212 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">d</td>
-<td style="text-align: right;">0.778</td>
-<td style="text-align: right;">0.263</td>
-<td style="text-align: right;">0.288</td>
-<td style="text-align: right;">0.766</td>
-<td style="text-align: right;">1.334</td>
-<td style="text-align: right;">3229</td>
-<td style="text-align: right;">1.001</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">OR</td>
-<td style="text-align: right;">2.256</td>
-<td style="text-align: right;">0.647</td>
-<td style="text-align: right;">1.334</td>
-<td style="text-align: right;">2.151</td>
-<td style="text-align: right;">3.796</td>
-<td style="text-align: right;">3175</td>
-<td style="text-align: right;">1.001</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">tau</td>
-<td style="text-align: right;">0.433</td>
-<td style="text-align: right;">0.263</td>
-<td style="text-align: right;">0.057</td>
-<td style="text-align: right;">0.383</td>
-<td style="text-align: right;">1.117</td>
-<td style="text-align: right;">2758</td>
+<td style="text-align: right;">-0.262</td>
+<td style="text-align: right;">0.050</td>
+<td style="text-align: right;">-0.360</td>
+<td style="text-align: right;">-0.261</td>
+<td style="text-align: right;">-0.165</td>
+<td style="text-align: right;">11112</td>
 <td style="text-align: right;">1.000</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">OR</td>
+<td style="text-align: right;">0.771</td>
+<td style="text-align: right;">0.039</td>
+<td style="text-align: right;">0.698</td>
+<td style="text-align: right;">0.770</td>
+<td style="text-align: right;">0.848</td>
+<td style="text-align: right;">11088</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">d</td>
+<td style="text-align: right;">-0.249</td>
+<td style="text-align: right;">0.066</td>
+<td style="text-align: right;">-0.375</td>
+<td style="text-align: right;">-0.250</td>
+<td style="text-align: right;">-0.116</td>
+<td style="text-align: right;">9340</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OR</td>
+<td style="text-align: right;">0.781</td>
+<td style="text-align: right;">0.051</td>
+<td style="text-align: right;">0.687</td>
+<td style="text-align: right;">0.779</td>
+<td style="text-align: right;">0.891</td>
+<td style="text-align: right;">9262</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sigma</td>
+<td style="text-align: right;">0.135</td>
+<td style="text-align: right;">0.082</td>
+<td style="text-align: right;">0.009</td>
+<td style="text-align: right;">0.128</td>
+<td style="text-align: right;">0.316</td>
+<td style="text-align: right;">3358</td>
+<td style="text-align: right;">1.001</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">OR_new</td>
-<td style="text-align: right;">2.762</td>
-<td style="text-align: right;">7.868</td>
-<td style="text-align: right;">0.719</td>
-<td style="text-align: right;">2.137</td>
-<td style="text-align: right;">7.462</td>
-<td style="text-align: right;">7858</td>
+<td style="text-align: right;">0.790</td>
+<td style="text-align: right;">0.147</td>
+<td style="text-align: right;">0.545</td>
+<td style="text-align: right;">0.776</td>
+<td style="text-align: right;">1.125</td>
+<td style="text-align: right;">13979</td>
 <td style="text-align: right;">1.000</td>
 </tr>
 </tbody>
 </table>
 </div>
-<details class="code-fold">
-<summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>n_div <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">sapply</span>(<span class="fu">get_sampler_params</span>(fit_bayes, <span class="at">inc_warmup =</span> <span class="cn">FALSE</span>), <span class="cf">function</span>(x) <span class="fu">sum</span>(x[, <span class="st">"divergent__"</span>])))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 </div>
-<p>All R-hat values are at or below 1.001, the smallest ESS is 2758, and the sampler reported 0 divergent transitions.</p>
+<p>The first two rows are the fixed-effect model, the rest the random-effects model. Neither sampler reported any divergent transitions (0 and 0), the largest R-hat is 1.001, and the smallest effective sample size is 3,358.</p>
 </section>
 </section>
 <section id="results" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="results"><span class="header-section-number">5</span> Results &amp; Interpretation</h2>
+<h2 data-number="5" class="anchored" data-anchor-id="results"><span class="header-section-number">5</span> Results: Reproducing TSD 2</h2>
+<p>TSD 2 reports its own posterior summaries and fit statistics for this example in its Table 2. Placing them next to the Stan output shows whether the reconstruction holds:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>post <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(fit_bayes, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"OR"</span>, <span class="st">"OR_new"</span>, <span class="st">"tau"</span>))</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>b_or <span class="ot">&lt;-</span> <span class="fu">quantile</span>(post<span class="sc">$</span>OR, <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span>))</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>b_new <span class="ot">&lt;-</span> <span class="fu">quantile</span>(post<span class="sc">$</span>OR_new, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>))</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>b_tau <span class="ot">&lt;-</span> <span class="fu">quantile</span>(post<span class="sc">$</span>tau, <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span>))</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Fixed effect"</span>, <span class="st">"Random effects (DerSimonian-Laird)"</span>, <span class="st">"Random effects (Bayesian)"</span>),</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">ci_text</span>(lor_fe, se_fe), <span class="fu">ci_text</span>(lor_re, se_re), <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f, %.2f)"</span>, b_or[<span class="dv">1</span>], b_or[<span class="dv">2</span>], b_or[<span class="dv">3</span>])),</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"&amp;ndash;"</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f to %.2f"</span>, pi_lo, pi_hi), <span class="fu">sprintf</span>(<span class="st">"%.2f to %.2f"</span>, b_new[<span class="dv">1</span>], b_new[<span class="dv">2</span>])),</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"0 (assumed)"</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, <span class="fu">sqrt</span>(tau2)), <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f, %.2f)"</span>, b_tau[<span class="dv">1</span>], b_tau[<span class="dv">2</span>], b_tau[<span class="dv">3</span>]))</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Model"</span>, <span class="st">"Pooled OR (95% interval)"</span>, <span class="st">"95% prediction interval"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">tau$ (between-study SD)"</span>)</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Published values, exactly as printed in TSD 2 Table 2</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>tsd2 <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-0.26"</span>, <span class="st">"0.050"</span>, <span class="st">"-0.36"</span>, <span class="st">"-0.16"</span>, <span class="st">"46.8"</span>, <span class="st">"23.0"</span>, <span class="st">"69.8"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-0.25"</span>, <span class="st">"0.066"</span>, <span class="st">"-0.38"</span>, <span class="st">"-0.12"</span>, <span class="st">"0.13"</span>, <span class="st">"41.9"</span>, <span class="st">"28.1"</span>, <span class="st">"70.0"</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>ours <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"DIC"</span>]),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"sigma"</span>, <span class="st">"50%"</span>]),</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"DIC"</span>])</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fixed effect: $d$ (log OR), median"</span>, <span class="st">"Fixed effect: SD"</span>, <span class="st">"Fixed effect: 2.5%"</span>, <span class="st">"Fixed effect: 97.5%"</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fixed effect: $</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"Fixed effect: $p_D$"</span>, <span class="st">"Fixed effect: DIC"</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random effects: $d$ (log OR), median"</span>, <span class="st">"Random effects: SD"</span>, <span class="st">"Random effects: 2.5%"</span>, <span class="st">"Random effects: 97.5%"</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random effects: $</span><span class="sc">\\</span><span class="st">sigma$, median"</span>, <span class="st">"Random effects: $</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"Random effects: $p_D$"</span>, <span class="st">"Random effects: DIC"</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        tsd2, ours</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"lcc"</span>,</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Quantity"</span>, <span class="st">"TSD 2, Table 2"</span>, <span class="st">"This page, Stan"</span>)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 31%">
+<col style="width: 52%">
 <col style="width: 22%">
-<col style="width: 21%">
-<col style="width: 23%">
+<col style="width: 24%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Model</th>
-<th style="text-align: left;">Pooled OR (95% interval)</th>
-<th style="text-align: left;">95% prediction interval</th>
-<th style="text-align: left;"><span class="math inline">\(\tau\)</span> (between-study SD)</th>
+<th style="text-align: left;">Quantity</th>
+<th style="text-align: center;">TSD 2, Table 2</th>
+<th style="text-align: center;">This page, Stan</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Fixed effect</td>
-<td style="text-align: left;">1.92 (1.51, 2.42)</td>
-<td style="text-align: left;">–</td>
-<td style="text-align: left;">0 (assumed)</td>
+<td style="text-align: left;">Fixed effect: <span class="math inline">\(d\)</span> (log OR), median</td>
+<td style="text-align: center;">-0.26</td>
+<td style="text-align: center;">-0.26</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Random effects (DerSimonian-Laird)</td>
-<td style="text-align: left;">2.16 (1.46, 3.19)</td>
-<td style="text-align: left;">1.00 to 4.64</td>
-<td style="text-align: left;">0.34</td>
+<td style="text-align: left;">Fixed effect: SD</td>
+<td style="text-align: center;">0.050</td>
+<td style="text-align: center;">0.050</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Random effects (Bayesian)</td>
-<td style="text-align: left;">2.15 (1.33, 3.80)</td>
-<td style="text-align: left;">0.72 to 7.46</td>
-<td style="text-align: left;">0.38 (0.06, 1.12)</td>
+<td style="text-align: left;">Fixed effect: 2.5%</td>
+<td style="text-align: center;">-0.36</td>
+<td style="text-align: center;">-0.36</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fixed effect: 97.5%</td>
+<td style="text-align: center;">-0.16</td>
+<td style="text-align: center;">-0.16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Fixed effect: <span class="math inline">\(\bar{D}_{res}\)</span></td>
+<td style="text-align: center;">46.8</td>
+<td style="text-align: center;">46.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fixed effect: <span class="math inline">\(p_D\)</span></td>
+<td style="text-align: center;">23.0</td>
+<td style="text-align: center;">23.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Fixed effect: DIC</td>
+<td style="text-align: center;">69.8</td>
+<td style="text-align: center;">70.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Random effects: <span class="math inline">\(d\)</span> (log OR), median</td>
+<td style="text-align: center;">-0.25</td>
+<td style="text-align: center;">-0.25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Random effects: SD</td>
+<td style="text-align: center;">0.066</td>
+<td style="text-align: center;">0.066</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Random effects: 2.5%</td>
+<td style="text-align: center;">-0.38</td>
+<td style="text-align: center;">-0.38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Random effects: 97.5%</td>
+<td style="text-align: center;">-0.12</td>
+<td style="text-align: center;">-0.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Random effects: <span class="math inline">\(\sigma\)</span>, median</td>
+<td style="text-align: center;">0.13</td>
+<td style="text-align: center;">0.13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Random effects: <span class="math inline">\(\bar{D}_{res}\)</span></td>
+<td style="text-align: center;">41.9</td>
+<td style="text-align: center;">41.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Random effects: <span class="math inline">\(p_D\)</span></td>
+<td style="text-align: center;">28.1</td>
+<td style="text-align: center;">28.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Random effects: DIC</td>
+<td style="text-align: center;">70.0</td>
+<td style="text-align: center;">70.2</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
+<p>Every quantity reproduces to within Monte Carlo error. The pooled log OR agrees to two decimal places in both models, the residual deviances match at 46.81 and 41.89, and <span class="math inline">\(p_D\)</span> and DIC differ by about 0.2, which is the order of the simulation noise in these statistics. The reconstruction uses a different sampler (Stan rather than WinBUGS) and a different parameterisation of the random effects, so agreement at this level is a check on the model specification, not a repetition of the same arithmetic.</p>
 <p>Three readings of this table matter for an HTA submission.</p>
-<p><strong>Fixed vs random effects.</strong> The fixed-effect OR (1.92) sits closer to Study 3 than the random-effects OR (2.16), because the fixed-effect model gives the largest, least favourable trial 42% of the weight. Which is right is not a statistical question alone: if the trials plausibly differ in population or setting, the fixed-effect assumption of one common effect is hard to defend, and its narrower interval is not a real gain in precision.</p>
-<p><strong>Confidence vs prediction interval.</strong> The random-effects 95% CI (1.46 to 3.19) describes the average effect across settings like these trials. The prediction interval (1.00 to 4.64) describes the effect to expect in one new setting, and its lower end sits at 1.00. B helps on average; whether it helps in a particular new population is far less certain. A cost-effectiveness model that uses only the pooled estimate carries the first statement, not the second.</p>
-<p><strong>Frequentist vs Bayesian random effects.</strong> The Bayesian 95% interval for the pooled OR (1.33 to 3.80) is wider than the DerSimonian–Laird CI. The two are not different models: as <a href="#sec-bayes" class="quarto-xref">Section&nbsp;2.6</a> shows, holding <span class="math inline">\(\tau\)</span> fixed and using a flat prior reproduces the DerSimonian–Laird estimate and interval exactly. The difference is that DerSimonian–Laird plugs in one value of <span class="math inline">\(\tau\)</span> (0.34) as if it were known, while the Bayesian model carries the uncertainty about <span class="math inline">\(\tau\)</span> itself, whose 95% interval runs from 0.06 to 1.12. With five trials, that uncertainty is large, and ignoring it overstates precision.</p>
+<p><strong>Fixed versus random effects, when the two agree.</strong> The random-effects model fits better (<span class="math inline">\(\bar{D}_{res}\)</span> 41.89 against 46.81, for 44 data points) but uses more effective parameters (28.32 against 23.19), and the DIC ends up essentially tied: 70.22 against 70.00. TSD 2 draws the conclusion that “there is little to choose between the two models and the fixed effect model may be preferred since it is easier to interpret”. This is the situation described in <a href="#nte-choose" class="quarto-xref">Note&nbsp;1</a>: no threshold decides it, and the argument moves to interpretability.</p>
+<p><strong>What <span class="math inline">\(p_D\)</span> shows about the parameter count.</strong> The fixed-effect model has 23 parameters, 22 baselines and one pooled effect, and <span class="math inline">\(p_D\)</span> comes out at 23.19: with a vague prior, every parameter counts as one. The random-effects model nominally adds 22 trial-specific effects and <span class="math inline">\(\sigma\)</span>, which would be 46, but <span class="math inline">\(p_D\)</span> is only 28.32. The 22 trial effects are held together by the between-trial distribution, so they are worth about 5.14 free parameters between them rather than 22. This is the shrinkage of <a href="#sec-bayes" class="quarto-xref">Section&nbsp;2.6</a> measured on real data.</p>
+<p><strong>What the pooled estimate means, and what it does not.</strong> The random-effects OR is 0.78 with a 95% credible interval of 0.69 to 0.89: on average across settings like these trials, beta-blockers reduce mortality. The prediction interval for a new setting is wider, 0.54 to 1.12, and its upper end sits above 1. TSD 2 does not report a prediction interval for this example, and neither do most submissions; with <span class="math inline">\(\sigma\)</span> estimated at 0.13 the gap between the two intervals is real but moderate here. In an appraisal, the confidence interval answers “what is the average effect”, while the prediction interval answers “what might this treatment do in the population we are appraising”.</p>
+<p>The two random-effects analyses also disagree about how much heterogeneity there is: DerSimonian-Laird returns <span class="math inline">\(\hat\tau\)</span> = 0.08, the Bayesian model a posterior median of 0.13. With 22 trials that scatter little more than chance alone would explain, the data say little about <span class="math inline">\(\sigma\)</span>, so the vague <span class="math inline">\(\text{Uniform}(0, 5)\)</span> prior keeps the posterior away from zero while the moment estimator is free to fall almost to it. That difference is why the frequentist prediction interval (0.64 to 0.94) is narrower than the Bayesian one, and it is the reason TSD 2 insists on inspecting the posterior for <span class="math inline">\(\sigma\)</span> against its prior.</p>
 </section>
 <section id="audit" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="audit"><span class="header-section-number">6</span> HTA Audit Points &amp; Interview Q&amp;A</h2>
 <div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1287,25 +1492,9 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>No.&nbsp;I² is a supporting signal, not a switch, and a low I² with few trials is weak evidence of homogeneity, because <span class="math inline">\(Q\)</span> has little power to detect heterogeneity when <span class="math inline">\(k\)</span> is small. The judgement starts from whether the trials plausibly estimate one common effect; see <a href="#nte-choose" class="quarto-xref">Note&nbsp;1</a> for the full order.</p>
-</div>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>What does an I² of around 60% actually tell you?
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
 <div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>That around 60% of the scatter between trials is real rather than chance, not how far apart the true effects are: that depends on trial size as well, and <span class="math inline">\(\tau\)</span> or the prediction interval is the measure to use. See <a href="#sec-i2" class="quarto-xref">Section&nbsp;2.4.3</a>.</p>
+<p>No.&nbsp;I² is a supporting signal, not a switch, and a low I² with few trials is weak evidence of homogeneity, because <span class="math inline">\(Q\)</span> has little power to detect heterogeneity when <span class="math inline">\(k\)</span> is small. The judgement starts from whether the trials plausibly estimate one common effect; see <a href="#nte-choose" class="quarto-xref">Note&nbsp;1</a> for the full order.</p>
 </div>
 </div>
 </div>
@@ -1315,13 +1504,13 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Why is DerSimonian–Laird criticised when there are few trials?
+<span class="screen-reader-only">Important</span>The beta-blocker trials give an I² of about 10%. Does that settle it?
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>It estimates <span class="math inline">\(\tau^2\)</span> from one moment equation and then treats the estimate as fixed, so the confidence interval ignores the uncertainty in <span class="math inline">\(\tau^2\)</span>. With few trials that uncertainty is large, and the interval is too narrow. Common remedies are the Hartung–Knapp–Sidik–Jonkman adjustment, which rescales the variance and uses a <span class="math inline">\(t\)</span> distribution, usually widening the interval, restricted maximum likelihood for <span class="math inline">\(\tau^2\)</span>, or a Bayesian model that carries the uncertainty in <span class="math inline">\(\tau\)</span> through, as above.</p>
+<p>It says that only about a tenth of the scatter between these trials looks like real difference rather than chance, which is consistent with the small <span class="math inline">\(\hat\tau\)</span> and with the two models agreeing. It does not by itself justify a fixed-effect analysis: <span class="math inline">\(I^2\)</span> is a share, not a size, and with 22 trials of very unequal precision the same true spread would read differently (<a href="#sec-i2" class="quarto-xref">Section&nbsp;2.4.3</a>). The prediction interval, which still reaches above 1, is the more decision-relevant summary.</p>
 </div>
 </div>
 </div>
@@ -1331,11 +1520,27 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>When is a pairwise meta-analysis enough, and when do you need an NMA?
+<span class="screen-reader-only">Important</span>Why is DerSimonian–Laird criticised when there are few trials?
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>It estimates <span class="math inline">\(\tau^2\)</span> from one moment equation and then treats the estimate as fixed, so the confidence interval ignores the uncertainty in <span class="math inline">\(\tau^2\)</span>. With few trials that uncertainty is large, and the interval is too narrow. Common remedies are the Hartung–Knapp–Sidik–Jonkman adjustment, which rescales the variance and uses a <span class="math inline">\(t\)</span> distribution, usually widening the interval, restricted maximum likelihood for <span class="math inline">\(\tau^2\)</span>, or a Bayesian model that carries the uncertainty in <span class="math inline">\(\tau\)</span> through, as above.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>When is a pairwise meta-analysis enough, and when do you need an NMA?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>A pairwise meta-analysis is enough when the decision problem is one comparison and there are head-to-head trials of it. Once the decision involves several treatments, or the comparator of interest has never been tested directly against the new treatment, the evidence has to be connected through common comparators, which is what an <a href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">NMA</a> does.</p>
 </div>
@@ -1345,6 +1550,7 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <section id="conclusion" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">7</span> Conclusion</h2>
 <p>Pairwise meta-analysis comes down to a weighted average with two decisions attached: how to weight the trials, and whether they share one effect. The fixed-effect model weights by precision alone; the random-effects model adds between-study variance, which evens out the weights, widens the interval and makes the prediction interval available. The Bayesian version works from the counts and carries the uncertainty in <span class="math inline">\(\tau\)</span>, and it is the same model that a <a href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">Standard Bayesian NMA</a> extends to a network of comparisons.</p>
+<p>On the beta-blocker data all of this reproduces what TSD 2 reports, down to the residual deviance and the effective number of parameters. The two models are hard to separate on fit, which is the ordinary case rather than the exception, and the decision then rests on interpretability and on what the prediction interval says about a new population.</p>
 <p><strong>Methodological References</strong>: NICE DSU TSD 2 (Dias et al., 2011, updated 2016); <em>Cochrane Handbook for Systematic Reviews of Interventions</em>, Chapter 10; DerSimonian &amp; Laird (1986); Higgins, Thompson &amp; Spiegelhalter (2009) on prediction intervals.</p>
 
 
