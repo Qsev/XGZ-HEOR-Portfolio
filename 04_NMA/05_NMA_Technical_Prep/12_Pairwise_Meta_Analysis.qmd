@@ -342,37 +342,28 @@ blocker <- data.frame(
     r_T = c(3, 7, 5, 102, 28, 4, 98, 60, 25, 138, 64, 45, 9, 57, 25, 33, 28, 8, 6, 32, 27, 22),
     n_T = c(38, 114, 69, 1533, 355, 59, 945, 632, 278, 1916, 873, 263, 291, 858, 154, 207, 251, 151, 174, 209, 391, 680)
 )
-
-kable(
-    data.frame(
-        blocker$trial,
-        sprintf("%d / %d", blocker$r_C, blocker$n_C),
-        sprintf("%d / %d", blocker$r_T, blocker$n_T)
-    ),
-    align = "lcc",
-    col.names = c("Trial", "Deaths / patients, control", "Deaths / patients, beta-blocker")
-)
 ```
 
-The 22 trials cover `r format(sum(blocker$n_C) + sum(blocker$n_T), big.mark = ",")` patients and `r format(sum(blocker$r_C) + sum(blocker$r_T), big.mark = ",")` deaths, and they differ in size by almost two orders of magnitude, from `r min(blocker$n_C + blocker$n_T)` patients to `r format(max(blocker$n_C + blocker$n_T), big.mark = ",")`. That spread is what makes the weighting question concrete.
+The 22 trials cover `r format(sum(blocker$n_C) + sum(blocker$n_T), big.mark = ",")` patients and `r format(sum(blocker$r_C) + sum(blocker$r_T), big.mark = ",")` deaths, and they differ in size by almost two orders of magnitude, from `r min(blocker$n_C + blocker$n_T)` patients to `r format(max(blocker$n_C + blocker$n_T), big.mark = ",")`. That spread is what makes the weighting question concrete. The 22 rows of counts are listed in @sec-data.
 
 ## Implementation: From Scratch, `metafor` and Stan
 
-### From Scratch in Base R
+### From Scratch, Checked Against `metafor`
 
-Every quantity from the theoretical framework, computed directly:
+Every quantity from the theoretical framework, computed directly and then verified against the standard R package:
 
-```{r from-scratch}
+```{r from-scratch, message=FALSE}
+library(metafor)
+
 fmt <- function(x) sprintf("%.2f", x)
 ci_text <- function(est, se) sprintf("%.2f (%.2f, %.2f)", exp(est), exp(est - 1.96 * se), exp(est + 1.96 * se))
 
-# Cells of each 2x2 table
+# Effect size and variance per trial, from the 2x2 cells
 resp_B <- blocker$r_T
 non_B <- blocker$n_T - blocker$r_T
 resp_A <- blocker$r_C
 non_A <- blocker$n_C - blocker$r_C
 
-# Effect size and variance per trial
 y <- log((resp_B / non_B) / (resp_A / non_A)) # log OR
 v <- 1 / resp_B + 1 / non_B + 1 / resp_A + 1 / non_A
 k <- length(y)
@@ -388,12 +379,10 @@ Q_p <- pchisq(Q, df = k - 1, lower.tail = FALSE)
 tau2 <- max(0, (Q - (k - 1)) / (sum(w) - sum(w^2) / sum(w))) # DerSimonian-Laird
 I2 <- max(0, (Q - (k - 1)) / Q)
 
-# Random effects
+# Random effects, and the 95% prediction interval on the OR scale
 w_re <- 1 / (v + tau2)
 lor_re <- sum(w_re * y) / sum(w_re)
 se_re <- sqrt(1 / sum(w_re))
-
-# 95% prediction interval, on the OR scale
 pi_half <- 1.96 * sqrt(tau2 + se_re^2)
 pi_lo <- exp(lor_re - pi_half)
 pi_hi <- exp(lor_re + pi_half)
@@ -401,11 +390,14 @@ pi_hi <- exp(lor_re + pi_half)
 w_fe_pct <- 100 * w / sum(w)
 w_re_pct <- 100 * w_re / sum(w_re)
 
-kable(
-    data.frame(Q, k - 1, Q_p, tau2, 100 * I2),
-    digits = c(2, 0, 3, 3, 1),
-    col.names = c("Cochran's Q", "df", "p-value", "$\\tau^2$", "$I^2$ (%)")
-)
+# Same analysis through metafor, for verification
+es <- escalc(measure = "OR", ai = r_T, n1i = n_T, ci = r_C, n2i = n_C, data = blocker)
+fit_fe <- rma(yi, vi, data = es, method = "FE")
+fit_re <- rma(yi, vi, data = es, method = "DL")
+max_diff <- max(abs(
+    c(lor_fe, se_fe, lor_re, se_re, tau2, 100 * I2) -
+        c(coef(fit_fe), fit_fe$se, coef(fit_re), fit_re$se, fit_re$tau2, fit_re$I2)
+))
 
 kable(
     data.frame(
@@ -417,29 +409,7 @@ kable(
 )
 ```
 
-Heterogeneity here is modest: $Q$ = `r fmt(Q)` on `r k - 1` degrees of freedom (p = `r sprintf("%.2f", Q_p)`), $\hat\tau$ = `r sprintf("%.3f", sqrt(tau2))` on the log OR scale, and $I^2$ = `r sprintf("%.0f%%", 100 * I2)`. The two models therefore give nearly the same answer, and the weights move only a little: the largest trial (trial `r which.max(blocker$n_C + blocker$n_T)`, with `r format(max(blocker$n_C + blocker$n_T), big.mark = ",")` patients) carries `r sprintf("%.0f%%", max(w_fe_pct))` of the weight under fixed effects and `r sprintf("%.0f%%", w_re_pct[which.max(w_fe_pct)])` under random effects.
-
-### Cross-Check With `metafor`
-
-The standard R package gives the same numbers:
-
-```{r metafor-check, message=FALSE}
-library(metafor)
-
-es <- escalc(measure = "OR", ai = r_T, n1i = n_T, ci = r_C, n2i = n_C, data = blocker)
-fit_fe <- rma(yi, vi, data = es, method = "FE")
-fit_re <- rma(yi, vi, data = es, method = "DL")
-
-kable(
-    data.frame(
-        c("log OR, fixed effect", "SE, fixed effect", "log OR, random effects", "SE, random effects", "$\\tau^2$", "$I^2$ (%)"),
-        c(lor_fe, se_fe, lor_re, se_re, tau2, 100 * I2),
-        c(coef(fit_fe), fit_fe$se, coef(fit_re), fit_re$se, fit_re$tau2, fit_re$I2)
-    ),
-    digits = 4,
-    col.names = c("Quantity", "From scratch", "metafor")
-)
-```
+Heterogeneity is modest: $Q$ = `r fmt(Q)` on `r k - 1` degrees of freedom (p = `r sprintf("%.2f", Q_p)`), $\hat\tau$ = `r sprintf("%.3f", sqrt(tau2))` on the log OR scale, and $I^2$ = `r sprintf("%.0f%%", 100 * I2)`. The two models therefore give nearly the same answer, and the weights move only a little: the largest trial (trial `r which.max(blocker$n_C + blocker$n_T)`, with `r format(max(blocker$n_C + blocker$n_T), big.mark = ",")` patients) carries `r sprintf("%.0f%%", max(w_fe_pct))` of the weight under fixed effects and `r sprintf("%.0f%%", w_re_pct[which.max(w_fe_pct)])` under random effects. `metafor` reproduces all six quantities above, the largest discrepancy being `r sprintf("%.0e", max_diff)`.
 
 The forest plot shows each trial with its 95% CI, the random-effects pooled estimate as a diamond, and the prediction interval as the dotted line through it:
 
@@ -515,8 +485,14 @@ stats_re <- fit_stats(bayes_re)
 
 pars_fe <- summary(bayes_fe, pars = c("d", "OR"))$summary
 pars_re <- summary(bayes_re, pars = c("d", "OR", "sigma", "OR_new"))$summary
+posterior_tbl <- rbind(pars_fe, pars_re)[, c("mean", "sd", "2.5%", "50%", "97.5%", "n_eff", "Rhat")]
+rownames(posterior_tbl) <- c(
+    "Fixed effect: d (log OR)", "Fixed effect: OR",
+    "Random effects: d (log OR)", "Random effects: OR",
+    "Random effects: sigma (between-trial SD)", "Random effects: OR in a new trial"
+)
 kable(
-    rbind(pars_fe, pars_re)[, c("mean", "sd", "2.5%", "50%", "97.5%", "n_eff", "Rhat")],
+    posterior_tbl,
     digits = c(3, 3, 3, 3, 3, 0, 3),
     col.names = c("Mean", "SD", "2.5%", "Median", "97.5%", "ESS", "R-hat")
 )
@@ -527,7 +503,50 @@ n_div <- function(fit) sum(sapply(get_sampler_params(fit, inc_warmup = FALSE), f
 1.  Posterior mean of the residual deviance, summed over all 44 trial arms
 2.  The same deviance evaluated once, at the posterior mean of the fitted values
 
-The first two rows are the fixed-effect model, the rest the random-effects model. Neither sampler reported any divergent transitions (`r n_div(bayes_fe)` and `r n_div(bayes_re)`), the largest R-hat is `r sprintf("%.3f", max(c(pars_fe[, "Rhat"], pars_re[, "Rhat"])))`, and the smallest effective sample size is `r format(round(min(c(pars_fe[, "n_eff"], pars_re[, "n_eff"]))), big.mark = ",")`.
+Neither sampler reported any divergent transitions (`r n_div(bayes_fe)` and `r n_div(bayes_re)`), the largest R-hat is `r sprintf("%.3f", max(c(pars_fe[, "Rhat"], pars_re[, "Rhat"])))`, and the smallest effective sample size is `r format(round(min(c(pars_fe[, "n_eff"], pars_re[, "n_eff"]))), big.mark = ",")`.
+
+### The Same Quantities, Both Ways
+
+The frequentist and Bayesian analyses estimate the same things. Setting them next to each other shows where they agree and where they cannot:
+
+```{r both-ways}
+or_ci <- function(est, lo, hi) sprintf("%.2f (%.2f, %.2f)", exp(est), exp(lo), exp(hi))
+post <- rstan::extract(bayes_re, pars = c("sigma", "OR_new"))
+
+kable(
+    data.frame(
+        c(
+            "Pooled OR, fixed effect",
+            "Pooled OR, random effects",
+            "Between-trial SD ($\\hat\\tau$ or $\\sigma$)",
+            "95% prediction interval, OR",
+            "Cochran's $Q$, $I^2$"
+        ),
+        c(
+            or_ci(lor_fe, lor_fe - 1.96 * se_fe, lor_fe + 1.96 * se_fe),
+            or_ci(lor_re, lor_re - 1.96 * se_re, lor_re + 1.96 * se_re),
+            sprintf("%.3f", sqrt(tau2)),
+            sprintf("%.2f to %.2f", pi_lo, pi_hi),
+            sprintf("%.2f, %.0f%%", Q, 100 * I2)
+        ),
+        c(
+            or_ci(pars_fe["d", "50%"], pars_fe["d", "2.5%"], pars_fe["d", "97.5%"]),
+            or_ci(pars_re["d", "50%"], pars_re["d", "2.5%"], pars_re["d", "97.5%"]),
+            sprintf("%.3f (%.3f, %.3f)", median(post$sigma), quantile(post$sigma, 0.025), quantile(post$sigma, 0.975)),
+            sprintf("%.2f to %.2f", quantile(post$OR_new, 0.025), quantile(post$OR_new, 0.975)),
+            "no counterpart"
+        )
+    ),
+    align = "lcc",
+    col.names = c("Quantity", "Frequentist (inverse variance, DL)", "Bayesian (Stan)")
+)
+```
+
+The pooled effects agree closely, in both models and on both scales. That is not a coincidence: @sec-bayes shows that with $\tau$ held fixed and a flat prior, the Bayesian posterior mean for the pooled effect **is** the inverse-variance weighted average, so the two can only differ through the treatment of $\tau$ and through the Normal approximation the frequentist analysis makes for each trial.
+
+The heterogeneity estimates do not agree, and the quantities that depend on them inherit the difference. Everything that follows from $\tau$ is affected: the random-effects interval is a little wider in the Bayesian analysis, and the prediction interval noticeably so.
+
+The last row is the one to note in an audit. $Q$ and $I^2$ are constructions of the Cochrane tradition and have no counterpart in this model; TSD 2 reports neither for this example, and defers heterogeneity to TSD 3. The two traditions summarise the same data differently: one reports heterogeneity statistics, the other model fit.
 
 ## Results: Reproducing TSD 2 {#results}
 
@@ -610,3 +629,20 @@ Pairwise meta-analysis comes down to a weighted average with two decisions attac
 On the beta-blocker data all of this reproduces what TSD 2 reports, down to the residual deviance and the effective number of parameters. The two models are hard to separate on fit, which is the ordinary case rather than the exception, and the decision then rests on interpretability and on what the prediction interval says about a new population.
 
 **Methodological References**: NICE DSU TSD 2 (Dias et al., 2011, updated 2016); *Cochrane Handbook for Systematic Reviews of Interventions*, Chapter 10; DerSimonian & Laird (1986); Higgins, Thompson & Spiegelhalter (2009) on prediction intervals.
+
+## Appendix: The Trial Data {#sec-data}
+
+Deaths and patients in each arm of the 22 trials, as given in NICE DSU TSD 2 Table 1 (Carlin, 1992).
+
+```{r data-table, echo=FALSE}
+kable(
+    data.frame(
+        blocker$trial,
+        sprintf("%d / %d", blocker$r_C, blocker$n_C),
+        sprintf("%d / %d", blocker$r_T, blocker$n_T),
+        sprintf("%.2f", exp(y))
+    ),
+    align = "lccc",
+    col.names = c("Trial", "Deaths / patients, control", "Deaths / patients, beta-blocker", "OR")
+)
+```

@@ -328,13 +328,14 @@ window.Quarto = {
   <li><a href="#the-worked-example-beta-blockers-after-myocardial-infarction" id="toc-the-worked-example-beta-blockers-after-myocardial-infarction" class="nav-link" data-scroll-target="#the-worked-example-beta-blockers-after-myocardial-infarction"><span class="header-section-number">3</span> The Worked Example: Beta-Blockers After Myocardial Infarction</a></li>
   <li><a href="#implementation-from-scratch-metafor-and-stan" id="toc-implementation-from-scratch-metafor-and-stan" class="nav-link" data-scroll-target="#implementation-from-scratch-metafor-and-stan"><span class="header-section-number">4</span> Implementation: From Scratch, <code>metafor</code> and Stan</a>
   <ul class="collapse">
-  <li><a href="#from-scratch-in-base-r" id="toc-from-scratch-in-base-r" class="nav-link" data-scroll-target="#from-scratch-in-base-r"><span class="header-section-number">4.1</span> From Scratch in Base R</a></li>
-  <li><a href="#cross-check-with-metafor" id="toc-cross-check-with-metafor" class="nav-link" data-scroll-target="#cross-check-with-metafor"><span class="header-section-number">4.2</span> Cross-Check With <code>metafor</code></a></li>
-  <li><a href="#the-bayesian-models-in-stan" id="toc-the-bayesian-models-in-stan" class="nav-link" data-scroll-target="#the-bayesian-models-in-stan"><span class="header-section-number">4.3</span> The Bayesian Models in Stan</a></li>
+  <li><a href="#from-scratch-checked-against-metafor" id="toc-from-scratch-checked-against-metafor" class="nav-link" data-scroll-target="#from-scratch-checked-against-metafor"><span class="header-section-number">4.1</span> From Scratch, Checked Against <code>metafor</code></a></li>
+  <li><a href="#the-bayesian-models-in-stan" id="toc-the-bayesian-models-in-stan" class="nav-link" data-scroll-target="#the-bayesian-models-in-stan"><span class="header-section-number">4.2</span> The Bayesian Models in Stan</a></li>
+  <li><a href="#the-same-quantities-both-ways" id="toc-the-same-quantities-both-ways" class="nav-link" data-scroll-target="#the-same-quantities-both-ways"><span class="header-section-number">4.3</span> The Same Quantities, Both Ways</a></li>
   </ul></li>
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">5</span> Results: Reproducing TSD 2</a></li>
   <li><a href="#audit" id="toc-audit" class="nav-link" data-scroll-target="#audit"><span class="header-section-number">6</span> HTA Audit Points &amp; Interview Q&amp;A</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">7</span> Conclusion</a></li>
+  <li><a href="#sec-data" id="toc-sec-data" class="nav-link" data-scroll-target="#sec-data"><span class="header-section-number">8</span> Appendix: The Trial Data</a></li>
   </ul>
 </nav>
     </div>
@@ -733,228 +734,73 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_C =</span> <span class="fu">c</span>(<span class="dv">39</span>, <span class="dv">116</span>, <span class="dv">93</span>, <span class="dv">1520</span>, <span class="dv">365</span>, <span class="dv">52</span>, <span class="dv">939</span>, <span class="dv">471</span>, <span class="dv">282</span>, <span class="dv">1921</span>, <span class="dv">583</span>, <span class="dv">266</span>, <span class="dv">293</span>, <span class="dv">883</span>, <span class="dv">147</span>, <span class="dv">213</span>, <span class="dv">122</span>, <span class="dv">154</span>, <span class="dv">134</span>, <span class="dv">218</span>, <span class="dv">364</span>, <span class="dv">674</span>),</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">r_T =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">5</span>, <span class="dv">102</span>, <span class="dv">28</span>, <span class="dv">4</span>, <span class="dv">98</span>, <span class="dv">60</span>, <span class="dv">25</span>, <span class="dv">138</span>, <span class="dv">64</span>, <span class="dv">45</span>, <span class="dv">9</span>, <span class="dv">57</span>, <span class="dv">25</span>, <span class="dv">33</span>, <span class="dv">28</span>, <span class="dv">8</span>, <span class="dv">6</span>, <span class="dv">32</span>, <span class="dv">27</span>, <span class="dv">22</span>),</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_T =</span> <span class="fu">c</span>(<span class="dv">38</span>, <span class="dv">114</span>, <span class="dv">69</span>, <span class="dv">1533</span>, <span class="dv">355</span>, <span class="dv">59</span>, <span class="dv">945</span>, <span class="dv">632</span>, <span class="dv">278</span>, <span class="dv">1916</span>, <span class="dv">873</span>, <span class="dv">263</span>, <span class="dv">291</span>, <span class="dv">858</span>, <span class="dv">154</span>, <span class="dv">207</span>, <span class="dv">251</span>, <span class="dv">151</span>, <span class="dv">174</span>, <span class="dv">209</span>, <span class="dv">391</span>, <span class="dv">680</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        blocker<span class="sc">$</span>trial,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%d / %d"</span>, blocker<span class="sc">$</span>r_C, blocker<span class="sc">$</span>n_C),</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%d / %d"</span>, blocker<span class="sc">$</span>r_T, blocker<span class="sc">$</span>n_T)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"lcc"</span>,</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Trial"</span>, <span class="st">"Deaths / patients, control"</span>, <span class="st">"Deaths / patients, beta-blocker"</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Trial</th>
-<th style="text-align: center;">Deaths / patients, control</th>
-<th style="text-align: center;">Deaths / patients, beta-blocker</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: center;">3 / 39</td>
-<td style="text-align: center;">3 / 38</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2</td>
-<td style="text-align: center;">14 / 116</td>
-<td style="text-align: center;">7 / 114</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">3</td>
-<td style="text-align: center;">11 / 93</td>
-<td style="text-align: center;">5 / 69</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">4</td>
-<td style="text-align: center;">127 / 1520</td>
-<td style="text-align: center;">102 / 1533</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">5</td>
-<td style="text-align: center;">27 / 365</td>
-<td style="text-align: center;">28 / 355</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">6</td>
-<td style="text-align: center;">6 / 52</td>
-<td style="text-align: center;">4 / 59</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">7</td>
-<td style="text-align: center;">152 / 939</td>
-<td style="text-align: center;">98 / 945</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">8</td>
-<td style="text-align: center;">48 / 471</td>
-<td style="text-align: center;">60 / 632</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">9</td>
-<td style="text-align: center;">37 / 282</td>
-<td style="text-align: center;">25 / 278</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">10</td>
-<td style="text-align: center;">188 / 1921</td>
-<td style="text-align: center;">138 / 1916</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">11</td>
-<td style="text-align: center;">52 / 583</td>
-<td style="text-align: center;">64 / 873</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">12</td>
-<td style="text-align: center;">47 / 266</td>
-<td style="text-align: center;">45 / 263</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">13</td>
-<td style="text-align: center;">16 / 293</td>
-<td style="text-align: center;">9 / 291</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">14</td>
-<td style="text-align: center;">45 / 883</td>
-<td style="text-align: center;">57 / 858</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">15</td>
-<td style="text-align: center;">31 / 147</td>
-<td style="text-align: center;">25 / 154</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">16</td>
-<td style="text-align: center;">38 / 213</td>
-<td style="text-align: center;">33 / 207</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">17</td>
-<td style="text-align: center;">12 / 122</td>
-<td style="text-align: center;">28 / 251</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">18</td>
-<td style="text-align: center;">6 / 154</td>
-<td style="text-align: center;">8 / 151</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">19</td>
-<td style="text-align: center;">3 / 134</td>
-<td style="text-align: center;">6 / 174</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">20</td>
-<td style="text-align: center;">40 / 218</td>
-<td style="text-align: center;">32 / 209</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">21</td>
-<td style="text-align: center;">43 / 364</td>
-<td style="text-align: center;">27 / 391</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">22</td>
-<td style="text-align: center;">39 / 674</td>
-<td style="text-align: center;">22 / 680</td>
-</tr>
-</tbody>
-</table>
 </div>
-</div>
-<p>The 22 trials cover 20,290 patients and 1,811 deaths, and they differ in size by almost two orders of magnitude, from 77 patients to 3,837. That spread is what makes the weighting question concrete.</p>
+<p>The 22 trials cover 20,290 patients and 1,811 deaths, and they differ in size by almost two orders of magnitude, from 77 patients to 3,837. That spread is what makes the weighting question concrete. The 22 rows of counts are listed in <a href="#sec-data" class="quarto-xref">Section&nbsp;8</a>.</p>
 </section>
 <section id="implementation-from-scratch-metafor-and-stan" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="implementation-from-scratch-metafor-and-stan"><span class="header-section-number">4</span> Implementation: From Scratch, <code>metafor</code> and Stan</h2>
-<section id="from-scratch-in-base-r" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="from-scratch-in-base-r"><span class="header-section-number">4.1</span> From Scratch in Base R</h3>
-<p>Every quantity from the theoretical framework, computed directly:</p>
+<section id="from-scratch-checked-against-metafor" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="from-scratch-checked-against-metafor"><span class="header-section-number">4.1</span> From Scratch, Checked Against <code>metafor</code></h3>
+<p>Every quantity from the theoretical framework, computed directly and then verified against the standard R package:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fmt <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, x)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ci_text <span class="ot">&lt;-</span> <span class="cf">function</span>(est, se) <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f, %.2f)"</span>, <span class="fu">exp</span>(est), <span class="fu">exp</span>(est <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se), <span class="fu">exp</span>(est <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Cells of each 2x2 table</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>resp_B <span class="ot">&lt;-</span> blocker<span class="sc">$</span>r_T</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>non_B <span class="ot">&lt;-</span> blocker<span class="sc">$</span>n_T <span class="sc">-</span> blocker<span class="sc">$</span>r_T</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>resp_A <span class="ot">&lt;-</span> blocker<span class="sc">$</span>r_C</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>non_A <span class="ot">&lt;-</span> blocker<span class="sc">$</span>n_C <span class="sc">-</span> blocker<span class="sc">$</span>r_C</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Effect size and variance per trial</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">log</span>((resp_B <span class="sc">/</span> non_B) <span class="sc">/</span> (resp_A <span class="sc">/</span> non_A)) <span class="co"># log OR</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> resp_B <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> non_B <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> resp_A <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> non_A</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed effect</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> v</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>lor_fe <span class="ot">&lt;-</span> <span class="fu">sum</span>(w <span class="sc">*</span> y) <span class="sc">/</span> <span class="fu">sum</span>(w)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>se_fe <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">sum</span>(w))</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Heterogeneity</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>Q <span class="ot">&lt;-</span> <span class="fu">sum</span>(w <span class="sc">*</span> (y <span class="sc">-</span> lor_fe)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>Q_p <span class="ot">&lt;-</span> <span class="fu">pchisq</span>(Q, <span class="at">df =</span> k <span class="sc">-</span> <span class="dv">1</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>tau2 <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="dv">0</span>, (Q <span class="sc">-</span> (k <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">/</span> (<span class="fu">sum</span>(w) <span class="sc">-</span> <span class="fu">sum</span>(w<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>(w))) <span class="co"># DerSimonian-Laird</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>I2 <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="dv">0</span>, (Q <span class="sc">-</span> (k <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">/</span> Q)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Random effects</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>w_re <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (v <span class="sc">+</span> tau2)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>lor_re <span class="ot">&lt;-</span> <span class="fu">sum</span>(w_re <span class="sc">*</span> y) <span class="sc">/</span> <span class="fu">sum</span>(w_re)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>se_re <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">sum</span>(w_re))</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% prediction interval, on the OR scale</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>pi_half <span class="ot">&lt;-</span> <span class="fl">1.96</span> <span class="sc">*</span> <span class="fu">sqrt</span>(tau2 <span class="sc">+</span> se_re<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>pi_lo <span class="ot">&lt;-</span> <span class="fu">exp</span>(lor_re <span class="sc">-</span> pi_half)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>pi_hi <span class="ot">&lt;-</span> <span class="fu">exp</span>(lor_re <span class="sc">+</span> pi_half)</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>w_fe_pct <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> w <span class="sc">/</span> <span class="fu">sum</span>(w)</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>w_re_pct <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> w_re <span class="sc">/</span> <span class="fu">sum</span>(w_re)</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(Q, k <span class="sc">-</span> <span class="dv">1</span>, Q_p, tau2, <span class="dv">100</span> <span class="sc">*</span> I2),</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">1</span>),</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Cochran's Q"</span>, <span class="st">"df"</span>, <span class="st">"p-value"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">tau^2$"</span>, <span class="st">"$I^2$ (%)"</span>)</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: right;">Cochran’s Q</th>
-<th style="text-align: right;">df</th>
-<th style="text-align: right;">p-value</th>
-<th style="text-align: right;"><span class="math inline">\(\tau^2\)</span></th>
-<th style="text-align: right;"><span class="math inline">\(I^2\)</span> (%)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">23.26</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">0.33</td>
-<td style="text-align: right;">0.006</td>
-<td style="text-align: right;">9.7</td>
-</tr>
-</tbody>
-</table>
-</div>
-<details class="code-fold">
-<summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Fixed effect"</span>, <span class="st">"Random effects (DerSimonian-Laird)"</span>),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">ci_text</span>(lor_fe, se_fe), <span class="fu">ci_text</span>(lor_re, se_re)),</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"&amp;ndash;"</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f to %.2f"</span>, pi_lo, pi_hi))</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Model"</span>, <span class="st">"Pooled OR (95% CI)"</span>, <span class="st">"95% prediction interval"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(metafor)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>fmt <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, x)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ci_text <span class="ot">&lt;-</span> <span class="cf">function</span>(est, se) <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f, %.2f)"</span>, <span class="fu">exp</span>(est), <span class="fu">exp</span>(est <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se), <span class="fu">exp</span>(est <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Effect size and variance per trial, from the 2x2 cells</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>resp_B <span class="ot">&lt;-</span> blocker<span class="sc">$</span>r_T</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>non_B <span class="ot">&lt;-</span> blocker<span class="sc">$</span>n_T <span class="sc">-</span> blocker<span class="sc">$</span>r_T</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>resp_A <span class="ot">&lt;-</span> blocker<span class="sc">$</span>r_C</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>non_A <span class="ot">&lt;-</span> blocker<span class="sc">$</span>n_C <span class="sc">-</span> blocker<span class="sc">$</span>r_C</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">log</span>((resp_B <span class="sc">/</span> non_B) <span class="sc">/</span> (resp_A <span class="sc">/</span> non_A)) <span class="co"># log OR</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> resp_B <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> non_B <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> resp_A <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> non_A</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed effect</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> v</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>lor_fe <span class="ot">&lt;-</span> <span class="fu">sum</span>(w <span class="sc">*</span> y) <span class="sc">/</span> <span class="fu">sum</span>(w)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>se_fe <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">sum</span>(w))</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Heterogeneity</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>Q <span class="ot">&lt;-</span> <span class="fu">sum</span>(w <span class="sc">*</span> (y <span class="sc">-</span> lor_fe)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>Q_p <span class="ot">&lt;-</span> <span class="fu">pchisq</span>(Q, <span class="at">df =</span> k <span class="sc">-</span> <span class="dv">1</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>tau2 <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="dv">0</span>, (Q <span class="sc">-</span> (k <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">/</span> (<span class="fu">sum</span>(w) <span class="sc">-</span> <span class="fu">sum</span>(w<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>(w))) <span class="co"># DerSimonian-Laird</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>I2 <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="dv">0</span>, (Q <span class="sc">-</span> (k <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">/</span> Q)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Random effects, and the 95% prediction interval on the OR scale</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>w_re <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (v <span class="sc">+</span> tau2)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>lor_re <span class="ot">&lt;-</span> <span class="fu">sum</span>(w_re <span class="sc">*</span> y) <span class="sc">/</span> <span class="fu">sum</span>(w_re)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>se_re <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">sum</span>(w_re))</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>pi_half <span class="ot">&lt;-</span> <span class="fl">1.96</span> <span class="sc">*</span> <span class="fu">sqrt</span>(tau2 <span class="sc">+</span> se_re<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>pi_lo <span class="ot">&lt;-</span> <span class="fu">exp</span>(lor_re <span class="sc">-</span> pi_half)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>pi_hi <span class="ot">&lt;-</span> <span class="fu">exp</span>(lor_re <span class="sc">+</span> pi_half)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>w_fe_pct <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> w <span class="sc">/</span> <span class="fu">sum</span>(w)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>w_re_pct <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> w_re <span class="sc">/</span> <span class="fu">sum</span>(w_re)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Same analysis through metafor, for verification</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>es <span class="ot">&lt;-</span> <span class="fu">escalc</span>(<span class="at">measure =</span> <span class="st">"OR"</span>, <span class="at">ai =</span> r_T, <span class="at">n1i =</span> n_T, <span class="at">ci =</span> r_C, <span class="at">n2i =</span> n_C, <span class="at">data =</span> blocker)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>fit_fe <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> es, <span class="at">method =</span> <span class="st">"FE"</span>)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>fit_re <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> es, <span class="at">method =</span> <span class="st">"DL"</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>max_diff <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">abs</span>(</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(lor_fe, se_fe, lor_re, se_re, tau2, <span class="dv">100</span> <span class="sc">*</span> I2) <span class="sc">-</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">coef</span>(fit_fe), fit_fe<span class="sc">$</span>se, <span class="fu">coef</span>(fit_re), fit_re<span class="sc">$</span>se, fit_re<span class="sc">$</span>tau2, fit_re<span class="sc">$</span>I2)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Fixed effect"</span>, <span class="st">"Random effects (DerSimonian-Laird)"</span>),</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">ci_text</span>(lor_fe, se_fe), <span class="fu">ci_text</span>(lor_re, se_re)),</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"&amp;ndash;"</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f to %.2f"</span>, pi_lo, pi_hi))</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Model"</span>, <span class="st">"Pooled OR (95% CI)"</span>, <span class="st">"95% prediction interval"</span>)</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -985,86 +831,19 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 </table>
 </div>
 </div>
-<p>Heterogeneity here is modest: <span class="math inline">\(Q\)</span> = 23.26 on 21 degrees of freedom (p = 0.33), <span class="math inline">\(\hat\tau\)</span> = 0.079 on the log OR scale, and <span class="math inline">\(I^2\)</span> = 10%. The two models therefore give nearly the same answer, and the weights move only a little: the largest trial (trial 10, with 3,837 patients) carries 18% of the weight under fixed effects and 15% under random effects.</p>
-</section>
-<section id="cross-check-with-metafor" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="cross-check-with-metafor"><span class="header-section-number">4.2</span> Cross-Check With <code>metafor</code></h3>
-<p>The standard R package gives the same numbers:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(metafor)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>es <span class="ot">&lt;-</span> <span class="fu">escalc</span>(<span class="at">measure =</span> <span class="st">"OR"</span>, <span class="at">ai =</span> r_T, <span class="at">n1i =</span> n_T, <span class="at">ci =</span> r_C, <span class="at">n2i =</span> n_C, <span class="at">data =</span> blocker)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>fit_fe <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> es, <span class="at">method =</span> <span class="st">"FE"</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>fit_re <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> es, <span class="at">method =</span> <span class="st">"DL"</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"log OR, fixed effect"</span>, <span class="st">"SE, fixed effect"</span>, <span class="st">"log OR, random effects"</span>, <span class="st">"SE, random effects"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">tau^2$"</span>, <span class="st">"$I^2$ (%)"</span>),</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(lor_fe, se_fe, lor_re, se_re, tau2, <span class="dv">100</span> <span class="sc">*</span> I2),</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">coef</span>(fit_fe), fit_fe<span class="sc">$</span>se, <span class="fu">coef</span>(fit_re), fit_re<span class="sc">$</span>se, fit_re<span class="sc">$</span>tau2, fit_re<span class="sc">$</span>I2)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">4</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Quantity"</span>, <span class="st">"From scratch"</span>, <span class="st">"metafor"</span>)</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Quantity</th>
-<th style="text-align: right;">From scratch</th>
-<th style="text-align: right;">metafor</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">log OR, fixed effect</td>
-<td style="text-align: right;">-0.2599</td>
-<td style="text-align: right;">-0.2599</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">SE, fixed effect</td>
-<td style="text-align: right;">0.0503</td>
-<td style="text-align: right;">0.0503</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">log OR, random effects</td>
-<td style="text-align: right;">-0.2527</td>
-<td style="text-align: right;">-0.2527</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">SE, random effects</td>
-<td style="text-align: right;">0.0554</td>
-<td style="text-align: right;">0.0554</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><span class="math inline">\(\tau^2\)</span></td>
-<td style="text-align: right;">0.0063</td>
-<td style="text-align: right;">0.0063</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><span class="math inline">\(I^2\)</span> (%)</td>
-<td style="text-align: right;">9.7251</td>
-<td style="text-align: right;">9.7251</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p>Heterogeneity is modest: <span class="math inline">\(Q\)</span> = 23.26 on 21 degrees of freedom (p = 0.33), <span class="math inline">\(\hat\tau\)</span> = 0.079 on the log OR scale, and <span class="math inline">\(I^2\)</span> = 10%. The two models therefore give nearly the same answer, and the weights move only a little: the largest trial (trial 10, with 3,837 patients) carries 18% of the weight under fixed effects and 15% under random effects. <code>metafor</code> reproduces all six quantities above, the largest discrepancy being 6e-14.</p>
 <p>The forest plot shows each trial with its 95% CI, the random-effects pooled estimate as a diamond, and the prediction interval as the dotted line through it:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">forest</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    fit_re,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">slab =</span> <span class="fu">paste</span>(<span class="st">"Trial"</span>, blocker<span class="sc">$</span>trial),</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">atransf =</span> exp,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">at =</span> <span class="fu">log</span>(<span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>)),</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">addpred =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">header =</span> <span class="fu">c</span>(<span class="st">"Trial"</span>, <span class="st">"OR [95% CI]"</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">forest</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    fit_re,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">slab =</span> <span class="fu">paste</span>(<span class="st">"Trial"</span>, blocker<span class="sc">$</span>trial),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">atransf =</span> exp,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">at =</span> <span class="fu">log</span>(<span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>)),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">addpred =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">header =</span> <span class="fu">c</span>(<span class="st">"Trial"</span>, <span class="st">"OR [95% CI]"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1075,8 +854,8 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 </div>
 </div>
 </section>
-<section id="the-bayesian-models-in-stan" class="level3" data-number="4.3">
-<h3 data-number="4.3" class="anchored" data-anchor-id="the-bayesian-models-in-stan"><span class="header-section-number">4.3</span> The Bayesian Models in Stan</h3>
+<section id="the-bayesian-models-in-stan" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="the-bayesian-models-in-stan"><span class="header-section-number">4.2</span> The Bayesian Models in Stan</h3>
 <p>TSD 2 fits this example in WinBUGS with a fixed-effect and a random-effects program. The two Stan models below are the same specifications: Binomial likelihood, logit link, one baseline per trial, and TSD 2’s own vague priors, <span class="math inline">\(N(0, 100^2)\)</span> for the baselines and the pooled effect and <span class="math inline">\(\text{Uniform}(0, 5)\)</span> for the between-trial SD.</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
@@ -1092,43 +871,43 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Fixed effect model for the Blocker example, following NICE DSU TSD 2 Program 1(d)</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; S;                        <span class="co">// number of trials</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_C;             <span class="co">// patients, control arm</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_C;             <span class="co">// deaths, control arm</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_T;             <span class="co">// patients, beta-blocker arm</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_T;             <span class="co">// deaths, beta-blocker arm</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] mu;                          <span class="co">// trial baselines, log odds of death on control</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d;                                <span class="co">// pooled log OR, beta-blocker vs control</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);                   <span class="co">// TSD 2: vague N(0, 100^2)</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  d ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  r_C ~ binomial_logit(n_C, mu);</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  r_T ~ binomial_logit(n_T, mu + d);</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="kw">generated quantities</span> {</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR = exp(d);</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_C;                       <span class="co">// expected deaths, control arm</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_T;                       <span class="co">// expected deaths, treatment arm</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> dev = <span class="dv">0</span>;                          <span class="co">// residual deviance, this draw</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:S) {</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    fit_C[i] = n_C[i] * inv_logit(mu[i]);</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    fit_T[i] = n_T[i] * inv_logit(mu[i] + d);</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_C[i] * log(r_C[i] / fit_C[i])</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>                + (n_C[i] - r_C[i]) * log((n_C[i] - r_C[i]) / (n_C[i] - fit_C[i])));</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_T[i] * log(r_T[i] / fit_T[i])</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>                + (n_T[i] - r_T[i]) * log((n_T[i] - r_T[i]) / (n_T[i] - fit_T[i])));</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Fixed effect model for the Blocker example, following NICE DSU TSD 2 Program 1(d)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; S;                        <span class="co">// number of trials</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_C;             <span class="co">// patients, control arm</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_C;             <span class="co">// deaths, control arm</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_T;             <span class="co">// patients, beta-blocker arm</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_T;             <span class="co">// deaths, beta-blocker arm</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] mu;                          <span class="co">// trial baselines, log odds of death on control</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d;                                <span class="co">// pooled log OR, beta-blocker vs control</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);                   <span class="co">// TSD 2: vague N(0, 100^2)</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  d ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  r_C ~ binomial_logit(n_C, mu);</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  r_T ~ binomial_logit(n_T, mu + d);</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="kw">generated quantities</span> {</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR = exp(d);</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_C;                       <span class="co">// expected deaths, control arm</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_T;                       <span class="co">// expected deaths, treatment arm</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> dev = <span class="dv">0</span>;                          <span class="co">// residual deviance, this draw</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:S) {</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    fit_C[i] = n_C[i] * inv_logit(mu[i]);</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    fit_T[i] = n_T[i] * inv_logit(mu[i] + d);</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_C[i] * log(r_C[i] / fit_C[i])</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>                + (n_C[i] - r_C[i]) * log((n_C[i] - r_C[i]) / (n_C[i] - fit_C[i])));</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_T[i] * log(r_T[i] / fit_T[i])</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>                + (n_T[i] - r_T[i]) * log((n_T[i] - r_T[i]) / (n_T[i] - fit_T[i])));</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -1148,51 +927,51 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Random effects model for the Blocker example, following NICE DSU TSD 2 Program 1(c)</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; S;                        <span class="co">// number of trials</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_C;             <span class="co">// patients, control arm</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_C;             <span class="co">// deaths, control arm</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_T;             <span class="co">// patients, beta-blocker arm</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_T;             <span class="co">// deaths, beta-blocker arm</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] mu;                          <span class="co">// trial baselines, log odds of death on control</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d;                                <span class="co">// mean log OR, beta-blocker vs control</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">5</span>&gt; sigma;          <span class="co">// between-trial SD; TSD 2: Uniform(0, 5)</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] z;                           <span class="co">// standardised trial deviations</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="kw">transformed parameters</span> {</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] delta = d + sigma * z;       <span class="co">// trial-specific log OR (non-centred)</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);                   <span class="co">// TSD 2: vague N(0, 100^2)</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  d ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  z ~ std_normal();                      <span class="co">// implies delta ~ normal(d, sigma)</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  r_C ~ binomial_logit(n_C, mu);</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  r_T ~ binomial_logit(n_T, mu + delta);</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="kw">generated quantities</span> {</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR = exp(d);</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR_new = exp(normal_rng(d, sigma)); <span class="co">// OR in a new trial setting</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_C;                       <span class="co">// expected deaths, control arm</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_T;                       <span class="co">// expected deaths, treatment arm</span></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> dev = <span class="dv">0</span>;                          <span class="co">// residual deviance, this draw</span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:S) {</span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    fit_C[i] = n_C[i] * inv_logit(mu[i]);</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    fit_T[i] = n_T[i] * inv_logit(mu[i] + delta[i]);</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_C[i] * log(r_C[i] / fit_C[i])</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>                + (n_C[i] - r_C[i]) * log((n_C[i] - r_C[i]) / (n_C[i] - fit_C[i])));</span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_T[i] * log(r_T[i] / fit_T[i])</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>                + (n_T[i] - r_T[i]) * log((n_T[i] - r_T[i]) / (n_T[i] - fit_T[i])));</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Random effects model for the Blocker example, following NICE DSU TSD 2 Program 1(c)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; S;                        <span class="co">// number of trials</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_C;             <span class="co">// patients, control arm</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_C;             <span class="co">// deaths, control arm</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n_T;             <span class="co">// patients, beta-blocker arm</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">array</span>[S] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; r_T;             <span class="co">// deaths, beta-blocker arm</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] mu;                          <span class="co">// trial baselines, log odds of death on control</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> d;                                <span class="co">// mean log OR, beta-blocker vs control</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">5</span>&gt; sigma;          <span class="co">// between-trial SD; TSD 2: Uniform(0, 5)</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] z;                           <span class="co">// standardised trial deviations</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="kw">transformed parameters</span> {</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] delta = d + sigma * z;       <span class="co">// trial-specific log OR (non-centred)</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);                   <span class="co">// TSD 2: vague N(0, 100^2)</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  d ~ normal(<span class="dv">0</span>, <span class="dv">100</span>);</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  z ~ std_normal();                      <span class="co">// implies delta ~ normal(d, sigma)</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  r_C ~ binomial_logit(n_C, mu);</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  r_T ~ binomial_logit(n_T, mu + delta);</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="kw">generated quantities</span> {</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR = exp(d);</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> OR_new = exp(normal_rng(d, sigma)); <span class="co">// OR in a new trial setting</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_C;                       <span class="co">// expected deaths, control arm</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[S] fit_T;                       <span class="co">// expected deaths, treatment arm</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span> dev = <span class="dv">0</span>;                          <span class="co">// residual deviance, this draw</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:S) {</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    fit_C[i] = n_C[i] * inv_logit(mu[i]);</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    fit_T[i] = n_T[i] * inv_logit(mu[i] + delta[i]);</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_C[i] * log(r_C[i] / fit_C[i])</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>                + (n_C[i] - r_C[i]) * log((n_C[i] - r_C[i]) / (n_C[i] - fit_C[i])));</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    dev += <span class="dv">2</span> * (r_T[i] * log(r_T[i] / fit_T[i])</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>                + (n_T[i] - r_T[i]) * log((n_T[i] - r_T[i]) / (n_T[i] - fit_T[i])));</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -1207,62 +986,78 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-6"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-6-1"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstan)</span>
-<span id="annotated-cell-6-2"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-6-3"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a>stan_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="annotated-cell-6-4"><a href="#annotated-cell-6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">S =</span> <span class="fu">nrow</span>(blocker),</span>
-<span id="annotated-cell-6-5"><a href="#annotated-cell-6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_C =</span> blocker<span class="sc">$</span>n_C, <span class="at">r_C =</span> blocker<span class="sc">$</span>r_C,</span>
-<span id="annotated-cell-6-6"><a href="#annotated-cell-6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_T =</span> blocker<span class="sc">$</span>n_T, <span class="at">r_T =</span> blocker<span class="sc">$</span>r_T</span>
-<span id="annotated-cell-6-7"><a href="#annotated-cell-6-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="annotated-cell-6-8"><a href="#annotated-cell-6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-6-9"><a href="#annotated-cell-6-9" aria-hidden="true" tabindex="-1"></a>fit_stan <span class="ot">&lt;-</span> <span class="cf">function</span>(file) {</span>
-<span id="annotated-cell-6-10"><a href="#annotated-cell-6-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stan</span>(</span>
-<span id="annotated-cell-6-11"><a href="#annotated-cell-6-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">file =</span> file, <span class="at">data =</span> stan_data,</span>
-<span id="annotated-cell-6-12"><a href="#annotated-cell-6-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">6000</span>, <span class="at">warmup =</span> <span class="dv">2000</span>,</span>
-<span id="annotated-cell-6-13"><a href="#annotated-cell-6-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">seed =</span> <span class="dv">42</span>, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.99</span>), <span class="at">refresh =</span> <span class="dv">0</span></span>
-<span id="annotated-cell-6-14"><a href="#annotated-cell-6-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="annotated-cell-6-15"><a href="#annotated-cell-6-15" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="annotated-cell-6-16"><a href="#annotated-cell-6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-6-17"><a href="#annotated-cell-6-17" aria-hidden="true" tabindex="-1"></a>bayes_fe <span class="ot">&lt;-</span> <span class="fu">fit_stan</span>(<span class="st">"blocker_fe.stan"</span>)</span>
-<span id="annotated-cell-6-18"><a href="#annotated-cell-6-18" aria-hidden="true" tabindex="-1"></a>bayes_re <span class="ot">&lt;-</span> <span class="fu">fit_stan</span>(<span class="st">"blocker_re.stan"</span>)</span>
-<span id="annotated-cell-6-19"><a href="#annotated-cell-6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-6-20"><a href="#annotated-cell-6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># TSD 2 fit statistics, from the deviance contributions the models return</span></span>
-<span id="annotated-cell-6-21"><a href="#annotated-cell-6-21" aria-hidden="true" tabindex="-1"></a>fit_stats <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) {</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-22" class="code-annotation-target"><a href="#annotated-cell-6-22" aria-hidden="true" tabindex="-1"></a>    D_bar <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"dev"</span>))</span>
-<span id="annotated-cell-6-23"><a href="#annotated-cell-6-23" aria-hidden="true" tabindex="-1"></a>    fit_C <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"fit_C"</span>))</span>
-<span id="annotated-cell-6-24"><a href="#annotated-cell-6-24" aria-hidden="true" tabindex="-1"></a>    fit_T <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"fit_T"</span>))</span>
-<span id="annotated-cell-6-25"><a href="#annotated-cell-6-25" aria-hidden="true" tabindex="-1"></a>    dev_at <span class="ot">&lt;-</span> <span class="cf">function</span>(r, n, f) <span class="dv">2</span> <span class="sc">*</span> (r <span class="sc">*</span> <span class="fu">log</span>(r <span class="sc">/</span> f) <span class="sc">+</span> (n <span class="sc">-</span> r) <span class="sc">*</span> <span class="fu">log</span>((n <span class="sc">-</span> r) <span class="sc">/</span> (n <span class="sc">-</span> f)))</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-6-26" class="code-annotation-target"><a href="#annotated-cell-6-26" aria-hidden="true" tabindex="-1"></a>    D_hat <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dev_at</span>(blocker<span class="sc">$</span>r_C, blocker<span class="sc">$</span>n_C, fit_C)) <span class="sc">+</span> <span class="fu">sum</span>(<span class="fu">dev_at</span>(blocker<span class="sc">$</span>r_T, blocker<span class="sc">$</span>n_T, fit_T))</span>
-<span id="annotated-cell-6-27"><a href="#annotated-cell-6-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="at">D_res =</span> D_bar, <span class="at">pD =</span> D_bar <span class="sc">-</span> D_hat, <span class="at">DIC =</span> D_bar <span class="sc">+</span> (D_bar <span class="sc">-</span> D_hat))</span>
-<span id="annotated-cell-6-28"><a href="#annotated-cell-6-28" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="annotated-cell-6-29"><a href="#annotated-cell-6-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-6-30"><a href="#annotated-cell-6-30" aria-hidden="true" tabindex="-1"></a>stats_fe <span class="ot">&lt;-</span> <span class="fu">fit_stats</span>(bayes_fe)</span>
-<span id="annotated-cell-6-31"><a href="#annotated-cell-6-31" aria-hidden="true" tabindex="-1"></a>stats_re <span class="ot">&lt;-</span> <span class="fu">fit_stats</span>(bayes_re)</span>
-<span id="annotated-cell-6-32"><a href="#annotated-cell-6-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-6-33"><a href="#annotated-cell-6-33" aria-hidden="true" tabindex="-1"></a>pars_fe <span class="ot">&lt;-</span> <span class="fu">summary</span>(bayes_fe, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"OR"</span>))<span class="sc">$</span>summary</span>
-<span id="annotated-cell-6-34"><a href="#annotated-cell-6-34" aria-hidden="true" tabindex="-1"></a>pars_re <span class="ot">&lt;-</span> <span class="fu">summary</span>(bayes_re, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"OR"</span>, <span class="st">"sigma"</span>, <span class="st">"OR_new"</span>))<span class="sc">$</span>summary</span>
-<span id="annotated-cell-6-35"><a href="#annotated-cell-6-35" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="annotated-cell-6-36"><a href="#annotated-cell-6-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rbind</span>(pars_fe, pars_re)[, <span class="fu">c</span>(<span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"2.5%"</span>, <span class="st">"50%"</span>, <span class="st">"97.5%"</span>, <span class="st">"n_eff"</span>, <span class="st">"Rhat"</span>)],</span>
-<span id="annotated-cell-6-37"><a href="#annotated-cell-6-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">3</span>),</span>
-<span id="annotated-cell-6-38"><a href="#annotated-cell-6-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"SD"</span>, <span class="st">"2.5%"</span>, <span class="st">"Median"</span>, <span class="st">"97.5%"</span>, <span class="st">"ESS"</span>, <span class="st">"R-hat"</span>)</span>
-<span id="annotated-cell-6-39"><a href="#annotated-cell-6-39" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="annotated-cell-6-40"><a href="#annotated-cell-6-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-6-41"><a href="#annotated-cell-6-41" aria-hidden="true" tabindex="-1"></a>n_div <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) <span class="fu">sum</span>(<span class="fu">sapply</span>(<span class="fu">get_sampler_params</span>(fit, <span class="at">inc_warmup =</span> <span class="cn">FALSE</span>), <span class="cf">function</span>(x) <span class="fu">sum</span>(x[, <span class="st">"divergent__"</span>])))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-4"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-4-1"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstan)</span>
+<span id="annotated-cell-4-2"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-4-3"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a>stan_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="annotated-cell-4-4"><a href="#annotated-cell-4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">S =</span> <span class="fu">nrow</span>(blocker),</span>
+<span id="annotated-cell-4-5"><a href="#annotated-cell-4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_C =</span> blocker<span class="sc">$</span>n_C, <span class="at">r_C =</span> blocker<span class="sc">$</span>r_C,</span>
+<span id="annotated-cell-4-6"><a href="#annotated-cell-4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_T =</span> blocker<span class="sc">$</span>n_T, <span class="at">r_T =</span> blocker<span class="sc">$</span>r_T</span>
+<span id="annotated-cell-4-7"><a href="#annotated-cell-4-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-4-8"><a href="#annotated-cell-4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-4-9"><a href="#annotated-cell-4-9" aria-hidden="true" tabindex="-1"></a>fit_stan <span class="ot">&lt;-</span> <span class="cf">function</span>(file) {</span>
+<span id="annotated-cell-4-10"><a href="#annotated-cell-4-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stan</span>(</span>
+<span id="annotated-cell-4-11"><a href="#annotated-cell-4-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">file =</span> file, <span class="at">data =</span> stan_data,</span>
+<span id="annotated-cell-4-12"><a href="#annotated-cell-4-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">6000</span>, <span class="at">warmup =</span> <span class="dv">2000</span>,</span>
+<span id="annotated-cell-4-13"><a href="#annotated-cell-4-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">seed =</span> <span class="dv">42</span>, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.99</span>), <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="annotated-cell-4-14"><a href="#annotated-cell-4-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="annotated-cell-4-15"><a href="#annotated-cell-4-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-4-16"><a href="#annotated-cell-4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-4-17"><a href="#annotated-cell-4-17" aria-hidden="true" tabindex="-1"></a>bayes_fe <span class="ot">&lt;-</span> <span class="fu">fit_stan</span>(<span class="st">"blocker_fe.stan"</span>)</span>
+<span id="annotated-cell-4-18"><a href="#annotated-cell-4-18" aria-hidden="true" tabindex="-1"></a>bayes_re <span class="ot">&lt;-</span> <span class="fu">fit_stan</span>(<span class="st">"blocker_re.stan"</span>)</span>
+<span id="annotated-cell-4-19"><a href="#annotated-cell-4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-4-20"><a href="#annotated-cell-4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># TSD 2 fit statistics, from the deviance contributions the models return</span></span>
+<span id="annotated-cell-4-21"><a href="#annotated-cell-4-21" aria-hidden="true" tabindex="-1"></a>fit_stats <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-4-22" class="code-annotation-target"><a href="#annotated-cell-4-22" aria-hidden="true" tabindex="-1"></a>    D_bar <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"dev"</span>))</span>
+<span id="annotated-cell-4-23"><a href="#annotated-cell-4-23" aria-hidden="true" tabindex="-1"></a>    fit_C <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"fit_C"</span>))</span>
+<span id="annotated-cell-4-24"><a href="#annotated-cell-4-24" aria-hidden="true" tabindex="-1"></a>    fit_T <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"fit_T"</span>))</span>
+<span id="annotated-cell-4-25"><a href="#annotated-cell-4-25" aria-hidden="true" tabindex="-1"></a>    dev_at <span class="ot">&lt;-</span> <span class="cf">function</span>(r, n, f) <span class="dv">2</span> <span class="sc">*</span> (r <span class="sc">*</span> <span class="fu">log</span>(r <span class="sc">/</span> f) <span class="sc">+</span> (n <span class="sc">-</span> r) <span class="sc">*</span> <span class="fu">log</span>((n <span class="sc">-</span> r) <span class="sc">/</span> (n <span class="sc">-</span> f)))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-4-26" class="code-annotation-target"><a href="#annotated-cell-4-26" aria-hidden="true" tabindex="-1"></a>    D_hat <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dev_at</span>(blocker<span class="sc">$</span>r_C, blocker<span class="sc">$</span>n_C, fit_C)) <span class="sc">+</span> <span class="fu">sum</span>(<span class="fu">dev_at</span>(blocker<span class="sc">$</span>r_T, blocker<span class="sc">$</span>n_T, fit_T))</span>
+<span id="annotated-cell-4-27"><a href="#annotated-cell-4-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="at">D_res =</span> D_bar, <span class="at">pD =</span> D_bar <span class="sc">-</span> D_hat, <span class="at">DIC =</span> D_bar <span class="sc">+</span> (D_bar <span class="sc">-</span> D_hat))</span>
+<span id="annotated-cell-4-28"><a href="#annotated-cell-4-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="annotated-cell-4-29"><a href="#annotated-cell-4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-4-30"><a href="#annotated-cell-4-30" aria-hidden="true" tabindex="-1"></a>stats_fe <span class="ot">&lt;-</span> <span class="fu">fit_stats</span>(bayes_fe)</span>
+<span id="annotated-cell-4-31"><a href="#annotated-cell-4-31" aria-hidden="true" tabindex="-1"></a>stats_re <span class="ot">&lt;-</span> <span class="fu">fit_stats</span>(bayes_re)</span>
+<span id="annotated-cell-4-32"><a href="#annotated-cell-4-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-4-33"><a href="#annotated-cell-4-33" aria-hidden="true" tabindex="-1"></a>pars_fe <span class="ot">&lt;-</span> <span class="fu">summary</span>(bayes_fe, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"OR"</span>))<span class="sc">$</span>summary</span>
+<span id="annotated-cell-4-34"><a href="#annotated-cell-4-34" aria-hidden="true" tabindex="-1"></a>pars_re <span class="ot">&lt;-</span> <span class="fu">summary</span>(bayes_re, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"OR"</span>, <span class="st">"sigma"</span>, <span class="st">"OR_new"</span>))<span class="sc">$</span>summary</span>
+<span id="annotated-cell-4-35"><a href="#annotated-cell-4-35" aria-hidden="true" tabindex="-1"></a>posterior_tbl <span class="ot">&lt;-</span> <span class="fu">rbind</span>(pars_fe, pars_re)[, <span class="fu">c</span>(<span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"2.5%"</span>, <span class="st">"50%"</span>, <span class="st">"97.5%"</span>, <span class="st">"n_eff"</span>, <span class="st">"Rhat"</span>)]</span>
+<span id="annotated-cell-4-36"><a href="#annotated-cell-4-36" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(posterior_tbl) <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="annotated-cell-4-37"><a href="#annotated-cell-4-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Fixed effect: d (log OR)"</span>, <span class="st">"Fixed effect: OR"</span>,</span>
+<span id="annotated-cell-4-38"><a href="#annotated-cell-4-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Random effects: d (log OR)"</span>, <span class="st">"Random effects: OR"</span>,</span>
+<span id="annotated-cell-4-39"><a href="#annotated-cell-4-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Random effects: sigma (between-trial SD)"</span>, <span class="st">"Random effects: OR in a new trial"</span></span>
+<span id="annotated-cell-4-40"><a href="#annotated-cell-4-40" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-4-41"><a href="#annotated-cell-4-41" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="annotated-cell-4-42"><a href="#annotated-cell-4-42" aria-hidden="true" tabindex="-1"></a>    posterior_tbl,</span>
+<span id="annotated-cell-4-43"><a href="#annotated-cell-4-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">3</span>),</span>
+<span id="annotated-cell-4-44"><a href="#annotated-cell-4-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"SD"</span>, <span class="st">"2.5%"</span>, <span class="st">"Median"</span>, <span class="st">"97.5%"</span>, <span class="st">"ESS"</span>, <span class="st">"R-hat"</span>)</span>
+<span id="annotated-cell-4-45"><a href="#annotated-cell-4-45" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-4-46"><a href="#annotated-cell-4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-4-47"><a href="#annotated-cell-4-47" aria-hidden="true" tabindex="-1"></a>n_div <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) <span class="fu">sum</span>(<span class="fu">sapply</span>(<span class="fu">get_sampler_params</span>(fit, <span class="at">inc_warmup =</span> <span class="cn">FALSE</span>), <span class="cf">function</span>(x) <span class="fu">sum</span>(x[, <span class="st">"divergent__"</span>])))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-annotation">
 <dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="22" data-code-annotation="1">Posterior mean of the residual deviance, summed over all 44 trial arms</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="22" data-code-annotation="1">Posterior mean of the residual deviance, summed over all 44 trial arms</span>
 </dd>
-<dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="26" data-code-annotation="2">The same deviance evaluated once, at the posterior mean of the fitted values</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="26" data-code-annotation="2">The same deviance evaluated once, at the posterior mean of the fitted values</span>
 </dd>
 </dl>
 </div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 6%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;"></th>
@@ -1277,7 +1072,7 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">d</td>
+<td style="text-align: left;">Fixed effect: d (log OR)</td>
 <td style="text-align: right;">-0.262</td>
 <td style="text-align: right;">0.050</td>
 <td style="text-align: right;">-0.360</td>
@@ -1287,7 +1082,7 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <td style="text-align: right;">1.000</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">OR</td>
+<td style="text-align: left;">Fixed effect: OR</td>
 <td style="text-align: right;">0.771</td>
 <td style="text-align: right;">0.039</td>
 <td style="text-align: right;">0.698</td>
@@ -1297,7 +1092,7 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <td style="text-align: right;">1.000</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">d</td>
+<td style="text-align: left;">Random effects: d (log OR)</td>
 <td style="text-align: right;">-0.249</td>
 <td style="text-align: right;">0.066</td>
 <td style="text-align: right;">-0.375</td>
@@ -1307,7 +1102,7 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <td style="text-align: right;">1.000</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">OR</td>
+<td style="text-align: left;">Random effects: OR</td>
 <td style="text-align: right;">0.781</td>
 <td style="text-align: right;">0.051</td>
 <td style="text-align: right;">0.687</td>
@@ -1317,7 +1112,7 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <td style="text-align: right;">1.000</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">sigma</td>
+<td style="text-align: left;">Random effects: sigma (between-trial SD)</td>
 <td style="text-align: right;">0.135</td>
 <td style="text-align: right;">0.082</td>
 <td style="text-align: right;">0.009</td>
@@ -1327,7 +1122,7 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <td style="text-align: right;">1.001</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">OR_new</td>
+<td style="text-align: left;">Random effects: OR in a new trial</td>
 <td style="text-align: right;">0.790</td>
 <td style="text-align: right;">0.147</td>
 <td style="text-align: right;">0.545</td>
@@ -1340,7 +1135,92 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 </table>
 </div>
 </div>
-<p>The first two rows are the fixed-effect model, the rest the random-effects model. Neither sampler reported any divergent transitions (0 and 0), the largest R-hat is 1.001, and the smallest effective sample size is 3,358.</p>
+<p>Neither sampler reported any divergent transitions (0 and 0), the largest R-hat is 1.001, and the smallest effective sample size is 3,358.</p>
+</section>
+<section id="the-same-quantities-both-ways" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="the-same-quantities-both-ways"><span class="header-section-number">4.3</span> The Same Quantities, Both Ways</h3>
+<p>The frequentist and Bayesian analyses estimate the same things. Setting them next to each other shows where they agree and where they cannot:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>View the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>or_ci <span class="ot">&lt;-</span> <span class="cf">function</span>(est, lo, hi) <span class="fu">sprintf</span>(<span class="st">"%.2f (%.2f, %.2f)"</span>, <span class="fu">exp</span>(est), <span class="fu">exp</span>(lo), <span class="fu">exp</span>(hi))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>post <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(bayes_re, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"sigma"</span>, <span class="st">"OR_new"</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Pooled OR, fixed effect"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Pooled OR, random effects"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Between-trial SD ($</span><span class="sc">\\</span><span class="st">hat</span><span class="sc">\\</span><span class="st">tau$ or $</span><span class="sc">\\</span><span class="st">sigma$)"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"95% prediction interval, OR"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Cochran's $Q$, $I^2$"</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>            <span class="fu">or_ci</span>(lor_fe, lor_fe <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se_fe, lor_fe <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se_fe),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">or_ci</span>(lor_re, lor_re <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se_re, lor_re <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se_re),</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, <span class="fu">sqrt</span>(tau2)),</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sprintf</span>(<span class="st">"%.2f to %.2f"</span>, pi_lo, pi_hi),</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sprintf</span>(<span class="st">"%.2f, %.0f%%"</span>, Q, <span class="dv">100</span> <span class="sc">*</span> I2)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>            <span class="fu">or_ci</span>(pars_fe[<span class="st">"d"</span>, <span class="st">"50%"</span>], pars_fe[<span class="st">"d"</span>, <span class="st">"2.5%"</span>], pars_fe[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>            <span class="fu">or_ci</span>(pars_re[<span class="st">"d"</span>, <span class="st">"50%"</span>], pars_re[<span class="st">"d"</span>, <span class="st">"2.5%"</span>], pars_re[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sprintf</span>(<span class="st">"%.3f (%.3f, %.3f)"</span>, <span class="fu">median</span>(post<span class="sc">$</span>sigma), <span class="fu">quantile</span>(post<span class="sc">$</span>sigma, <span class="fl">0.025</span>), <span class="fu">quantile</span>(post<span class="sc">$</span>sigma, <span class="fl">0.975</span>)),</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sprintf</span>(<span class="st">"%.2f to %.2f"</span>, <span class="fu">quantile</span>(post<span class="sc">$</span>OR_new, <span class="fl">0.025</span>), <span class="fu">quantile</span>(post<span class="sc">$</span>OR_new, <span class="fl">0.975</span>)),</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>            <span class="st">"no counterpart"</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"lcc"</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Quantity"</span>, <span class="st">"Frequentist (inverse variance, DL)"</span>, <span class="st">"Bayesian (Stan)"</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 42%">
+<col style="width: 36%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Quantity</th>
+<th style="text-align: center;">Frequentist (inverse variance, DL)</th>
+<th style="text-align: center;">Bayesian (Stan)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Pooled OR, fixed effect</td>
+<td style="text-align: center;">0.77 (0.70, 0.85)</td>
+<td style="text-align: center;">0.77 (0.70, 0.85)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pooled OR, random effects</td>
+<td style="text-align: center;">0.78 (0.70, 0.87)</td>
+<td style="text-align: center;">0.78 (0.69, 0.89)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Between-trial SD (<span class="math inline">\(\hat\tau\)</span> or <span class="math inline">\(\sigma\)</span>)</td>
+<td style="text-align: center;">0.079</td>
+<td style="text-align: center;">0.128 (0.009, 0.316)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">95% prediction interval, OR</td>
+<td style="text-align: center;">0.64 to 0.94</td>
+<td style="text-align: center;">0.54 to 1.12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cochran’s <span class="math inline">\(Q\)</span>, <span class="math inline">\(I^2\)</span></td>
+<td style="text-align: center;">23.26, 10%</td>
+<td style="text-align: center;">no counterpart</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The pooled effects agree closely, in both models and on both scales. That is not a coincidence: <a href="#sec-bayes" class="quarto-xref">Section&nbsp;2.6</a> shows that with <span class="math inline">\(\tau\)</span> held fixed and a flat prior, the Bayesian posterior mean for the pooled effect <strong>is</strong> the inverse-variance weighted average, so the two can only differ through the treatment of <span class="math inline">\(\tau\)</span> and through the Normal approximation the frequentist analysis makes for each trial.</p>
+<p>The heterogeneity estimates do not agree, and the quantities that depend on them inherit the difference. Everything that follows from <span class="math inline">\(\tau\)</span> is affected: the random-effects interval is a little wider in the Bayesian analysis, and the prediction interval noticeably so.</p>
+<p>The last row is the one to note in an audit. <span class="math inline">\(Q\)</span> and <span class="math inline">\(I^2\)</span> are constructions of the Cochrane tradition and have no counterpart in this model; TSD 2 reports neither for this example, and defers heterogeneity to TSD 3. The two traditions summarise the same data differently: one reports heterogeneity statistics, the other model fit.</p>
 </section>
 </section>
 <section id="results" class="level2" data-number="5">
@@ -1349,35 +1229,35 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <div class="cell">
 <details class="code-fold">
 <summary>View the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Published values, exactly as printed in TSD 2 Table 2</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>tsd2 <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-0.26"</span>, <span class="st">"0.050"</span>, <span class="st">"-0.36"</span>, <span class="st">"-0.16"</span>, <span class="st">"46.8"</span>, <span class="st">"23.0"</span>, <span class="st">"69.8"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-0.25"</span>, <span class="st">"0.066"</span>, <span class="st">"-0.38"</span>, <span class="st">"-0.12"</span>, <span class="st">"0.13"</span>, <span class="st">"41.9"</span>, <span class="st">"28.1"</span>, <span class="st">"70.0"</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>ours <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"DIC"</span>]),</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"sigma"</span>, <span class="st">"50%"</span>]),</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"DIC"</span>])</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fixed effect: $d$ (log OR), median"</span>, <span class="st">"Fixed effect: SD"</span>, <span class="st">"Fixed effect: 2.5%"</span>, <span class="st">"Fixed effect: 97.5%"</span>,</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fixed effect: $</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"Fixed effect: $p_D$"</span>, <span class="st">"Fixed effect: DIC"</span>,</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random effects: $d$ (log OR), median"</span>, <span class="st">"Random effects: SD"</span>, <span class="st">"Random effects: 2.5%"</span>, <span class="st">"Random effects: 97.5%"</span>,</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random effects: $</span><span class="sc">\\</span><span class="st">sigma$, median"</span>, <span class="st">"Random effects: $</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"Random effects: $p_D$"</span>, <span class="st">"Random effects: DIC"</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        tsd2, ours</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"lcc"</span>,</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Quantity"</span>, <span class="st">"TSD 2, Table 2"</span>, <span class="st">"This page, Stan"</span>)</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Published values, exactly as printed in TSD 2 Table 2</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>tsd2 <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-0.26"</span>, <span class="st">"0.050"</span>, <span class="st">"-0.36"</span>, <span class="st">"-0.16"</span>, <span class="st">"46.8"</span>, <span class="st">"23.0"</span>, <span class="st">"69.8"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-0.25"</span>, <span class="st">"0.066"</span>, <span class="st">"-0.38"</span>, <span class="st">"-0.12"</span>, <span class="st">"0.13"</span>, <span class="st">"41.9"</span>, <span class="st">"28.1"</span>, <span class="st">"70.0"</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>ours <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_fe[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_fe[<span class="st">"DIC"</span>]),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"50%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"sd"</span>]),</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"2.5%"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"d"</span>, <span class="st">"97.5%"</span>]),</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, pars_re[<span class="st">"sigma"</span>, <span class="st">"50%"</span>]),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"D_res"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"pD"</span>]), <span class="fu">sprintf</span>(<span class="st">"%.1f"</span>, stats_re[<span class="st">"DIC"</span>])</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fixed effect: $d$ (log OR), median"</span>, <span class="st">"Fixed effect: SD"</span>, <span class="st">"Fixed effect: 2.5%"</span>, <span class="st">"Fixed effect: 97.5%"</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fixed effect: $</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"Fixed effect: $p_D$"</span>, <span class="st">"Fixed effect: DIC"</span>,</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random effects: $d$ (log OR), median"</span>, <span class="st">"Random effects: SD"</span>, <span class="st">"Random effects: 2.5%"</span>, <span class="st">"Random effects: 97.5%"</span>,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random effects: $</span><span class="sc">\\</span><span class="st">sigma$, median"</span>, <span class="st">"Random effects: $</span><span class="sc">\\</span><span class="st">bar{D}_{res}$"</span>, <span class="st">"Random effects: $p_D$"</span>, <span class="st">"Random effects: DIC"</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        tsd2, ours</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"lcc"</span>,</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Quantity"</span>, <span class="st">"TSD 2, Table 2"</span>, <span class="st">"This page, Stan"</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1552,6 +1432,164 @@ p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
 <p>Pairwise meta-analysis comes down to a weighted average with two decisions attached: how to weight the trials, and whether they share one effect. The fixed-effect model weights by precision alone; the random-effects model adds between-study variance, which evens out the weights, widens the interval and makes the prediction interval available. The Bayesian version works from the counts and carries the uncertainty in <span class="math inline">\(\tau\)</span>, and it is the same model that a <a href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">Standard Bayesian NMA</a> extends to a network of comparisons.</p>
 <p>On the beta-blocker data all of this reproduces what TSD 2 reports, down to the residual deviance and the effective number of parameters. The two models are hard to separate on fit, which is the ordinary case rather than the exception, and the decision then rests on interpretability and on what the prediction interval says about a new population.</p>
 <p><strong>Methodological References</strong>: NICE DSU TSD 2 (Dias et al., 2011, updated 2016); <em>Cochrane Handbook for Systematic Reviews of Interventions</em>, Chapter 10; DerSimonian &amp; Laird (1986); Higgins, Thompson &amp; Spiegelhalter (2009) on prediction intervals.</p>
+</section>
+<section id="sec-data" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="sec-data"><span class="header-section-number">8</span> Appendix: The Trial Data</h2>
+<p>Deaths and patients in each arm of the 22 trials, as given in NICE DSU TSD 2 Table 1 (Carlin, 1992).</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 38%">
+<col style="width: 45%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Trial</th>
+<th style="text-align: center;">Deaths / patients, control</th>
+<th style="text-align: center;">Deaths / patients, beta-blocker</th>
+<th style="text-align: center;">OR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: center;">3 / 39</td>
+<td style="text-align: center;">3 / 38</td>
+<td style="text-align: center;">1.03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: center;">14 / 116</td>
+<td style="text-align: center;">7 / 114</td>
+<td style="text-align: center;">0.48</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: center;">11 / 93</td>
+<td style="text-align: center;">5 / 69</td>
+<td style="text-align: center;">0.58</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: center;">127 / 1520</td>
+<td style="text-align: center;">102 / 1533</td>
+<td style="text-align: center;">0.78</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: center;">27 / 365</td>
+<td style="text-align: center;">28 / 355</td>
+<td style="text-align: center;">1.07</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: center;">6 / 52</td>
+<td style="text-align: center;">4 / 59</td>
+<td style="text-align: center;">0.56</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: center;">152 / 939</td>
+<td style="text-align: center;">98 / 945</td>
+<td style="text-align: center;">0.60</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: center;">48 / 471</td>
+<td style="text-align: center;">60 / 632</td>
+<td style="text-align: center;">0.92</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: center;">37 / 282</td>
+<td style="text-align: center;">25 / 278</td>
+<td style="text-align: center;">0.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: center;">188 / 1921</td>
+<td style="text-align: center;">138 / 1916</td>
+<td style="text-align: center;">0.72</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">11</td>
+<td style="text-align: center;">52 / 583</td>
+<td style="text-align: center;">64 / 873</td>
+<td style="text-align: center;">0.81</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">12</td>
+<td style="text-align: center;">47 / 266</td>
+<td style="text-align: center;">45 / 263</td>
+<td style="text-align: center;">0.96</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">13</td>
+<td style="text-align: center;">16 / 293</td>
+<td style="text-align: center;">9 / 291</td>
+<td style="text-align: center;">0.55</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">14</td>
+<td style="text-align: center;">45 / 883</td>
+<td style="text-align: center;">57 / 858</td>
+<td style="text-align: center;">1.33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">15</td>
+<td style="text-align: center;">31 / 147</td>
+<td style="text-align: center;">25 / 154</td>
+<td style="text-align: center;">0.73</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">16</td>
+<td style="text-align: center;">38 / 213</td>
+<td style="text-align: center;">33 / 207</td>
+<td style="text-align: center;">0.87</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">17</td>
+<td style="text-align: center;">12 / 122</td>
+<td style="text-align: center;">28 / 251</td>
+<td style="text-align: center;">1.15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">18</td>
+<td style="text-align: center;">6 / 154</td>
+<td style="text-align: center;">8 / 151</td>
+<td style="text-align: center;">1.38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">19</td>
+<td style="text-align: center;">3 / 134</td>
+<td style="text-align: center;">6 / 174</td>
+<td style="text-align: center;">1.56</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">20</td>
+<td style="text-align: center;">40 / 218</td>
+<td style="text-align: center;">32 / 209</td>
+<td style="text-align: center;">0.80</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21</td>
+<td style="text-align: center;">43 / 364</td>
+<td style="text-align: center;">27 / 391</td>
+<td style="text-align: center;">0.55</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">22</td>
+<td style="text-align: center;">39 / 674</td>
+<td style="text-align: center;">22 / 680</td>
+<td style="text-align: center;">0.54</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 
 </section>
