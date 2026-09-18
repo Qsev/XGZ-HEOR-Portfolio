@@ -127,7 +127,7 @@ Deciding between a Fixed Effects and a Random Effects model is a critical decisi
 
 1. **Clinical Plausibility**: Are the trials sufficiently similar in terms of patient populations (e.g., age, baseline severity), treatment protocols, and outcome definitions? If there are obvious differences, an RE model is clinically more plausible. 
 2. **Statistical Heterogeneity**: - Check the estimated between-study standard deviation ($\tau$). Is it large relative to the treatment effects? - Look at the $I^2$ statistic from pairwise meta-analyses. 
-3. **Model Fit (DIC)**: Compare the Deviance Information Criterion (DIC) between FE and RE models. A smaller DIC indicates a better fit. A difference of 3-5 points is usually considered meaningful. If DIC is similar, the simpler FE model is often preferred (principle of parsimony). 
+3. **Model Fit (DIC)**: Compare the Deviance Information Criterion (DIC) between FE and RE models, alongside the residual deviance. A smaller DIC indicates a better fit, and the DIC already penalises the extra parameter the RE model brings. NICE DSU TSD 2 recommends consulting both and sets no numerical threshold: the difference of 3-5 points often quoted is a rule of thumb from the wider DIC literature, not from TSD 2. When the two models are close, the choice rests on the data-generating process and the interpretability of the results. 
 4. **Network Sparsity**: If the network is sparse (very few studies per comparison), the RE model may struggle to estimate $\tau$ accurately, leading to wide credible intervals. In such cases, an FE model or an RE model with an informative prior for $\tau$ may be necessary.
 :::
 
@@ -580,6 +580,8 @@ After running the MCMC, we combine the direct and indirect evidence to get the f
 ### The League Table (Median OR and 95% CrI)
 
 ```{r league-table}
+library(knitr) # the chunks above may be served from cache, so load it here too
+
 post <- rstan::extract(fit, pars = c("d_AB", "d_AC"))
 d <- cbind(A = 0, B = post$d_AB, C = post$d_AC) # log OR of each treatment vs A, one row per draw
 trts <- colnames(d)

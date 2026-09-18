@@ -33,6 +33,8 @@ For a binary outcome such as response, each trial reduces to a 2×2 table:
 | Treatment B |    $a$     |      $b$       |
 | Treatment A |    $c$     |      $d$       |
 
+Index the trials by $i = 1, \dots, k$ (in the mock case below, $k = 5$). In trial $i$, arm B enrols $n_B$ patients and arm A enrols $n_A$. The responder counts are random variables, $a \sim \text{Binomial}(n_B, p_B)$ and $c \sim \text{Binomial}(n_A, p_A)$, where $p_B$ and $p_A$ are the true response rates; the non-responders are $b = n_B - a$ and $d = n_A - c$. The subscript $i$ is dropped from these quantities to keep the formulas readable.
+
 The odds ratio and its logarithm are
 
 $$OR_i = \frac{a / b}{c / d} = \frac{ad}{bc}, \qquad y_i = \ln OR_i$$
@@ -48,7 +50,7 @@ Each arm contributes the reciprocals of its own two counts. Larger trials have l
 ::: {.callout-note collapse="true"}
 # Where the variance formula comes from
 
-**Step 1: the response rate in one arm.** Take arm B, with $n$ patients and true response rate $p$. The number of responders is $a \sim \text{Binomial}(n, p)$, so the observed rate $\hat p = a / n$ has variance
+**Step 1: the response rate in one arm.** Take arm B, and write $n = n_B$ and $p = p_B$ for short. Since $a \sim \text{Binomial}(n, p)$, the observed rate $\hat p = a / n$ has variance
 
 $$\text{Var}(\hat p) = \frac{p(1-p)}{n}$$ {#eq-var-p}
 
@@ -95,7 +97,9 @@ The **fixed-effect** model assumes every trial estimates one common effect $\the
 
 $$y_i \sim N(\theta, v_i), \qquad i = 1, \dots, k$$
 
-treating each $v_i$ as known. The log-likelihood is
+treating each $v_i$ as known. Strictly, the variance of $y_i$ depends on the true response rates $p_B$ and $p_A$, which are unknown; $v_i$ replaces them with the observed rates, so it is an estimate. Treating it as a known constant is an approximation that works well with large counts, but with few events it makes both the weights and the pooled estimate unreliable, because $y_i$ and $v_i$ are computed from the same counts.
+
+The log-likelihood is
 
 $$\ell(\theta) = -\frac{1}{2} \sum_{i=1}^{k} \frac{(y_i - \theta)^2}{v_i} + \text{const}$$
 
@@ -115,7 +119,9 @@ Trials differ in populations, doses and settings, so the true effect may differ 
 
 $$y_i \sim N(\theta_i, v_i), \qquad \theta_i \sim N(\mu, \tau^2)$$
 
-Here $\mu$ is the average effect across settings and $\tau^2$ the between-study variance. Integrating out $\theta_i$ gives
+Here $\mu$ is the average effect across settings and $\tau^2$ the between-study variance. $v_i$ is the within-trial variance computed from $a, b, c, d$: it describes how $y_i$ varies around trial $i$'s own true effect $\theta_i$. A single trial has only one $\theta_i$, so it cannot show how true effects differ between trials; $\tau^2$ is estimated from how much the trials scatter beyond what their own $v_i$ can explain, as described in @sec-tau2.
+
+Integrating out $\theta_i$ gives
 
 $$y_i \sim N(\mu, \; v_i + \tau^2)$$
 
@@ -134,6 +140,19 @@ The random-effects model needs a value for $\tau^2$, and the choice between the 
 | Cochran's $Q$ | Do the trials disagree more than chance alone would explain? | A test statistic |
 | $\tau^2$ | How far apart are the true effects? | Variance of the log OR |
 | $I^2$ | What share of the observed scatter is real rather than chance? | A proportion, 0 to 100% |
+
+::: {#nte-choose .callout-note collapse="true"}
+# Choosing between the two models
+
+In order of what should carry the most weight:
+
+1.  **Clinical judgement, first.** Do the trials plausibly estimate one common effect: similar populations, doses, comparators, outcome definitions and follow-up? If they clearly do not, the fixed-effect assumption is hard to defend and the random-effects model is the honest default. A fixed-effect analysis then needs a positive argument, not just a favourable statistic.
+2.  **The size of the heterogeneity, not its significance.** Read $\tau$ and the prediction interval (@sec-pi), and ask whether the spread they describe is large enough to change a decision. A statistically significant $Q$ with a prediction interval that stays well away from no effect is a different situation from a non-significant $Q$ with a prediction interval that crosses it.
+3.  **Model fit.** Compare the two models on residual deviance and DIC: lower is better, and the DIC already penalises the extra parameter the random-effects model brings. NICE DSU TSD 2 recommends consulting both and sets no numerical threshold for how large a difference counts; the figure of 3 to 5 points often quoted is a rule of thumb from the wider DIC literature, not from TSD 2. When the two models are close, TSD 2's advice elsewhere is to decide on the data-generating process and the interpretability of the results rather than on the statistic.
+4.  **How many trials there are.** With few trials $\tau$ is badly estimated, and a DerSimonian–Laird random-effects interval can be too narrow (@sec-tau2). The remedies are the Hartung–Knapp–Sidik–Jonkman adjustment, REML, or a Bayesian model with an informative prior on $\tau$. Switching to a fixed-effect model is not a remedy: it assumes the problem away.
+
+Three things not to do: choose by whether $Q$ is significant, choose by an $I^2$ threshold alone, or choose the model that happens to give the narrower interval. NICE DSU TSD 2 sets out the fit-based comparison; the [Standard Bayesian NMA](01_Standard_Bayesian_NMA_Guide.qmd) guide lists the same judgement in a network setting.
+:::
 
 #### Cochran's Q: More Scatter Than Chance?
 
@@ -154,7 +173,7 @@ That gives a test: a $Q$ well above $k - 1$ is unlikely if the trials share one 
 
 Either way, $Q$ says whether heterogeneity is detectable, not how large it is.
 
-#### τ²: How Far Apart Are the True Effects?
+#### τ²: How Far Apart Are the True Effects? {#sec-tau2}
 
 $\tau^2$ is the variance of the true log ORs across settings, and $\tau$ their standard deviation. It is the quantity with a direct clinical reading: under the random-effects model, about 95% of true effects lie within $\mu \pm 1.96\,\tau$ on the log scale. On the OR scale that is a multiplicative range. With $\tau = 0.3$, for example, true ORs span a factor of $e^{1.96 \times 0.3} \approx 1.8$ either side of the average OR: an average OR of 2 would be consistent with true ORs from about 1.1 to 3.6 in different settings.
 
@@ -233,7 +252,7 @@ $$\frac{\hat\tau^2}{\hat\tau^2 + s^2} = \frac{(Q - (k - 1)) / c}{(Q - (k - 1)) /
 So $I^2$ and $\hat\tau^2_{DL}$ carry the same information from $Q$; $I^2$ simply rescales it by the precision of the trials.
 :::
 
-### The Prediction Interval
+### The Prediction Interval {#sec-pi}
 
 The confidence interval for $\mu$ describes uncertainty about the **average** effect. A decision about a new population needs the range of effects to expect in **one new setting**, which also includes the spread $\tau^2$:
 
@@ -241,15 +260,65 @@ $$\hat\mu_{RE} \pm 1.96 \sqrt{\hat\tau^2 + \text{Var}(\hat\mu_{RE})}$$
 
 With substantial heterogeneity, the prediction interval can include no effect even when the confidence interval does not.
 
-### The Bayesian Version: An NMA With One Comparison
+### The Bayesian Version: The Same Model, Estimated Differently {#sec-bayes}
 
-The models above take each $y_i$ and $v_i$ as given, which relies on a Normal approximation. The Bayesian model used for NMA goes back to the counts, with a Binomial likelihood for each arm:
+The models above reduce each trial to two numbers, $y_i$ and $v_i$, and treat $y_i$ as Normal with known variance. The Bayesian model used for NMA skips that reduction and works directly with the number of responders and patients in each arm, through a Binomial likelihood:
 
 $$r_{iA} \sim \text{Binomial}(n_{iA}, p_{iA}), \qquad r_{iB} \sim \text{Binomial}(n_{iB}, p_{iB})$$
 
 $$\text{logit}(p_{iA}) = \mu_i, \qquad \text{logit}(p_{iB}) = \mu_i + \delta_i, \qquad \delta_i \sim N(d, \tau^2)$$
 
-This is the model of the [Standard Bayesian NMA](01_Standard_Bayesian_NMA_Guide.qmd) guide with a single comparison: $\mu_i$ is the study's baseline log odds, $\delta_i$ its log OR and $d$ the pooled log OR. Two differences from the DerSimonian–Laird approach matter in practice: no Normal approximation is needed for each trial, and $\tau$ is estimated with its own uncertainty instead of being plugged in as a single number.
+This is the model of the [Standard Bayesian NMA](01_Standard_Bayesian_NMA_Guide.qmd) guide with a single comparison, and its unknowns are the ones already met above under different names: $d$ is the average effect ($\mu$ in the random-effects model), $\delta_i$ is trial $i$'s own true effect ($\theta_i$), and $\tau$ is the spread between trials. Only the baselines $\mu_i$ are new, because reducing each trial to $y_i$ had already removed them by taking a difference within the trial. Note that $\mu_i$ here is a baseline log odds, not the average effect $\mu$ of the random-effects model; the clash of letters is the convention used in the NMA literature.
+
+What changes is not the model but what is treated as unknown. The frequentist approach treats $\mu$ and $\tau$ as fixed constants to be estimated, and $\theta_i$ as a random draw that is never itself reported. The Bayesian approach treats all of them as unknown quantities with a joint posterior distribution:
+
+$$
+\begin{aligned}
+p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
+& \prod_{i=1}^{k} P(r_{iA}, r_{iB} \mid \mu_i, \delta_i) && \text{likelihood} \\[4pt]
+\times \; & \prod_{i=1}^{k} N(\delta_i \mid d, \tau^2) && \text{between-trial distribution} \\[4pt]
+\times \; & \; p(d)\; p(\tau) \prod_{i=1}^{k} p(\mu_i) && \text{priors}
+\end{aligned}
+$$ {#eq-post}
+
+There is nothing to solve in ([-@eq-post]); MCMC maps it by sampling, exactly as in [The Core of Bayesian Estimation](10_Bayesian_Estimation.qmd).
+
+Counting the unknowns: with $k$ trials there are $2k + 2$ of them, a baseline and a true effect for each trial plus $d$ and $\tau$. The baselines are nuisance parameters, each identified by its own trial's control arm and never pooled; the frequentist model removes them by taking a difference within each trial. The $\delta_i$ are not free either: the between-trial distribution holds them together, which is what makes $d$ and $\tau$ estimable and what stops each $\delta_i$ from simply reproducing that trial's own log OR.
+
+Two things follow, and both show up in the results below.
+
+::: {.callout-note collapse="true"}
+# With τ held fixed, the two approaches give the same answer
+
+Take the Normal approximation of the earlier sections, $y_i \mid \theta_i \sim N(\theta_i, v_i)$ and $\theta_i \sim N(\mu, \tau^2)$, so that marginally $y_i \sim N(\mu, v_i + \tau^2)$. Hold $\tau^2$ fixed and put a flat prior on $\mu$, $p(\mu) \propto 1$. The posterior is then proportional to the likelihood:
+
+$$p(\mu \mid y) \;\propto\; \prod_{i=1}^{k} \exp\left(-\frac{(y_i - \mu)^2}{2(v_i + \tau^2)}\right) = \exp\left(-\frac{1}{2}\sum_{i=1}^{k} w_i^* (y_i - \mu)^2\right)$$ {#eq-post-mu}
+
+with $w_i^* = 1/(v_i + \tau^2)$ as before. Expanding the sum in ([-@eq-post-mu]) and completing the square in $\mu$ gives a Normal posterior:
+
+$$\mu \mid y \;\sim\; N\left( \frac{\sum w_i^* y_i}{\sum w_i^*}, \; \frac{1}{\sum w_i^*} \right)$$ {#eq-post-normal}
+
+The posterior mean in ([-@eq-post-normal]) is exactly the random-effects estimate $\hat\mu_{RE}$, and the posterior variance is exactly $\text{Var}(\hat\mu_{RE})$. So the DerSimonian–Laird interval is the credible interval of this Bayesian model under a flat prior with $\tau$ fixed at $\hat\tau$.
+
+The Bayesian model in this guide differs from that special case in two ways: it gives $\tau$ a prior and integrates over it rather than fixing it, and it uses the Binomial counts rather than the Normal approximation. The first difference is what widens the interval in the results below.
+:::
+
+::: {.callout-note collapse="true"}
+# Shrinkage: each trial's own effect is revised
+
+The posterior also reports each $\delta_i$, which the frequentist model never estimates. Using the same Normal approximation, with $\mu$ and $\tau^2$ treated as known, the posterior for one trial's true effect combines two sources: its own result $y_i$, with precision $1/v_i$, and the distribution the trials come from, with precision $1/\tau^2$. Weighting each by its precision,
+
+$$E(\theta_i \mid y_i) = B_i \, y_i + (1 - B_i)\, \mu, \qquad B_i = \frac{\tau^2}{\tau^2 + v_i}$$ {#eq-shrink}
+
+Each trial's estimate is pulled from its own result towards the average of the trials. How far it is pulled depends on the comparison in $B_i$:
+
+- A **small trial** has a large $v_i$, so $B_i$ is small and its result is pulled a long way towards $\mu$. An extreme result from a small trial is largely discounted.
+- A **large trial** has a small $v_i$, so $B_i$ is close to 1 and its result stands nearly as observed.
+- If $\tau^2 \to 0$, every $B_i \to 0$ and all trials collapse onto $\mu$, which is the fixed-effect model.
+- If $\tau^2$ is large, $B_i \to 1$ and the trials are left alone, as if each were analysed separately.
+
+In an NMA this is the mechanism behind a question EAGs often ask: how much of the estimate for a treatment supported by one small trial comes from that trial, and how much is borrowed from the rest of the network.
+:::
 
 ## The Minimal Mock Case: Five Trials of B vs A
 
@@ -391,7 +460,7 @@ cat(readLines("pairwise_re.stan"), sep = "\n")
 
 Three choices in the model are worth stating:
 
-- **Priors**: $N(0, 10^2)$ for the baselines $\mu_i$ and the pooled log OR $d$, which is vague on the log-odds scale; half-Normal$(0, 1)$ for $\tau$, which keeps implausibly large heterogeneity unlikely without ruling it out.
+- **Priors**: $N(0, 10^2)$ for the baselines $\mu_i$ and the pooled log OR $d$, which is vague on the log-odds scale; half-Normal$(0, 1)$ for $\tau$, which keeps implausibly large heterogeneity unlikely without ruling it out. NICE DSU TSD 2 uses wider conventions, $N(0, 100^2)$ for $\mu_i$ and $d$ and $\sigma \sim \text{Uniform}(0, 2)$ for the between-trial standard deviation; the tighter priors here are chosen to sample stably with only five trials, and a submission would report a sensitivity analysis over both.
 - **Non-centred parameterisation**: $\delta_i = d + \tau z_i$ with $z_i \sim N(0, 1)$. It describes the same model as $\delta_i \sim N(d, \tau^2)$, but samples far more reliably when $\tau$ is poorly identified, as it is with five trials.
 - **Prediction**: `OR_new` draws a log OR for a new study from $N(d, \tau^2)$ at every iteration, giving the Bayesian counterpart of the prediction interval.
 
@@ -452,14 +521,14 @@ Three readings of this table matter for an HTA submission.
 
 **Confidence vs prediction interval.** The random-effects 95% CI (`r sprintf("%.2f to %.2f", exp(lor_re - 1.96 * se_re), exp(lor_re + 1.96 * se_re))`) describes the average effect across settings like these trials. The prediction interval (`r sprintf("%.2f to %.2f", pi_lo, pi_hi)`) describes the effect to expect in one new setting, and its lower end sits at `r fmt(pi_lo)`. B helps on average; whether it helps in a particular new population is far less certain. A cost-effectiveness model that uses only the pooled estimate carries the first statement, not the second.
 
-**Frequentist vs Bayesian random effects.** The Bayesian 95% interval for the pooled OR (`r sprintf("%.2f to %.2f", b_or[2], b_or[3])`) is wider than the DerSimonian–Laird CI. DerSimonian–Laird plugs in one value of $\tau$ (`r fmt(sqrt(tau2))`) as if it were known; the Bayesian model carries the uncertainty about $\tau$ itself, whose 95% interval runs from `r fmt(b_tau[2])` to `r fmt(b_tau[3])`. With five trials, that uncertainty is large, and ignoring it overstates precision.
+**Frequentist vs Bayesian random effects.** The Bayesian 95% interval for the pooled OR (`r sprintf("%.2f to %.2f", b_or[2], b_or[3])`) is wider than the DerSimonian–Laird CI. The two are not different models: as @sec-bayes shows, holding $\tau$ fixed and using a flat prior reproduces the DerSimonian–Laird estimate and interval exactly. The difference is that DerSimonian–Laird plugs in one value of $\tau$ (`r fmt(sqrt(tau2))`) as if it were known, while the Bayesian model carries the uncertainty about $\tau$ itself, whose 95% interval runs from `r fmt(b_tau[2])` to `r fmt(b_tau[3])`. With five trials, that uncertainty is large, and ignoring it overstates precision.
 
 ## HTA Audit Points & Interview Q&A {#audit}
 
 ::: {.callout-important collapse="true"}
 # Should I choose fixed or random effects based on I²?
 
-No. The choice should rest first on whether the trials plausibly estimate one common effect: similar populations, doses, comparators and outcome definitions. I² is a supporting signal, not a switch. A low I² with few trials is weak evidence of homogeneity, because Q has little power to detect heterogeneity when $k$ is small. NICE DSU TSD 2 compares fixed- and random-effects models on fit (residual deviance and DIC) alongside this clinical reasoning.
+No. I² is a supporting signal, not a switch, and a low I² with few trials is weak evidence of homogeneity, because $Q$ has little power to detect heterogeneity when $k$ is small. The judgement starts from whether the trials plausibly estimate one common effect; see @nte-choose for the full order.
 :::
 
 ::: {.callout-important collapse="true"}

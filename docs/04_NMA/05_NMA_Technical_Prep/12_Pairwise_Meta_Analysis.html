@@ -2,22 +2,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Xiaoge Zhang, PhD">
-<meta name="dcterms.date" content="2026-09-17">
+<meta name="dcterms.date" content="2026-09-18">
 
 <title>Pairwise Meta-Analysis: The Foundation of NMA – HEOR Technical Portfolio</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -75,10 +78,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-8c38fd85d21bfe44b50360969156fb14.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-6191c8c4c757b97205a8995aa6c30869.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -108,7 +111,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -319,8 +322,8 @@ window.Quarto = {
   <li><a href="#fixed-effect-inverse-variance-weighting" id="toc-fixed-effect-inverse-variance-weighting" class="nav-link" data-scroll-target="#fixed-effect-inverse-variance-weighting"><span class="header-section-number">2.2</span> Fixed Effect: Inverse-Variance Weighting</a></li>
   <li><a href="#random-effects-when-trials-estimate-different-effects" id="toc-random-effects-when-trials-estimate-different-effects" class="nav-link" data-scroll-target="#random-effects-when-trials-estimate-different-effects"><span class="header-section-number">2.3</span> Random Effects: When Trials Estimate Different Effects</a></li>
   <li><a href="#measuring-heterogeneity-q-τ²-and-i²" id="toc-measuring-heterogeneity-q-τ²-and-i²" class="nav-link" data-scroll-target="#measuring-heterogeneity-q-τ²-and-i²"><span class="header-section-number">2.4</span> Measuring Heterogeneity: Q, τ² and I²</a></li>
-  <li><a href="#the-prediction-interval" id="toc-the-prediction-interval" class="nav-link" data-scroll-target="#the-prediction-interval"><span class="header-section-number">2.5</span> The Prediction Interval</a></li>
-  <li><a href="#the-bayesian-version-an-nma-with-one-comparison" id="toc-the-bayesian-version-an-nma-with-one-comparison" class="nav-link" data-scroll-target="#the-bayesian-version-an-nma-with-one-comparison"><span class="header-section-number">2.6</span> The Bayesian Version: An NMA With One Comparison</a></li>
+  <li><a href="#sec-pi" id="toc-sec-pi" class="nav-link" data-scroll-target="#sec-pi"><span class="header-section-number">2.5</span> The Prediction Interval</a></li>
+  <li><a href="#sec-bayes" id="toc-sec-bayes" class="nav-link" data-scroll-target="#sec-bayes"><span class="header-section-number">2.6</span> The Bayesian Version: The Same Model, Estimated Differently</a></li>
   </ul></li>
   <li><a href="#the-minimal-mock-case-five-trials-of-b-vs-a" id="toc-the-minimal-mock-case-five-trials-of-b-vs-a" class="nav-link" data-scroll-target="#the-minimal-mock-case-five-trials-of-b-vs-a"><span class="header-section-number">3</span> The Minimal Mock Case: Five Trials of B vs A</a></li>
   <li><a href="#implementation-from-scratch-metafor-and-stan" id="toc-implementation-from-scratch-metafor-and-stan" class="nav-link" data-scroll-target="#implementation-from-scratch-metafor-and-stan"><span class="header-section-number">4</span> Implementation: From Scratch, <code>metafor</code> and Stan</a>
@@ -357,7 +360,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 17, 2026</p>
+      <p class="date">September 18, 2026</p>
     </div>
   </div>
   
@@ -405,6 +408,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
+<p>Index the trials by <span class="math inline">\(i = 1, \dots, k\)</span> (in the mock case below, <span class="math inline">\(k = 5\)</span>). In trial <span class="math inline">\(i\)</span>, arm B enrols <span class="math inline">\(n_B\)</span> patients and arm A enrols <span class="math inline">\(n_A\)</span>. The responder counts are random variables, <span class="math inline">\(a \sim \text{Binomial}(n_B, p_B)\)</span> and <span class="math inline">\(c \sim \text{Binomial}(n_A, p_A)\)</span>, where <span class="math inline">\(p_B\)</span> and <span class="math inline">\(p_A\)</span> are the true response rates; the non-responders are <span class="math inline">\(b = n_B - a\)</span> and <span class="math inline">\(d = n_A - c\)</span>. The subscript <span class="math inline">\(i\)</span> is dropped from these quantities to keep the formulas readable.</p>
 <p>The odds ratio and its logarithm are</p>
 <p><span class="math display">\[OR_i = \frac{a / b}{c / d} = \frac{ad}{bc}, \qquad y_i = \ln OR_i\]</span></p>
 <p>Meta-analysis works on the log scale because the OR is bounded below by 0 and asymmetric around 1, whereas <span class="math inline">\(\ln OR\)</span> is symmetric around 0 and close to Normal in reasonably sized trials.</p>
@@ -423,7 +427,7 @@ window.Quarto = {
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p><strong>Step 1: the response rate in one arm.</strong> Take arm B, with <span class="math inline">\(n\)</span> patients and true response rate <span class="math inline">\(p\)</span>. The number of responders is <span class="math inline">\(a \sim \text{Binomial}(n, p)\)</span>, so the observed rate <span class="math inline">\(\hat p = a / n\)</span> has variance</p>
+<p><strong>Step 1: the response rate in one arm.</strong> Take arm B, and write <span class="math inline">\(n = n_B\)</span> and <span class="math inline">\(p = p_B\)</span> for short. Since <span class="math inline">\(a \sim \text{Binomial}(n, p)\)</span>, the observed rate <span class="math inline">\(\hat p = a / n\)</span> has variance</p>
 <p><span id="eq-var-p"><span class="math display">\[\text{Var}(\hat p) = \frac{p(1-p)}{n} \tag{1}\]</span></span></p>
 <p><strong>Step 2: from the rate to the log odds.</strong> The log OR is built not from <span class="math inline">\(\hat p\)</span> but from its log odds, <span class="math inline">\(g(\hat p) = \ln\frac{\hat p}{1 - \hat p} = \ln\frac{a}{b}\)</span>. The <strong>delta method</strong> handles this change of scale. Near <span class="math inline">\(p\)</span>, the curve <span class="math inline">\(g\)</span> is close to its tangent line:</p>
 <p><span id="eq-taylor"><span class="math display">\[g(\hat p) \approx g(p) + g'(p)\,(\hat p - p) \tag{2}\]</span></span></p>
@@ -451,7 +455,8 @@ window.Quarto = {
 <h3 data-number="2.2" class="anchored" data-anchor-id="fixed-effect-inverse-variance-weighting"><span class="header-section-number">2.2</span> Fixed Effect: Inverse-Variance Weighting</h3>
 <p>The <strong>fixed-effect</strong> model assumes every trial estimates one common effect <span class="math inline">\(\theta\)</span>, and differs from it only through sampling error:</p>
 <p><span class="math display">\[y_i \sim N(\theta, v_i), \qquad i = 1, \dots, k\]</span></p>
-<p>treating each <span class="math inline">\(v_i\)</span> as known. The log-likelihood is</p>
+<p>treating each <span class="math inline">\(v_i\)</span> as known. Strictly, the variance of <span class="math inline">\(y_i\)</span> depends on the true response rates <span class="math inline">\(p_B\)</span> and <span class="math inline">\(p_A\)</span>, which are unknown; <span class="math inline">\(v_i\)</span> replaces them with the observed rates, so it is an estimate. Treating it as a known constant is an approximation that works well with large counts, but with few events it makes both the weights and the pooled estimate unreliable, because <span class="math inline">\(y_i\)</span> and <span class="math inline">\(v_i\)</span> are computed from the same counts.</p>
+<p>The log-likelihood is</p>
 <p><span class="math display">\[\ell(\theta) = -\frac{1}{2} \sum_{i=1}^{k} \frac{(y_i - \theta)^2}{v_i} + \text{const}\]</span></p>
 <p>Setting its derivative to zero gives the maximum likelihood estimate:</p>
 <p><span class="math display">\[\sum_{i=1}^{k} \frac{y_i - \theta}{v_i} = 0 \quad \Rightarrow \quad \hat\theta_{FE} = \frac{\sum w_i y_i}{\sum w_i}, \qquad w_i = \frac{1}{v_i}\]</span></p>
@@ -463,7 +468,8 @@ window.Quarto = {
 <h3 data-number="2.3" class="anchored" data-anchor-id="random-effects-when-trials-estimate-different-effects"><span class="header-section-number">2.3</span> Random Effects: When Trials Estimate Different Effects</h3>
 <p>Trials differ in populations, doses and settings, so the true effect may differ between them. The <strong>random-effects</strong> model lets each trial have its own true effect <span class="math inline">\(\theta_i\)</span>, drawn from a common distribution:</p>
 <p><span class="math display">\[y_i \sim N(\theta_i, v_i), \qquad \theta_i \sim N(\mu, \tau^2)\]</span></p>
-<p>Here <span class="math inline">\(\mu\)</span> is the average effect across settings and <span class="math inline">\(\tau^2\)</span> the between-study variance. Integrating out <span class="math inline">\(\theta_i\)</span> gives</p>
+<p>Here <span class="math inline">\(\mu\)</span> is the average effect across settings and <span class="math inline">\(\tau^2\)</span> the between-study variance. <span class="math inline">\(v_i\)</span> is the within-trial variance computed from <span class="math inline">\(a, b, c, d\)</span>: it describes how <span class="math inline">\(y_i\)</span> varies around trial <span class="math inline">\(i\)</span>’s own true effect <span class="math inline">\(\theta_i\)</span>. A single trial has only one <span class="math inline">\(\theta_i\)</span>, so it cannot show how true effects differ between trials; <span class="math inline">\(\tau^2\)</span> is estimated from how much the trials scatter beyond what their own <span class="math inline">\(v_i\)</span> can explain, as described in <a href="#sec-tau2" class="quarto-xref">Section&nbsp;2.4.2</a>.</p>
+<p>Integrating out <span class="math inline">\(\theta_i\)</span> gives</p>
 <p><span class="math display">\[y_i \sim N(\mu, \; v_i + \tau^2)\]</span></p>
 <p>which is the fixed-effect model with every variance increased by <span class="math inline">\(\tau^2\)</span>. The same algebra therefore applies, with weights <span class="math inline">\(w_i^* = 1 / (v_i + \tau^2)\)</span>:</p>
 <p><span class="math display">\[\hat\mu_{RE} = \frac{\sum w_i^* y_i}{\sum w_i^*}, \qquad \text{Var}(\hat\mu_{RE}) = \frac{1}{\sum w_i^*}\]</span></p>
@@ -503,6 +509,29 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
+<div id="nte-choose" class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note&nbsp;1: Choosing between the two models
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In order of what should carry the most weight:</p>
+<ol type="1">
+<li><strong>Clinical judgement, first.</strong> Do the trials plausibly estimate one common effect: similar populations, doses, comparators, outcome definitions and follow-up? If they clearly do not, the fixed-effect assumption is hard to defend and the random-effects model is the honest default. A fixed-effect analysis then needs a positive argument, not just a favourable statistic.</li>
+<li><strong>The size of the heterogeneity, not its significance.</strong> Read <span class="math inline">\(\tau\)</span> and the prediction interval (<a href="#sec-pi" class="quarto-xref">Section&nbsp;2.5</a>), and ask whether the spread they describe is large enough to change a decision. A statistically significant <span class="math inline">\(Q\)</span> with a prediction interval that stays well away from no effect is a different situation from a non-significant <span class="math inline">\(Q\)</span> with a prediction interval that crosses it.</li>
+<li><strong>Model fit.</strong> Compare the two models on residual deviance and DIC: lower is better, and the DIC already penalises the extra parameter the random-effects model brings. NICE DSU TSD 2 recommends consulting both and sets no numerical threshold for how large a difference counts; the figure of 3 to 5 points often quoted is a rule of thumb from the wider DIC literature, not from TSD 2. When the two models are close, TSD 2’s advice elsewhere is to decide on the data-generating process and the interpretability of the results rather than on the statistic.</li>
+<li><strong>How many trials there are.</strong> With few trials <span class="math inline">\(\tau\)</span> is badly estimated, and a DerSimonian–Laird random-effects interval can be too narrow (<a href="#sec-tau2" class="quarto-xref">Section&nbsp;2.4.2</a>). The remedies are the Hartung–Knapp–Sidik–Jonkman adjustment, REML, or a Bayesian model with an informative prior on <span class="math inline">\(\tau\)</span>. Switching to a fixed-effect model is not a remedy: it assumes the problem away.</li>
+</ol>
+<p>Three things not to do: choose by whether <span class="math inline">\(Q\)</span> is significant, choose by an <span class="math inline">\(I^2\)</span> threshold alone, or choose the model that happens to give the narrower interval. NICE DSU TSD 2 sets out the fit-based comparison; the <a href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">Standard Bayesian NMA</a> guide lists the same judgement in a network setting.</p>
+</div>
+</div>
+</div>
 <section id="cochrans-q-more-scatter-than-chance" class="level4" data-number="2.4.1">
 <h4 data-number="2.4.1" class="anchored" data-anchor-id="cochrans-q-more-scatter-than-chance"><span class="header-section-number">2.4.1</span> Cochran’s Q: More Scatter Than Chance?</h4>
 <p><span class="math inline">\(Q\)</span> adds up how far each trial sits from the fixed-effect estimate:</p>
@@ -517,8 +546,8 @@ window.Quarto = {
 </ul>
 <p>Either way, <span class="math inline">\(Q\)</span> says whether heterogeneity is detectable, not how large it is.</p>
 </section>
-<section id="τ²-how-far-apart-are-the-true-effects" class="level4" data-number="2.4.2">
-<h4 data-number="2.4.2" class="anchored" data-anchor-id="τ²-how-far-apart-are-the-true-effects"><span class="header-section-number">2.4.2</span> τ²: How Far Apart Are the True Effects?</h4>
+<section id="sec-tau2" class="level4" data-number="2.4.2">
+<h4 data-number="2.4.2" class="anchored" data-anchor-id="sec-tau2"><span class="header-section-number">2.4.2</span> τ²: How Far Apart Are the True Effects?</h4>
 <p><span class="math inline">\(\tau^2\)</span> is the variance of the true log ORs across settings, and <span class="math inline">\(\tau\)</span> their standard deviation. It is the quantity with a direct clinical reading: under the random-effects model, about 95% of true effects lie within <span class="math inline">\(\mu \pm 1.96\,\tau\)</span> on the log scale. On the OR scale that is a multiplicative range. With <span class="math inline">\(\tau = 0.3\)</span>, for example, true ORs span a factor of <span class="math inline">\(e^{1.96 \times 0.3} \approx 1.8\)</span> either side of the average OR: an average OR of 2 would be consistent with true ORs from about 1.1 to 3.6 in different settings.</p>
 <p>The <strong>DerSimonian–Laird</strong> estimator obtains <span class="math inline">\(\tau^2\)</span> from <span class="math inline">\(Q\)</span>. Under the random-effects model, the expected value of <span class="math inline">\(Q\)</span> rises in a straight line with <span class="math inline">\(\tau^2\)</span>:</p>
 <p><span class="math display">\[E(Q) = (k - 1) + \tau^2 \left( \sum w_i - \frac{\sum w_i^2}{\sum w_i} \right)\]</span></p>
@@ -530,7 +559,7 @@ window.Quarto = {
 <li><strong>One number, treated as known.</strong> The random-effects weights and interval use <span class="math inline">\(\hat\tau^2\)</span> as if it were the true value. With few trials the estimate is very imprecise, and that imprecision is not carried into the pooled interval. Restricted maximum likelihood (REML) and Paule–Mandel are common alternative estimators; the Bayesian model in this guide instead gives <span class="math inline">\(\tau\)</span> a posterior distribution.</li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -539,7 +568,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Write <span class="math inline">\(W = \sum w_i\)</span> and <span class="math inline">\(\hat\theta = \sum w_i y_i / W\)</span>. Under the random-effects model, <span class="math inline">\(y_i = \mu + (\theta_i - \mu) + \varepsilon_i\)</span> with <span class="math inline">\(\text{Var}(y_i) = v_i + \tau^2\)</span>, and the trials are independent.</p>
 <p><strong>Step 1: split Q.</strong> Adding and subtracting <span class="math inline">\(\mu\)</span> inside the square, the cross term cancels because <span class="math inline">\(\sum w_i (y_i - \hat\theta) = 0\)</span>:</p>
@@ -590,7 +619,7 @@ window.Quarto = {
 <li><strong>I² does not tell you what to expect in a new setting.</strong> For that, <span class="math inline">\(\tau\)</span> and the prediction interval below are the relevant quantities.</li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -599,7 +628,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Write <span class="math inline">\(c = W - \sum w_i^2 / W\)</span>, the denominator of the DerSimonian–Laird estimator, so that <span class="math inline">\(\hat\tau^2 = (Q - (k - 1)) / c\)</span>. Higgins and Thompson (2002) define the typical within-trial variance as</p>
 <p><span class="math display">\[s^2 = \frac{(k - 1)\,W}{W^2 - \sum w_i^2} = \frac{k - 1}{c}\]</span></p>
@@ -611,18 +640,76 @@ window.Quarto = {
 </div>
 </section>
 </section>
-<section id="the-prediction-interval" class="level3" data-number="2.5">
-<h3 data-number="2.5" class="anchored" data-anchor-id="the-prediction-interval"><span class="header-section-number">2.5</span> The Prediction Interval</h3>
+<section id="sec-pi" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="sec-pi"><span class="header-section-number">2.5</span> The Prediction Interval</h3>
 <p>The confidence interval for <span class="math inline">\(\mu\)</span> describes uncertainty about the <strong>average</strong> effect. A decision about a new population needs the range of effects to expect in <strong>one new setting</strong>, which also includes the spread <span class="math inline">\(\tau^2\)</span>:</p>
 <p><span class="math display">\[\hat\mu_{RE} \pm 1.96 \sqrt{\hat\tau^2 + \text{Var}(\hat\mu_{RE})}\]</span></p>
 <p>With substantial heterogeneity, the prediction interval can include no effect even when the confidence interval does not.</p>
 </section>
-<section id="the-bayesian-version-an-nma-with-one-comparison" class="level3" data-number="2.6">
-<h3 data-number="2.6" class="anchored" data-anchor-id="the-bayesian-version-an-nma-with-one-comparison"><span class="header-section-number">2.6</span> The Bayesian Version: An NMA With One Comparison</h3>
-<p>The models above take each <span class="math inline">\(y_i\)</span> and <span class="math inline">\(v_i\)</span> as given, which relies on a Normal approximation. The Bayesian model used for NMA goes back to the counts, with a Binomial likelihood for each arm:</p>
+<section id="sec-bayes" class="level3" data-number="2.6">
+<h3 data-number="2.6" class="anchored" data-anchor-id="sec-bayes"><span class="header-section-number">2.6</span> The Bayesian Version: The Same Model, Estimated Differently</h3>
+<p>The models above reduce each trial to two numbers, <span class="math inline">\(y_i\)</span> and <span class="math inline">\(v_i\)</span>, and treat <span class="math inline">\(y_i\)</span> as Normal with known variance. The Bayesian model used for NMA skips that reduction and works directly with the number of responders and patients in each arm, through a Binomial likelihood:</p>
 <p><span class="math display">\[r_{iA} \sim \text{Binomial}(n_{iA}, p_{iA}), \qquad r_{iB} \sim \text{Binomial}(n_{iB}, p_{iB})\]</span></p>
 <p><span class="math display">\[\text{logit}(p_{iA}) = \mu_i, \qquad \text{logit}(p_{iB}) = \mu_i + \delta_i, \qquad \delta_i \sim N(d, \tau^2)\]</span></p>
-<p>This is the model of the <a href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">Standard Bayesian NMA</a> guide with a single comparison: <span class="math inline">\(\mu_i\)</span> is the study’s baseline log odds, <span class="math inline">\(\delta_i\)</span> its log OR and <span class="math inline">\(d\)</span> the pooled log OR. Two differences from the DerSimonian–Laird approach matter in practice: no Normal approximation is needed for each trial, and <span class="math inline">\(\tau\)</span> is estimated with its own uncertainty instead of being plugged in as a single number.</p>
+<p>This is the model of the <a href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">Standard Bayesian NMA</a> guide with a single comparison, and its unknowns are the ones already met above under different names: <span class="math inline">\(d\)</span> is the average effect (<span class="math inline">\(\mu\)</span> in the random-effects model), <span class="math inline">\(\delta_i\)</span> is trial <span class="math inline">\(i\)</span>’s own true effect (<span class="math inline">\(\theta_i\)</span>), and <span class="math inline">\(\tau\)</span> is the spread between trials. Only the baselines <span class="math inline">\(\mu_i\)</span> are new, because reducing each trial to <span class="math inline">\(y_i\)</span> had already removed them by taking a difference within the trial. Note that <span class="math inline">\(\mu_i\)</span> here is a baseline log odds, not the average effect <span class="math inline">\(\mu\)</span> of the random-effects model; the clash of letters is the convention used in the NMA literature.</p>
+<p>What changes is not the model but what is treated as unknown. The frequentist approach treats <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\tau\)</span> as fixed constants to be estimated, and <span class="math inline">\(\theta_i\)</span> as a random draw that is never itself reported. The Bayesian approach treats all of them as unknown quantities with a joint posterior distribution:</p>
+<p><span id="eq-post"><span class="math display">\[
+\begin{aligned}
+p(d, \tau, \delta, \mu \mid \text{counts}) \;\propto\;
+&amp; \prod_{i=1}^{k} P(r_{iA}, r_{iB} \mid \mu_i, \delta_i) &amp;&amp; \text{likelihood} \\[4pt]
+\times \; &amp; \prod_{i=1}^{k} N(\delta_i \mid d, \tau^2) &amp;&amp; \text{between-trial distribution} \\[4pt]
+\times \; &amp; \; p(d)\; p(\tau) \prod_{i=1}^{k} p(\mu_i) &amp;&amp; \text{priors}
+\end{aligned}
+\tag{10}\]</span></span></p>
+<p>There is nothing to solve in (<a href="#eq-post" class="quarto-xref">10</a>); MCMC maps it by sampling, exactly as in <a href="../../04_NMA/05_NMA_Technical_Prep/10_Bayesian_Estimation.html">The Core of Bayesian Estimation</a>.</p>
+<p>Counting the unknowns: with <span class="math inline">\(k\)</span> trials there are <span class="math inline">\(2k + 2\)</span> of them, a baseline and a true effect for each trial plus <span class="math inline">\(d\)</span> and <span class="math inline">\(\tau\)</span>. The baselines are nuisance parameters, each identified by its own trial’s control arm and never pooled; the frequentist model removes them by taking a difference within each trial. The <span class="math inline">\(\delta_i\)</span> are not free either: the between-trial distribution holds them together, which is what makes <span class="math inline">\(d\)</span> and <span class="math inline">\(\tau\)</span> estimable and what stops each <span class="math inline">\(\delta_i\)</span> from simply reproducing that trial’s own log OR.</p>
+<p>Two things follow, and both show up in the results below.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>With τ held fixed, the two approaches give the same answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Take the Normal approximation of the earlier sections, <span class="math inline">\(y_i \mid \theta_i \sim N(\theta_i, v_i)\)</span> and <span class="math inline">\(\theta_i \sim N(\mu, \tau^2)\)</span>, so that marginally <span class="math inline">\(y_i \sim N(\mu, v_i + \tau^2)\)</span>. Hold <span class="math inline">\(\tau^2\)</span> fixed and put a flat prior on <span class="math inline">\(\mu\)</span>, <span class="math inline">\(p(\mu) \propto 1\)</span>. The posterior is then proportional to the likelihood:</p>
+<p><span id="eq-post-mu"><span class="math display">\[p(\mu \mid y) \;\propto\; \prod_{i=1}^{k} \exp\left(-\frac{(y_i - \mu)^2}{2(v_i + \tau^2)}\right) = \exp\left(-\frac{1}{2}\sum_{i=1}^{k} w_i^* (y_i - \mu)^2\right) \tag{11}\]</span></span></p>
+<p>with <span class="math inline">\(w_i^* = 1/(v_i + \tau^2)\)</span> as before. Expanding the sum in (<a href="#eq-post-mu" class="quarto-xref">11</a>) and completing the square in <span class="math inline">\(\mu\)</span> gives a Normal posterior:</p>
+<p><span id="eq-post-normal"><span class="math display">\[\mu \mid y \;\sim\; N\left( \frac{\sum w_i^* y_i}{\sum w_i^*}, \; \frac{1}{\sum w_i^*} \right) \tag{12}\]</span></span></p>
+<p>The posterior mean in (<a href="#eq-post-normal" class="quarto-xref">12</a>) is exactly the random-effects estimate <span class="math inline">\(\hat\mu_{RE}\)</span>, and the posterior variance is exactly <span class="math inline">\(\text{Var}(\hat\mu_{RE})\)</span>. So the DerSimonian–Laird interval is the credible interval of this Bayesian model under a flat prior with <span class="math inline">\(\tau\)</span> fixed at <span class="math inline">\(\hat\tau\)</span>.</p>
+<p>The Bayesian model in this guide differs from that special case in two ways: it gives <span class="math inline">\(\tau\)</span> a prior and integrates over it rather than fixing it, and it uses the Binomial counts rather than the Normal approximation. The first difference is what widens the interval in the results below.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Shrinkage: each trial’s own effect is revised
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The posterior also reports each <span class="math inline">\(\delta_i\)</span>, which the frequentist model never estimates. Using the same Normal approximation, with <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\tau^2\)</span> treated as known, the posterior for one trial’s true effect combines two sources: its own result <span class="math inline">\(y_i\)</span>, with precision <span class="math inline">\(1/v_i\)</span>, and the distribution the trials come from, with precision <span class="math inline">\(1/\tau^2\)</span>. Weighting each by its precision,</p>
+<p><span id="eq-shrink"><span class="math display">\[E(\theta_i \mid y_i) = B_i \, y_i + (1 - B_i)\, \mu, \qquad B_i = \frac{\tau^2}{\tau^2 + v_i} \tag{13}\]</span></span></p>
+<p>Each trial’s estimate is pulled from its own result towards the average of the trials. How far it is pulled depends on the comparison in <span class="math inline">\(B_i\)</span>:</p>
+<ul>
+<li>A <strong>small trial</strong> has a large <span class="math inline">\(v_i\)</span>, so <span class="math inline">\(B_i\)</span> is small and its result is pulled a long way towards <span class="math inline">\(\mu\)</span>. An extreme result from a small trial is largely discounted.</li>
+<li>A <strong>large trial</strong> has a small <span class="math inline">\(v_i\)</span>, so <span class="math inline">\(B_i\)</span> is close to 1 and its result stands nearly as observed.</li>
+<li>If <span class="math inline">\(\tau^2 \to 0\)</span>, every <span class="math inline">\(B_i \to 0\)</span> and all trials collapse onto <span class="math inline">\(\mu\)</span>, which is the fixed-effect model.</li>
+<li>If <span class="math inline">\(\tau^2\)</span> is large, <span class="math inline">\(B_i \to 1\)</span> and the trials are left alone, as if each were analysed separately.</li>
+</ul>
+<p>In an NMA this is the mechanism behind a question EAGs often ask: how much of the estimate for a treatment supported by one small trial comes from that trial, and how much is borrowed from the rest of the network.</p>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="the-minimal-mock-case-five-trials-of-b-vs-a" class="level2" data-number="3">
@@ -972,7 +1059,7 @@ window.Quarto = {
 <section id="bayesian-random-effects-in-stan" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="bayesian-random-effects-in-stan"><span class="header-section-number">4.3</span> Bayesian Random Effects in Stan</h3>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -981,7 +1068,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -1025,7 +1112,7 @@ window.Quarto = {
 </div>
 <p>Three choices in the model are worth stating:</p>
 <ul>
-<li><strong>Priors</strong>: <span class="math inline">\(N(0, 10^2)\)</span> for the baselines <span class="math inline">\(\mu_i\)</span> and the pooled log OR <span class="math inline">\(d\)</span>, which is vague on the log-odds scale; half-Normal<span class="math inline">\((0, 1)\)</span> for <span class="math inline">\(\tau\)</span>, which keeps implausibly large heterogeneity unlikely without ruling it out.</li>
+<li><strong>Priors</strong>: <span class="math inline">\(N(0, 10^2)\)</span> for the baselines <span class="math inline">\(\mu_i\)</span> and the pooled log OR <span class="math inline">\(d\)</span>, which is vague on the log-odds scale; half-Normal<span class="math inline">\((0, 1)\)</span> for <span class="math inline">\(\tau\)</span>, which keeps implausibly large heterogeneity unlikely without ruling it out. NICE DSU TSD 2 uses wider conventions, <span class="math inline">\(N(0, 100^2)\)</span> for <span class="math inline">\(\mu_i\)</span> and <span class="math inline">\(d\)</span> and <span class="math inline">\(\sigma \sim \text{Uniform}(0, 2)\)</span> for the between-trial standard deviation; the tighter priors here are chosen to sample stably with only five trials, and a submission would report a sensitivity analysis over both.</li>
 <li><strong>Non-centred parameterisation</strong>: <span class="math inline">\(\delta_i = d + \tau z_i\)</span> with <span class="math inline">\(z_i \sim N(0, 1)\)</span>. It describes the same model as <span class="math inline">\(\delta_i \sim N(d, \tau^2)\)</span>, but samples far more reliably when <span class="math inline">\(\tau\)</span> is poorly identified, as it is with five trials.</li>
 <li><strong>Prediction</strong>: <code>OR_new</code> draws a log OR for a new study from <span class="math inline">\(N(d, \tau^2)\)</span> at every iteration, giving the Bayesian counterpart of the prediction interval.</li>
 </ul>
@@ -1186,12 +1273,12 @@ window.Quarto = {
 <p>Three readings of this table matter for an HTA submission.</p>
 <p><strong>Fixed vs random effects.</strong> The fixed-effect OR (1.92) sits closer to Study 3 than the random-effects OR (2.16), because the fixed-effect model gives the largest, least favourable trial 42% of the weight. Which is right is not a statistical question alone: if the trials plausibly differ in population or setting, the fixed-effect assumption of one common effect is hard to defend, and its narrower interval is not a real gain in precision.</p>
 <p><strong>Confidence vs prediction interval.</strong> The random-effects 95% CI (1.46 to 3.19) describes the average effect across settings like these trials. The prediction interval (1.00 to 4.64) describes the effect to expect in one new setting, and its lower end sits at 1.00. B helps on average; whether it helps in a particular new population is far less certain. A cost-effectiveness model that uses only the pooled estimate carries the first statement, not the second.</p>
-<p><strong>Frequentist vs Bayesian random effects.</strong> The Bayesian 95% interval for the pooled OR (1.33 to 3.80) is wider than the DerSimonian–Laird CI. DerSimonian–Laird plugs in one value of <span class="math inline">\(\tau\)</span> (0.34) as if it were known; the Bayesian model carries the uncertainty about <span class="math inline">\(\tau\)</span> itself, whose 95% interval runs from 0.06 to 1.12. With five trials, that uncertainty is large, and ignoring it overstates precision.</p>
+<p><strong>Frequentist vs Bayesian random effects.</strong> The Bayesian 95% interval for the pooled OR (1.33 to 3.80) is wider than the DerSimonian–Laird CI. The two are not different models: as <a href="#sec-bayes" class="quarto-xref">Section&nbsp;2.6</a> shows, holding <span class="math inline">\(\tau\)</span> fixed and using a flat prior reproduces the DerSimonian–Laird estimate and interval exactly. The difference is that DerSimonian–Laird plugs in one value of <span class="math inline">\(\tau\)</span> (0.34) as if it were known, while the Bayesian model carries the uncertainty about <span class="math inline">\(\tau\)</span> itself, whose 95% interval runs from 0.06 to 1.12. With five trials, that uncertainty is large, and ignoring it overstates precision.</p>
 </section>
 <section id="audit" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="audit"><span class="header-section-number">6</span> HTA Audit Points &amp; Interview Q&amp;A</h2>
 <div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1200,14 +1287,14 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>No.&nbsp;The choice should rest first on whether the trials plausibly estimate one common effect: similar populations, doses, comparators and outcome definitions. I² is a supporting signal, not a switch. A low I² with few trials is weak evidence of homogeneity, because Q has little power to detect heterogeneity when <span class="math inline">\(k\)</span> is small. NICE DSU TSD 2 compares fixed- and random-effects models on fit (residual deviance and DIC) alongside this clinical reasoning.</p>
+<p>No.&nbsp;I² is a supporting signal, not a switch, and a low I² with few trials is weak evidence of homogeneity, because <span class="math inline">\(Q\)</span> has little power to detect heterogeneity when <span class="math inline">\(k\)</span> is small. The judgement starts from whether the trials plausibly estimate one common effect; see <a href="#nte-choose" class="quarto-xref">Note&nbsp;1</a> for the full order.</p>
 </div>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1216,14 +1303,14 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>That around 60% of the scatter between trials is real rather than chance, not how far apart the true effects are: that depends on trial size as well, and <span class="math inline">\(\tau\)</span> or the prediction interval is the measure to use. See <a href="#sec-i2" class="quarto-xref">Section&nbsp;2.4.3</a>.</p>
 </div>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1232,14 +1319,14 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>It estimates <span class="math inline">\(\tau^2\)</span> from one moment equation and then treats the estimate as fixed, so the confidence interval ignores the uncertainty in <span class="math inline">\(\tau^2\)</span>. With few trials that uncertainty is large, and the interval is too narrow. Common remedies are the Hartung–Knapp–Sidik–Jonkman adjustment, which rescales the variance and uses a <span class="math inline">\(t\)</span> distribution, usually widening the interval, restricted maximum likelihood for <span class="math inline">\(\tau^2\)</span>, or a Bayesian model that carries the uncertainty in <span class="math inline">\(\tau\)</span> through, as above.</p>
 </div>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1248,7 +1335,7 @@ window.Quarto = {
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>A pairwise meta-analysis is enough when the decision problem is one comparison and there are head-to-head trials of it. Once the decision involves several treatments, or the comparator of interest has never been tested directly against the new treatment, the evidence has to be connected through common comparators, which is what an <a href="../../04_NMA/05_NMA_Technical_Prep/01_Standard_Bayesian_NMA_Guide.html">NMA</a> does.</p>
 </div>
